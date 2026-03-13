@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Competency Explorer | AI Badge</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23000036'/><stop offset='100%25' stop-color='%2302066F'/></linearGradient></defs><polygon points='50,3 93,28 93,72 50,97 7,72 7,28' fill='url(%23g)' rx='6'/><text x='50' y='58' text-anchor='middle' font-family='Inter,sans-serif' font-size='36' font-weight='700' fill='%23D4AF37'>AI</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+
+  /* Deep blue system */
+  --blue-deep: #000036;
+  --blue-royal: #02066F;
+  --blue-electric: #050c91;
+  --blue-accent: #0066ff;
+  --blue-light: #4080ff;
+
+  /* Gold accents */
+  --gold: #D4AF37;
+  --gold-rich: #B8860B;
+  --gold-light: #F5E7A0;
+  --gold-glow: rgba(212,175,55,0.4);
+  --gold-subtle: rgba(212,175,55,0.08);
+  --gold-border: rgba(212,175,55,0.2);
+}
+
+/* ===== DARK MODE (default) ===== */
+[data-theme="dark"] {
+  --bg-page: #000036;
+  --bg-gradient: linear-gradient(135deg, #000036 0%, #02066F 50%, #050c91 100%);
+  --bg-card: rgba(10, 14, 50, 0.7);
+  --bg-card-solid: #0a0e32;
+  --bg-card-hover: rgba(15, 20, 60, 0.85);
+  --bg-inset: rgba(255,255,255,0.03);
+  --card-border: rgba(212,175,55,0.12);
+  --card-border-hover: rgba(212,175,55,0.25);
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.3);
+  --card-blur: saturate(180%) blur(24px);
+  --label-primary: #F5F5F7;
+  --label-secondary: rgba(235,235,245,0.6);
+  --label-tertiary: rgba(235,235,245,0.3);
+  --label-quaternary: rgba(235,235,245,0.14);
+  --accent: #D4AF37;
+  --accent-subtle: rgba(212,175,55,0.1);
+  --green: #30D158;
+  --orange: #FF9F0A;
+  --red: #FF453A;
+  --teal: #64D2FF;
+  --indigo: #5E5CE6;
+  --purple: #BF5AF2;
+  --fill: rgba(120,120,128,0.24);
+  --fill-secondary: rgba(120,120,128,0.18);
+  --separator: rgba(212,175,55,0.08);
+  --range-track: rgba(255,255,255,0.08);
+  --gauge-bg: rgba(255,255,255,0.06);
+  --dim-overlay-bg: rgba(0,0,0,0.6);
+  --sheet-bg: rgba(10,14,50,0.92);
+  --thumb-shadow: 0 0.5px 1px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(212,175,55,0.2);
+  --thumb-shadow-hover: 0 1px 2px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(212,175,55,0.3);
+  --scrollbar-thumb: rgba(212,175,55,0.15);
+}
+
+/* ===== LIGHT MODE ===== */
+[data-theme="light"] {
+  --bg-page: #F0F0F5;
+  --bg-gradient: linear-gradient(135deg, #E8ECF5 0%, #F0F0F5 50%, #F5F5FA 100%);
+  --bg-card: rgba(255,255,255,0.82);
+  --bg-card-solid: #FFFFFF;
+  --bg-card-hover: rgba(255,255,255,0.92);
+  --bg-inset: rgba(0,0,54,0.03);
+  --card-border: rgba(0,0,54,0.08);
+  --card-border-hover: rgba(0,0,54,0.15);
+  --card-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
+  --card-blur: saturate(180%) blur(20px);
+  --label-primary: #0a0e32;
+  --label-secondary: rgba(10,14,50,0.6);
+  --label-tertiary: rgba(10,14,50,0.35);
+  --label-quaternary: rgba(10,14,50,0.18);
+  --accent: #B8860B;
+  --accent-subtle: rgba(184,134,11,0.08);
+  --green: #34C759;
+  --orange: #FF9500;
+  --red: #FF3B30;
+  --teal: #5AC8FA;
+  --indigo: #5856D6;
+  --purple: #AF52DE;
+  --fill: rgba(120,120,128,0.12);
+  --fill-secondary: rgba(120,120,128,0.08);
+  --separator: rgba(0,0,54,0.06);
+  --range-track: rgba(0,0,54,0.08);
+  --gauge-bg: rgba(0,0,54,0.05);
+  --dim-overlay-bg: rgba(0,0,0,0.3);
+  --sheet-bg: rgba(255,255,255,0.92);
+  --thumb-shadow: 0 0.5px 1px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.16), 0 0 0 0.5px rgba(0,0,0,0.04);
+  --thumb-shadow-hover: 0 1px 2px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.2), 0 0 0 0.5px rgba(0,0,0,0.05);
+  --scrollbar-thumb: rgba(0,0,54,0.1);
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--label-primary);
+  background: var(--bg-page);
+  line-height: 1.47;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Ambient gradient background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.4s ease;
+}
+[data-theme="dark"] body::before {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(212,175,55,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(0,102,255,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(2,6,111,0.15) 0%, transparent 60%),
+    var(--bg-gradient);
+}
+[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,0,54,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(184,134,11,0.05) 0%, transparent 50%),
+    var(--bg-gradient);
+}
+
+/* ===== NAVIGATION BAR ===== */
+.nav-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 0.5px solid rgba(212,175,55,0.15);
+  will-change: transform;
+  transition: background 0.4s ease;
+}
+[data-theme="dark"] .nav-bar {
+  background: linear-gradient(135deg, rgba(0,0,54,0.95) 0%, rgba(2,6,111,0.95) 100%);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+[data-theme="light"] .nav-bar {
+  background: linear-gradient(135deg, rgba(10,14,50,0.95) 0%, rgba(2,6,111,0.95) 100%);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: #D4AF37;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nav-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.nav-link:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+/* Theme toggle */
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(212,175,55,0.2);
+  background: rgba(212,175,55,0.08);
+  color: #D4AF37;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0; line-height: 1;
+}
+.theme-toggle:hover { background: rgba(212,175,55,0.15); border-color: rgba(212,175,55,0.35); }
+
+/* ===== AUTH BANNER ===== */
+.auth-banner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--label-primary);
+  border-bottom: 1px solid var(--separator);
+  display: none;
+}
+[data-theme="dark"] .auth-banner { background: rgba(212,175,55,0.06); }
+[data-theme="light"] .auth-banner { background: rgba(184,134,11,0.06); }
+.auth-banner a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.auth-banner a:hover { text-decoration: underline; }
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  padding: 28px 24px 8px;
+  max-width: 1440px;
+  margin: 0 auto;
+  text-align: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.hero.collapsed { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+.hero h2 {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--label-primary);
+}
+[data-theme="dark"] .hero h2 {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E7A0 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero p {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--label-secondary);
+  margin-top: 4px;
+}
+
+/* ===== LAYOUT GRID ===== */
+.layout {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 8px 24px 40px;
+  display: grid;
+  grid-template-columns: 320px 1fr 380px;
+  grid-template-rows: auto auto;
+  gap: 16px;
+  align-items: start;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: var(--card-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  border-radius: 20px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  padding: 24px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+}
+.card:hover { border-color: var(--card-border-hover); }
+
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+/* ===== SLIDERS ===== */
+.sliders-panel { grid-column: 1; grid-row: 1 / 3; }
+
+.slider-group { margin-bottom: 18px; }
+.slider-group:last-of-type { margin-bottom: 0; }
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.slider-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--label-primary);
+  letter-spacing: -0.01em;
+}
+.slider-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  transition: background 0.35s ease, transform 0.15s ease;
+  font-variant-numeric: tabular-nums;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--range-track);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #D4AF37;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: var(--thumb-shadow), 0 0 12px rgba(212,175,55,0.3);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: var(--thumb-shadow-hover), 0 0 18px rgba(212,175,55,0.4);
+}
+input[type=range]::-webkit-slider-thumb:active { transform: scale(1.12); }
+input[type=range]::-moz-range-thumb {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #D4AF37; border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: var(--thumb-shadow), 0 0 12px rgba(212,175,55,0.3);
+  cursor: pointer;
+}
+
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0; flex-shrink: 0;
+  font-family: var(--font-body);
+}
+.info-btn:hover { background: var(--accent); color: #000036; }
+
+/* ===== RADAR ===== */
+.radar-panel {
+  grid-column: 2; grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 480px;
+  padding: 12px;
+}
+canvas#radar { max-width: 100%; max-height: 520px; }
+
+/* ===== PRESETS ===== */
+.presets-panel { grid-column: 2; grid-row: 2; }
+.presets-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.preset-chip {
+  flex: 1 1 auto;
+  min-width: 96px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  backdrop-filter: var(--card-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--label-primary);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.preset-chip:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(212,175,55,0.3);
+}
+.preset-chip.active {
+  background: #D4AF37;
+  border-color: #D4AF37;
+  color: #000036;
+  box-shadow: 0 2px 16px rgba(212,175,55,0.35), 0 0 0 1px rgba(212,175,55,0.2);
+}
+
+.compare-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--separator);
+}
+.btn-secondary {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--bg-card);
+  backdrop-filter: var(--card-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-secondary:hover { background: var(--bg-card-hover); border-color: var(--card-border-hover); }
+.btn-secondary.active { background: #D4AF37; border-color: #D4AF37; color: #000036; }
+.btn-secondary.danger:hover { background: rgba(255,59,48,0.1); color: var(--red); border-color: rgba(255,59,48,0.3); }
+
+/* ===== SUMMARY ===== */
+.summary-panel {
+  grid-column: 3; grid-row: 1 / 3;
+  overflow-y: auto; max-height: calc(100vh - 130px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.summary-panel::-webkit-scrollbar { width: 6px; }
+.summary-panel::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+
+/* Score ring */
+.score-ring-container {
+  text-align: center;
+  padding: 20px 0 16px;
+}
+.score-ring-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 200px; height: 200px;
+}
+.score-ring-wrapper svg { transform: rotate(-90deg); }
+.score-ring-wrapper .score-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.score-number {
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-body);
+}
+.score-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--label-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+.tier-name {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 16px;
+}
+.tier-desc {
+  font-size: 14px;
+  color: var(--label-secondary);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Archetype */
+.archetype-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-inset);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 20px 0;
+  border: 1px solid var(--separator);
+}
+.archetype-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: var(--bg-card-solid);
+  border: 1px solid var(--card-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.archetype-label {
+  font-size: 11px; font-weight: 600;
+  color: var(--label-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.archetype-name { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.archetype-desc { font-size: 13px; color: var(--label-secondary); margin-top: 1px; }
+
+/* Flags */
+.flag-card {
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid transparent;
+}
+.flag-card.warning { background: rgba(255,159,10,0.08); border-color: rgba(255,159,10,0.18); }
+.flag-card.caution { background: rgba(255,214,10,0.06); border-color: rgba(255,214,10,0.12); }
+.flag-card.info { background: rgba(10,132,255,0.08); border-color: rgba(10,132,255,0.15); }
+[data-theme="light"] .flag-card.warning { background: rgba(255,149,0,0.08); border-color: rgba(255,149,0,0.15); }
+[data-theme="light"] .flag-card.caution { background: rgba(255,204,0,0.08); border-color: rgba(255,204,0,0.12); }
+[data-theme="light"] .flag-card.info { background: rgba(0,122,255,0.08); border-color: rgba(0,122,255,0.12); }
+.flag-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* Sections */
+.section-label {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin: 24px 0 12px;
+}
+
+/* Framework Gauges */
+.fw-gauge { margin-bottom: 16px; }
+.fw-gauge:last-child { margin-bottom: 0; }
+.fw-gauge-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 6px;
+}
+.fw-gauge-name { font-size: 13px; font-weight: 600; color: var(--label-primary); }
+.fw-gauge-level { font-size: 13px; font-weight: 700; transition: color 0.3s; }
+.fw-gauge-bar {
+  display: flex; height: 6px; border-radius: 99px;
+  overflow: hidden; background: var(--gauge-bg); gap: 1.5px;
+}
+.fw-seg { position: relative; overflow: hidden; border-radius: 1px; }
+.fw-seg:first-child { border-radius: 99px 1px 1px 99px; }
+.fw-seg:last-child { border-radius: 1px 99px 99px 1px; }
+.fw-seg:only-child { border-radius: 99px; }
+.fw-seg-fill {
+  position: absolute; top: 0; left: 0; height: 100%;
+  border-radius: inherit; transition: width 0.5s ease;
+}
+.fw-gauge-labels { display: flex; margin-top: 4px; gap: 1.5px; }
+.fw-seg-label {
+  font-size: 10px; font-weight: 500; color: var(--label-tertiary);
+  text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ===== DIMENSION SHEET OVERLAY ===== */
+.dim-overlay {
+  position: fixed; inset: 0;
+  background: var(--dim-overlay-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  z-index: 1000; opacity: 0; visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s;
+}
+.dim-overlay.open { opacity: 1; visibility: visible; }
+
+.page-content {
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+              border-radius 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  transform-origin: center top;
+}
+.page-content.sheet-open {
+  transform: scale(0.94) translateY(8px);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.dim-sheet {
+  position: fixed; top: 0; right: 0;
+  width: 460px; max-width: 96vw; height: 100vh;
+  background: var(--sheet-bg);
+  backdrop-filter: saturate(200%) blur(50px);
+  -webkit-backdrop-filter: saturate(200%) blur(50px);
+  z-index: 1001;
+  transform: translateX(100%);
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex; flex-direction: column; overflow: hidden;
+  border-left: 1px solid var(--card-border);
+  will-change: transform;
+}
+.dim-sheet.open { transform: translateX(0); }
+
+.dim-sheet-handle {
+  width: 36px; height: 5px;
+  border-radius: 99px;
+  background: var(--fill);
+  margin: 8px auto 0;
+  flex-shrink: 0;
+}
+.dim-sheet-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px 12px;
+}
+.dim-sheet-header h2 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+}
+.dim-close {
+  width: 30px; height: 30px;
+  border-radius: 50%; border: none;
+  background: var(--fill);
+  color: var(--label-secondary);
+  font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.dim-close:hover { background: rgba(120,120,128,0.3); }
+
+.dim-sheet-body { flex: 1; overflow-y: auto; padding: 8px 24px 24px; }
+
+.level-card {
+  background: var(--bg-inset);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  border: 1px solid var(--separator);
+  transition: all 0.2s ease;
+}
+.level-card:last-child { margin-bottom: 0; }
+.level-card.current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 2px 12px rgba(212,175,55,0.2);
+  background: var(--accent-subtle);
+}
+.level-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 8px;
+  background: var(--fill); color: var(--label-secondary);
+  font-size: 12px; font-weight: 700; margin-bottom: 6px;
+}
+.level-card.current .level-num { background: var(--accent); color: #000036; }
+.level-quote {
+  font-size: 14px; font-style: italic; font-weight: 500;
+  color: var(--label-primary); margin-bottom: 4px; line-height: 1.4;
+}
+.level-desc { font-size: 13px; color: var(--label-secondary); line-height: 1.45; }
+.level-tag {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--accent); background: var(--accent-subtle);
+  padding: 2px 8px; border-radius: 6px; margin-left: 8px; vertical-align: middle;
+}
+
+/* ===== LAYER 2: EMAIL GATE + CALIBRATION ===== */
+.layer2-section {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+.email-gate {
+  text-align: center;
+  padding: 48px 32px;
+  border-radius: 20px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-card);
+  backdrop-filter: var(--card-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  box-shadow: var(--card-shadow);
+  margin-top: 40px;
+}
+.email-gate h3 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--label-primary);
+}
+[data-theme="dark"] .email-gate h3 {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E7A0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.email-gate p {
+  font-size: 15px;
+  color: var(--label-secondary);
+  margin-bottom: 24px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+.email-form {
+  display: flex;
+  gap: 10px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.email-input {
+  flex: 1;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-inset);
+  color: var(--label-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.email-input:focus { border-color: var(--accent); }
+.email-input::placeholder { color: var(--label-tertiary); }
+.email-submit {
+  height: 48px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: #D4AF37;
+  color: #000036;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.email-submit:hover { background: #F5E7A0; box-shadow: 0 4px 20px rgba(212,175,55,0.3); }
+.email-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Calibration questions */
+.calibration-section {
+  margin-top: 40px;
+  display: none;
+}
+.calibration-section.visible { display: block; }
+
+.calibration-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.calibration-header h3 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--label-primary);
+}
+[data-theme="dark"] .calibration-header h3 {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E7A0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.calibration-header p {
+  font-size: 14px;
+  color: var(--label-secondary);
+  line-height: 1.5;
+}
+
+.cal-dimension {
+  margin-bottom: 28px;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-card);
+  backdrop-filter: var(--card-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+}
+.cal-dim-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+.cal-question {
+  margin-bottom: 16px;
+}
+.cal-question:last-child { margin-bottom: 0; }
+.cal-q-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--label-primary);
+  margin-bottom: 8px;
+  line-height: 1.45;
+}
+.cal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cal-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--separator);
+  background: var(--bg-inset);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  color: var(--label-primary);
+  line-height: 1.4;
+}
+.cal-option:hover {
+  border-color: var(--card-border-hover);
+  background: var(--bg-card-hover);
+}
+.cal-option.selected {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.cal-option input[type=radio] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--label-tertiary);
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.cal-option.selected input[type=radio] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.cal-option.selected input[type=radio]::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #000036;
+}
+.cal-option-text { flex: 1; }
+
+.calibration-submit {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 32px auto 0;
+  height: 52px;
+  border: none;
+  border-radius: 14px;
+  background: #D4AF37;
+  color: #000036;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.calibration-submit:hover { background: #F5E7A0; box-shadow: 0 4px 24px rgba(212,175,55,0.35); }
+.calibration-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Recalibrated results */
+.recalibrated-results {
+  margin-top: 32px;
+  text-align: center;
+  display: none;
+}
+.recalibrated-results.visible { display: block; }
+.recalibrated-results h3 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--label-primary);
+  margin-bottom: 16px;
+}
+[data-theme="dark"] .recalibrated-results h3 {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E7A0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.recalibrated-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+.recal-dim {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--separator);
+  background: var(--bg-inset);
+  text-align: center;
+}
+.recal-dim-name {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--label-tertiary);
+  margin-bottom: 4px;
+}
+.recal-dim-vals {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--label-primary);
+}
+.recal-dim-vals .arrow {
+  color: var(--accent);
+  margin: 0 4px;
+}
+
+.coaching-cta {
+  margin-top: 32px;
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--gold-border);
+  background: var(--accent-subtle);
+  text-align: center;
+}
+.coaching-cta h4 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--label-primary);
+  margin-bottom: 8px;
+}
+.coaching-cta p {
+  font-size: 14px;
+  color: var(--label-secondary);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.coaching-cta-btn {
+  display: inline-block;
+  padding: 14px 32px;
+  border-radius: 12px;
+  background: #D4AF37;
+  color: #000036;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.coaching-cta-btn:hover { background: #F5E7A0; box-shadow: 0 4px 20px rgba(212,175,55,0.3); }
+
+/* ===== LOGGED-IN CLIENT BANNER ===== */
+.client-context {
+  text-align: center;
+  padding: 20px 24px;
+  margin: 0 auto 0;
+  max-width: 600px;
+  font-size: 14px;
+  color: var(--label-secondary);
+  line-height: 1.5;
+  display: none;
+}
+.client-context.visible { display: block; }
+.client-context strong { color: var(--label-primary); font-weight: 600; }
+
+.save-assessment-row {
+  text-align: center;
+  margin-top: 24px;
+  display: none;
+}
+.save-assessment-row.visible { display: block; }
+.save-btn {
+  display: inline-block;
+  padding: 14px 36px;
+  border: none;
+  border-radius: 14px;
+  background: #D4AF37;
+  color: #000036;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.save-btn:hover { background: #F5E7A0; box-shadow: 0 4px 24px rgba(212,175,55,0.35); }
+.save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.portal-return {
+  display: none;
+  text-align: center;
+  margin-top: 16px;
+}
+.portal-return.visible { display: block; }
+.portal-return a {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+.portal-return a:hover { text-decoration: underline; }
+
+/* ===== FOOTER ===== */
+footer {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 24px 16px;
+  font-size: 12px;
+  color: var(--label-tertiary);
+}
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; }
+  .sliders-panel { grid-column: 1; grid-row: 1; }
+  .radar-panel { grid-column: 2; grid-row: 1; min-height: 400px; }
+  .presets-panel { grid-column: 1 / 3; grid-row: 2; }
+  .summary-panel { grid-column: 1 / 3; grid-row: 3; max-height: none; }
+}
+@media (max-width: 680px) {
+  .layout { grid-template-columns: 1fr; padding: 0 16px; }
+  .sliders-panel, .radar-panel, .presets-panel, .summary-panel { grid-column: 1; grid-row: auto; }
+  .hero h2 { font-size: 28px; }
+  .hero { padding: 16px 16px 4px; }
+  .email-form { flex-direction: column; }
+  .recalibrated-details { grid-template-columns: repeat(2, 1fr); }
+  .nav-link { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-content" id="pageContent">
+
+<nav class="nav-bar" id="navBar">
+  <a href="index.html" class="nav-logo">AI Badge</a>
+  <div class="nav-right">
+    <a href="#" class="nav-link" id="navBackLink">Back to site</a>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">&#9788;</button>
+  </div>
+</nav>
+
+<!-- Auth-aware banner (shown for logged-in users) -->
+<div class="auth-banner" id="authBanner"></div>
+
+<div class="hero" id="heroTitle">
+  <h2>AI Competency Explorer</h2>
+  <p>Composite Assessment Framework, CACF v1.0</p>
+</div>
+
+<!-- Client context (shown for logged-in users) -->
+<div class="client-context" id="clientContext"></div>
+
+<div class="layout">
+  <div class="card sliders-panel">
+    <div class="card-title">Dimensions</div>
+    <div id="sliders"></div>
+  </div>
+
+  <div class="card radar-panel">
+    <canvas id="radar" width="540" height="520"></canvas>
+  </div>
+
+  <div class="card presets-panel">
+    <div class="card-title">Profiles</div>
+    <div class="presets-row" id="presets"></div>
+    <div class="compare-row">
+      <button class="btn-secondary" id="compareToggle" onclick="toggleCompare()">Compare</button>
+      <button class="btn-secondary danger" id="clearOverlay" onclick="clearOverlay()" style="display:none;">Clear</button>
+    </div>
+  </div>
+
+  <div class="card summary-panel">
+    <div id="summary"></div>
+    <!-- Save button for logged-in clients -->
+    <div class="save-assessment-row" id="saveRow">
+      <button class="save-btn" id="saveBtn" onclick="saveAssessment()">Save Assessment</button>
+    </div>
+    <div class="portal-return" id="portalReturn">
+      <a href="portal.html">Return to your portal &#8594;</a>
+    </div>
+  </div>
+</div>
+
+<!-- Layer 2: Email gate + calibration (public visitors only) -->
+<div class="layer2-section" id="layer2Section">
+
+  <!-- Email gate -->
+  <div class="email-gate" id="emailGate">
+    <h3>Get Your Calibrated Assessment</h3>
+    <p>Your initial score is a starting point. Answer 12 targeted questions to refine your profile with greater accuracy.</p>
+    <div class="email-form" id="emailForm">
+      <input type="email" class="email-input" id="emailInput" placeholder="Your email address" autocomplete="email">
+      <button class="email-submit" id="emailSubmit" onclick="submitEmail()">Continue</button>
+    </div>
+    <p style="font-size:12px; color:var(--label-tertiary); margin-top:12px; margin-bottom:0;">We will only use this to send your results. No spam, ever.</p>
+  </div>
+
+  <!-- Calibration questions (hidden until email submitted) -->
+  <div class="calibration-section" id="calibrationSection">
+    <div class="calibration-header">
+      <h3>Calibration Questions</h3>
+      <p>These scenario-based questions help refine your initial self-assessment. Your score may adjust up or down based on your responses.</p>
+    </div>
+    <div id="calibrationQuestions"></div>
+    <button class="calibration-submit" id="calibrationSubmit" onclick="submitCalibration()" disabled>Submit Calibration</button>
+  </div>
+
+  <!-- Recalibrated results (hidden until calibration submitted) -->
+  <div class="recalibrated-results" id="recalibratedResults">
+    <h3>Your Calibrated Assessment</h3>
+    <div id="recalibratedSummary"></div>
+
+    <div class="coaching-cta">
+      <h4>Interested in structured coaching?</h4>
+      <p>AI Badge is a 6-week one-to-one programme that takes you from your current level to measurable, demonstrable competency. Every session is personalised to your goals.</p>
+      <a href="mailto:victor@fiveinnolabs.com?subject=AI Badge coaching enquiry" class="coaching-cta-btn">Let's talk</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>Victor del Rosal &nbsp;&middot;&nbsp; <a href="https://fiveinnolabs.com">fiveinnolabs</a> &nbsp;&middot;&nbsp; 2026</footer>
+</div>
+
+<!-- Dimension detail sheet -->
+<div class="dim-overlay" id="dimOverlay" onclick="closeDimPanel()"></div>
+<div class="dim-sheet" id="dimPanel">
+  <div class="dim-sheet-handle"></div>
+  <div class="dim-sheet-header">
+    <h2 id="dimPanelTitle">Dimension</h2>
+    <button class="dim-close" onclick="closeDimPanel()">&times;</button>
+  </div>
+  <div class="dim-sheet-body" id="dimPanelBody"></div>
+</div>
+
+<!-- Firebase SDKs (loaded but non-blocking; features degrade gracefully if unavailable) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+/* ===================================================================
+   AI COMPETENCY EXPLORER
+   Full assessment engine for AI Badge
+   Adapted from CACF radar-explorer.html
+   =================================================================== */
+
+// ===== CONSTANTS =====
+
+const DIMS = ['AI Foundations','Critical Evaluation','Productive Creation','Technical Building','Ethics & Governance','Tool Fluency'];
+
+const PRESETS = {
+  'Newcomer':[1,1,1,1,1,1], 'Policy Person':[2,4,2,1,5,2], 'Vibe Coder':[2,2,4,4,1,5],
+  'The Academic':[5,5,2,2,4,1], 'Practitioner':[3,3,4,3,3,3], 'Architect':[4,4,4,5,4,5]
+};
+
+const LEVEL_COLORS_DARK  = ['#8E8E93','#64D2FF','#D4AF37','#5E5CE6','#F5F5F7'];
+const LEVEL_COLORS_LIGHT = ['#8E8E93','#5AC8FA','#B8860B','#5856D6','#1D1D1F'];
+
+function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+function levelColors() { return isDark() ? LEVEL_COLORS_DARK : LEVEL_COLORS_LIGHT; }
+
+const DIM_LEVELS = {
+  'AI Foundations': [
+    {q:"I've used ChatGPT a few times.",d:"Knows AI exists, can't explain how it works. May think AI truly understands language."},
+    {q:"I know it's pattern matching, not thinking.",d:"Understands training data, knows about hallucinations, can distinguish AI from traditional software."},
+    {q:"I can explain context windows, tokens, and temperature.",d:"Understands transformer concepts, fine-tuning vs prompting, why AI makes certain mistakes."},
+    {q:"I understand embeddings, attention, and RAG trade-offs.",d:"Working knowledge of model architectures, can discuss model selection decisions."},
+    {q:"I could hold my own with an ML engineer.",d:"Can evaluate architectures, discuss training dynamics, engage with frontier research."}
+  ],
+  'Critical Evaluation': [
+    {q:"If ChatGPT said it, it must be right.",d:"Takes output at face value, copy-pastes without review."},
+    {q:"I know it can be wrong, so I double-check the important stuff.",d:"Occasionally fact-checks, spots obvious errors."},
+    {q:"I systematically evaluate every output before using it.",d:"Compares across models, identifies bias and hallucination, explains why output is good or bad."},
+    {q:"I've built evaluation rubrics for my team.",d:"Creates multi-dimensional quality criteria, designs prompts to test AI limitations."},
+    {q:"I design evaluation frameworks at the organisational level.",d:"Assesses systems for systematic bias, builds automated evaluation pipelines."}
+  ],
+  'Productive Creation': [
+    {q:"I ask it questions and copy the answers.",d:"Single-turn interactions, uses AI like a search engine."},
+    {q:"I use it to draft emails and summarise documents.",d:"Multi-turn conversations, starting to develop a workflow."},
+    {q:"AI is part of my daily workflow across multiple tasks.",d:"Documents, presentations, data analysis, code. Multi-modal. Iterates effectively."},
+    {q:"I design AI-augmented workflows and build with coding assistants.",d:"Custom GPTs, Claude Projects, chains tools together, complex multi-step outputs."},
+    {q:"I architect AI-powered applications for production.",d:"Builds with APIs, designs end-to-end AI-augmented pipelines, AI as core component."}
+  ],
+  'Technical Building': [
+    {q:"I wouldn't know what an API is.",d:"No technical background, web interfaces only."},
+    {q:"I know APIs exist but I've never made one work.",d:"Conceptual understanding, has seen code but doesn't write it."},
+    {q:"I've built a simple app with AI help.",d:"Basic Python/JS, can make an API call with guidance, no-code/low-code platforms."},
+    {q:"I'm comfortable with APIs, SDKs, and CLI tools.",d:"Builds AI-integrated applications, understands deployment, implements RAG pipelines."},
+    {q:"I architect multi-agent systems and deploy to production.",d:"MCP servers, orchestration layers, custom tooling, infrastructure decisions."}
+  ],
+  'Ethics & Governance': [
+    {q:"I guess there are some ethical issues? I haven't really thought about it.",d:"Vaguely aware, no specific knowledge, unaware of EU AI Act."},
+    {q:"I can name the big concerns: bias, privacy, job loss.",d:"Knows EU AI Act exists, understands data ethics conceptually."},
+    {q:"I can apply ethical frameworks to real scenarios.",d:"Understands EU AI Act risk categories, conducts basic impact assessments, thinks about consent and attribution."},
+    {q:"I design AI usage policies for my organisation.",d:"GDPR implications, risk assessments for AI deployments, advises teams on responsible practices."},
+    {q:"I build governance programmes and compliance frameworks.",d:"Maps deployments to regulatory requirements, trains others, advises on policy."}
+  ],
+  'Tool Fluency': [
+    {q:"I use ChatGPT, that's about it.",d:"One tool, web interface, single-turn."},
+    {q:"I use a few AI tools and know which one is better for what.",d:"2-3 tools, file uploads, custom instructions, AI within existing workflows."},
+    {q:"I use Artifacts, Code Interpreter, image generation, the works.",d:"Creative/analytical tools, multi-modal, project features, system prompts."},
+    {q:"I work in Cursor and I'm starting to use the terminal.",d:"Developer AI tools, IDE-integrated, starting CLI tools."},
+    {q:"Claude Code, APIs, multi-agent frameworks. I pick the right tool for the job.",d:"Terminal/CLI fluent, API-direct, tool-agnostic."}
+  ]
+};
+
+// ===== TIERS =====
+
+const TIERS_DARK = [
+  {min:0,max:15,name:'AI Aware',color:'#8E8E93',desc:'Beginning the journey. Exploring what AI can do.'},
+  {min:16,max:30,name:'AI Explorer',color:'#64D2FF',desc:'Actively learning. Building understanding and first skills.'},
+  {min:31,max:45,name:'AI Practitioner',color:'#D4AF37',desc:'Competent user. AI is part of your daily workflow.'},
+  {min:46,max:60,name:'AI Professional',color:'#5E5CE6',desc:'Advanced user. Creating with AI and guiding others.'},
+  {min:61,max:75,name:'AI Specialist',color:'#BF5AF2',desc:'Deep expertise. Building applications and shaping policy.'},
+  {min:76,max:90,name:'AI Strategist',color:'#FF9F0A',desc:'Leading AI initiatives with vision and depth.'},
+  {min:91,max:100,name:'AI Architect',color:'#30D158',desc:'Full-spectrum mastery. You design, build, and lead at scale.'}
+];
+const TIERS_LIGHT = [
+  {min:0,max:15,name:'AI Aware',color:'#8E8E93',desc:'Beginning the journey. Exploring what AI can do.'},
+  {min:16,max:30,name:'AI Explorer',color:'#5AC8FA',desc:'Actively learning. Building understanding and first skills.'},
+  {min:31,max:45,name:'AI Practitioner',color:'#B8860B',desc:'Competent user. AI is part of your daily workflow.'},
+  {min:46,max:60,name:'AI Professional',color:'#5856D6',desc:'Advanced user. Creating with AI and guiding others.'},
+  {min:61,max:75,name:'AI Specialist',color:'#AF52DE',desc:'Deep expertise. Building applications and shaping policy.'},
+  {min:76,max:90,name:'AI Strategist',color:'#FF9500',desc:'Leading AI initiatives with vision and depth.'},
+  {min:91,max:100,name:'AI Architect',color:'#34C759',desc:'Full-spectrum mastery. You design, build, and lead at scale.'}
+];
+
+function getTiers() { return isDark() ? TIERS_DARK : TIERS_LIGHT; }
+function score(v) { return Math.round(((v.reduce((a,b)=>a+b,0)-6)/24)*100); }
+function tier(s) { const T=getTiers(); return T.find(t=>s>=t.min&&s<=t.max)||T[0]; }
+
+// ===== FRAMEWORKS =====
+
+const FRAMEWORKS_DARK = [
+  { name:'UNESCO', segments:[{label:'Understand',max:33,color:'#8E8E93'},{label:'Apply',max:66,color:'#D4AF37'},{label:'Create',max:100,color:'#F5F5F7'}] },
+  { name:'Turing Institute', segments:[{label:'AI Citizen',max:30,color:'#8E8E93'},{label:'AI Worker',max:65,color:'#D4AF37'},{label:'AI Leader',max:100,color:'#F5F5F7'}] },
+  { name:'DigComp 3.0', segments:[{label:'Foundation',max:25,color:'#636366'},{label:'Intermediate',max:50,color:'#64D2FF'},{label:'Advanced',max:75,color:'#D4AF37'},{label:'Highly Specialised',max:100,color:'#F5F5F7'}] },
+  { name:'SFIA 9', segments:[{label:'1',max:14,color:'#48484A'},{label:'2',max:28,color:'#636366'},{label:'3',max:42,color:'#8E8E93'},{label:'4',max:56,color:'#64D2FF'},{label:'5',max:71,color:'#D4AF37'},{label:'6',max:85,color:'#5E5CE6'},{label:'7',max:100,color:'#F5F5F7'}] },
+  { name:'EU AI Act', segments:[{label:'Foundation',max:35,color:'#8E8E93'},{label:'Compliant',max:70,color:'#D4AF37'},{label:'Strategic',max:100,color:'#30D158'}] },
+  { name:'OECD/EC AILit', segments:[{label:'Foundational',max:33,color:'#8E8E93'},{label:'Developing',max:66,color:'#D4AF37'},{label:'Proficient',max:100,color:'#F5F5F7'}] }
+];
+const FRAMEWORKS_LIGHT = [
+  { name:'UNESCO', segments:[{label:'Understand',max:33,color:'#8E8E93'},{label:'Apply',max:66,color:'#B8860B'},{label:'Create',max:100,color:'#1D1D1F'}] },
+  { name:'Turing Institute', segments:[{label:'AI Citizen',max:30,color:'#8E8E93'},{label:'AI Worker',max:65,color:'#B8860B'},{label:'AI Leader',max:100,color:'#1D1D1F'}] },
+  { name:'DigComp 3.0', segments:[{label:'Foundation',max:25,color:'#C7C7CC'},{label:'Intermediate',max:50,color:'#5AC8FA'},{label:'Advanced',max:75,color:'#B8860B'},{label:'Highly Specialised',max:100,color:'#1D1D1F'}] },
+  { name:'SFIA 9', segments:[{label:'1',max:14,color:'#D1D1D6'},{label:'2',max:28,color:'#AEAEB2'},{label:'3',max:42,color:'#8E8E93'},{label:'4',max:56,color:'#5AC8FA'},{label:'5',max:71,color:'#B8860B'},{label:'6',max:85,color:'#5856D6'},{label:'7',max:100,color:'#1D1D1F'}] },
+  { name:'EU AI Act', segments:[{label:'Foundation',max:35,color:'#8E8E93'},{label:'Compliant',max:70,color:'#B8860B'},{label:'Strategic',max:100,color:'#34C759'}] },
+  { name:'OECD/EC AILit', segments:[{label:'Foundational',max:33,color:'#8E8E93'},{label:'Developing',max:66,color:'#B8860B'},{label:'Proficient',max:100,color:'#1D1D1F'}] }
+];
+
+function getFrameworks() { return isDark() ? FRAMEWORKS_DARK : FRAMEWORKS_LIGHT; }
+
+// ===== ARCHETYPES =====
+
+function archetype(v) {
+  const[f,c,p,t,e,l]=v, avg=v.reduce((a,b)=>a+b,0)/6;
+  const sd=Math.sqrt(v.reduce((s,x)=>s+Math.pow(x-avg,2),0)/6);
+  if(sd<0.6) return{n:'Generalist',i:'\u2B21',d:'Balanced across all dimensions'};
+  if(e>=4&&e>=Math.max(...v.filter((_,i)=>i!==4))) return{n:'Governance Lead',i:'\u2696',d:'Ethics and policy first'};
+  if(t>=4&&l>=4&&t+l>=f+e+2) return{n:'Builder',i:'\u2699',d:'Builds and deploys with AI'};
+  if(f>=4&&c>=4&&f+c>=t+l+2) return{n:'Analyst',i:'\u25CE',d:'Deep understanding and evaluation'};
+  if(p>=4&&p>=Math.max(t,f)) return{n:'Creator',i:'\u2726',d:'Produces and innovates with AI'};
+  if(f>=4&&(p<=2||l<=2)) return{n:'Theorist',i:'\u25B3',d:'Knows the science, building practical skills'};
+  if(l>=4&&p>=3&&f<=2) return{n:'Operator',i:'\u25B7',d:'Highly capable, deepening understanding'};
+  if(sd>1.3) return{n:'Specialist',i:'\u25C6',d:'Deep in specific areas, with gaps to fill'};
+  return{n:'Developing',i:'\u2197',d:'Growing across multiple dimensions'};
+}
+
+// ===== FLAGS =====
+
+function flags(v) {
+  const[f,c,p,t,e,l]=v, fl=[];
+  if((t>=4||l>=4)&&e<=2) fl.push({t:'warning',x:'Builder without guardrails: strong technical skills need stronger ethics awareness'});
+  if(p>=4&&c<=2) fl.push({t:'warning',x:'Uncritical creator: producing at scale without systematic evaluation is risky'});
+  if(l>=4&&f<=2) fl.push({t:'caution',x:'Tool-dependent: fluent with interfaces but may not understand what\'s underneath'});
+  if(f>=4&&e>=4&&p<=2&&l<=2) fl.push({t:'info',x:'Strong theoretical base: ready to put knowledge into practice'});
+  return fl;
+}
+
+// ===== LAYER 2 CALIBRATION QUESTIONS =====
+
+const CALIBRATION_QUESTIONS = [
+  {
+    dim: 0, // AI Foundations
+    questions: [
+      {
+        text: 'When someone mentions "hallucination" in AI, I...',
+        options: [
+          { label: 'Can explain what it means and why it happens', mod: 0.5 },
+          { label: 'Have heard the term but couldn\'t explain the mechanism', mod: 0 },
+          { label: 'Am not sure what that refers to in an AI context', mod: -0.5 }
+        ]
+      },
+      {
+        text: 'I could explain the difference between a language model and a search engine to a colleague.',
+        options: [
+          { label: 'Confidently, including why it matters for how you use them', mod: 0.5 },
+          { label: 'Roughly, though I might get some details wrong', mod: 0 },
+          { label: 'Not really, they seem similar to me', mod: -0.5 }
+        ]
+      }
+    ]
+  },
+  {
+    dim: 1, // Critical Evaluation
+    questions: [
+      {
+        text: 'When I get an AI-generated answer, I...',
+        options: [
+          { label: 'Systematically verify key claims against reliable sources', mod: 0.5 },
+          { label: 'Occasionally check if something feels off', mod: 0 },
+          { label: 'Generally trust it if it sounds reasonable', mod: -0.5 }
+        ]
+      },
+      {
+        text: 'I can identify when an AI tool is likely to give unreliable results based on the type of task.',
+        options: [
+          { label: 'Yes, consistently. I know the failure modes well.', mod: 0.5 },
+          { label: 'Sometimes, for the tools I use most often', mod: 0 },
+          { label: 'Rarely. I tend to try and see what happens.', mod: -0.5 }
+        ]
+      }
+    ]
+  },
+  {
+    dim: 2, // Productive Creation
+    questions: [
+      {
+        text: 'In my daily work, I use AI tools...',
+        options: [
+          { label: 'Multiple times daily for varied tasks across different tools', mod: 0.5 },
+          { label: 'A few times a week for specific tasks', mod: 0 },
+          { label: 'Rarely or never in a structured way', mod: -0.5 }
+        ]
+      },
+      {
+        text: 'I have created a multi-step workflow or process that involves AI.',
+        options: [
+          { label: 'Yes, several. I design workflows that chain AI tools together.', mod: 0.5 },
+          { label: 'One or two simple ones', mod: 0 },
+          { label: 'Not yet', mod: -0.5 }
+        ]
+      }
+    ]
+  },
+  {
+    dim: 3, // Technical Building
+    questions: [
+      {
+        text: 'I have connected an AI tool to another system using an API or automation platform.',
+        options: [
+          { label: 'Yes, I\'ve built integrations that run in production or daily use', mod: 0.5 },
+          { label: 'I\'ve tried it or followed a tutorial', mod: 0 },
+          { label: 'No, I wouldn\'t know where to start', mod: -0.5 }
+        ]
+      },
+      {
+        text: 'If asked to build a simple AI-powered tool, I would...',
+        options: [
+          { label: 'Know where to start, what stack to use, and how to deploy it', mod: 0.5 },
+          { label: 'Need significant guidance but could follow along', mod: 0 },
+          { label: 'Not know where to begin', mod: -0.5 }
+        ]
+      }
+    ]
+  },
+  {
+    dim: 4, // Ethics & Governance
+    questions: [
+      {
+        text: 'I can name specific provisions of the EU AI Act that affect my industry.',
+        options: [
+          { label: 'Yes, I understand risk categories and compliance requirements', mod: 0.5 },
+          { label: 'I\'m aware of the Act but not its specific provisions', mod: 0 },
+          { label: 'I\'m not familiar with the EU AI Act', mod: -0.5 }
+        ]
+      },
+      {
+        text: 'Before using AI on sensitive data, I consider...',
+        options: [
+          { label: 'Data protection, bias, transparency, and organisational policy', mod: 0.5 },
+          { label: 'Privacy mainly', mod: 0 },
+          { label: 'I don\'t usually think about it', mod: -0.5 }
+        ]
+      }
+    ]
+  },
+  {
+    dim: 5, // Tool Fluency
+    questions: [
+      {
+        text: 'Beyond ChatGPT, I regularly use...',
+        options: [
+          { label: '3+ different AI tools for different purposes (e.g., Claude, Midjourney, Copilot, Perplexity)', mod: 0.5 },
+          { label: '1-2 other tools occasionally', mod: 0 },
+          { label: 'Just ChatGPT or one similar tool', mod: -0.5 }
+        ]
+      },
+      {
+        text: 'I have used AI tools through a command line, API, or developer interface.',
+        options: [
+          { label: 'Regularly, it\'s part of my workflow', mod: 0.5 },
+          { label: 'Once or twice to experiment', mod: 0 },
+          { label: 'Never', mod: -0.5 }
+        ]
+      }
+    ]
+  }
+];
+
+// ===== STATE =====
+
+let vals = [3,3,3,3,3,3], dv = [3,3,3,3,3,3], ov = null;
+let comparing = false, af = null, activePreset = null, lps = [];
+let currentUser = null;
+let userBaseline = null;
+let capturedEmail = null;
+let calibrationAnswers = {};
+
+// ===== CANVAS SETUP =====
+
+const C = document.getElementById('radar');
+const X = C.getContext('2d');
+let dpr = window.devicePixelRatio || 1;
+
+function setupCanvas() {
+  const r = C.getBoundingClientRect();
+  const w = r.width || 540, h = r.height || 520;
+  C.width = w * dpr; C.height = h * dpr;
+  C.style.width = w + 'px'; C.style.height = h + 'px';
+  X.setTransform(dpr,0,0,dpr,0,0);
+}
+
+// Canvas click and hover for dimension labels
+C.addEventListener('click', e => {
+  const r = C.getBoundingClientRect(), mx = e.clientX-r.left, my = e.clientY-r.top;
+  for (const l of lps) if (mx>=l.x && mx<=l.x+l.w && my>=l.y && my<=l.y+l.h) { openDimPanel(l.i); return; }
+});
+C.addEventListener('mousemove', e => {
+  const r = C.getBoundingClientRect(), mx = e.clientX-r.left, my = e.clientY-r.top;
+  C.style.cursor = lps.some(l => mx>=l.x && mx<=l.x+l.w && my>=l.y && my<=l.y+l.h) ? 'pointer' : 'default';
+});
+
+// ===== THEME TOGGLE =====
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').innerHTML = next === 'dark' ? '&#9788;' : '&#9790;';
+  localStorage.setItem('aibadge-theme', next);
+  draw(); updateSummary(); updateColors();
+}
+
+// Restore saved theme
+(function() {
+  const saved = localStorage.getItem('aibadge-theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').innerHTML = saved === 'dark' ? '&#9788;' : '&#9790;';
+  }
+})();
+
+// ===== COLOUR HELPERS =====
+
+function lc(v) { return levelColors()[Math.round(v)-1] || levelColors()[0]; }
+
+function updateColors() {
+  DIMS.forEach((_,i) => {
+    const sl=document.getElementById('sl'+i), sv=document.getElementById('sv'+i);
+    if (!sl || !sv) return;
+    const c = lc(vals[i]), pct = ((vals[i]-1)/4)*100;
+    sl.style.background = `linear-gradient(to right, ${c} ${pct}%, var(--range-track) ${pct}%)`;
+    sv.style.background = c;
+  });
+}
+
+// ===== SLIDERS =====
+
+function buildSliders() {
+  const el = document.getElementById('sliders'); el.innerHTML = '';
+  DIMS.forEach((dim,i) => {
+    const g = document.createElement('div'); g.className = 'slider-group';
+    g.innerHTML = `<div class="slider-header">
+      <span class="slider-name">${dim}<button class="info-btn" onclick="openDimPanel(${i})">i</button></span>
+      <span class="slider-badge" id="sv${i}">${vals[i]}</span>
+    </div><input type="range" min="1" max="5" step="1" value="${vals[i]}" id="sl${i}">`;
+    el.appendChild(g);
+    g.querySelector('input').addEventListener('input', function() {
+      vals[i] = +this.value;
+      document.getElementById('sv'+i).textContent = vals[i];
+      activePreset = null; hlPreset(); updateColors(); anim(vals);
+    });
+  });
+}
+
+function syncSliders() {
+  DIMS.forEach((_,i) => {
+    const sl=document.getElementById('sl'+i), sv=document.getElementById('sv'+i);
+    if(sl) sl.value=vals[i]; if(sv) sv.textContent=vals[i];
+  });
+  updateColors();
+}
+
+// ===== PRESETS =====
+
+function buildPresets() {
+  const el = document.getElementById('presets'); el.innerHTML = '';
+  Object.keys(PRESETS).forEach(n => {
+    const b = document.createElement('button');
+    b.className = 'preset-chip'; b.textContent = n; b.dataset.p = n;
+    b.onclick = () => { activePreset=n; vals=[...PRESETS[n]]; syncSliders(); hlPreset(); anim(vals); };
+    el.appendChild(b);
+  });
+}
+function hlPreset() {
+  document.querySelectorAll('.preset-chip').forEach(b => b.classList.toggle('active', b.dataset.p===activePreset));
+}
+
+// ===== COMPARE / OVERLAY =====
+
+function toggleCompare() {
+  if (!comparing) {
+    comparing=true; ov=[...dv];
+    document.getElementById('compareToggle').classList.add('active');
+    document.getElementById('clearOverlay').style.display='';
+  } else clearOverlay();
+  draw();
+}
+function clearOverlay() {
+  comparing=false; ov=null;
+  document.getElementById('compareToggle').classList.remove('active');
+  document.getElementById('clearOverlay').style.display='none';
+  draw();
+}
+
+// Load baseline as overlay for logged-in clients
+function loadBaselineOverlay(baselineScores) {
+  ov = [
+    baselineScores.aiFoundations,
+    baselineScores.criticalEvaluation,
+    baselineScores.productiveCreation,
+    baselineScores.technicalBuilding,
+    baselineScores.ethicsGovernance,
+    baselineScores.toolFluency
+  ];
+  comparing = true;
+  document.getElementById('compareToggle').classList.add('active');
+  document.getElementById('compareToggle').textContent = 'Baseline overlay';
+  document.getElementById('clearOverlay').style.display = '';
+  draw();
+}
+
+// ===== ANIMATION =====
+
+function anim(target) {
+  const s=[...dv], t0=performance.now(), dur=450;
+  function tick(now) {
+    let t = Math.min((now-t0)/dur,1);
+    t = t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+    for(let i=0;i<6;i++) dv[i]=s[i]+(target[i]-s[i])*t;
+    draw(); updateSummary();
+    if(t<1) af=requestAnimationFrame(tick);
+  }
+  if(af) cancelAnimationFrame(af);
+  af=requestAnimationFrame(tick);
+}
+
+// ===== RADAR DRAWING =====
+
+function draw() {
+  const dk = isDark();
+  const W=C.width/dpr, H=C.height/dpr, cx=W/2, cy=H/2+8, R=Math.min(W,H)*0.36, n=6, a0=-Math.PI/2;
+  X.clearRect(0,0,W,H);
+
+  function pt(axis,lv) {
+    const a=(2*Math.PI/n)*axis+a0, r=(lv/5)*R;
+    return [cx+r*Math.cos(a), cy+r*Math.sin(a)];
+  }
+
+  const ringAlpha = dk ? 'rgba(255,255,255,' : 'rgba(0,0,54,';
+  const labelColor = dk ? '#F5F5F7' : '#0a0e32';
+  const numColor = dk ? 'rgba(235,235,245,0.3)' : 'rgba(0,0,54,0.2)';
+  const goldColor = '#D4AF37';
+  const goldAlpha = dk ? 'rgba(212,175,55,' : 'rgba(184,134,11,';
+
+  // Rings
+  for(let lv=5;lv>=1;lv--) {
+    X.beginPath();
+    for(let i=0;i<=n;i++){const[x,y]=pt(i%n,lv); i?X.lineTo(x,y):X.moveTo(x,y);}
+    X.closePath();
+    X.strokeStyle = ringAlpha + (lv===5?'0.12':'0.05') + ')';
+    X.lineWidth = lv===5?0.8:0.5;
+    X.stroke();
+    const[lx,ly]=pt(0,lv);
+    X.fillStyle=numColor; X.font="500 9px 'Inter', sans-serif";
+    X.textAlign='center'; X.textBaseline='bottom';
+    X.fillText(lv,lx,ly-5);
+  }
+
+  // Axes
+  for(let i=0;i<n;i++){
+    const[x,y]=pt(i,5);
+    X.beginPath(); X.moveTo(cx,cy); X.lineTo(x,y);
+    X.strokeStyle=ringAlpha+'0.05)'; X.lineWidth=0.5; X.stroke();
+  }
+
+  // Labels (clickable)
+  lps=[];
+  X.fillStyle=labelColor; X.font="600 12px 'Inter', sans-serif";
+  for(let i=0;i<n;i++){
+    const a=(2*Math.PI/n)*i+a0, lr=R+26;
+    const lx=cx+lr*Math.cos(a), ly=cy+lr*Math.sin(a);
+    X.textAlign=Math.abs(Math.cos(a))<0.01?'center':Math.cos(a)>0?'left':'right';
+    X.textBaseline=Math.abs(Math.sin(a))<0.2?'middle':Math.sin(a)>0?'top':'bottom';
+    X.fillText(DIMS[i],lx,ly);
+    const tw=X.measureText(DIMS[i]).width, al=X.textAlign;
+    const rx=al==='center'?lx-tw/2:al==='right'?lx-tw:lx;
+    lps.push({x:rx-4,y:ly-10,w:tw+8,h:20,i});
+  }
+
+  // Overlay ghost
+  if(ov) shape(ov, ringAlpha+'0.04)', ringAlpha+'0.2)', 1.5, true);
+
+  // Main shape with gradient fill
+  X.beginPath();
+  for(let i=0;i<=n;i++){const[x,y]=pt(i%n,dv[i%n]); i?X.lineTo(x,y):X.moveTo(x,y);}
+  X.closePath();
+  const g=X.createRadialGradient(cx,cy,0,cx,cy,R);
+  if(dk) {
+    g.addColorStop(0,'rgba(212,175,55,0.25)');
+    g.addColorStop(0.4,'rgba(2,6,111,0.2)');
+    g.addColorStop(0.7,'rgba(0,102,255,0.08)');
+    g.addColorStop(1,'rgba(0,0,54,0.02)');
+  } else {
+    g.addColorStop(0,'rgba(184,134,11,0.18)');
+    g.addColorStop(0.4,'rgba(0,0,54,0.08)');
+    g.addColorStop(0.7,'rgba(0,102,255,0.04)');
+    g.addColorStop(1,'rgba(0,0,54,0.01)');
+  }
+  X.fillStyle=g; X.fill();
+  X.strokeStyle=goldColor; X.lineWidth=2.5; X.stroke();
+
+  // Vertex dots with gold glow
+  for(let i=0;i<n;i++){
+    const[x,y]=pt(i,dv[i]);
+    // Glow
+    X.beginPath(); X.arc(x,y,10,0,Math.PI*2);
+    X.fillStyle=goldAlpha+'0.2)'; X.fill();
+    // Dot
+    X.beginPath(); X.arc(x,y,4.5,0,Math.PI*2);
+    X.fillStyle=goldColor; X.fill();
+    X.strokeStyle=dk?'rgba(0,0,54,0.6)':'rgba(255,255,255,0.9)'; X.lineWidth=2; X.stroke();
+  }
+
+  function shape(v,f,s,w,d) {
+    X.beginPath();
+    for(let i=0;i<=n;i++){const[x,y]=pt(i%n,v[i%n]); i?X.lineTo(x,y):X.moveTo(x,y);}
+    X.closePath(); X.fillStyle=f; X.fill();
+    if(d) X.setLineDash([6,4]);
+    X.strokeStyle=s; X.lineWidth=w; X.stroke(); X.setLineDash([]);
+  }
+}
+
+// ===== FRAMEWORK GAUGE BUILDER =====
+
+function getActiveSegment(fw, pct) {
+  for (const seg of fw.segments) { if (pct <= seg.max) return seg; }
+  return fw.segments[fw.segments.length - 1];
+}
+
+function buildGaugeHTML(fw, pct) {
+  const active = getActiveSegment(fw, pct);
+  let h = `<div class="fw-gauge"><div class="fw-gauge-header">`;
+  h += `<span class="fw-gauge-name">${fw.name}</span>`;
+  h += `<span class="fw-gauge-level" style="color:${active.color}">${active.label}</span>`;
+  h += `</div><div class="fw-gauge-bar">`;
+  let prevMax = 0;
+  fw.segments.forEach(seg => {
+    const width = seg.max - prevMax;
+    const isFilled = pct >= seg.max, isActive = pct > prevMax && pct <= seg.max;
+    const fillPct = isActive ? ((pct - prevMax) / width) * 100 : (isFilled ? 100 : 0);
+    h += `<div class="fw-seg" style="flex:${width};" title="${seg.label}">`;
+    h += `<div class="fw-seg-fill" style="width:${fillPct}%;background:${seg.color};${isActive?'border-radius:0 4px 4px 0;':''}"></div></div>`;
+    prevMax = seg.max;
+  });
+  h += `</div><div class="fw-gauge-labels">`;
+  prevMax = 0;
+  fw.segments.forEach(seg => { const w = seg.max - prevMax; h += `<span class="fw-seg-label" style="flex:${w};">${seg.label}</span>`; prevMax = seg.max; });
+  h += `</div></div>`;
+  return h;
+}
+
+// ===== SUMMARY PANEL =====
+
+function updateSummary() {
+  const el=document.getElementById('summary');
+  const dk = isDark();
+  const s=score(vals), t=tier(s), a=archetype(vals), fl=flags(vals);
+  const circ=2*Math.PI*86, off=circ-(s/100)*circ;
+  const ringBg = dk ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,54,0.06)';
+
+  let h='';
+
+  h+=`<div class="score-ring-container">
+    <div class="score-ring-wrapper">
+      <svg width="200" height="200" viewBox="0 0 184 184">
+        <circle cx="92" cy="92" r="86" fill="none" stroke="${ringBg}" stroke-width="7"/>
+        <circle cx="92" cy="92" r="86" fill="none" stroke="${t.color}" stroke-width="7"
+          stroke-dasharray="${circ}" stroke-dashoffset="${off}"
+          stroke-linecap="round" style="transition: stroke-dashoffset 0.5s ease, stroke 0.4s;"/>
+      </svg>
+      <div class="score-text">
+        <div class="score-number" style="color:${t.color}">${s}</div>
+        <div class="score-label">Score</div>
+      </div>
+    </div>
+    <div class="tier-name" style="color:${t.color}">${t.name}</div>
+    <div class="tier-desc">${t.desc}</div>
+  </div>`;
+
+  h+=`<div class="archetype-row">
+    <div class="archetype-icon">${a.i}</div>
+    <div>
+      <div class="archetype-label">Profile</div>
+      <div class="archetype-name">${a.n}</div>
+      <div class="archetype-desc">${a.d}</div>
+    </div>
+  </div>`;
+
+  if(fl.length){
+    fl.forEach(f=>{
+      const ic=f.t==='warning'?'\u26A0':f.t==='caution'?'\u25D0':'\u2139';
+      h+=`<div class="flag-card ${f.t}"><span class="flag-icon">${ic}</span><span>${f.x}</span></div>`;
+    });
+  }
+
+  h+='<div class="section-label">Framework Mapping</div>';
+  getFrameworks().forEach(fw => { h += buildGaugeHTML(fw, s); });
+  el.innerHTML=h;
+}
+
+// ===== DIMENSION DETAIL PANEL =====
+
+function openDimPanel(i) {
+  const dim=DIMS[i], levels=DIM_LEVELS[dim], cl=vals[i];
+  document.getElementById('dimPanelTitle').textContent=dim;
+  let h='';
+  levels.forEach((lv,li)=>{
+    const n=li+1, cur=n===cl;
+    h+=`<div class="level-card${cur?' current':''}">`;
+    h+=`<span class="level-num">${n}</span>`;
+    if(cur) h+=`<span class="level-tag">Your level</span>`;
+    h+=`<div class="level-quote">"${lv.q}"</div>`;
+    h+=`<div class="level-desc">${lv.d}</div></div>`;
+  });
+  document.getElementById('dimPanelBody').innerHTML=h;
+  document.getElementById('dimOverlay').classList.add('open');
+  document.getElementById('dimPanel').classList.add('open');
+  document.getElementById('pageContent').classList.add('sheet-open');
+  document.body.style.overflow='hidden';
+}
+function closeDimPanel() {
+  document.getElementById('dimOverlay').classList.remove('open');
+  document.getElementById('dimPanel').classList.remove('open');
+  document.getElementById('pageContent').classList.remove('sheet-open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDimPanel();});
+
+// ===== SCROLL BEHAVIOUR =====
+
+const navBar = document.getElementById('navBar');
+const heroTitle = document.getElementById('heroTitle');
+function onScroll() {
+  const y = window.scrollY;
+  if (y > 44) { heroTitle.classList.add('collapsed'); }
+  else { heroTitle.classList.remove('collapsed'); }
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+
+// ===== EMAIL CAPTURE =====
+
+function submitEmail() {
+  const input = document.getElementById('emailInput');
+  const email = input.value.trim();
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    input.style.borderColor = 'var(--red)';
+    input.focus();
+    return;
+  }
+  input.style.borderColor = '';
+  capturedEmail = email;
+
+  // Hide the email gate
+  document.getElementById('emailGate').style.display = 'none';
+
+  // Build and show calibration questions
+  buildCalibrationQuestions();
+  document.getElementById('calibrationSection').classList.add('visible');
+
+  // Smooth scroll to the calibration section
+  document.getElementById('calibrationSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Handle enter key in email input
+document.getElementById('emailInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') submitEmail();
+});
+
+// ===== CALIBRATION QUESTIONS =====
+
+function buildCalibrationQuestions() {
+  const container = document.getElementById('calibrationQuestions');
+  container.innerHTML = '';
+
+  CALIBRATION_QUESTIONS.forEach((dimGroup, dgi) => {
+    const dimDiv = document.createElement('div');
+    dimDiv.className = 'cal-dimension';
+    let h = `<div class="cal-dim-title">${DIMS[dimGroup.dim]}</div>`;
+
+    dimGroup.questions.forEach((q, qi) => {
+      const qKey = `${dgi}_${qi}`;
+      h += `<div class="cal-question">`;
+      h += `<div class="cal-q-text">${q.text}</div>`;
+      h += `<div class="cal-options">`;
+      q.options.forEach((opt, oi) => {
+        h += `<label class="cal-option" data-key="${qKey}" data-oi="${oi}" onclick="selectCalOption(this, '${qKey}', ${oi}, ${opt.mod}, ${dimGroup.dim})">`;
+        h += `<input type="radio" name="cal_${qKey}">`;
+        h += `<span class="cal-option-text">${opt.label}</span>`;
+        h += `</label>`;
+      });
+      h += `</div></div>`;
+    });
+
+    dimDiv.innerHTML = h;
+    container.appendChild(dimDiv);
+  });
+}
+
+function selectCalOption(el, key, oi, mod, dim) {
+  // Deselect siblings
+  el.closest('.cal-options').querySelectorAll('.cal-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+
+  // Store answer
+  if (!calibrationAnswers[dim]) calibrationAnswers[dim] = [];
+  calibrationAnswers[dim] = calibrationAnswers[dim].filter(a => a.key !== key);
+  calibrationAnswers[dim].push({ key, mod });
+
+  // Check if all questions answered
+  checkCalibrationComplete();
+}
+
+function checkCalibrationComplete() {
+  let totalQuestions = 0;
+  let answeredQuestions = 0;
+  CALIBRATION_QUESTIONS.forEach(dg => {
+    totalQuestions += dg.questions.length;
+  });
+  Object.values(calibrationAnswers).forEach(answers => {
+    answeredQuestions += answers.length;
+  });
+  document.getElementById('calibrationSubmit').disabled = answeredQuestions < totalQuestions;
+}
+
+function submitCalibration() {
+  // Calculate calibrated scores
+  const calibratedVals = [...vals];
+  Object.keys(calibrationAnswers).forEach(dim => {
+    const dimIndex = parseInt(dim);
+    const answers = calibrationAnswers[dim];
+    let totalMod = 0;
+    answers.forEach(a => { totalMod += a.mod; });
+    // Average the modifiers for this dimension
+    const avgMod = totalMod / answers.length;
+    calibratedVals[dimIndex] = Math.max(1, Math.min(5, Math.round((calibratedVals[dimIndex] + avgMod) * 2) / 2));
+    // Round to nearest integer for the final value
+    calibratedVals[dimIndex] = Math.max(1, Math.min(5, Math.round(calibratedVals[dimIndex])));
+  });
+
+  // Update the main Explorer with calibrated values
+  const originalVals = [...vals];
+  vals = calibratedVals;
+  syncSliders();
+  anim(vals);
+
+  // Hide calibration, show recalibrated results
+  document.getElementById('calibrationSection').classList.remove('visible');
+  document.getElementById('calibrationSection').style.display = 'none';
+
+  // Build recalibrated results summary
+  showRecalibratedResults(originalVals, calibratedVals);
+
+  // Save to Firestore (publicAssessments collection)
+  savePublicAssessment(capturedEmail, originalVals, calibratedVals);
+}
+
+function showRecalibratedResults(original, calibrated) {
+  const container = document.getElementById('recalibratedResults');
+  const summaryDiv = document.getElementById('recalibratedSummary');
+
+  const s = score(calibrated), t = tier(s);
+
+  let h = `<p style="font-size:15px; color:var(--label-secondary); margin-bottom:20px;">Your scores have been recalibrated based on your responses. The radar chart above reflects your updated profile.</p>`;
+
+  h += `<div class="recalibrated-details">`;
+  DIMS.forEach((dim, i) => {
+    const changed = original[i] !== calibrated[i];
+    h += `<div class="recal-dim" style="${changed ? 'border-color: var(--accent);' : ''}">`;
+    h += `<div class="recal-dim-name">${dim.replace('& ','&amp; ')}</div>`;
+    if (changed) {
+      h += `<div class="recal-dim-vals">${original[i]} <span class="arrow">${calibrated[i] > original[i] ? '\u2191' : '\u2193'}</span> ${calibrated[i]}</div>`;
+    } else {
+      h += `<div class="recal-dim-vals">${calibrated[i]}</div>`;
+    }
+    h += `</div>`;
+  });
+  h += `</div>`;
+
+  summaryDiv.innerHTML = h;
+  container.classList.add('visible');
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===== FIREBASE INTEGRATION =====
+
+let db = null;
+let auth = null;
+
+function initFirebase() {
+  try {
+    // Check if Firebase is available and config exists
+    if (typeof firebase === 'undefined') return;
+
+    // Try loading external config first
+    const script = document.querySelector('script[src*="firebase-app.js"]');
+    if (script) return; // Let external config handle it
+
+    // Fallback: check if already initialized
+    if (firebase.apps.length > 0) {
+      auth = firebase.auth();
+      db = firebase.firestore();
+      setupAuthListener();
+    }
+  } catch(e) {
+    console.log('Firebase not configured yet. Running in standalone mode.');
+  }
+}
+
+function setupAuthListener() {
+  if (!auth) return;
+  auth.onAuthStateChanged(user => {
+    currentUser = user;
+    if (user) {
+      showLoggedInUI(user);
+    } else {
+      showPublicUI();
+    }
+  });
+}
+
+function showLoggedInUI(user) {
+  const name = user.displayName || user.email.split('@')[0];
+
+  // Show auth banner
+  const banner = document.getElementById('authBanner');
+  banner.innerHTML = `Welcome back, <strong>${name}</strong>. <a href="portal.html">Go to your portal</a>`;
+  banner.style.display = 'block';
+
+  // Update nav
+  document.getElementById('navBackLink').textContent = 'Back to portal';
+  document.getElementById('navBackLink').href = 'portal.html';
+
+  // Show client context
+  const ctx = document.getElementById('clientContext');
+  ctx.classList.add('visible');
+
+  // Check for existing baseline
+  loadUserAssessments(user.uid).then(assessments => {
+    if (assessments && assessments.baseline) {
+      userBaseline = assessments.baseline;
+      ctx.innerHTML = `This is your <strong>reassessment</strong>. Take your time. When you're done, save your results to compare against your baseline.`;
+      // Offer to show baseline overlay
+      loadBaselineOverlay(userBaseline.scores);
+    } else {
+      ctx.innerHTML = `This is your <strong>baseline assessment</strong>. Take your time and answer honestly. Your results will be saved to your profile.`;
+    }
+  });
+
+  // Show save button, hide email gate
+  document.getElementById('saveRow').classList.add('visible');
+  document.getElementById('layer2Section').style.display = 'none';
+}
+
+function showPublicUI() {
+  // Show the Layer 2 section for public visitors
+  document.getElementById('layer2Section').style.display = 'block';
+  document.getElementById('saveRow').classList.remove('visible');
+  document.getElementById('authBanner').style.display = 'none';
+}
+
+async function loadUserAssessments(uid) {
+  if (!db) return null;
+  try {
+    const baselineDoc = await db.collection('users').doc(uid).collection('assessments').doc('baseline').get();
+    const finalDoc = await db.collection('users').doc(uid).collection('assessments').doc('final').get();
+    return {
+      baseline: baselineDoc.exists ? baselineDoc.data() : null,
+      final: finalDoc.exists ? finalDoc.data() : null
+    };
+  } catch(e) {
+    console.error('Error loading assessments:', e);
+    return null;
+  }
+}
+
+async function saveAssessment() {
+  if (!currentUser || !db) {
+    alert('Unable to save. Please ensure you are logged in.');
+    return;
+  }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const s = score(vals);
+  const t = tier(s);
+  const a = archetype(vals);
+  const fl = flags(vals);
+
+  const assessmentData = {
+    scores: {
+      aiFoundations: vals[0],
+      criticalEvaluation: vals[1],
+      productiveCreation: vals[2],
+      technicalBuilding: vals[3],
+      ethicsGovernance: vals[4],
+      toolFluency: vals[5]
+    },
+    tier: t.name,
+    archetype: a.n,
+    flags: fl.map(f => ({ type: f.t, text: f.x })),
+    score: s,
+    completedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    const docId = userBaseline ? 'final' : 'baseline';
+    await db.collection('users').doc(currentUser.uid).collection('assessments').doc(docId).set(assessmentData);
+
+    btn.textContent = 'Saved';
+    btn.style.background = 'var(--green)';
+
+    // Show portal return link
+    document.getElementById('portalReturn').classList.add('visible');
+  } catch(e) {
+    console.error('Error saving assessment:', e);
+    btn.textContent = 'Error. Try again.';
+    btn.disabled = false;
+    btn.style.background = '';
+  }
+}
+
+async function savePublicAssessment(email, originalScores, calibratedScores) {
+  if (!db) return;
+  try {
+    await db.collection('publicAssessments').add({
+      email: email,
+      originalScores: {
+        aiFoundations: originalScores[0],
+        criticalEvaluation: originalScores[1],
+        productiveCreation: originalScores[2],
+        technicalBuilding: originalScores[3],
+        ethicsGovernance: originalScores[4],
+        toolFluency: originalScores[5]
+      },
+      calibratedScores: {
+        aiFoundations: calibratedScores[0],
+        criticalEvaluation: calibratedScores[1],
+        productiveCreation: calibratedScores[2],
+        technicalBuilding: calibratedScores[3],
+        ethicsGovernance: calibratedScores[4],
+        toolFluency: calibratedScores[5]
+      },
+      originalScore: score(originalScores),
+      calibratedScore: score(calibratedScores),
+      tier: tier(score(calibratedScores)).name,
+      archetype: archetype(calibratedScores).n,
+      calibrationAnswers: calibrationAnswers,
+      completedAt: new Date().toISOString()
+    });
+  } catch(e) {
+    console.log('Could not save public assessment:', e);
+  }
+}
+
+// ===== INIT =====
+
+function init() {
+  setupCanvas();
+  buildSliders();
+  buildPresets();
+  dv = [...vals];
+  updateColors();
+  draw();
+  updateSummary();
+  window.addEventListener('resize', () => { setupCanvas(); draw(); });
+
+  // Init Firebase (non-blocking)
+  initFirebase();
+}
+
+init();
+</script>
+
+<!-- External Firebase config (loaded after main script so it can override) -->
+<script src="assets/js/firebase-app.js" onerror="console.log('firebase-app.js not found. Running standalone.')"></script>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign In | AI Badge</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="logo-mark">
+        <h1 class="serif">AI Badge</h1>
+        <p>Sign in to your coaching portal</p>
+      </div>
+
+      <div id="auth-error" class="auth-error"></div>
+
+      <form id="login-form" autocomplete="on">
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-input"
+            placeholder="you@company.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-input"
+            placeholder="Your password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" id="sign-in-btn">
+          Sign In
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <a href="#" id="forgot-password-link">Forgot password?</a>
+      </div>
+    </div>
+
+    <div class="auth-branding">
+      fiveinnolabs
+    </div>
+  </div>
+
+  <!-- Firebase SDK (v10 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="assets/js/firebase-app.js"></script>
+
+  <script>
+    // Initialise Firebase
+    initFirebase();
+
+    // If already signed in, redirect
+    onAuthChange((user) => {
+      if (user) {
+        window.location.href = "portal.html";
+      }
+    });
+
+    // DOM references
+    const loginForm = document.getElementById("login-form");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const signInBtn = document.getElementById("sign-in-btn");
+    const authError = document.getElementById("auth-error");
+    const forgotLink = document.getElementById("forgot-password-link");
+
+    // Sign in handler
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideError();
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showError("Please enter your email and password.");
+        return;
+      }
+
+      signInBtn.disabled = true;
+      signInBtn.textContent = "Signing in\u2026";
+
+      const result = await signIn(email, password);
+
+      if (result.success) {
+        // onAuthChange will handle the redirect
+        signInBtn.textContent = "Redirecting\u2026";
+      } else {
+        showError(result.error);
+        signInBtn.disabled = false;
+        signInBtn.textContent = "Sign In";
+      }
+    });
+
+    // Forgot password handler
+    forgotLink.addEventListener("click", async (e) => {
+      e.preventDefault();
+      hideError();
+
+      const email = emailInput.value.trim();
+      if (!email) {
+        showError("Enter your email address above, then click Forgot password.");
+        return;
+      }
+
+      const result = await sendPasswordReset(email);
+      if (result.success) {
+        authError.textContent = "Password reset email sent. Check your inbox.";
+        authError.style.background = "#f0fdf4";
+        authError.style.color = "#059669";
+        authError.style.borderColor = "#bbf7d0";
+        authError.classList.add("visible");
+      } else {
+        showError(result.error);
+      }
+    });
+
+    // Error helpers
+    function showError(message) {
+      authError.textContent = message;
+      authError.style.background = "";
+      authError.style.color = "";
+      authError.style.borderColor = "";
+      authError.classList.add("visible");
+    }
+
+    function hideError() {
+      authError.classList.remove("visible");
+    }
+  </script>
+
+</body>
+</html>

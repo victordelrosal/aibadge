@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Badge: Discover Your AI Capability</title>
+<meta name="description" content="AI Badge is a world-class AI coaching practice. Map your AI capability across six dimensions grounded in UNESCO, Turing, and EU frameworks.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231a1a4e'/><stop offset='100%25' stop-color='%23243b8e'/></linearGradient></defs><polygon points='50,3 93,28 93,72 50,97 7,72 7,28' fill='url(%23g)' rx='6'/><text x='50' y='58' text-anchor='middle' font-family='-apple-system,sans-serif' font-size='36' font-weight='700' fill='white'>AI</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<style>
+/* === RESET & VARIABLES === */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue-deep:#000036;
+  --blue-royal:#02066F;
+  --blue-electric:#050c91;
+  --blue-vivid:#001489;
+  --blue-accent:#0066ff;
+  --blue-light:#4080ff;
+  --blue-glow:rgba(0,102,255,0.3);
+  --gold-premium:#D4AF37;
+  --gold-rich:#B8860B;
+  --gold-light:#F5E7A0;
+  --gold-glow:rgba(212,175,55,0.4);
+  --white:#ffffff;
+  --off-white:#FAFBFF;
+  --grey-light:#E8ECF3;
+  --grey-medium:#D1D5DB;
+  --grey-dark:#6B7280;
+  --black-soft:#0A0E27;
+  --black-rich:#030712;
+  --shadow-soft:0 4px 20px rgba(0,0,0,0.08);
+  --shadow-medium:0 10px 40px rgba(0,0,0,0.12);
+  --shadow-deep:0 20px 60px rgba(0,0,0,0.2);
+  scroll-behavior:smooth;
+}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  line-height:1.6;
+  color:var(--black-soft);
+  background:var(--white);
+  overflow-x:hidden;
+}
+.container{max-width:1200px;margin:0 auto;padding:0 2rem}
+.section{padding:6rem 0;position:relative}
+.section-light{background:var(--white)}
+.section-gray{background:linear-gradient(180deg,#f7f8fc 0%,#eef0f5 100%)}
+.text-center{text-align:center}
+h2.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:2.8rem;
+  font-weight:700;
+  margin-bottom:1rem;
+  color:var(--black-soft);
+}
+h2.section-title.light{color:var(--white)}
+.section-subtitle{
+  font-size:1.15rem;
+  color:var(--grey-dark);
+  max-width:640px;
+  margin:0 auto 3rem;
+  line-height:1.7;
+}
+.fade-in{
+  opacity:0;
+  transform:translateY(30px);
+  transition:opacity 0.7s ease,transform 0.7s ease;
+}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* === AUTH BANNER === */
+#auth-banner{
+  display:none;
+  background:linear-gradient(90deg,var(--gold-premium),var(--gold-rich));
+  color:var(--black-soft);
+  text-align:center;
+  padding:0.7rem 1rem;
+  font-weight:600;
+  font-size:0.95rem;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1001;
+}
+#auth-banner a{color:var(--black-soft);text-decoration:underline;margin-left:0.5rem}
+body.has-auth-banner{padding-top:2.5rem}
+body.has-auth-banner .navbar{top:2.5rem}
+
+/* === NAVBAR === */
+.navbar{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:1000;
+  background:rgba(0,0,54,0.85);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  transition:all 0.3s ease;
+}
+.navbar.compact{padding:0.3rem 0;background:rgba(0,0,54,0.95)}
+.nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:1.2rem 4%;
+  max-width:1400px;
+  margin:auto;
+  transition:padding 0.3s ease;
+}
+.navbar.compact .nav{padding:0.7rem 4%}
+.logo{
+  font-size:1.6rem;
+  font-weight:700;
+  letter-spacing:0.02em;
+  text-decoration:none;
+  display:flex;
+  align-items:baseline;
+  gap:0.15em;
+}
+.logo-ai{color:var(--gold-premium);font-weight:700}
+.logo-badge{color:var(--white);font-weight:700}
+.nav-links{display:flex;gap:2.5rem;list-style:none;align-items:center}
+.nav-links a{
+  text-decoration:none;
+  color:rgba(255,255,255,0.8);
+  font-weight:500;
+  font-size:0.92rem;
+  position:relative;
+  transition:color 0.3s ease;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-5px;left:0;
+  width:0;height:2px;background:var(--gold-premium);
+  transition:width 0.3s ease;
+}
+.nav-links a:hover{color:var(--white)}
+.nav-links a:hover::after{width:100%}
+.nav-signin{
+  color:rgba(255,255,255,0.6) !important;
+  font-size:0.88rem !important;
+}
+.mobile-toggle{
+  display:none;
+  background:none;border:none;cursor:pointer;
+  width:28px;height:20px;position:relative;
+}
+.mobile-toggle span{
+  display:block;width:100%;height:2px;
+  background:var(--white);border-radius:2px;
+  position:absolute;left:0;transition:all 0.3s ease;
+}
+.mobile-toggle span:nth-child(1){top:0}
+.mobile-toggle span:nth-child(2){top:50%;transform:translateY(-50%)}
+.mobile-toggle span:nth-child(3){bottom:0}
+
+/* === HERO === */
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(165deg,var(--blue-deep) 0%,var(--blue-royal) 40%,var(--blue-electric) 100%);
+  position:relative;
+  overflow:hidden;
+  padding:7rem 2rem 4rem;
+}
+.hero-particles{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  overflow:hidden;z-index:1;
+}
+.particle{
+  position:absolute;
+  background:rgba(100,160,255,0.35);
+  border-radius:50%;
+  opacity:0.3;
+  animation:float 20s infinite ease-in-out;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) translateX(0) scale(1)}
+  33%{transform:translateY(-30px) translateX(30px) scale(1.1)}
+  66%{transform:translateY(30px) translateX(-30px) scale(0.9)}
+}
+.hero-content{
+  position:relative;z-index:2;
+  text-align:center;
+  max-width:1100px;margin:auto;
+  width:100%;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:3.6rem;
+  font-weight:700;
+  color:var(--white);
+  margin-bottom:1.2rem;
+  line-height:1.15;
+}
+.hero .sub{
+  font-size:1.2rem;
+  color:rgba(255,255,255,0.75);
+  max-width:680px;
+  margin:0 auto 2.5rem;
+  line-height:1.7;
+}
+
+/* === EXPLORER LITE (HERO) === */
+.explorer-lite{
+  display:grid;
+  grid-template-columns:1fr 280px;
+  gap:2rem;
+  align-items:center;
+  max-width:820px;
+  margin:0 auto 2.5rem;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px;
+  padding:2rem;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.explorer-sliders{display:flex;flex-direction:column;gap:0.9rem}
+.slider-row{display:flex;align-items:center;gap:0.8rem}
+.slider-label{
+  font-size:0.82rem;
+  font-weight:600;
+  color:rgba(255,255,255,0.85);
+  min-width:115px;
+  text-align:right;
+  white-space:nowrap;
+}
+.slider-val{
+  font-size:0.82rem;
+  font-weight:700;
+  color:var(--gold-premium);
+  min-width:18px;
+  text-align:center;
+}
+input[type="range"].explorer-slider{
+  -webkit-appearance:none;
+  appearance:none;
+  flex:1;
+  height:4px;
+  background:rgba(255,255,255,0.12);
+  border-radius:4px;
+  outline:none;
+  cursor:pointer;
+}
+input[type="range"].explorer-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:18px;height:18px;
+  border-radius:50%;
+  background:var(--gold-premium);
+  border:2px solid rgba(255,255,255,0.9);
+  box-shadow:0 2px 8px rgba(212,175,55,0.4);
+  cursor:pointer;
+  transition:transform 0.15s ease;
+}
+input[type="range"].explorer-slider::-webkit-slider-thumb:hover{
+  transform:scale(1.2);
+}
+input[type="range"].explorer-slider::-moz-range-thumb{
+  width:18px;height:18px;
+  border-radius:50%;
+  background:var(--gold-premium);
+  border:2px solid rgba(255,255,255,0.9);
+  box-shadow:0 2px 8px rgba(212,175,55,0.4);
+  cursor:pointer;
+}
+.explorer-radar{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.5rem;
+}
+#radar-lite{
+  max-width:100%;
+  height:auto;
+}
+.radar-score{
+  font-size:1.6rem;
+  font-weight:700;
+  color:var(--white);
+  line-height:1.2;
+}
+.radar-tier{
+  font-size:0.95rem;
+  font-weight:600;
+  transition:color 0.3s ease;
+}
+.radar-archetype{
+  font-size:0.82rem;
+  color:rgba(255,255,255,0.6);
+}
+.radar-archetype span{
+  color:rgba(255,255,255,0.85);
+  font-weight:600;
+}
+
+/* CTA Button */
+.btn-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  padding:1rem 2.5rem;
+  font-size:1.1rem;
+  font-weight:700;
+  color:var(--black-soft);
+  background:linear-gradient(135deg,var(--gold-premium),var(--gold-rich));
+  border:none;
+  border-radius:12px;
+  text-decoration:none;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  box-shadow:0 4px 20px rgba(212,175,55,0.3);
+}
+.btn-cta:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(212,175,55,0.4);
+}
+.btn-cta-outline{
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  padding:0.9rem 2.2rem;
+  font-size:1.05rem;
+  font-weight:600;
+  color:var(--white);
+  background:transparent;
+  border:2px solid rgba(255,255,255,0.3);
+  border-radius:12px;
+  text-decoration:none;
+  cursor:pointer;
+  transition:all 0.3s ease;
+}
+.btn-cta-outline:hover{
+  border-color:var(--gold-premium);
+  color:var(--gold-premium);
+}
+
+/* === DIMENSIONS SECTION === */
+.dimensions-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.5rem;
+  max-width:1000px;
+  margin:0 auto;
+}
+.dim-card{
+  background:var(--white);
+  border-radius:16px;
+  padding:2rem 1.8rem;
+  border:1px solid rgba(0,0,0,0.06);
+  box-shadow:var(--shadow-soft);
+  transition:all 0.3s ease;
+  position:relative;
+  overflow:hidden;
+}
+.dim-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--gold-premium),var(--gold-rich));
+}
+.dim-card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-medium);
+}
+.dim-icon{font-size:2rem;margin-bottom:0.8rem;display:block}
+.dim-name{
+  font-size:1.1rem;
+  font-weight:700;
+  color:var(--black-soft);
+  margin-bottom:0.5rem;
+}
+.dim-desc{
+  font-size:0.92rem;
+  color:var(--grey-dark);
+  line-height:1.6;
+}
+.framework-attribution{
+  text-align:center;
+  margin-top:2.5rem;
+  font-size:0.88rem;
+  color:var(--grey-dark);
+  font-style:italic;
+}
+
+/* === HOW IT WORKS === */
+.steps-pipeline{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  max-width:900px;
+  margin:0 auto;
+  position:relative;
+}
+.steps-pipeline::before{
+  content:'';
+  position:absolute;
+  top:2.8rem;
+  left:12%;
+  right:12%;
+  height:2px;
+  background:linear-gradient(90deg,var(--grey-light),var(--blue-accent),var(--gold-premium));
+  z-index:0;
+}
+.step-item{
+  text-align:center;
+  position:relative;
+  z-index:1;
+  padding:0 0.5rem;
+}
+.step-icon{
+  width:56px;height:56px;
+  border-radius:50%;
+  background:var(--white);
+  border:2px solid var(--blue-accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;
+  margin:0 auto 1rem;
+  box-shadow:var(--shadow-soft);
+}
+.step-name{
+  font-size:1.05rem;
+  font-weight:700;
+  color:var(--black-soft);
+  margin-bottom:0.4rem;
+}
+.step-desc{
+  font-size:0.88rem;
+  color:var(--grey-dark);
+  line-height:1.5;
+}
+
+/* === WHO THIS IS FOR === */
+.who-list{
+  max-width:700px;
+  margin:0 auto;
+  list-style:none;
+}
+.who-list li{
+  font-size:1.1rem;
+  color:var(--black-soft);
+  line-height:1.8;
+  padding:0.5rem 0;
+  display:flex;
+  align-items:flex-start;
+  gap:0.8rem;
+}
+.who-list li .check{
+  color:var(--gold-premium);
+  font-weight:700;
+  font-size:1.2rem;
+  flex-shrink:0;
+  margin-top:0.15rem;
+}
+.who-closing{
+  text-align:center;
+  margin-top:2rem;
+  font-size:1.05rem;
+  color:var(--grey-dark);
+  font-style:italic;
+  max-width:600px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* === PROGRAMME === */
+.programme-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.2rem;
+  max-width:900px;
+  margin:0 auto 3rem;
+}
+.week-card{
+  background:var(--white);
+  border-radius:14px;
+  padding:1.5rem;
+  border:1px solid rgba(0,0,0,0.06);
+  box-shadow:var(--shadow-soft);
+  transition:all 0.3s ease;
+}
+.week-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-medium)}
+.week-num{
+  font-size:0.78rem;
+  font-weight:700;
+  text-transform:uppercase;
+  color:var(--blue-accent);
+  letter-spacing:0.08em;
+  margin-bottom:0.5rem;
+}
+.week-desc{font-size:0.92rem;color:var(--grey-dark);line-height:1.6}
+.format-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1rem;
+  max-width:800px;
+  margin:0 auto;
+}
+.format-item{
+  display:flex;
+  align-items:flex-start;
+  gap:0.6rem;
+  font-size:0.92rem;
+  color:var(--black-soft);
+}
+.format-item .icon{
+  color:var(--blue-accent);
+  font-size:1.1rem;
+  flex-shrink:0;
+  margin-top:0.1rem;
+}
+
+/* === GUIDE (INSTRUCTOR) === */
+.guide-section{padding-bottom:4rem}
+.guide-photo{
+  width:260px;
+  height:auto;
+  border-radius:20px;
+  margin-bottom:2rem;
+  box-shadow:var(--shadow-medium);
+}
+.guide-card{
+  max-width:900px;
+  margin:0 auto;
+  background:var(--white);
+  border-radius:24px;
+  padding:3rem;
+  box-shadow:var(--shadow-medium);
+  position:relative;
+  overflow:hidden;
+}
+.guide-card::before{
+  content:'';
+  position:absolute;
+  top:-60px;right:-60px;
+  width:160px;height:160px;
+  background:radial-gradient(circle,var(--blue-glow) 0%,transparent 70%);
+  opacity:0.3;
+}
+.guide-bio{position:relative;z-index:1}
+.guide-bio p{
+  font-size:1.1rem;
+  line-height:1.8;
+  margin-bottom:1.2rem;
+  color:var(--grey-dark);
+}
+.guide-bio p:first-child{
+  font-size:1.2rem;
+  color:var(--black-soft);
+}
+
+/* Training logos */
+.training-logos{margin:2rem 0}
+.training-logos h3{
+  font-size:1.15rem;
+  text-align:center;
+  margin-bottom:1.5rem;
+  color:var(--grey-dark);
+  font-weight:600;
+  background:rgba(0,102,255,0.05);
+  padding:1.2rem;
+  border-radius:8px;
+}
+.training-logos-container{overflow:hidden;width:100%}
+.training-logos-track{
+  display:flex;
+  gap:3rem;
+  animation:scrollLogos 22s linear infinite;
+  width:max-content;
+}
+.training-logos-track:hover{animation-play-state:paused}
+.training-logos-track img{
+  height:140px;
+  width:auto;
+  filter:grayscale(100%);
+  opacity:0.8;
+  flex-shrink:0;
+  transition:all 0.3s ease;
+  cursor:pointer;
+}
+.training-logos-track img:hover{
+  filter:grayscale(0%);
+  opacity:1;
+  transform:scale(1.2);
+  z-index:10;
+  position:relative;
+}
+@keyframes scrollLogos{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(calc(-50% - 1.5rem))}
+}
+
+/* Award */
+.award-box{
+  background:rgba(0,102,255,0.05);
+  border-radius:16px;
+  padding:1.5rem;
+  margin-top:2rem;
+  border-left:4px solid var(--gold-premium);
+  display:flex;
+  align-items:flex-start;
+  gap:1rem;
+}
+.award-box img{height:90px;flex-shrink:0;margin-top:0.2rem;opacity:0.85}
+.award-box p{
+  font-size:1.05rem;
+  line-height:1.8;
+  color:var(--black-soft);
+  font-weight:500;
+}
+.award-box strong{color:var(--gold-premium)}
+
+/* === TESTIMONIALS === */
+.testimonials-carousel{position:relative}
+.carousel-viewport{overflow:hidden}
+.carousel-track{display:flex;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1)}
+.carousel-slide{flex:0 0 100%;box-sizing:border-box;padding:0 1rem}
+@media(min-width:700px){.carousel-slide{flex-basis:50%}}
+.testimonial{
+  background:var(--white);
+  border-radius:20px;
+  padding:2.5rem;
+  box-shadow:var(--shadow-soft);
+  border:1px solid rgba(0,0,0,0.05);
+  min-height:300px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.testimonial-quote{
+  font-size:1.05rem;
+  line-height:1.8;
+  color:var(--black-soft);
+  margin-bottom:1rem;
+  font-style:italic;
+}
+.testimonial-quote::before{content:'\201C';font-size:2rem;color:var(--gold-premium);line-height:0;vertical-align:-0.4em;margin-right:0.1em}
+.testimonial-author{
+  font-size:0.9rem;
+  color:var(--grey-dark);
+  font-weight:500;
+}
+.testimonial-img{
+  width:100%;max-width:100%;height:auto;
+  border-radius:12px;display:block;
+}
+.carousel-button{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,0.9);
+  border:1px solid rgba(0,0,0,0.08);
+  font-size:1.5rem;
+  cursor:pointer;
+  z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-soft);
+  transition:all 0.2s ease;
+  color:var(--black-soft);
+}
+.carousel-button:hover{background:var(--white);box-shadow:var(--shadow-medium)}
+.carousel-button.prev{left:-8px}
+.carousel-button.next{right:-8px}
+.carousel-dots{
+  display:flex;gap:8px;justify-content:center;margin-top:1.5rem;
+}
+.carousel-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(0,0,0,0.15);
+  border:none;padding:0;cursor:pointer;
+  transition:all 0.3s ease;
+}
+.carousel-dot[aria-current="true"]{background:var(--blue-accent)}
+
+/* === PRICING === */
+.pricing-card{
+  max-width:560px;
+  margin:0 auto;
+  background:var(--white);
+  border-radius:24px;
+  padding:3rem;
+  box-shadow:var(--shadow-medium);
+  border:1px solid rgba(0,0,0,0.06);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.pricing-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:4px;
+  background:linear-gradient(90deg,var(--gold-premium),var(--gold-rich),var(--gold-premium));
+}
+.pricing-anchor{
+  font-size:1.1rem;
+  color:var(--grey-dark);
+  margin-bottom:0.5rem;
+}
+.pricing-anchor s{opacity:0.6}
+.pricing-amount{
+  font-size:4rem;
+  font-weight:700;
+  color:var(--gold-premium);
+  margin-bottom:0.3rem;
+  line-height:1.1;
+}
+.pricing-label{
+  font-size:1rem;
+  font-weight:600;
+  color:var(--blue-accent);
+  margin-bottom:2rem;
+}
+.pricing-list{
+  list-style:none;
+  text-align:left;
+  margin:0 auto 2.5rem;
+  max-width:380px;
+}
+.pricing-list li{
+  padding:0.5rem 0;
+  font-size:1rem;
+  color:var(--black-soft);
+  display:flex;
+  align-items:flex-start;
+  gap:0.6rem;
+  line-height:1.5;
+}
+.pricing-list li .tick{
+  color:var(--gold-premium);
+  font-weight:700;
+  flex-shrink:0;
+  margin-top:0.1rem;
+}
+.pricing-note{
+  font-size:0.88rem;
+  color:var(--grey-dark);
+  margin-top:1.5rem;
+}
+
+/* === FAQ === */
+.faq-container{max-width:800px;margin:0 auto}
+.faq-item{
+  margin-bottom:1rem;
+  background:var(--white);
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid rgba(0,0,0,0.06);
+  box-shadow:0 4px 16px rgba(0,0,0,0.04);
+  transition:all 0.3s ease;
+}
+.faq-item:hover{box-shadow:0 6px 24px rgba(0,0,0,0.07)}
+.faq-question{
+  padding:1.3rem 1.5rem;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  transition:all 0.3s ease;
+}
+.faq-question h3{
+  color:#444;
+  font-size:1.1rem;
+  margin:0;
+  font-weight:500;
+  letter-spacing:0.01em;
+}
+.faq-icon{
+  color:var(--blue-accent);
+  font-size:1.4rem;
+  font-weight:300;
+  transition:transform 0.3s ease;
+  flex-shrink:0;
+  margin-left:1rem;
+}
+.faq-answer{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease;
+  padding:0 1.5rem;
+  opacity:0;
+}
+.faq-answer.open{
+  opacity:1;
+}
+.faq-answer p{
+  padding-bottom:1.5rem;
+  color:#555;
+  line-height:1.8;
+  font-size:1rem;
+}
+
+/* === FOOTER === */
+.footer{
+  background:linear-gradient(165deg,var(--blue-deep) 0%,var(--blue-royal) 100%);
+  color:rgba(255,255,255,0.7);
+  padding:3rem 0;
+  text-align:center;
+}
+.footer-logo{
+  height:40px;
+  margin-bottom:1rem;
+  opacity:0.8;
+}
+.footer p{font-size:0.88rem;margin-bottom:0.5rem}
+.footer-links{display:flex;gap:1.5rem;justify-content:center;margin:1rem 0}
+.footer-links a{
+  color:rgba(255,255,255,0.6);
+  text-decoration:none;
+  font-size:0.88rem;
+  transition:color 0.3s ease;
+}
+.footer-links a:hover{color:var(--white)}
+.footer-brand{font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:0.5rem}
+
+/* === RESPONSIVE === */
+@media(max-width:1200px){
+  .hero h1{font-size:3rem}
+}
+@media(max-width:900px){
+  .explorer-lite{
+    grid-template-columns:1fr;
+    max-width:500px;
+  }
+  .explorer-radar{order:-1}
+  .dimensions-grid{grid-template-columns:repeat(2,1fr)}
+  .steps-pipeline{grid-template-columns:repeat(2,1fr);gap:2rem}
+  .steps-pipeline::before{display:none}
+  .programme-grid{grid-template-columns:repeat(2,1fr)}
+  h2.section-title{font-size:2.2rem}
+}
+@media(max-width:680px){
+  .nav-links{display:none}
+  .nav-links.open{
+    display:flex;
+    flex-direction:column;
+    position:absolute;
+    top:100%;left:0;right:0;
+    background:rgba(0,0,54,0.97);
+    padding:1.5rem 2rem;
+    gap:1.2rem;
+  }
+  .mobile-toggle{display:block}
+  .hero{padding:6rem 1.2rem 3rem}
+  .hero h1{font-size:2.2rem}
+  .hero .sub{font-size:1rem}
+  .explorer-lite{padding:1.2rem;gap:1.2rem}
+  .slider-label{min-width:90px;font-size:0.75rem}
+  .dimensions-grid{grid-template-columns:1fr}
+  .steps-pipeline{grid-template-columns:1fr;gap:1.5rem}
+  .programme-grid{grid-template-columns:1fr}
+  .section{padding:4rem 0}
+  .container{padding:0 1.2rem}
+  .guide-card{padding:2rem}
+  .pricing-card{padding:2rem}
+  .award-box{flex-direction:column;align-items:center;text-align:center}
+  .carousel-button.prev{left:2px}
+  .carousel-button.next{right:2px}
+}
+</style>
+</head>
+<body>
+
+<!-- Auth Banner (hidden by default, shown by Firebase) -->
+<div id="auth-banner">
+  Welcome back, <span id="auth-name">User</span>.
+  <a href="portal.html">Go to your portal</a>
+</div>
+
+<!-- Fixed Navigation -->
+<header class="navbar" id="navbar">
+  <nav class="nav">
+    <a href="#" class="logo"><span class="logo-ai">AI</span><span class="logo-badge">Badge</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#dimensions">Dimensions</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#guide">Guide</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="login.html" class="nav-signin">Sign In</a></li>
+    </ul>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="hero">
+  <div class="hero-particles" id="particles"></div>
+  <div class="hero-content">
+    <h1 class="fade-in">Discover Your AI Capability</h1>
+    <p class="sub fade-in">Most professionals use AI without knowing their real level. In 30 seconds, map yours across six dimensions grounded in UNESCO, Turing, and EU frameworks.</p>
+
+    <!-- LIVE SIMPLIFIED RADAR EXPLORER -->
+    <div class="explorer-lite fade-in" id="explorerLite">
+      <div class="explorer-sliders" id="explorerSliders">
+        <!-- Sliders built by JS -->
+      </div>
+      <div class="explorer-radar">
+        <canvas id="radar-lite" width="540" height="520"></canvas>
+        <div class="radar-score" id="radarScore">Score: 0</div>
+        <div class="radar-tier" id="radarTier">AI Aware</div>
+        <div class="radar-archetype" id="radarArchetype">Profile: <span>Developing</span></div>
+      </div>
+    </div>
+
+    <a href="explore.html" class="btn-cta fade-in">Get Your Full Assessment <span>&rarr;</span></a>
+  </div>
+</section>
+
+<!-- ===================== SIX DIMENSIONS ===================== -->
+<section class="section section-light" id="dimensions">
+  <div class="container">
+    <h2 class="section-title text-center fade-in">Six Dimensions of AI Capability</h2>
+    <p class="section-subtitle text-center fade-in">A comprehensive framework mapping the full spectrum of AI competency.</p>
+
+    <div class="dimensions-grid">
+      <div class="dim-card fade-in">
+        <span class="dim-icon">&#129504;</span>
+        <div class="dim-name">AI Foundations</div>
+        <div class="dim-desc">Core concepts: how models work, types of AI, capabilities and limitations.</div>
+      </div>
+      <div class="dim-card fade-in">
+        <span class="dim-icon">&#128269;</span>
+        <div class="dim-name">Critical Evaluation</div>
+        <div class="dim-desc">Assessing AI outputs for accuracy, bias, and fitness for purpose.</div>
+      </div>
+      <div class="dim-card fade-in">
+        <span class="dim-icon">&#9889;</span>
+        <div class="dim-name">Productive Creation</div>
+        <div class="dim-desc">Using AI to generate, iterate, and produce work at a higher level.</div>
+      </div>
+      <div class="dim-card fade-in">
+        <span class="dim-icon">&#128295;</span>
+        <div class="dim-name">Technical Building</div>
+        <div class="dim-desc">Building applications, automations, and systems with AI.</div>
+      </div>
+      <div class="dim-card fade-in">
+        <span class="dim-icon">&#9878;&#65039;</span>
+        <div class="dim-name">Ethics &amp; Governance</div>
+        <div class="dim-desc">Understanding responsible use, regulation, risk, and organisational policy.</div>
+      </div>
+      <div class="dim-card fade-in">
+        <span class="dim-icon">&#128736;&#65039;</span>
+        <div class="dim-name">Tool Fluency</div>
+        <div class="dim-desc">Practical skill with AI tools: prompting, configuration, and workflow integration.</div>
+      </div>
+    </div>
+
+    <p class="framework-attribution fade-in">Grounded in UNESCO, Alan Turing Institute, DigComp, EU AI Act, and OECD frameworks.</p>
+  </div>
+</section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section class="section section-gray" id="how-it-works">
+  <div class="container">
+    <h2 class="section-title text-center fade-in">Your Journey</h2>
+    <p class="section-subtitle text-center fade-in">Four steps from awareness to measurable growth.</p>
+
+    <div class="steps-pipeline">
+      <div class="step-item fade-in">
+        <div class="step-icon">&#128202;</div>
+        <div class="step-name">Assess</div>
+        <div class="step-desc">Map your capability across six dimensions.</div>
+      </div>
+      <div class="step-item fade-in">
+        <div class="step-icon">&#127919;</div>
+        <div class="step-name">Calibrate</div>
+        <div class="step-desc">Get a personalised development pathway.</div>
+      </div>
+      <div class="step-item fade-in">
+        <div class="step-icon">&#129309;</div>
+        <div class="step-name">Coach</div>
+        <div class="step-desc">Weekly one-to-one check-ins with expert guidance.</div>
+      </div>
+      <div class="step-item fade-in">
+        <div class="step-icon">&#128200;</div>
+        <div class="step-name">Prove</div>
+        <div class="step-desc">Measurable before-and-after progression.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== WHO THIS IS FOR ===================== -->
+<section class="section section-light" id="who">
+  <div class="container">
+    <h2 class="section-title text-center fade-in">Is This For You?</h2>
+
+    <ul class="who-list fade-in">
+      <li><span class="check">&#10003;</span>Mid-career professionals who want structured AI development, not random YouTube tutorials.</li>
+      <li><span class="check">&#10003;</span>Non-technical leaders who need to understand AI deeply without writing code.</li>
+      <li><span class="check">&#10003;</span>Anyone who has tried AI tools but wants a guided path from curious to confident.</li>
+    </ul>
+
+    <p class="who-closing fade-in">If you have been meaning to "get good at AI" but don't know where to start, this is your starting point.</p>
+  </div>
+</section>
+
+<!-- ===================== WHAT YOU GET ===================== -->
+<section class="section section-gray" id="programme">
+  <div class="container">
+    <h2 class="section-title text-center fade-in">The Six-Week Programme</h2>
+    <p class="section-subtitle text-center fade-in">A structured, human-paced coaching engagement.</p>
+
+    <div class="programme-grid">
+      <div class="week-card fade-in">
+        <div class="week-num">Week 1</div>
+        <div class="week-desc">Baseline assessment, orientation, first guided exercises.</div>
+      </div>
+      <div class="week-card fade-in">
+        <div class="week-num">Week 2</div>
+        <div class="week-desc">Check-in, adjust calibration, deepen exercises.</div>
+      </div>
+      <div class="week-card fade-in">
+        <div class="week-num">Week 3</div>
+        <div class="week-desc">Mid-point review, more advanced material.</div>
+      </div>
+      <div class="week-card fade-in">
+        <div class="week-num">Week 4</div>
+        <div class="week-desc">Real-world application to your own work.</div>
+      </div>
+      <div class="week-card fade-in">
+        <div class="week-num">Week 5</div>
+        <div class="week-desc">Consolidation, broader application.</div>
+      </div>
+      <div class="week-card fade-in">
+        <div class="week-num">Week 6</div>
+        <div class="week-desc">Final check-in, reassessment, before-and-after review.</div>
+      </div>
+    </div>
+
+    <div class="format-grid fade-in">
+      <div class="format-item"><span class="icon">&#128337;</span><span>First session: ~30 minutes</span></div>
+      <div class="format-item"><span class="icon">&#128337;</span><span>Weekly check-ins: ~20 minutes</span></div>
+      <div class="format-item"><span class="icon">&#128218;</span><span>Between sessions: self-paced guided exercises + recorded tutorials</span></div>
+      <div class="format-item"><span class="icon">&#128187;</span><span>Platform: Google Meet or Microsoft Teams</span></div>
+      <div class="format-item"><span class="icon">&#9200;</span><span>Flexibility: programme pauses if you are away, resumes when you are back</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MEET YOUR GUIDE ===================== -->
+<section class="section section-light guide-section" id="guide">
+  <div class="container">
+    <h2 class="section-title text-center fade-in">Meet Your Guide</h2>
+
+    <div class="text-center fade-in">
+      <img src="assets/img/VictordelRosal.png" alt="Victor del Rosal" class="guide-photo">
+    </div>
+
+    <div class="guide-card fade-in">
+      <div class="guide-bio">
+        <p><strong>Victor del Rosal</strong> is an award-winning AI educator and author of <em>HUMANLIKE: The AI Transformation</em> and <em>Disruption</em>. He has trained Fortune 500 senior managers and business leaders on generative AI with the UCD Professional Academy, and currently serves as Chief AI Officer at fiveinnolabs and co-founder of Agentive, an AI consulting practice.</p>
+
+        <p>He is an Adjunct Professor at the National College of Ireland, where he teaches AI for Business at the Master's level. He holds degrees from Tec de Monterrey, UCD Smurfit, Oxford, and Harvard. He is the creator of the Five Innovators Framework and the ECHO5 methodology, and a recipient of the Ohtli Prize from the Mexican Embassy in Ireland.</p>
+
+        <p>Victor delivers sessions using his <strong style="color:var(--blue-electric)">ECHO5 method</strong>: Enlighten, Encourage, Envision, Empower, Equip. Whether you are new to AI or at an intermediate level, you will feel guided, challenged, and supported. He has 170+ GitHub repositories and builds the tools he teaches with.</p>
+
+        <div class="training-logos">
+          <h3>Delivered genAI training at</h3>
+          <div class="training-logos-container">
+            <div class="training-logos-track">
+              <img src="assets/img/company01.png" alt="Company 1">
+              <img src="assets/img/company02.png" alt="Company 2">
+              <img src="assets/img/company03.png" alt="Company 3">
+              <img src="assets/img/company04.png" alt="Company 4">
+              <img src="assets/img/company05.png" alt="Company 5">
+              <img src="assets/img/company06.png" alt="Company 6">
+              <img src="assets/img/company07.png" alt="Company 7">
+              <img src="assets/img/company08.png" alt="Company 8">
+              <img src="assets/img/company09.png" alt="Company 9">
+              <img src="assets/img/company01.png" alt="" aria-hidden="true">
+              <img src="assets/img/company02.png" alt="" aria-hidden="true">
+              <img src="assets/img/company03.png" alt="" aria-hidden="true">
+              <img src="assets/img/company04.png" alt="" aria-hidden="true">
+              <img src="assets/img/company05.png" alt="" aria-hidden="true">
+              <img src="assets/img/company06.png" alt="" aria-hidden="true">
+              <img src="assets/img/company07.png" alt="" aria-hidden="true">
+              <img src="assets/img/company08.png" alt="" aria-hidden="true">
+              <img src="assets/img/company09.png" alt="" aria-hidden="true">
+            </div>
+          </div>
+        </div>
+
+        <div class="award-box">
+          <img src="assets/img/award.png" alt="Teaching Award">
+          <p>Recognised with the <strong>Teaching Award by the National Forum of T&amp;L Enhancement in Higher Education</strong> and the <strong>NCI President's Award for Distinguished Teaching</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TESTIMONIALS ===================== -->
+<section class="section section-gray" id="testimonials">
+  <div class="container">
+    <h2 class="section-title text-center fade-in">What Participants Say</h2>
+
+    <div class="testimonials-carousel fade-in" role="region" aria-roledescription="carousel" aria-label="Testimonials carousel">
+      <button class="carousel-button prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="carousel-button next" aria-label="Next" type="button">&#8250;</button>
+
+      <div class="carousel-viewport">
+        <div class="carousel-track" id="testimonials-track">
+          <!-- Slide 1: Image (Joe) -->
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <img class="testimonial-img" src="assets/img/JoeWilde.png" alt="Joe Wilde testimonial" loading="lazy">
+            </div>
+          </article>
+
+          <!-- Slide 2: Image (Dermot) -->
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <img class="testimonial-img" src="assets/img/DermotBradfield.png" alt="Dermot Bradfield testimonial" loading="lazy">
+            </div>
+          </article>
+
+          <!-- Slide 3: Text -->
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <p class="testimonial-quote">The team's officially AI-empowered. We covered everything from how AI can automate the boring stuff, to how generative models can help us brainstorm, create, and bring procurement into a new era.</p>
+              <div class="testimonial-author">Company in High Tech &amp; Telecom Supply Chain with &euro;150m turnover</div>
+            </div>
+          </article>
+
+          <!-- Slide 4: Text -->
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <p class="testimonial-quote">Victor is incredibly knowledgeable in all things digital and has a desire to continue to learn and help people and businesses pursue their digital transformation.</p>
+              <div class="testimonial-author"><strong>Michelle Guthrie</strong>, Senior Enterprise Development Officer, Local Enterprise Office, County Clare, Ireland</div>
+            </div>
+          </article>
+
+          <!-- Slide 5: Text -->
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <p class="testimonial-quote">Victor delivered the keynote at our GenAI hackathon. It was a big hit and opened people's eyes at all levels to what can be achieved with GenAI.</p>
+              <div class="testimonial-author"><strong>Mark Greville</strong>, VP Engineering, Workhuman</div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="carousel-dots" role="tablist" aria-label="Testimonials pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRICING ===================== -->
+<section class="section section-light" id="pricing">
+  <div class="container">
+    <h2 class="section-title text-center fade-in">Investment</h2>
+
+    <div class="pricing-card fade-in">
+      <div class="pricing-anchor"><s>&euro;1,200</s> (standard rate)</div>
+      <div class="pricing-amount">&euro;285</div>
+      <div class="pricing-label">Early Participant Rate</div>
+
+      <ul class="pricing-list">
+        <li><span class="tick">&#10003;</span>Full AI Competency Assessment (baseline + end-of-programme)</li>
+        <li><span class="tick">&#10003;</span>Personalised development pathway</li>
+        <li><span class="tick">&#10003;</span>6 weekly one-to-one coaching sessions</li>
+        <li><span class="tick">&#10003;</span>Guided exercises calibrated to your level</li>
+        <li><span class="tick">&#10003;</span>Recorded tutorial library access</li>
+        <li><span class="tick">&#10003;</span>Progress tracking dashboard</li>
+        <li><span class="tick">&#10003;</span>Before-and-after competency report</li>
+      </ul>
+
+      <a href="#" class="btn-cta" id="startJourneyBtn">Start Your Journey</a>
+
+      <p class="pricing-note">Payment via Revolut. Limited availability.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FAQ ===================== -->
+<section class="section section-gray" id="faq">
+  <div class="container">
+    <h2 class="section-title text-center fade-in">Frequently Asked Questions</h2>
+
+    <div class="faq-container fade-in">
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>What happens in the first session?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>The first session is approximately 30 minutes. It covers orientation, your baseline AI competency assessment, setting expectations, and your first guided exercises are assigned.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>How much time do I need each week?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>About 20 minutes for the weekly check-in, plus 1 to 2 hours of self-paced exercises and tutorials. The pace is designed for working professionals.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Do I need technical experience?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>No. The programme is calibrated to your starting level. Complete beginners are welcome. If you are more experienced, the exercises and material will adjust to challenge you appropriately.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>What if I need to miss a week?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>The programme pauses and resumes when you are ready. No penalty, no pressure. Life happens, and the programme is designed around that reality.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>What platform do you use?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Google Meet or Microsoft Teams, your choice. Whichever is most convenient for you.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>What do I get at the end?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>A measurable before-and-after competency assessment showing your growth across six dimensions. Plus the AI Badge digital credential that you can share on LinkedIn and with your employer.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Can my employer sponsor this?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Yes. Contact Victor directly for corporate arrangements, team packages, or invoice-based payment.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <img src="assets/img/fiveinnolabs.png" alt="fiveinnolabs" class="footer-logo">
+  <p>&copy; 2026 fiveinnolabs. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="mailto:victor@fiveinnolabs.com">Contact</a>
+  </div>
+  <p class="footer-brand">AI Badge is a fiveinnolabs product.</p>
+</footer>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script>
+// ==========================================
+// SIMPLIFIED RADAR EXPLORER (HERO)
+// ==========================================
+(function(){
+  const DIMS = ['AI Foundations','Critical Evaluation','Productive Creation','Technical Building','Ethics & Governance','Tool Fluency'];
+  const TIERS = [
+    {min:0,max:15,name:'AI Aware',color:'#8E8E93'},
+    {min:16,max:30,name:'AI Explorer',color:'#64D2FF'},
+    {min:31,max:45,name:'AI Practitioner',color:'#0A84FF'},
+    {min:46,max:60,name:'AI Professional',color:'#5E5CE6'},
+    {min:61,max:75,name:'AI Specialist',color:'#BF5AF2'},
+    {min:76,max:90,name:'AI Strategist',color:'#FF9F0A'},
+    {min:91,max:100,name:'AI Architect',color:'#30D158'}
+  ];
+
+  let vals = [1,1,1,1,1,1];
+  let displayVals = [1,1,1,1,1,1];
+  let animFrame = null;
+
+  // Build sliders
+  const slidersEl = document.getElementById('explorerSliders');
+  DIMS.forEach((dim, i) => {
+    const row = document.createElement('div');
+    row.className = 'slider-row';
+    row.innerHTML = `
+      <span class="slider-label">${dim}</span>
+      <input type="range" class="explorer-slider" min="1" max="5" value="1" data-idx="${i}" aria-label="${dim}">
+      <span class="slider-val" id="sv${i}">1</span>
+    `;
+    slidersEl.appendChild(row);
+  });
+
+  // Slider events
+  document.querySelectorAll('.explorer-slider').forEach(sl => {
+    sl.addEventListener('input', function(){
+      const idx = parseInt(this.dataset.idx);
+      vals[idx] = parseInt(this.value);
+      document.getElementById('sv'+idx).textContent = this.value;
+      animateTo(vals);
+    });
+  });
+
+  // Score, tier, archetype
+  function calcScore(v) {
+    return Math.round(((v.reduce((a,b)=>a+b,0) - 6) / 24) * 100);
+  }
+  function calcTier(s) {
+    return TIERS.find(t => s >= t.min && s <= t.max) || TIERS[0];
+  }
+  function calcArchetype(v) {
+    const [f,c,p,t,e,l] = v;
+    const avg = v.reduce((a,b)=>a+b,0)/6;
+    const sd = Math.sqrt(v.reduce((s,x)=>s+Math.pow(x-avg,2),0)/6);
+    if(sd < 0.6) return {n:'Generalist', i:'\u2B21'};
+    if(e>=4 && e>=Math.max(...v.filter((_,i)=>i!==4))) return {n:'Governance Lead', i:'\u2696'};
+    if(t>=4 && l>=4 && t+l>=f+e+2) return {n:'Builder', i:'\u2699'};
+    if(f>=4 && c>=4 && f+c>=t+l+2) return {n:'Analyst', i:'\u25CE'};
+    if(p>=4 && p>=Math.max(t,f)) return {n:'Creator', i:'\u2726'};
+    if(f>=4 && (p<=2||l<=2)) return {n:'Theorist', i:'\u25B3'};
+    if(l>=4 && p>=3 && f<=2) return {n:'Operator', i:'\u25B7'};
+    if(sd > 1.3) return {n:'Specialist', i:'\u25C6'};
+    return {n:'Developing', i:'\u2197'};
+  }
+
+  // Animation
+  function animateTo(target) {
+    const start = [...displayVals];
+    const t0 = performance.now();
+    const dur = 400;
+    function tick(now) {
+      let t = Math.min((now - t0) / dur, 1);
+      t = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+      for (let i = 0; i < 6; i++) displayVals[i] = start[i] + (target[i] - start[i]) * t;
+      drawRadar();
+      updateInfo();
+      if (t < 1) animFrame = requestAnimationFrame(tick);
+    }
+    if (animFrame) cancelAnimationFrame(animFrame);
+    animFrame = requestAnimationFrame(tick);
+  }
+
+  // Canvas setup
+  const canvas = document.getElementById('radar-lite');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = 540 * dpr;
+  canvas.height = 520 * dpr;
+  canvas.style.width = '270px';
+  canvas.style.height = '260px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  function drawRadar() {
+    const W = 540/dpr*dpr, H = 520/dpr*dpr;
+    const cW = 270, cH = 260;
+    const cx = cW/2, cy = cH/2 + 4;
+    const R = Math.min(cW, cH) * 0.36;
+    const n = 6, a0 = -Math.PI/2;
+    ctx.clearRect(0, 0, cW, cH);
+
+    function pt(axis, lv) {
+      const a = (2*Math.PI/n)*axis + a0;
+      const r = (lv/5)*R;
+      return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+    }
+
+    // Rings
+    for (let lv = 5; lv >= 1; lv--) {
+      ctx.beginPath();
+      for (let i = 0; i <= n; i++) {
+        const [x,y] = pt(i%n, lv);
+        i ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(255,255,255,' + (lv===5 ? '0.12' : '0.05') + ')';
+      ctx.lineWidth = lv===5 ? 0.8 : 0.5;
+      ctx.stroke();
+    }
+
+    // Axes
+    for (let i = 0; i < n; i++) {
+      const [x,y] = pt(i, 5);
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y);
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+
+    // Labels
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.font = '600 9px Inter, -apple-system, sans-serif';
+    const shortLabels = ['Foundations','Critical Eval','Creation','Technical','Ethics','Tool Fluency'];
+    for (let i = 0; i < n; i++) {
+      const a = (2*Math.PI/n)*i + a0;
+      const lr = R + 22;
+      const lx = cx + lr*Math.cos(a);
+      const ly = cy + lr*Math.sin(a);
+      ctx.textAlign = Math.abs(Math.cos(a))<0.01 ? 'center' : Math.cos(a)>0 ? 'left' : 'right';
+      ctx.textBaseline = Math.abs(Math.sin(a))<0.2 ? 'middle' : Math.sin(a)>0 ? 'top' : 'bottom';
+      ctx.fillText(shortLabels[i], lx, ly);
+    }
+
+    // Filled shape
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const [x,y] = pt(i%n, displayVals[i%n]);
+      i ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+    }
+    ctx.closePath();
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+    g.addColorStop(0, 'rgba(10,132,255,0.35)');
+    g.addColorStop(0.6, 'rgba(10,132,255,0.12)');
+    g.addColorStop(1, 'rgba(10,132,255,0.03)');
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.strokeStyle = '#0A84FF';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Dots with gold accent
+    for (let i = 0; i < n; i++) {
+      const [x,y] = pt(i, displayVals[i]);
+      // Glow
+      ctx.beginPath();
+      ctx.arc(x, y, 8, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(212,175,55,0.2)';
+      ctx.fill();
+      // Dot
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, Math.PI*2);
+      ctx.fillStyle = '#D4AF37';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,54,0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  function updateInfo() {
+    const s = calcScore(displayVals);
+    const t = calcTier(s);
+    const a = calcArchetype(displayVals.map(Math.round));
+    document.getElementById('radarScore').textContent = t.name + ' \u2014 Score: ' + s;
+    document.getElementById('radarTier').textContent = t.name;
+    document.getElementById('radarTier').style.color = t.color;
+    document.getElementById('radarArchetype').innerHTML = 'Profile: <span>' + a.i + ' ' + a.n + '</span>';
+  }
+
+  // Initial draw
+  drawRadar();
+  updateInfo();
+})();
+
+// ==========================================
+// PARTICLES
+// ==========================================
+(function(){
+  const container = document.getElementById('particles');
+  if (!container) return;
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 5 + 2;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 20 + 's';
+    p.style.animationDuration = (20 + Math.random() * 10) + 's';
+    container.appendChild(p);
+  }
+})();
+
+// ==========================================
+// NAVBAR SCROLL
+// ==========================================
+(function(){
+  const navbar = document.getElementById('navbar');
+  let lastScroll = 0;
+  window.addEventListener('scroll', function(){
+    const y = window.scrollY;
+    navbar.classList.toggle('compact', y > 80);
+    lastScroll = y;
+  }, {passive: true});
+})();
+
+// ==========================================
+// MOBILE NAV
+// ==========================================
+document.getElementById('mobileToggle').addEventListener('click', function(){
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+// Close mobile nav on link click
+document.querySelectorAll('#navLinks a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+// ==========================================
+// FADE-IN ON SCROLL
+// ==========================================
+(function(){
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+})();
+
+// ==========================================
+// TESTIMONIALS CAROUSEL
+// ==========================================
+(function(){
+  const track = document.getElementById('testimonials-track');
+  if (!track) return;
+  const slides = Array.from(track.children);
+  const prevBtn = document.querySelector('.carousel-button.prev');
+  const nextBtn = document.querySelector('.carousel-button.next');
+  const dotsContainer = document.querySelector('.carousel-dots');
+
+  // Determine slides per view
+  function slidesPerView() {
+    return window.innerWidth >= 700 ? 2 : 1;
+  }
+
+  let current = 0;
+  const originalCount = slides.length;
+
+  function totalPages() {
+    return Math.ceil(originalCount / slidesPerView());
+  }
+
+  function buildDots() {
+    dotsContainer.innerHTML = '';
+    const pages = totalPages();
+    for (let i = 0; i < pages; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot';
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', 'Page ' + (i+1));
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    }
+    updateDots();
+  }
+
+  function updateDots() {
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => {
+      d.setAttribute('aria-current', i === current ? 'true' : 'false');
+    });
+  }
+
+  function goTo(idx) {
+    const pages = totalPages();
+    current = ((idx % pages) + pages) % pages;
+    const offset = current * slidesPerView();
+    const pct = (offset / originalCount) * 100;
+    track.style.transform = 'translateX(-' + pct + '%)';
+    updateDots();
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  buildDots();
+  window.addEventListener('resize', () => { current = 0; buildDots(); goTo(0); });
+
+  // Auto-advance
+  let auto = setInterval(() => goTo(current + 1), 4000);
+  const carousel = track.closest('.testimonials-carousel');
+  carousel.addEventListener('mouseenter', () => clearInterval(auto));
+  carousel.addEventListener('mouseleave', () => { auto = setInterval(() => goTo(current + 1), 4000); });
+})();
+
+// ==========================================
+// FAQ ACCORDION
+// ==========================================
+(function(){
+  document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', function(){
+      const item = this.parentNode;
+      const answer = item.querySelector('.faq-answer');
+      const icon = this.querySelector('.faq-icon');
+      const wasActive = item.classList.contains('active');
+
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(other => {
+        if (other !== item) {
+          other.classList.remove('active');
+          const otherAnswer = other.querySelector('.faq-answer');
+          const otherIcon = other.querySelector('.faq-icon');
+          otherAnswer.style.maxHeight = '0';
+          otherAnswer.style.opacity = '0';
+          otherAnswer.classList.remove('open');
+          otherIcon.textContent = '+';
+          otherIcon.style.transform = 'rotate(0deg)';
+        }
+      });
+
+      if (wasActive) {
+        item.classList.remove('active');
+        answer.style.maxHeight = '0';
+        answer.style.opacity = '0';
+        answer.classList.remove('open');
+        icon.textContent = '+';
+        icon.style.transform = 'rotate(0deg)';
+      } else {
+        item.classList.add('active');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        answer.style.opacity = '1';
+        answer.classList.add('open');
+        icon.textContent = '\u2212';
+        icon.style.transform = 'rotate(180deg)';
+      }
+    });
+  });
+})();
+
+// ==========================================
+// FIREBASE AUTH CHECK
+// ==========================================
+(function(){
+  // Firebase SDK loaded below; check auth state when ready
+  function checkAuth() {
+    if (typeof firebase === 'undefined' || !firebase.auth) return;
+    firebase.auth().onAuthStateChanged(function(user){
+      if (user) {
+        const banner = document.getElementById('auth-banner');
+        const nameEl = document.getElementById('auth-name');
+        nameEl.textContent = user.displayName || user.email || 'User';
+        banner.style.display = 'block';
+        document.body.classList.add('has-auth-banner');
+      }
+    });
+  }
+  // Try immediately, and also on load
+  if (document.readyState === 'complete') checkAuth();
+  else window.addEventListener('load', checkAuth);
+})();
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="assets/js/firebase-app.js"></script>
+
+</body>
+</html>

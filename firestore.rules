@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------
+    // Helper: is the current user the admin (Victor)?
+    // ----------------------------------------------------------------
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.token.email == "victor@fiveinnolabs.com";
+    }
+
+    function isOwner(userId) {
+      return request.auth != null
+          && request.auth.uid == userId;
+    }
+
+    // ----------------------------------------------------------------
+    // Users: owners can read/write their own doc; admin reads all
+    // ----------------------------------------------------------------
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId);
+
+      // Assessments subcollection (baseline, final)
+      match /assessments/{assessmentId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isOwner(userId);
+      }
+
+      // Weeks / Exercises subcollections
+      match /weeks/{weekNum} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isOwner(userId);
+
+        match /exercises/{exerciseId} {
+          allow read: if isOwner(userId) || isAdmin();
+          allow write: if isOwner(userId);
+        }
+      }
+    }
+
+    // ----------------------------------------------------------------
+    // Programmes: readable by any authenticated user
+    // ----------------------------------------------------------------
+    match /programmes/{programmeId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------
+    // Public assessments: anyone can create (lead capture);
+    // only admin can read
+    // ----------------------------------------------------------------
+    match /public_assessments/{docId} {
+      allow create: if true;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ----------------------------------------------------------------
+    // Default deny
+    // ----------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

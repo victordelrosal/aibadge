@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Badge Portal</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23D4AF37'/><stop offset='100%25' stop-color='%2302066F'/></linearGradient></defs><rect width='100' height='100' rx='20' fill='url(%23g)'/><text x='50' y='62' text-anchor='middle' font-family='Inter,sans-serif' font-size='36' font-weight='700' fill='white'>AI</text></svg>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-page: #F8F9FA;
+  --bg-card: #FFFFFF;
+  --sidebar-width: 260px;
+  --gold: #D4AF37;
+  --gold-light: #F5E7A0;
+  --gold-glow: rgba(212,175,55,0.4);
+  --gold-subtle: rgba(212,175,55,0.08);
+  --blue-deep: #02066F;
+  --blue-accent: #0066ff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-tertiary: rgba(60,60,67,0.33);
+  --success: #34C759;
+  --warning: #FF9500;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
+  --card-radius: 14px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ==================== HEADER ==================== */
+.portal-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.header-logo .logo-ai { color: var(--gold); }
+.header-logo .logo-badge { color: var(--blue-deep); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-welcome {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.header-welcome strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.btn-logout {
+  background: none;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+.btn-logout:hover {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.15);
+  color: var(--text-primary);
+}
+
+/* ==================== LAYOUT ==================== */
+.portal-layout {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+/* ==================== SIDEBAR ==================== */
+.portal-sidebar {
+  width: var(--sidebar-width);
+  background: #fff;
+  border-right: 1px solid rgba(0,0,0,0.06);
+  padding: 24px 0;
+  flex-shrink: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  border-left: 3px solid transparent;
+  text-decoration: none;
+}
+.nav-item:hover {
+  color: var(--text-primary);
+  background: rgba(0,0,0,0.02);
+}
+.nav-item.active {
+  color: var(--gold);
+  border-left-color: var(--gold);
+  background: var(--gold-subtle);
+  font-weight: 600;
+}
+.nav-item .nav-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+/* ==================== MAIN CONTENT ==================== */
+.portal-main {
+  flex: 1;
+  padding: 32px;
+  max-width: 1200px;
+  overflow-y: auto;
+}
+
+.view { display: none; opacity: 0; transition: opacity 0.3s ease; }
+.view.active { display: block; opacity: 1; }
+
+/* ==================== CARDS ==================== */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+}
+
+.card-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--blue-deep);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+/* ==================== RADAR SECTION ==================== */
+.radar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.radar-canvas-wrap {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 540/520;
+  position: relative;
+}
+.radar-canvas-wrap canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.radar-summary {
+  width: 100%;
+  max-width: 480px;
+  margin-top: 8px;
+}
+
+/* Score ring */
+.score-ring-container { text-align: center; padding: 16px 0; }
+.score-ring-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 160px;
+  height: 160px;
+}
+.score-ring-wrapper svg { transform: rotate(-90deg); }
+.score-ring-wrapper .score-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.score-number {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.score-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+.tier-name {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 12px;
+  text-align: center;
+}
+.tier-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Archetype */
+.archetype-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 16px 0;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.archetype-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.archetype-label {
+  font-size: 10px; font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.archetype-name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.archetype-desc { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+
+/* Flags */
+.flag-card {
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid transparent;
+}
+.flag-card.warning { background: rgba(255,149,0,0.08); border-color: rgba(255,149,0,0.15); }
+.flag-card.caution { background: rgba(255,204,0,0.08); border-color: rgba(255,204,0,0.12); }
+.flag-card.info { background: rgba(0,122,255,0.08); border-color: rgba(0,122,255,0.12); }
+.flag-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+.btn-assessment {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  transition: all var(--transition);
+  margin-top: 16px;
+}
+.btn-assessment:hover {
+  background: #c9a330;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--gold-glow);
+}
+
+.no-assessment {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-secondary);
+}
+.no-assessment .empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+.no-assessment p { margin-bottom: 8px; font-size: 15px; }
+
+/* ==================== WEEK + CHECK-IN CARDS ==================== */
+.dashboard-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.week-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold-subtle);
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.progress-bar-wrap {
+  background: rgba(0,0,0,0.06);
+  border-radius: 6px;
+  height: 6px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.checkin-date {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.checkin-time {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.checkin-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: rgba(0,0,0,0.04);
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.checkin-glow {
+  animation: goldGlow 2s ease-in-out infinite alternate;
+}
+@keyframes goldGlow {
+  0% { box-shadow: var(--card-shadow); }
+  100% { box-shadow: 0 0 0 2px var(--gold-glow), 0 4px 20px var(--gold-glow); }
+}
+
+.btn-calendar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 12px;
+  transition: all var(--transition);
+}
+.btn-calendar:hover {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.15);
+}
+
+/* ==================== EXERCISES ==================== */
+.exercise-list { list-style: none; }
+
+.exercise-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.exercise-item:last-child { border-bottom: none; }
+
+.exercise-checkbox {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.exercise-checkbox input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.exercise-checkbox input:checked {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.exercise-checkbox input:checked::after {
+  content: '\2713';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.exercise-checkbox input:hover {
+  border-color: var(--gold);
+}
+
+.exercise-content { flex: 1; }
+.exercise-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.exercise-title.completed {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+.exercise-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  line-height: 1.4;
+  display: none;
+}
+.exercise-desc.expanded { display: block; }
+.exercise-toggle {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: var(--blue-accent);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 2px 0;
+  margin-top: 2px;
+}
+.exercise-timestamp {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* ==================== SCHEDULE ==================== */
+.schedule-timeline {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.schedule-week {
+  flex: 1;
+  min-width: 120px;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+  background: rgba(0,0,0,0.02);
+  border: 2px solid transparent;
+  transition: all var(--transition);
+}
+.schedule-week.current {
+  border-color: var(--gold);
+  background: var(--gold-subtle);
+}
+.schedule-week.pause {
+  background: rgba(0,0,0,0.04);
+  opacity: 0.6;
+}
+.schedule-week.completed {
+  background: rgba(52,199,89,0.06);
+}
+.schedule-week.future {
+  opacity: 0.5;
+}
+
+.schedule-week-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.schedule-week-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.schedule-week-status {
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+/* ==================== NOTES ==================== */
+.note-textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+  padding: 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  resize: vertical;
+  transition: border-color var(--transition);
+  line-height: 1.6;
+}
+.note-textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-glow);
+}
+.note-textarea::placeholder { color: var(--text-tertiary); }
+
+.note-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.btn-save-note {
+  background: var(--blue-deep);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+.btn-save-note:hover {
+  background: #030870;
+  transform: translateY(-1px);
+}
+.btn-save-note:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.note-saved-at {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* ==================== EXERCISES VIEW ==================== */
+.week-section {
+  margin-bottom: 12px;
+}
+
+.week-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+}
+.week-section-header:hover {
+  background: #FAFBFC;
+}
+.week-section-header.current-week {
+  border-left: 3px solid var(--gold);
+}
+.week-section-header.future-week {
+  opacity: 0.5;
+}
+
+.week-section-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.week-section-number {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue-deep);
+}
+.week-section-focus {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.week-section-summary {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--success);
+}
+.week-section-locked {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+.week-section-chevron {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  transition: transform 0.2s ease;
+}
+.week-section-header.expanded .week-section-chevron {
+  transform: rotate(90deg);
+}
+
+.week-section-body {
+  display: none;
+  padding: 8px 20px 16px;
+  background: var(--bg-card);
+  border-radius: 0 0 var(--card-radius) var(--card-radius);
+  margin-top: -8px;
+  box-shadow: var(--card-shadow);
+}
+.week-section-body.expanded { display: block; }
+
+/* ==================== PLACEHOLDER VIEWS ==================== */
+.placeholder-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 24px;
+}
+.placeholder-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  opacity: 0.3;
+}
+.placeholder-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--blue-deep);
+  margin-bottom: 8px;
+}
+.placeholder-desc {
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+/* Profile info */
+.profile-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 500px;
+  margin: 32px auto 0;
+}
+.profile-field {
+  background: rgba(0,0,0,0.02);
+  padding: 14px 16px;
+  border-radius: 10px;
+}
+.profile-field-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+.profile-field-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ==================== MOBILE TABS ==================== */
+.mobile-tabs {
+  display: none;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 0 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-tabs::-webkit-scrollbar { display: none; }
+
+.mobile-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition);
+}
+.mobile-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  font-weight: 600;
+}
+
+/* ==================== LOADING STATE ==================== */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.3s ease;
+}
+.loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(0,0,0,0.08);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 900px) {
+  .portal-sidebar { display: none; }
+  .mobile-tabs { display: flex; }
+  .portal-main { padding: 24px 16px; }
+  .dashboard-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .portal-main { padding: 16px 12px; }
+  .card { padding: 16px; }
+  .header-welcome { display: none; }
+  .schedule-timeline { flex-direction: column; }
+  .schedule-week { min-width: unset; }
+  .profile-info { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- Header -->
+<header class="portal-header">
+  <a href="index.html" class="header-logo">
+    <span class="logo-ai">AI</span><span class="logo-badge">Badge</span>
+  </a>
+  <div class="header-right">
+    <span class="header-welcome" id="headerWelcome">Welcome</span>
+    <button class="btn-logout" id="btnLogout" onclick="handleLogout()">Log out</button>
+  </div>
+</header>
+
+<!-- Mobile tabs -->
+<nav class="mobile-tabs" id="mobileTabs">
+  <div class="mobile-tab active" data-view="dashboard" onclick="switchView('dashboard')">
+    <span>&#128202;</span> Dashboard
+  </div>
+  <div class="mobile-tab" data-view="exercises" onclick="switchView('exercises')">
+    <span>&#128203;</span> Exercises
+  </div>
+  <div class="mobile-tab" data-view="tutorials" onclick="switchView('tutorials')">
+    <span>&#127909;</span> Tutorials
+  </div>
+  <div class="mobile-tab" data-view="profile" onclick="switchView('profile')">
+    <span>&#128100;</span> Profile
+  </div>
+</nav>
+
+<div class="portal-layout">
+  <!-- Sidebar -->
+  <nav class="portal-sidebar" id="sidebar">
+    <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+      <span class="nav-icon">&#128202;</span> Dashboard
+    </div>
+    <div class="nav-item" data-view="exercises" onclick="switchView('exercises')">
+      <span class="nav-icon">&#128203;</span> Exercises
+    </div>
+    <div class="nav-item" data-view="tutorials" onclick="switchView('tutorials')">
+      <span class="nav-icon">&#127909;</span> Tutorials
+    </div>
+    <div class="nav-item" data-view="profile" onclick="switchView('profile')">
+      <span class="nav-icon">&#128100;</span> Profile
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="portal-main" id="portalMain">
+
+    <!-- ==================== DASHBOARD VIEW ==================== -->
+    <div class="view active" id="view-dashboard">
+
+      <!-- Section A: Radar -->
+      <div class="card">
+        <div class="card-title">Your AI Competency</div>
+        <div class="radar-section" id="radarSection">
+          <div class="no-assessment" id="noAssessment">
+            <div class="empty-icon">&#128301;</div>
+            <p>You have not completed your baseline assessment yet.</p>
+            <p style="font-size:13px;color:var(--text-tertiary);">Take the AI Competency Explorer to establish your starting point.</p>
+            <a href="explore.html" class="btn-assessment">Take Assessment</a>
+          </div>
+          <div id="radarDisplay" style="display:none;">
+            <div class="radar-canvas-wrap">
+              <canvas id="radarCanvas" width="540" height="520"></canvas>
+            </div>
+            <div class="radar-summary" id="radarSummary"></div>
+            <div style="text-align:center;">
+              <a href="explore.html" class="btn-assessment" id="btnAssessment">Retake Assessment</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section B: Current Week + Next Check-in -->
+      <div class="dashboard-row" id="dashboardRow">
+        <div class="card" id="currentWeekCard">
+          <div class="card-title">Current Week</div>
+          <div class="week-badge" id="weekBadge">Week 1 of 6</div>
+          <p id="weekFocus" style="font-size:14px;color:var(--text-primary);margin-bottom:4px;"></p>
+          <div class="progress-text" id="weekProgress">0 of 0 exercises completed</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="weekProgressBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="card" id="checkinCard">
+          <div class="card-title">Next Check-in</div>
+          <div class="checkin-date" id="checkinDate">--</div>
+          <div class="checkin-time" id="checkinTime">--</div>
+          <div class="checkin-platform" id="checkinPlatform">--</div>
+          <button class="btn-calendar" id="btnCalendar" onclick="downloadICS()">
+            &#128197; Add to calendar
+          </button>
+        </div>
+      </div>
+
+      <!-- Section C: This Week's Exercises -->
+      <div class="card" id="weekExercisesCard">
+        <div class="card-title">This Week's Exercises</div>
+        <ul class="exercise-list" id="dashExerciseList"></ul>
+      </div>
+
+      <!-- Section D: Schedule Overview -->
+      <div class="card">
+        <div class="card-title">Schedule Overview</div>
+        <div class="schedule-timeline" id="scheduleTimeline"></div>
+      </div>
+
+      <!-- Section E: Notes for Victor -->
+      <div class="card">
+        <div class="card-title">Notes for Victor</div>
+        <textarea class="note-textarea" id="noteTextarea" placeholder="Questions, thoughts, or anything you'd like to discuss..."></textarea>
+        <div class="note-footer">
+          <button class="btn-save-note" id="btnSaveNote" onclick="saveNote()">Save Note</button>
+          <span class="note-saved-at" id="noteSavedAt"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== EXERCISES VIEW ==================== -->
+    <div class="view" id="view-exercises">
+      <h2 style="font-size:24px;font-weight:700;color:var(--blue-deep);margin-bottom:20px;">Exercise Library</h2>
+      <div id="exerciseWeeks"></div>
+    </div>
+
+    <!-- ==================== TUTORIALS VIEW ==================== -->
+    <div class="view" id="view-tutorials">
+      <div class="placeholder-view">
+        <div class="placeholder-icon">&#127909;</div>
+        <div class="placeholder-title">Tutorials Coming Soon</div>
+        <p class="placeholder-desc">Recorded tutorials and guides will appear here as they become available.</p>
+      </div>
+    </div>
+
+    <!-- ==================== PROFILE VIEW ==================== -->
+    <div class="view" id="view-profile">
+      <div class="placeholder-view">
+        <div class="placeholder-icon">&#128100;</div>
+        <div class="placeholder-title">Your Profile</div>
+        <div class="profile-info" id="profileInfo">
+          <div class="profile-field">
+            <div class="profile-field-label">Name</div>
+            <div class="profile-field-value" id="profileName">--</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Email</div>
+            <div class="profile-field-value" id="profileEmail">--</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Start Date</div>
+            <div class="profile-field-value" id="profileStartDate">--</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Current Week</div>
+            <div class="profile-field-value" id="profileWeek">--</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Status</div>
+            <div class="profile-field-value" id="profileStatus">--</div>
+          </div>
+        </div>
+        <div style="margin-top:40px;max-width:500px;">
+          <div class="card" style="text-align:left;">
+            <div class="card-title">Your Progress Report</div>
+            <p style="font-size:14px;color:var(--text-secondary);">Your before-and-after competency comparison will be available at the end of your programme.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-app.js"></script>
+
+<script>
+// ====================================================================
+// PORTAL STATE
+// ====================================================================
+let currentUser = null;
+let userData = null;
+let baselineAssessment = null;
+let finalAssessment = null;
+let programmeTemplate = null;
+let weekExercises = {};
+
+// ====================================================================
+// DIMENSION DATA (from radar-explorer.html)
+// ====================================================================
+const DIMS = ['AI Foundations','Critical Evaluation','Productive Creation','Technical Building','Ethics & Governance','Tool Fluency'];
+const DIM_KEYS = ['aiFoundations','criticalEvaluation','productiveCreation','technicalBuilding','ethicsGovernance','toolFluency'];
+
+const TIERS = [
+  {min:0,max:15,name:'AI Aware',color:'#8E8E93',desc:'Beginning the journey. Exploring what AI can do.'},
+  {min:16,max:30,name:'AI Explorer',color:'#5AC8FA',desc:'Actively learning. Building understanding and first skills.'},
+  {min:31,max:45,name:'AI Practitioner',color:'#007AFF',desc:'Competent user. AI is part of your daily workflow.'},
+  {min:46,max:60,name:'AI Professional',color:'#5856D6',desc:'Advanced user. Creating with AI and guiding others.'},
+  {min:61,max:75,name:'AI Specialist',color:'#AF52DE',desc:'Deep expertise. Building applications and shaping policy.'},
+  {min:76,max:90,name:'AI Strategist',color:'#FF9500',desc:'Leading AI initiatives with vision and depth.'},
+  {min:91,max:100,name:'AI Architect',color:'#34C759',desc:'Full-spectrum mastery. You design, build, and lead at scale.'}
+];
+
+function computeScore(v) {
+  return Math.round(((v.reduce((a,b)=>a+b,0) - 6) / 24) * 100);
+}
+
+function findTier(s) {
+  return TIERS.find(t => s >= t.min && s <= t.max) || TIERS[0];
+}
+
+function computeArchetype(v) {
+  const [f,c,p,t,e,l] = v;
+  const avg = v.reduce((a,b)=>a+b,0)/6;
+  const sd = Math.sqrt(v.reduce((s,x)=>s+Math.pow(x-avg,2),0)/6);
+  if(sd < 0.6) return {n:'Generalist',i:'\u2B21',d:'Balanced across all dimensions'};
+  if(e>=4 && e>=Math.max(...v.filter((_,i)=>i!==4))) return {n:'Governance Lead',i:'\u2696',d:'Ethics and policy first'};
+  if(t>=4 && l>=4 && t+l>=f+e+2) return {n:'Builder',i:'\u2699',d:'Builds and deploys with AI'};
+  if(f>=4 && c>=4 && f+c>=t+l+2) return {n:'Analyst',i:'\u25CE',d:'Deep understanding and evaluation'};
+  if(p>=4 && p>=Math.max(t,f)) return {n:'Creator',i:'\u2726',d:'Produces and innovates with AI'};
+  if(f>=4 && (p<=2||l<=2)) return {n:'Theorist',i:'\u25B3',d:'Knows the science, building practical skills'};
+  if(l>=4 && p>=3 && f<=2) return {n:'Operator',i:'\u25B7',d:'Highly capable, deepening understanding'};
+  if(sd > 1.3) return {n:'Specialist',i:'\u25C6',d:'Deep in specific areas, with gaps to fill'};
+  return {n:'Developing',i:'\u2197',d:'Growing across multiple dimensions'};
+}
+
+function computeFlags(v) {
+  const [f,c,p,t,e,l] = v;
+  const fl = [];
+  if((t>=4||l>=4) && e<=2) fl.push({t:'warning',x:'Builder without guardrails: strong technical skills need stronger ethics awareness'});
+  if(p>=4 && c<=2) fl.push({t:'warning',x:'Uncritical creator: producing at scale without systematic evaluation is risky'});
+  if(l>=4 && f<=2) fl.push({t:'caution',x:'Tool-dependent: fluent with interfaces but may not understand what is underneath'});
+  if(f>=4 && e>=4 && p<=2 && l<=2) fl.push({t:'info',x:'Strong theoretical base: ready to put knowledge into practice'});
+  return fl;
+}
+
+// Convert named scores map to array
+function scoresToArray(scores) {
+  return DIM_KEYS.map(k => scores[k] || 1);
+}
+
+// ====================================================================
+// RADAR CANVAS RENDERING
+// ====================================================================
+const radarCanvas = document.getElementById('radarCanvas');
+const ctx = radarCanvas.getContext('2d');
+let radarDPR = window.devicePixelRatio || 1;
+
+function setupRadarCanvas() {
+  const wrap = radarCanvas.parentElement;
+  const w = wrap.clientWidth || 480;
+  const h = Math.round(w * (520/540));
+  radarCanvas.width = w * radarDPR;
+  radarCanvas.height = h * radarDPR;
+  radarCanvas.style.width = w + 'px';
+  radarCanvas.style.height = h + 'px';
+  ctx.setTransform(radarDPR, 0, 0, radarDPR, 0, 0);
+}
+
+function drawRadar(values, overlayValues) {
+  const W = radarCanvas.width / radarDPR;
+  const H = radarCanvas.height / radarDPR;
+  const cx = W / 2;
+  const cy = H / 2 + 8;
+  const R = Math.min(W, H) * 0.36;
+  const n = 6;
+  const a0 = -Math.PI / 2;
+
+  ctx.clearRect(0, 0, W, H);
+
+  function pt(axis, lv) {
+    const a = (2 * Math.PI / n) * axis + a0;
+    const r = (lv / 5) * R;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  }
+
+  // Rings
+  for (let lv = 5; lv >= 1; lv--) {
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const [x, y] = pt(i % n, lv);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = lv === 5 ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.04)';
+    ctx.lineWidth = lv === 5 ? 0.8 : 0.5;
+    ctx.stroke();
+
+    // Ring number
+    const [lx, ly] = pt(0, lv);
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.font = '500 9px Inter, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(lv, lx, ly - 5);
+  }
+
+  // Axes
+  for (let i = 0; i < n; i++) {
+    const [x, y] = pt(i, 5);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = 'rgba(0,0,0,0.04)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Labels
+  ctx.fillStyle = '#1a1a2e';
+  ctx.font = '600 12px Inter, -apple-system, sans-serif';
+  for (let i = 0; i < n; i++) {
+    const a = (2 * Math.PI / n) * i + a0;
+    const lr = R + 26;
+    const lx = cx + lr * Math.cos(a);
+    const ly = cy + lr * Math.sin(a);
+    ctx.textAlign = Math.abs(Math.cos(a)) < 0.01 ? 'center' : Math.cos(a) > 0 ? 'left' : 'right';
+    ctx.textBaseline = Math.abs(Math.sin(a)) < 0.2 ? 'middle' : Math.sin(a) > 0 ? 'top' : 'bottom';
+    ctx.fillText(DIMS[i], lx, ly);
+  }
+
+  // Overlay (baseline ghost) if both baseline and final exist
+  if (overlayValues) {
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const [x, y] = pt(i % n, overlayValues[i % n]);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0,0,0,0.03)';
+    ctx.fill();
+    ctx.setLineDash([6, 4]);
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Main shape with gradient fill
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    const [x, y] = pt(i % n, values[i % n]);
+    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  }
+  ctx.closePath();
+
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+  g.addColorStop(0, 'rgba(0,102,255,0.2)');
+  g.addColorStop(0.6, 'rgba(0,102,255,0.06)');
+  g.addColorStop(1, 'rgba(0,102,255,0.01)');
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.strokeStyle = '#0066ff';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Vertex dots with gold accent
+  for (let i = 0; i < n; i++) {
+    const [x, y] = pt(i, values[i]);
+    // Glow
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(212,175,55,0.15)';
+    ctx.fill();
+    // Dot
+    ctx.beginPath();
+    ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#D4AF37';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+}
+
+// Animated radar draw
+function animateRadar(targetValues, overlayValues) {
+  const start = [1,1,1,1,1,1];
+  const t0 = performance.now();
+  const dur = 600;
+
+  function tick(now) {
+    let t = Math.min((now - t0) / dur, 1);
+    t = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+    const current = start.map((s, i) => s + (targetValues[i] - s) * t);
+    drawRadar(current, overlayValues);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ====================================================================
+// RENDER RADAR SUMMARY (score ring, tier, archetype, flags)
+// ====================================================================
+function renderRadarSummary(values) {
+  const el = document.getElementById('radarSummary');
+  const s = computeScore(values);
+  const t = findTier(s);
+  const a = computeArchetype(values);
+  const fl = computeFlags(values);
+
+  const circ = 2 * Math.PI * 70;
+  const off = circ - (s / 100) * circ;
+  const ringBg = 'rgba(0,0,0,0.05)';
+
+  let h = '';
+
+  h += `<div class="score-ring-container">
+    <div class="score-ring-wrapper">
+      <svg width="160" height="160" viewBox="0 0 150 150">
+        <circle cx="75" cy="75" r="70" fill="none" stroke="${ringBg}" stroke-width="6"/>
+        <circle cx="75" cy="75" r="70" fill="none" stroke="${t.color}" stroke-width="6"
+          stroke-dasharray="${circ}" stroke-dashoffset="${off}"
+          stroke-linecap="round" style="transition: stroke-dashoffset 0.6s ease, stroke 0.4s;"/>
+      </svg>
+      <div class="score-text">
+        <div class="score-number" style="color:${t.color}">${s}</div>
+        <div class="score-label">Score</div>
+      </div>
+    </div>
+    <div class="tier-name" style="color:${t.color}">${t.name}</div>
+    <div class="tier-desc">${t.desc}</div>
+  </div>`;
+
+  h += `<div class="archetype-row">
+    <div class="archetype-icon">${a.i}</div>
+    <div>
+      <div class="archetype-label">Profile</div>
+      <div class="archetype-name">${a.n}</div>
+      <div class="archetype-desc">${a.d}</div>
+    </div>
+  </div>`;
+
+  if (fl.length) {
+    fl.forEach(f => {
+      const ic = f.t === 'warning' ? '\u26A0' : f.t === 'caution' ? '\u25D0' : '\u2139';
+      h += `<div class="flag-card ${f.t}"><span class="flag-icon">${ic}</span><span>${f.x}</span></div>`;
+    });
+  }
+
+  el.innerHTML = h;
+}
+
+// ====================================================================
+// VIEW SWITCHING
+// ====================================================================
+function switchView(viewName) {
+  // Update sidebar
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === viewName);
+  });
+  // Update mobile tabs
+  document.querySelectorAll('.mobile-tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === viewName);
+  });
+  // Switch views with fade
+  document.querySelectorAll('.view').forEach(el => {
+    el.classList.remove('active');
+  });
+  const target = document.getElementById('view-' + viewName);
+  if (target) {
+    setTimeout(() => target.classList.add('active'), 10);
+  }
+
+  // Resize radar if switching to dashboard
+  if (viewName === 'dashboard' && baselineAssessment) {
+    setTimeout(() => { setupRadarCanvas(); renderAssessment(); }, 50);
+  }
+}
+
+// ====================================================================
+// RENDER FUNCTIONS
+// ====================================================================
+function renderAssessment() {
+  if (!baselineAssessment) {
+    document.getElementById('noAssessment').style.display = '';
+    document.getElementById('radarDisplay').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('noAssessment').style.display = 'none';
+  document.getElementById('radarDisplay').style.display = '';
+
+  const displayScores = finalAssessment ? scoresToArray(finalAssessment.scores) : scoresToArray(baselineAssessment.scores);
+  const overlayScores = finalAssessment ? scoresToArray(baselineAssessment.scores) : null;
+
+  setupRadarCanvas();
+  animateRadar(displayScores, overlayScores);
+  renderRadarSummary(displayScores);
+
+  const btnText = baselineAssessment && !finalAssessment ? 'Retake Assessment' : 'Take Assessment';
+  document.getElementById('btnAssessment').textContent = btnText;
+}
+
+function renderCurrentWeek() {
+  if (!userData) return;
+  const week = userData.currentWeek || 1;
+  document.getElementById('weekBadge').textContent = `Week ${week} of 6`;
+
+  // Get focus from programme template
+  if (programmeTemplate && programmeTemplate.weeks) {
+    const weekData = programmeTemplate.weeks.find(w => w.week === week);
+    if (weekData) {
+      document.getElementById('weekFocus').textContent = weekData.focus;
+    }
+  }
+
+  // Exercise progress
+  const exercises = weekExercises[week] || {};
+  const exerciseKeys = Object.keys(exercises).filter(k => k.startsWith('exercise'));
+  const completed = exerciseKeys.filter(k => exercises[k] && exercises[k].completed).length;
+  const total = exerciseKeys.length;
+  document.getElementById('weekProgress').textContent = `${completed} of ${total} exercises completed`;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+  document.getElementById('weekProgressBar').style.width = pct + '%';
+}
+
+function renderCheckin() {
+  if (!userData) return;
+
+  const nextDate = getNextCheckinDate();
+  if (!nextDate) {
+    document.getElementById('checkinDate').textContent = 'Not scheduled';
+    return;
+  }
+
+  const opts = { weekday: 'long', day: 'numeric', month: 'long' };
+  document.getElementById('checkinDate').textContent = nextDate.toLocaleDateString('en-IE', opts);
+  document.getElementById('checkinTime').textContent = userData.checkInTime || '19:00';
+  document.getElementById('checkinPlatform').innerHTML = `&#128187; ${userData.checkInPlatform || 'Teams'}`;
+
+  // Check if within 24 hours
+  const hoursUntil = (nextDate.getTime() - Date.now()) / (1000 * 60 * 60);
+  if (hoursUntil > 0 && hoursUntil < 24) {
+    document.getElementById('checkinCard').classList.add('checkin-glow');
+  }
+}
+
+function getNextCheckinDate() {
+  if (!userData || !userData.startDate || !userData.checkInDay) return null;
+
+  const dayMap = { Sunday:0, Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6 };
+  const targetDay = dayMap[userData.checkInDay];
+  if (targetDay === undefined) return null;
+
+  const now = new Date();
+  const d = new Date(now);
+  d.setHours(0,0,0,0);
+
+  // Find next occurrence of checkInDay
+  while (d.getDay() !== targetDay || d <= now) {
+    d.setDate(d.getDate() + 1);
+  }
+
+  // Set time
+  if (userData.checkInTime) {
+    const [h, m] = userData.checkInTime.split(':');
+    d.setHours(parseInt(h), parseInt(m), 0, 0);
+  }
+
+  return d;
+}
+
+function renderDashboardExercises() {
+  if (!userData) return;
+  const week = userData.currentWeek || 1;
+  const exercises = weekExercises[week] || {};
+  const el = document.getElementById('dashExerciseList');
+
+  // Get exercise template
+  let templateExercises = [];
+  if (programmeTemplate && programmeTemplate.weeks) {
+    const weekData = programmeTemplate.weeks.find(w => w.week === week);
+    if (weekData) templateExercises = weekData.exercises || [];
+  }
+
+  if (templateExercises.length === 0) {
+    el.innerHTML = '<p style="font-size:14px;color:var(--text-secondary);padding:12px 0;">No exercises assigned for this week yet.</p>';
+    return;
+  }
+
+  let h = '';
+  templateExercises.forEach((ex, idx) => {
+    const key = 'exercise' + (idx + 1);
+    const data = exercises[key] || {};
+    const isCompleted = data.completed || false;
+    const ts = data.completedAt ? formatTimestamp(data.completedAt) : '';
+
+    h += `<li class="exercise-item">
+      <div class="exercise-checkbox">
+        <input type="checkbox" ${isCompleted ? 'checked' : ''} onchange="toggleExercise(${week}, '${key}', this.checked)">
+      </div>
+      <div class="exercise-content">
+        <div class="exercise-title ${isCompleted ? 'completed' : ''}">${ex.title}</div>
+        <button class="exercise-toggle" onclick="this.nextElementSibling.classList.toggle('expanded'); this.textContent = this.nextElementSibling.classList.contains('expanded') ? 'Hide details' : 'Show details';">Show details</button>
+        <div class="exercise-desc">${ex.description || ''}</div>
+        ${ts ? `<div class="exercise-timestamp">Completed ${ts}</div>` : ''}
+      </div>
+    </li>`;
+  });
+
+  el.innerHTML = h;
+}
+
+function renderSchedule() {
+  if (!userData) return;
+  const currentWeek = userData.currentWeek || 1;
+  const pauseWeeks = userData.pauseWeeks || [];
+  const el = document.getElementById('scheduleTimeline');
+
+  let h = '';
+  for (let w = 1; w <= 6; w++) {
+    // Determine week start date
+    let weekDate = '';
+    if (userData.startDate) {
+      const start = new Date(userData.startDate);
+      start.setDate(start.getDate() + (w - 1) * 7);
+      weekDate = start.toLocaleDateString('en-IE', { day: 'numeric', month: 'short' });
+    }
+
+    // Check if this is a pause week
+    const isPause = pauseWeeks.some(pw => {
+      if (!userData.startDate) return false;
+      const start = new Date(userData.startDate);
+      start.setDate(start.getDate() + (w - 1) * 7);
+      const weekStart = start.toISOString().split('T')[0];
+      return pw === weekStart;
+    });
+
+    let cls = '';
+    let status = '';
+    if (isPause) {
+      cls = 'pause';
+      status = 'Away';
+    } else if (w < currentWeek) {
+      cls = 'completed';
+      const exercises = weekExercises[w] || {};
+      const keys = Object.keys(exercises).filter(k => k.startsWith('exercise'));
+      const done = keys.filter(k => exercises[k] && exercises[k].completed).length;
+      const total = keys.length;
+      status = total > 0 && done === total ? '\u2705' : (total > 0 ? `${done}/${total}` : '\u2713');
+    } else if (w === currentWeek) {
+      cls = 'current';
+      status = '\u25CF';
+    } else {
+      cls = 'future';
+      status = '';
+    }
+
+    h += `<div class="schedule-week ${cls}">
+      <div class="schedule-week-num">Week ${w}</div>
+      <div class="schedule-week-label">${weekDate}</div>
+      <div class="schedule-week-status">${status}</div>
+    </div>`;
+  }
+
+  el.innerHTML = h;
+}
+
+function renderNote() {
+  if (!userData) return;
+  const textarea = document.getElementById('noteTextarea');
+  textarea.value = userData.noteForVictor || '';
+
+  if (userData.lastActiveAt) {
+    // Show a timestamp hint if note exists
+    if (userData.noteForVictor) {
+      document.getElementById('noteSavedAt').textContent = 'Note saved';
+    }
+  }
+}
+
+function renderExercisesView() {
+  const el = document.getElementById('exerciseWeeks');
+  if (!programmeTemplate || !programmeTemplate.weeks) {
+    el.innerHTML = '<p style="color:var(--text-secondary);">Programme template not yet loaded.</p>';
+    return;
+  }
+
+  const currentWeek = userData ? (userData.currentWeek || 1) : 1;
+  let h = '';
+
+  programmeTemplate.weeks.forEach(weekData => {
+    const w = weekData.week;
+    const isCurrent = w === currentWeek;
+    const isPast = w < currentWeek;
+    const isFuture = w > currentWeek;
+    const isExpanded = isCurrent;
+
+    const exercises = weekExercises[w] || {};
+    const templateExercises = weekData.exercises || [];
+    const keys = templateExercises.map((_, idx) => 'exercise' + (idx + 1));
+    const completed = keys.filter(k => exercises[k] && exercises[k].completed).length;
+    const total = templateExercises.length;
+
+    let headerCls = 'week-section-header';
+    if (isCurrent) headerCls += ' current-week';
+    if (isFuture) headerCls += ' future-week';
+    if (isExpanded) headerCls += ' expanded';
+
+    let summary = '';
+    if (isPast && total > 0) {
+      summary = `<span class="week-section-summary">${completed}/${total} completed \u2713</span>`;
+    } else if (isFuture) {
+      summary = `<span class="week-section-locked">Unlocked in Week ${w}</span>`;
+    }
+
+    h += `<div class="week-section">
+      <div class="${headerCls}" onclick="toggleWeekSection(this)">
+        <div class="week-section-left">
+          <span class="week-section-number">Week ${w}</span>
+          <span class="week-section-focus">${weekData.focus || ''}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${summary}
+          <span class="week-section-chevron">\u25B6</span>
+        </div>
+      </div>
+      <div class="week-section-body ${isExpanded ? 'expanded' : ''}">
+        <ul class="exercise-list">`;
+
+    templateExercises.forEach((ex, idx) => {
+      const key = 'exercise' + (idx + 1);
+      const data = exercises[key] || {};
+      const isCompleted = data.completed || false;
+      const ts = data.completedAt ? formatTimestamp(data.completedAt) : '';
+      const disabled = isFuture ? 'disabled' : '';
+
+      h += `<li class="exercise-item">
+        <div class="exercise-checkbox">
+          <input type="checkbox" ${isCompleted ? 'checked' : ''} ${disabled} onchange="toggleExercise(${w}, '${key}', this.checked)">
+        </div>
+        <div class="exercise-content">
+          <div class="exercise-title ${isCompleted ? 'completed' : ''}">${ex.title}</div>
+          <div class="exercise-desc expanded">${ex.description || ''}</div>
+          ${ts ? `<div class="exercise-timestamp">Completed ${ts}</div>` : ''}
+        </div>
+      </li>`;
+    });
+
+    h += `</ul></div></div>`;
+  });
+
+  el.innerHTML = h;
+}
+
+function toggleWeekSection(headerEl) {
+  headerEl.classList.toggle('expanded');
+  const body = headerEl.nextElementSibling;
+  body.classList.toggle('expanded');
+}
+
+function renderProfile() {
+  if (!userData) return;
+  document.getElementById('profileName').textContent = userData.name || '--';
+  document.getElementById('profileEmail').textContent = userData.email || '--';
+  document.getElementById('profileStartDate').textContent = userData.startDate || '--';
+  document.getElementById('profileWeek').textContent = `Week ${userData.currentWeek || 1} of 6`;
+  document.getElementById('profileStatus').textContent = (userData.status || 'active').charAt(0).toUpperCase() + (userData.status || 'active').slice(1);
+}
+
+// ====================================================================
+// ACTIONS
+// ====================================================================
+async function toggleExercise(week, key, completed) {
+  if (!currentUser) return;
+
+  const docRef = firebase.firestore()
+    .collection('users').doc(currentUser.uid)
+    .collection('exercises').doc('week' + week);
+
+  const update = {};
+  update[key + '.completed'] = completed;
+  if (completed) {
+    update[key + '.completedAt'] = firebase.firestore.FieldValue.serverTimestamp();
+  } else {
+    update[key + '.completedAt'] = firebase.firestore.FieldValue.delete();
+  }
+
+  try {
+    await docRef.set(update, { merge: true });
+    await updateLastActive();
+
+    // Re-fetch exercises for this week
+    const doc = await docRef.get();
+    if (doc.exists) weekExercises[week] = doc.data();
+
+    // Re-render affected areas
+    renderCurrentWeek();
+    renderDashboardExercises();
+    renderSchedule();
+    renderExercisesView();
+  } catch (err) {
+    console.error('Error toggling exercise:', err);
+  }
+}
+
+async function saveNote() {
+  if (!currentUser) return;
+  const btn = document.getElementById('btnSaveNote');
+  const textarea = document.getElementById('noteTextarea');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    await firebase.firestore().collection('users').doc(currentUser.uid).update({
+      noteForVictor: textarea.value
+    });
+    await updateLastActive();
+    document.getElementById('noteSavedAt').textContent = 'Saved just now';
+    btn.textContent = 'Saved';
+    setTimeout(() => { btn.textContent = 'Save Note'; btn.disabled = false; }, 2000);
+  } catch (err) {
+    console.error('Error saving note:', err);
+    btn.textContent = 'Save Note';
+    btn.disabled = false;
+  }
+}
+
+async function updateLastActive() {
+  if (!currentUser) return;
+  try {
+    await firebase.firestore().collection('users').doc(currentUser.uid).update({
+      lastActiveAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (err) {
+    console.error('Error updating lastActiveAt:', err);
+  }
+}
+
+function handleLogout() {
+  firebase.auth().signOut().then(() => {
+    window.location.href = 'login.html';
+  });
+}
+
+// ====================================================================
+// CALENDAR (.ics) GENERATION
+// ====================================================================
+function downloadICS() {
+  const nextDate = getNextCheckinDate();
+  if (!nextDate) return;
+
+  const platform = userData.checkInPlatform || 'Teams';
+  const [hour, minute] = (userData.checkInTime || '19:00').split(':').map(Number);
+
+  const start = new Date(nextDate);
+  start.setHours(hour, minute, 0, 0);
+  const end = new Date(start);
+  end.setMinutes(end.getMinutes() + 30);
+
+  function pad(n) { return n.toString().padStart(2, '0'); }
+  function toICSDate(d) {
+    return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+  }
+
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//AI Badge//Check-in//EN',
+    'BEGIN:VEVENT',
+    'DTSTART:' + toICSDate(start),
+    'DTEND:' + toICSDate(end),
+    'SUMMARY:AI Badge Check-in with Victor',
+    'DESCRIPTION:Weekly AI coaching check-in via ' + platform,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ai-badge-checkin.ics';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ====================================================================
+// UTILITIES
+// ====================================================================
+function formatTimestamp(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-IE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+// ====================================================================
+// FIREBASE AUTH + DATA LOADING
+// ====================================================================
+function initPortal() {
+  // Wait for firebase-app.js to initialise Firebase
+  if (typeof firebase === 'undefined' || !firebase.auth) {
+    console.error('Firebase not loaded. Ensure assets/js/firebase-app.js is present.');
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    return;
+  }
+
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    currentUser = user;
+
+    try {
+      // Fetch user profile
+      const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        userData = userDoc.data();
+      } else {
+        // Minimal fallback
+        userData = { name: user.displayName || user.email, email: user.email, currentWeek: 1, status: 'active' };
+      }
+
+      // Update header
+      document.getElementById('headerWelcome').innerHTML = `Welcome, <strong>${userData.name || 'there'}</strong>`;
+
+      // Fetch assessments
+      const baseDoc = await firebase.firestore()
+        .collection('users').doc(user.uid)
+        .collection('assessments').doc('baseline').get();
+      if (baseDoc.exists) baselineAssessment = baseDoc.data();
+
+      const finalDoc = await firebase.firestore()
+        .collection('users').doc(user.uid)
+        .collection('assessments').doc('final').get();
+      if (finalDoc.exists) finalAssessment = finalDoc.data();
+
+      // Fetch programme template
+      const progDoc = await firebase.firestore().collection('programmes').doc('default').get();
+      if (progDoc.exists) programmeTemplate = progDoc.data();
+
+      // Fetch exercises for all weeks
+      const exercisesSnap = await firebase.firestore()
+        .collection('users').doc(user.uid)
+        .collection('exercises').get();
+      exercisesSnap.forEach(doc => {
+        const weekNum = parseInt(doc.id.replace('week', ''));
+        if (!isNaN(weekNum)) weekExercises[weekNum] = doc.data();
+      });
+
+      // Render everything
+      renderAssessment();
+      renderCurrentWeek();
+      renderCheckin();
+      renderDashboardExercises();
+      renderSchedule();
+      renderNote();
+      renderExercisesView();
+      renderProfile();
+
+    } catch (err) {
+      console.error('Error loading portal data:', err);
+    }
+
+    // Hide loading
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  });
+}
+
+// Handle resize for radar
+window.addEventListener('resize', () => {
+  if (baselineAssessment && document.getElementById('view-dashboard').classList.contains('active')) {
+    setupRadarCanvas();
+    const displayScores = finalAssessment ? scoresToArray(finalAssessment.scores) : scoresToArray(baselineAssessment.scores);
+    const overlayScores = finalAssessment ? scoresToArray(baselineAssessment.scores) : null;
+    drawRadar(displayScores, overlayScores);
+  }
+});
+
+// Initialise
+initPortal();
+</script>
+</body>
+</html>
