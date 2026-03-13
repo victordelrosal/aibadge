@@ -267,8 +267,8 @@ body.has-auth-banner .navbar{top:2.5rem}
   animation:badgeSpin 12s linear infinite;
 }
 @keyframes badgeSpin{
-  0%{transform:perspective(800px) rotateY(0deg)}
-  100%{transform:perspective(800px) rotateY(360deg)}
+  0%,100%{transform:perspective(800px) rotateY(-25deg)}
+  50%{transform:perspective(800px) rotateY(25deg)}
 }
 .badge-showcase-img:hover{
   animation-play-state:paused;
