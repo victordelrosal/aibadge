@@ -191,18 +191,61 @@ body.has-auth-banner .navbar{top:2.5rem}
 }
 .hero h1{
   font-family:'Playfair Display',serif;
-  font-size:3.6rem;
+  font-size:4.2rem;
   font-weight:700;
   color:var(--white);
   margin-bottom:1.2rem;
-  line-height:1.15;
+  line-height:1.1;
 }
+.hero h1 .gold{color:var(--gold-premium)}
 .hero .sub{
-  font-size:1.2rem;
-  color:rgba(255,255,255,0.75);
-  max-width:680px;
+  font-size:1.25rem;
+  color:rgba(255,255,255,0.8);
+  max-width:640px;
   margin:0 auto 2.5rem;
   line-height:1.7;
+}
+.hero-image{
+  max-width:680px;
+  width:100%;
+  margin:0 auto 2.5rem;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  position:relative;
+}
+.hero-image img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:cover;
+}
+.hero-image::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 60%,rgba(0,0,54,0.4) 100%);
+  pointer-events:none;
+}
+/* === EXPLORER SECTION (moved from hero) === */
+.explorer-section{
+  background:linear-gradient(165deg,var(--blue-deep) 0%,var(--blue-royal) 60%,var(--blue-electric) 100%);
+  padding:5rem 2rem;
+}
+.explorer-section h2{
+  font-family:'Playfair Display',serif;
+  font-size:2.8rem;
+  font-weight:700;
+  color:var(--white);
+  text-align:center;
+  margin-bottom:0.8rem;
+}
+.explorer-section .section-subtitle{
+  color:rgba(255,255,255,0.7);
+  text-align:center;
+  max-width:580px;
+  margin:0 auto 2.5rem;
+  font-size:1.1rem;
 }
 
 /* === EXPLORER LITE (HERO) === */
@@ -817,7 +860,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
 /* === RESPONSIVE === */
 @media(max-width:1200px){
-  .hero h1{font-size:3rem}
+  .hero h1{font-size:3.2rem}
+}
+@media(max-width:900px){
+  .hero h1{font-size:2.6rem}
+  .hero-image{max-width:90%}
 }
 @media(max-width:900px){
   .explorer-lite{
@@ -890,22 +937,35 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 <section class="hero" id="hero">
   <div class="hero-particles" id="particles"></div>
   <div class="hero-content">
-    <h1 class="fade-in">Discover Your AI Capability</h1>
-    <p class="sub fade-in">Most professionals use AI without knowing their real level. In 30 seconds, map yours across six dimensions grounded in UNESCO, Turing, and EU frameworks.</p>
+    <h1 class="fade-in">Go From <span class="gold">AI Curious</span> to <span class="gold">AI Confident</span></h1>
+    <p class="sub fade-in">A personalised, one-to-one AI coaching programme that measures where you are, guides you forward, and proves how far you have come. Six weeks. Six dimensions. Real results.</p>
 
-    <!-- LIVE SIMPLIFIED RADAR EXPLORER -->
-    <div class="explorer-lite fade-in" id="explorerLite">
-      <div class="explorer-sliders" id="explorerSliders">
-        <!-- Sliders built by JS -->
-      </div>
-      <div class="explorer-radar">
-        <canvas id="radar-lite" width="540" height="520"></canvas>
-        <div class="radar-score" id="radarScore">Score: 0</div>
-        <div class="radar-tier" id="radarTier">AI Aware</div>
-        <div class="radar-archetype" id="radarArchetype">Profile: <span>Developing</span></div>
-      </div>
+    <div class="hero-image fade-in">
+      <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80&auto=format" alt="Professional coaching session" loading="eager">
     </div>
 
+    <a href="#explorer" class="btn-cta fade-in">Discover Your AI Level <span>&darr;</span></a>
+  </div>
+</section>
+
+<!-- ===================== INTERACTIVE EXPLORER ===================== -->
+<section class="explorer-section" id="explorer">
+  <h2 class="fade-in">Try the AI Competency Explorer</h2>
+  <p class="section-subtitle fade-in">Rate yourself across six dimensions. Get your score in 30 seconds.</p>
+
+  <div class="explorer-lite fade-in" id="explorerLite">
+    <div class="explorer-sliders" id="explorerSliders">
+      <!-- Sliders built by JS -->
+    </div>
+    <div class="explorer-radar">
+      <canvas id="radar-lite" width="540" height="520"></canvas>
+      <div class="radar-score" id="radarScore">Score: 0</div>
+      <div class="radar-tier" id="radarTier">AI Aware</div>
+      <div class="radar-archetype" id="radarArchetype">Profile: <span>Developing</span></div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:2rem">
     <a href="explore.html" class="btn-cta fade-in">Get Your Full Assessment <span>&rarr;</span></a>
   </div>
 </section>
