@@ -228,6 +228,12 @@ body.has-auth-banner .navbar{top:2.5rem}
   margin-bottom:1.5rem;
   filter:drop-shadow(0 0 30px rgba(212,175,55,0.4)) drop-shadow(0 0 60px rgba(0,102,255,0.2));
   animation:badgeFloat 4s ease-in-out infinite;
+  will-change:transform;
+  transform-style:preserve-3d;
+  transition:transform 0.15s ease-out, filter 0.15s ease-out;
+}
+.hero-badge.tilt-active{
+  animation:none;
 }
 @keyframes badgeFloat{
   0%,100%{transform:translateY(0)}
@@ -263,6 +269,9 @@ body.has-auth-banner .navbar{top:2.5rem}
   display:block;
   filter:drop-shadow(0 0 40px rgba(212,175,55,0.35)) drop-shadow(0 0 80px rgba(0,102,255,0.2));
   animation:badgeSpin 12s linear infinite;
+  will-change:transform;
+  transform-style:preserve-3d;
+  transition:transform 0.15s ease-out, filter 0.15s ease-out;
 }
 @keyframes badgeSpin{
   0%,100%{transform:perspective(800px) rotateY(-25deg)}
@@ -270,6 +279,9 @@ body.has-auth-banner .navbar{top:2.5rem}
 }
 .badge-showcase-img:hover{
   animation-play-state:paused;
+}
+.badge-showcase-img.tilt-active{
+  animation:none;
 }
 /* === EXPLORER SECTION (moved from hero) === */
 /* === EXPLORER SECTION (Apple aesthetics) === */
@@ -1890,6 +1902,53 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   // Try immediately, and also on load
   if (document.readyState === 'complete') checkAuth();
   else window.addEventListener('load', checkAuth);
+})();
+
+// ==========================================
+// 3D PARALLAX TILT EFFECT ON BADGE IMAGES
+// ==========================================
+(function(){
+  const MAX_TILT = 20; // degrees
+  const SCALE_HOVER = 1.05;
+
+  function initTilt(el){
+    if(!el) return;
+
+    el.addEventListener('mouseenter', function(){
+      el.classList.add('tilt-active');
+      el.style.transition = 'transform 0.15s ease-out, filter 0.15s ease-out';
+    });
+
+    el.addEventListener('mousemove', function(e){
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      // normalized -1 to 1
+      const nx = (e.clientX - cx) / (rect.width / 2);
+      const ny = (e.clientY - cy) / (rect.height / 2);
+      const rotY = nx * MAX_TILT;
+      const rotX = -ny * MAX_TILT;
+      // brightness follows tilt: brighter where cursor is
+      const brightness = 1 + 0.15 * Math.sqrt(nx * nx + ny * ny);
+
+      el.style.transform = 'perspective(1000px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(' + SCALE_HOVER + ')';
+      el.style.filter = 'drop-shadow(0 0 40px rgba(212,175,55,0.5)) drop-shadow(0 0 80px rgba(0,102,255,0.3)) brightness(' + brightness + ')';
+    });
+
+    el.addEventListener('mouseleave', function(){
+      el.style.transition = 'transform 0.5s ease-out, filter 0.5s ease-out';
+      el.style.transform = '';
+      el.style.filter = '';
+      // let the smooth reset finish, then re-enable CSS animation
+      setTimeout(function(){
+        el.classList.remove('tilt-active');
+        el.style.transition = '';
+      }, 500);
+    });
+  }
+
+  // target both badge images
+  document.querySelectorAll('.hero-badge, .badge-showcase-img').forEach(initTilt);
 })();
 </script>
 
