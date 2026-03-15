@@ -235,6 +235,18 @@ body.has-auth-banner .navbar{top:2.5rem}
 .hero-badge.tilt-active{
   animation:none;
 }
+.hero-3d-container{
+  width:200px;
+  aspect-ratio:1/1;
+  margin:0 auto 1.5rem;
+  cursor:grab;
+}
+.hero-3d-container:active{cursor:grabbing}
+.hero-3d-container canvas{
+  width:100%!important;
+  height:100%!important;
+  display:block;
+}
 @keyframes badgeFloat{
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-10px)}
@@ -284,7 +296,7 @@ body.has-auth-banner .navbar{top:2.5rem}
   animation:none;
 }
 .badge-3d-container{
-  width:400px;
+  width:500px;
   max-width:90%;
   aspect-ratio:1/1;
   margin:0 auto 2rem;
@@ -1108,7 +1120,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <div class="hero-overlay"></div>
   <div class="hero-particles" id="particles"></div>
   <div class="hero-content">
-    <img src="assets/img/ai-badge.png" alt="AI Badge" class="hero-badge fade-in">
+    <img src="assets/img/ai-badge.png" alt="AI Badge" class="hero-badge fade-in" id="heroBadgeFallback">
+    <div id="hero3dContainer" class="hero-3d-container fade-in" style="display:none;">
+      <canvas id="hero3dCanvas"></canvas>
+    </div>
     <h1 class="fade-in">Go From <span class="gold">AI Curious</span> to<br><span class="gold">AI Fluent</span> in Six Weeks</h1>
     <p class="sub fade-in">A personalised, one-to-one AI coaching programme that measures where you are, guides you forward, and proves how far you have come. Six weeks. Six dimensions. Real results.</p>
 
@@ -1964,11 +1979,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     });
   }
 
-  // target both badge images (hero only; showcase uses Three.js)
-  document.querySelectorAll('.hero-badge').forEach(initTilt);
-  // also tilt the fallback img if Three.js fails to load
-  var fallback = document.getElementById('badgeFallbackImg');
-  if(fallback && fallback.style.display !== 'none') initTilt(fallback);
+  // Tilt fallback images only if Three.js fails to load
+  document.querySelectorAll('#heroBadgeFallback, #badgeFallbackImg').forEach(function(el){
+    if(el && el.style.display !== 'none') initTilt(el);
+  });
 })();
 </script>
 
@@ -1976,230 +1990,181 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ==========================================
-// THREE.JS 3D BADGE (SHOWCASE SECTION)
+// THREE.JS 3D BADGE FACTORY (HERO + SHOWCASE)
 // ==========================================
 (function(){
-  try {
-  var container = document.getElementById('badge3dContainer');
-  var canvas = document.getElementById('badge3dCanvas');
-  var fallbackImg = document.getElementById('badgeFallbackImg');
-  if(!container || !canvas || typeof THREE === 'undefined'){
-    if(fallbackImg) fallbackImg.style.display = '';
-    return;
+  if(typeof THREE === 'undefined') return;
+
+  var BASE_Z_ROT = -29 * Math.PI / 180;
+
+  // Shared environment map (created once, reused)
+  var sharedEnvMap = null;
+
+  function createEnvMap(renderer){
+    if(sharedEnvMap) return sharedEnvMap;
+    var envScene = new THREE.Scene();
+    var envCamera = new THREE.CubeCamera(0.1, 100, new THREE.WebGLCubeRenderTarget(128));
+    var envGeo = new THREE.SphereGeometry(50, 32, 32);
+    envScene.add(new THREE.Mesh(envGeo, new THREE.MeshBasicMaterial({color:0x0a1a4e, side:THREE.BackSide})));
+    var spotGeo = new THREE.SphereGeometry(2, 16, 16);
+    var s1 = new THREE.Mesh(spotGeo, new THREE.MeshBasicMaterial({color:0xffffff}));
+    s1.position.set(10, 15, 20); envScene.add(s1);
+    var s2 = new THREE.Mesh(spotGeo.clone(), new THREE.MeshBasicMaterial({color:0xD4AF37}));
+    s2.position.set(-15, -5, 15); envScene.add(s2);
+    var s3 = new THREE.Mesh(spotGeo.clone(), new THREE.MeshBasicMaterial({color:0x4080ff}));
+    s3.position.set(5, -10, -15); envScene.add(s3);
+    envCamera.update(renderer, envScene);
+    sharedEnvMap = envCamera.renderTarget.texture;
+    return sharedEnvMap;
   }
 
-  // Scene setup (measure using fallback image width as reference)
-  var W = fallbackImg.clientWidth || 400;
-  var H = W; // square canvas
-  var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-  camera.position.set(0, 0, 4.2);
-
-  var renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true, antialias: true});
-  renderer.setSize(W, H);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.outputEncoding = THREE.sRGBEncoding;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.3;
-
-  // Generate environment map for reflections (procedural gradient cube)
-  var envSize = 128;
-  var envScene = new THREE.Scene();
-  var envCamera = new THREE.CubeCamera(0.1, 100, new THREE.WebGLCubeRenderTarget(envSize));
-  // Dark blue gradient sphere as environment
-  var envGeo = new THREE.SphereGeometry(50, 32, 32);
-  var envMat = new THREE.MeshBasicMaterial({
-    color: 0x0a1a4e,
-    side: THREE.BackSide
-  });
-  envScene.add(new THREE.Mesh(envGeo, envMat));
-  // Add bright spots for reflections
-  var spot1Geo = new THREE.SphereGeometry(2, 16, 16);
-  var spot1Mat = new THREE.MeshBasicMaterial({color: 0xffffff});
-  var spot1 = new THREE.Mesh(spot1Geo, spot1Mat);
-  spot1.position.set(10, 15, 20);
-  envScene.add(spot1);
-  var spot2 = new THREE.Mesh(spot1Geo.clone(), new THREE.MeshBasicMaterial({color: 0xD4AF37}));
-  spot2.position.set(-15, -5, 15);
-  envScene.add(spot2);
-  var spot3 = new THREE.Mesh(spot1Geo.clone(), new THREE.MeshBasicMaterial({color: 0x4080ff}));
-  spot3.position.set(5, -10, -15);
-  envScene.add(spot3);
-  envCamera.position.set(0, 0, 0);
-  envCamera.update(renderer, envScene);
-  var envMap = envCamera.renderTarget.texture;
-
-  // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-  var keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
-  keyLight.position.set(2, 3, 4);
-  scene.add(keyLight);
-
-  var fillLight = new THREE.DirectionalLight(0x4080ff, 0.5);
-  fillLight.position.set(-3, -1, 3);
-  scene.add(fillLight);
-
-  var goldRimLight = new THREE.PointLight(0xD4AF37, 1.0, 12);
-  goldRimLight.position.set(0, 0, 3);
-  scene.add(goldRimLight);
-
-  // Back light for edge glow
-  var backLight = new THREE.PointLight(0x4080ff, 0.6, 10);
-  backLight.position.set(0, 0, -3);
-  scene.add(backLight);
-
-  // Hexagonal prism via CylinderGeometry (simpler, more robust)
-  var RADIUS = 1.35;
-  var DEPTH = 0.2;
-  var geometry = new THREE.CylinderGeometry(RADIUS, RADIUS, DEPTH, 6, 1, false);
-  // Rotate so flat face points at camera (cylinder is Y-up by default)
-  geometry.rotateX(Math.PI / 2);
-  // Rotate 30deg so hexagon has flat top
-  geometry.rotateZ(Math.PI / 6);
-
-  // Load badge texture
-  var textureLoader = new THREE.TextureLoader();
-  var textureReady = false;
-  var badgeTexture = textureLoader.load('assets/img/ai-badge.png', function(tex){
-    tex.encoding = THREE.sRGBEncoding;
-    // Fix UV rotation from CylinderGeometry cap mapping
-    tex.center.set(0.5, 0.5);
-    tex.rotation = Math.PI / 2;
-    tex.needsUpdate = true;
-    textureReady = true;
-    // Show 3D, hide fallback
-    container.style.display = 'block';
-    fallbackImg.style.display = 'none';
-  }, undefined, function(){
-    // Texture failed; keep fallback
-    fallbackImg.style.display = '';
-    container.style.display = 'none';
-  });
-
-  // Materials
-  var frontMaterial = new THREE.MeshStandardMaterial({
-    map: badgeTexture,
-    metalness: 0.4,
-    roughness: 0.35,
-    envMap: envMap,
-    envMapIntensity: 0.5
-  });
-
-  var sideMaterial = new THREE.MeshStandardMaterial({
-    color: 0x1a1a4e,
-    metalness: 1.0,
-    roughness: 0.1,
-    envMap: envMap,
-    envMapIntensity: 1.0,
-    emissive: 0x0a0a3e,
-    emissiveIntensity: 0.15
-  });
-
-  var backMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0a0e27,
-    metalness: 0.9,
-    roughness: 0.2,
-    envMap: envMap,
-    envMapIntensity: 0.6
-  });
-
-  // CylinderGeometry groups: 0=side, 1=top cap, 2=bottom cap
-  // Top cap faces camera (front), bottom is back
-  var mesh = new THREE.Mesh(geometry, [sideMaterial, frontMaterial, backMaterial]);
-  var BASE_Z_ROT = -29 * Math.PI / 180; // 29deg clockwise
-  mesh.rotation.z = BASE_Z_ROT;
-  scene.add(mesh);
-
-  // Gold edge highlight
-  var edgeGeo = new THREE.EdgesGeometry(geometry, 20);
-  var edgeMat = new THREE.LineBasicMaterial({color: 0xD4AF37, transparent: true, opacity: 0.15});
-  var edgeLine = new THREE.LineSegments(edgeGeo, edgeMat);
-  edgeLine.rotation.z = BASE_Z_ROT;
-  scene.add(edgeLine);
-
-  // Interaction state
-  var targetRotX = 0, targetRotY = 0;
-  var currentRotX = 0, currentRotY = 0;
-  var isHovering = false;
-  var idleAngle = 0;
-
-  container.addEventListener('mouseenter', function(){ isHovering = true; });
-  container.addEventListener('mouseleave', function(){
-    isHovering = false;
-    targetRotX = 0;
-    targetRotY = 0;
-  });
-  container.addEventListener('mousemove', function(e){
-    if(!isHovering) return;
-    var rect = container.getBoundingClientRect();
-    var nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    var ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    targetRotY = nx * 0.6;
-    targetRotX = -ny * 0.4;
-    goldRimLight.position.set(nx * 3, -ny * 3, 3);
-  });
-
-  // Touch support
-  container.addEventListener('touchmove', function(e){
-    e.preventDefault();
-    var t = e.touches[0];
-    var rect = container.getBoundingClientRect();
-    var nx = ((t.clientX - rect.left) / rect.width - 0.5) * 2;
-    var ny = ((t.clientY - rect.top) / rect.height - 0.5) * 2;
-    isHovering = true;
-    targetRotY = nx * 0.6;
-    targetRotX = -ny * 0.4;
-    goldRimLight.position.set(nx * 3, -ny * 3, 3);
-  }, {passive: false});
-  container.addEventListener('touchend', function(){
-    isHovering = false;
-    targetRotX = 0;
-    targetRotY = 0;
-  });
-
-  // Animation loop
-  function animate(){
-    requestAnimationFrame(animate);
-    if(!textureReady) return;
-
-    if(isHovering){
-      currentRotX += (targetRotX - currentRotX) * 0.08;
-      currentRotY += (targetRotY - currentRotY) * 0.08;
-    } else {
-      idleAngle += 0.008;
-      var idleY = Math.sin(idleAngle) * 0.25;
-      currentRotX += (0 - currentRotX) * 0.03;
-      currentRotY += (idleY - currentRotY) * 0.03;
+  function init3DBadge(containerId, canvasId, fallbackId, defaultSize){
+    try {
+    var container = document.getElementById(containerId);
+    var canvas = document.getElementById(canvasId);
+    var fallbackImg = document.getElementById(fallbackId);
+    if(!container || !canvas){
+      if(fallbackImg) fallbackImg.style.display = '';
+      return;
     }
 
-    mesh.rotation.x = currentRotX;
-    mesh.rotation.y = currentRotY;
-    mesh.rotation.z = BASE_Z_ROT;
-    edgeLine.rotation.x = currentRotX;
-    edgeLine.rotation.y = currentRotY;
-    edgeLine.rotation.z = BASE_Z_ROT;
-    renderer.render(scene, camera);
-  }
-  animate();
+    var W = defaultSize;
+    var H = W;
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+    camera.position.set(0, 0, 4.2);
 
-  // Responsive resize
-  window.addEventListener('resize', function(){
-    W = container.clientWidth || 400;
-    H = W;
-    camera.aspect = 1;
-    camera.updateProjectionMatrix();
+    var renderer = new THREE.WebGLRenderer({canvas:canvas, alpha:true, antialias:true});
     renderer.setSize(W, H);
-  });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.3;
 
-  } catch(err) {
-    // Any error: show fallback image
-    console.warn('3D Badge error:', err);
-    var fb = document.getElementById('badgeFallbackImg');
-    var ct = document.getElementById('badge3dContainer');
-    if(fb) fb.style.display = '';
-    if(ct) ct.style.display = 'none';
+    var envMap = createEnvMap(renderer);
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    var keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    keyLight.position.set(2, 3, 4); scene.add(keyLight);
+    var fillLight = new THREE.DirectionalLight(0x4080ff, 0.5);
+    fillLight.position.set(-3, -1, 3); scene.add(fillLight);
+    var goldRimLight = new THREE.PointLight(0xD4AF37, 1.0, 12);
+    goldRimLight.position.set(0, 0, 3); scene.add(goldRimLight);
+    var backLight = new THREE.PointLight(0x4080ff, 0.6, 10);
+    backLight.position.set(0, 0, -3); scene.add(backLight);
+
+    // Hexagonal prism
+    var geometry = new THREE.CylinderGeometry(1.35, 1.35, 0.2, 6, 1, false);
+    geometry.rotateX(Math.PI / 2);
+    geometry.rotateZ(Math.PI / 6);
+
+    // Load texture
+    var textureReady = false;
+    var textureLoader = new THREE.TextureLoader();
+    var badgeTexture = textureLoader.load('assets/img/ai-badge.png', function(tex){
+      tex.encoding = THREE.sRGBEncoding;
+      tex.center.set(0.5, 0.5);
+      tex.rotation = Math.PI / 2;
+      tex.needsUpdate = true;
+      textureReady = true;
+      container.style.display = 'block';
+      if(fallbackImg) fallbackImg.style.display = 'none';
+    }, undefined, function(){
+      if(fallbackImg) fallbackImg.style.display = '';
+      container.style.display = 'none';
+    });
+
+    // Materials
+    var frontMat = new THREE.MeshStandardMaterial({
+      map:badgeTexture, metalness:0.4, roughness:0.35,
+      envMap:envMap, envMapIntensity:0.5
+    });
+    var sideMat = new THREE.MeshStandardMaterial({
+      color:0x1a1a4e, metalness:1.0, roughness:0.1,
+      envMap:envMap, envMapIntensity:1.0,
+      emissive:0x0a0a3e, emissiveIntensity:0.15
+    });
+    var backMat = new THREE.MeshStandardMaterial({
+      color:0x0a0e27, metalness:0.9, roughness:0.2,
+      envMap:envMap, envMapIntensity:0.6
+    });
+
+    var mesh = new THREE.Mesh(geometry, [sideMat, frontMat, backMat]);
+    mesh.rotation.z = BASE_Z_ROT;
+    scene.add(mesh);
+
+    var edgeLine = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geometry, 20),
+      new THREE.LineBasicMaterial({color:0xD4AF37, transparent:true, opacity:0.15})
+    );
+    edgeLine.rotation.z = BASE_Z_ROT;
+    scene.add(edgeLine);
+
+    // Interaction
+    var targetRotX=0, targetRotY=0, currentRotX=0, currentRotY=0;
+    var isHovering=false, idleAngle=0;
+
+    container.addEventListener('mouseenter', function(){ isHovering=true; });
+    container.addEventListener('mouseleave', function(){
+      isHovering=false; targetRotX=0; targetRotY=0;
+    });
+    container.addEventListener('mousemove', function(e){
+      if(!isHovering) return;
+      var rect=container.getBoundingClientRect();
+      var nx=((e.clientX-rect.left)/rect.width-0.5)*2;
+      var ny=((e.clientY-rect.top)/rect.height-0.5)*2;
+      targetRotY=nx*0.6; targetRotX=-ny*0.4;
+      goldRimLight.position.set(nx*3,-ny*3,3);
+    });
+    container.addEventListener('touchmove', function(e){
+      e.preventDefault();
+      var t=e.touches[0], rect=container.getBoundingClientRect();
+      var nx=((t.clientX-rect.left)/rect.width-0.5)*2;
+      var ny=((t.clientY-rect.top)/rect.height-0.5)*2;
+      isHovering=true; targetRotY=nx*0.6; targetRotX=-ny*0.4;
+      goldRimLight.position.set(nx*3,-ny*3,3);
+    }, {passive:false});
+    container.addEventListener('touchend', function(){
+      isHovering=false; targetRotX=0; targetRotY=0;
+    });
+
+    // Animation loop
+    function animate(){
+      requestAnimationFrame(animate);
+      if(!textureReady) return;
+      if(isHovering){
+        currentRotX+=(targetRotX-currentRotX)*0.08;
+        currentRotY+=(targetRotY-currentRotY)*0.08;
+      } else {
+        idleAngle+=0.008;
+        currentRotX+=(0-currentRotX)*0.03;
+        currentRotY+=(Math.sin(idleAngle)*0.25-currentRotY)*0.03;
+      }
+      mesh.rotation.x=currentRotX; mesh.rotation.y=currentRotY; mesh.rotation.z=BASE_Z_ROT;
+      edgeLine.rotation.x=currentRotX; edgeLine.rotation.y=currentRotY; edgeLine.rotation.z=BASE_Z_ROT;
+      renderer.render(scene,camera);
+    }
+    animate();
+
+    window.addEventListener('resize', function(){
+      W=container.clientWidth||defaultSize; H=W;
+      camera.aspect=1; camera.updateProjectionMatrix();
+      renderer.setSize(W,H);
+    });
+
+    } catch(err) {
+      console.warn('3D Badge error ('+containerId+'):', err);
+      var fb=document.getElementById(fallbackId);
+      var ct=document.getElementById(containerId);
+      if(fb) fb.style.display='';
+      if(ct) ct.style.display='none';
+    }
   }
+
+  // Initialize both badges
+  init3DBadge('hero3dContainer', 'hero3dCanvas', 'heroBadgeFallback', 200);
+  init3DBadge('badge3dContainer', 'badge3dCanvas', 'badgeFallbackImg', 500);
 })();
 </script>
 
