@@ -283,6 +283,19 @@ body.has-auth-banner .navbar{top:2.5rem}
 .badge-showcase-img.tilt-active{
   animation:none;
 }
+.badge-3d-container{
+  width:400px;
+  max-width:90%;
+  aspect-ratio:1/1;
+  margin:0 auto 2rem;
+  cursor:grab;
+}
+.badge-3d-container:active{cursor:grabbing}
+.badge-3d-container canvas{
+  width:100%!important;
+  height:100%!important;
+  display:block;
+}
 /* === EXPLORER SECTION (moved from hero) === */
 /* === EXPLORER SECTION (Apple aesthetics) === */
 .explorer-section{
@@ -1261,7 +1274,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 <section class="badge-showcase" id="badge">
   <h2 class="fade-in">The AI Badge</h2>
   <p class="section-subtitle fade-in">Your proof of AI fluency. Earned through six weeks of real work, real growth, and real results. A credential you will be proud to share.</p>
-  <img src="assets/img/ai-badge.png" alt="The AI Badge" class="badge-showcase-img fade-in">
+  <!-- Fallback image hidden when Three.js loads -->
+  <img src="assets/img/ai-badge.png" alt="The AI Badge" class="badge-showcase-img fade-in" id="badgeFallbackImg">
+  <div id="badge3dContainer" class="badge-3d-container fade-in" style="display:none;">
+    <canvas id="badge3dCanvas"></canvas>
+  </div>
 </section>
 
 <!-- ===================== MEET YOUR GUIDE ===================== -->
@@ -1947,8 +1964,252 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     });
   }
 
-  // target both badge images
-  document.querySelectorAll('.hero-badge, .badge-showcase-img').forEach(initTilt);
+  // target both badge images (hero only; showcase uses Three.js)
+  document.querySelectorAll('.hero-badge').forEach(initTilt);
+  // also tilt the fallback img if Three.js fails to load
+  var fallback = document.getElementById('badgeFallbackImg');
+  if(fallback && fallback.style.display !== 'none') initTilt(fallback);
+})();
+</script>
+
+<!-- Three.js for 3D Badge -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ==========================================
+// THREE.JS 3D BADGE (SHOWCASE SECTION)
+// ==========================================
+(function(){
+  var container = document.getElementById('badge3dContainer');
+  var canvas = document.getElementById('badge3dCanvas');
+  var fallbackImg = document.getElementById('badgeFallbackImg');
+  if(!container || !canvas || typeof THREE === 'undefined'){
+    // Three.js not available; keep fallback image visible
+    if(fallbackImg) fallbackImg.style.display = '';
+    return;
+  }
+
+  // Temporarily show to measure, then hide until texture loads
+  container.style.display = 'block';
+  container.style.visibility = 'hidden';
+  var scene = new THREE.Scene();
+  var W = container.clientWidth || 400;
+  var H = container.clientHeight || W;
+  container.style.display = 'none';
+  container.style.visibility = '';
+  var camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
+  camera.position.set(0, 0, 4.5);
+
+  var renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true, antialias: true});
+  renderer.setSize(W, H);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+
+  // Lighting
+  var ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambientLight);
+
+  var keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+  keyLight.position.set(2, 3, 4);
+  scene.add(keyLight);
+
+  var fillLight = new THREE.DirectionalLight(0x4080ff, 0.4);
+  fillLight.position.set(-2, -1, 3);
+  scene.add(fillLight);
+
+  var goldRimLight = new THREE.PointLight(0xD4AF37, 0.8, 10);
+  goldRimLight.position.set(0, 0, 3);
+  scene.add(goldRimLight);
+
+  // Hexagonal prism geometry
+  var RADIUS = 1.35;
+  var DEPTH = 0.18;
+  var hexShape = new THREE.Shape();
+  for(var i = 0; i < 6; i++){
+    var angle = (Math.PI / 3) * i - Math.PI / 6; // flat top
+    var x = RADIUS * Math.cos(angle);
+    var y = RADIUS * Math.sin(angle);
+    if(i === 0) hexShape.moveTo(x, y);
+    else hexShape.lineTo(x, y);
+  }
+  hexShape.closePath();
+
+  var extrudeSettings = {
+    depth: DEPTH,
+    bevelEnabled: true,
+    bevelThickness: 0.03,
+    bevelSize: 0.03,
+    bevelSegments: 3
+  };
+  var geometry = new THREE.ExtrudeGeometry(hexShape, extrudeSettings);
+  geometry.center();
+
+  // Materials
+  var textureLoader = new THREE.TextureLoader();
+  var badgeTexture = textureLoader.load('assets/img/ai-badge.png', function(){
+    // Texture loaded successfully; swap fallback for 3D
+    container.style.display = 'block';
+    fallbackImg.style.display = 'none';
+    renderer.render(scene, camera);
+  }, undefined, function(){
+    // Texture load failed; keep fallback
+    fallbackImg.style.display = '';
+  });
+  badgeTexture.encoding = THREE.sRGBEncoding;
+
+  // Front face material (badge image)
+  var frontMaterial = new THREE.MeshStandardMaterial({
+    map: badgeTexture,
+    metalness: 0.3,
+    roughness: 0.4
+  });
+
+  // Side/edge material (metallic gold-blue)
+  var sideMaterial = new THREE.MeshStandardMaterial({
+    color: 0x1a1a4e,
+    metalness: 0.9,
+    roughness: 0.2,
+    emissive: 0x0a0a2e,
+    emissiveIntensity: 0.1
+  });
+
+  // Back face material
+  var backMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0a0e27,
+    metalness: 0.8,
+    roughness: 0.3
+  });
+
+  // Assign materials to geometry groups
+  // ExtrudeGeometry: group 0 = front, group 1 = back, group 2 = sides (bevel+extrude)
+  // We need to reassign UV mapping for the front face
+  geometry.clearGroups();
+  var posAttr = geometry.getAttribute('position');
+  var normalAttr = geometry.getAttribute('normal');
+  var uvAttr = geometry.getAttribute('uv');
+
+  // Separate faces by normal direction
+  var frontIndices = [];
+  var backIndices = [];
+  var sideIndices = [];
+  var idx = geometry.getIndex();
+
+  for(var f = 0; f < idx.count; f += 3){
+    var a = idx.getX(f), b = idx.getX(f+1), c = idx.getX(f+2);
+    // average normal of triangle
+    var nz = (normalAttr.getZ(a) + normalAttr.getZ(b) + normalAttr.getZ(c)) / 3;
+    if(nz > 0.5) frontIndices.push(a, b, c);
+    else if(nz < -0.5) backIndices.push(a, b, c);
+    else sideIndices.push(a, b, c);
+  }
+
+  // Rebuild as indexed geometry with groups
+  var newIndices = frontIndices.concat(sideIndices).concat(backIndices);
+  geometry.setIndex(newIndices);
+  geometry.clearGroups();
+  geometry.addGroup(0, frontIndices.length, 0);                          // front = material 0
+  geometry.addGroup(frontIndices.length, sideIndices.length, 1);         // sides = material 1
+  geometry.addGroup(frontIndices.length + sideIndices.length, backIndices.length, 2); // back = material 2
+
+  // Fix UVs for the front face to map badge texture correctly
+  // Map x,y positions to 0..1 UV range
+  for(var i = 0; i < frontIndices.length; i++){
+    var vi = newIndices[i];
+    var px = posAttr.getX(vi);
+    var py = posAttr.getY(vi);
+    var u = (px / RADIUS + 1) / 2;
+    var v = (py / RADIUS + 1) / 2;
+    uvAttr.setXY(vi, u, v);
+  }
+  uvAttr.needsUpdate = true;
+
+  var mesh = new THREE.Mesh(geometry, [frontMaterial, sideMaterial, backMaterial]);
+  scene.add(mesh);
+
+  // Add gold edge ring (wireframe outline)
+  var edgeGeo = new THREE.EdgesGeometry(geometry, 15);
+  var edgeMat = new THREE.LineBasicMaterial({color: 0xD4AF37, linewidth: 1, transparent: true, opacity: 0.4});
+  var edgeLine = new THREE.LineSegments(edgeGeo, edgeMat);
+  scene.add(edgeLine);
+
+  // Interaction state
+  var targetRotX = 0, targetRotY = 0;
+  var currentRotX = 0, currentRotY = 0;
+  var isHovering = false;
+  var idleAngle = 0;
+
+  // Mouse interaction
+  container.addEventListener('mouseenter', function(){ isHovering = true; });
+  container.addEventListener('mouseleave', function(){
+    isHovering = false;
+    targetRotX = 0;
+    targetRotY = 0;
+  });
+
+  container.addEventListener('mousemove', function(e){
+    if(!isHovering) return;
+    var rect = container.getBoundingClientRect();
+    var nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    var ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    targetRotY = nx * 0.6;   // radians
+    targetRotX = -ny * 0.4;
+
+    // Move light to follow cursor for shine effect
+    goldRimLight.position.set(nx * 3, -ny * 3, 3);
+  });
+
+  // Touch support
+  container.addEventListener('touchmove', function(e){
+    e.preventDefault();
+    var touch = e.touches[0];
+    var rect = container.getBoundingClientRect();
+    var nx = ((touch.clientX - rect.left) / rect.width - 0.5) * 2;
+    var ny = ((touch.clientY - rect.top) / rect.height - 0.5) * 2;
+    isHovering = true;
+    targetRotY = nx * 0.6;
+    targetRotX = -ny * 0.4;
+    goldRimLight.position.set(nx * 3, -ny * 3, 3);
+  }, {passive: false});
+  container.addEventListener('touchend', function(){
+    isHovering = false;
+    targetRotX = 0;
+    targetRotY = 0;
+  });
+
+  // Animation loop
+  function animate(){
+    requestAnimationFrame(animate);
+
+    if(isHovering){
+      // Smooth lerp toward target
+      currentRotX += (targetRotX - currentRotX) * 0.08;
+      currentRotY += (targetRotY - currentRotY) * 0.08;
+    } else {
+      // Gentle idle sway
+      idleAngle += 0.008;
+      var idleY = Math.sin(idleAngle) * 0.3;
+      currentRotX += (0 - currentRotX) * 0.03;
+      currentRotY += (idleY - currentRotY) * 0.03;
+    }
+
+    mesh.rotation.x = currentRotX;
+    mesh.rotation.y = currentRotY;
+    edgeLine.rotation.x = currentRotX;
+    edgeLine.rotation.y = currentRotY;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Responsive resize
+  window.addEventListener('resize', function(){
+    W = container.clientWidth;
+    H = container.clientHeight || W;
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+  });
 })();
 </script>
 
