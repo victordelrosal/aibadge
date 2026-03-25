@@ -1657,7 +1657,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                 <div class="lms-module-meta">
                   <span x-text="mod.level" style="text-transform:capitalize;"></span>
                   <span class="dot">&#183;</span>
-                  <span x-text="mod.lessons.length + ' capsules'"></span>
+                  <span x-text="mod.lessons.length + ' tutorials'"></span>
                   <span class="dot">&#183;</span>
                   <span x-text="mod.durationMinutes + ' min'"></span>
                   <span class="dot">&#183;</span>
@@ -2113,9 +2113,17 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       </div>
     </div>
 
-    <!-- YouTube Video Placeholder -->
+    <!-- Tutorial Video -->
     <div class="cg-video-wrapper">
-      <iframe src="https://www.youtube.com/embed/3GwDStWiwME" allowfullscreen></iframe>
+      <iframe src="https://www.youtube.com/embed/IUHs60kWwdE" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides PDF -->
+    <div style="text-align:center;margin:1rem 0 1.5rem;">
+      <a href="tutorials/hello-world/slides.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
     </div>
 
     <!-- QUICK START -->
@@ -2154,7 +2162,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
         <h3>The Prompt to Use</h3>
         <div class="cg-code-block">
-          <pre>Code my very first Hello World page. Output as a single-file HTML, JavaScript, CSS in less than 100 lines of code.</pre>
+          <pre>Code my very first Hello World page in under 50 lines of code that includes a button and some movement. Output as a single-file HTML, JavaScript, CSS.</pre>
           <div class="cg-code-footer">
             <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
@@ -2198,7 +2206,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <h4>Step 2: Enter the Prompt</h4>
         <p>Copy and paste this exact text:</p>
         <div class="cg-code-block">
-          <pre>Code my very first Hello World page. Output as a single-file HTML, JavaScript, CSS in less than 100 lines of code.</pre>
+          <pre>Code my very first Hello World page in under 50 lines of code that includes a button and some movement. Output as a single-file HTML, JavaScript, CSS.</pre>
           <div class="cg-code-footer">
             <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
