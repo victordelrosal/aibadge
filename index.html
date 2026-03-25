@@ -1610,6 +1610,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       AI Badge
     </a>
     <div style="display:flex;align-items:center;gap:16px;">
+      <a href="explore.html" class="lms-topbar-link" target="_blank">Explorer</a>
       <template x-if="$store.auth.isAdmin">
         <a href="#/admin" class="lms-topbar-link">Admin</a>
       </template>
@@ -1757,6 +1758,52 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </template>
       </div>
     </template>
+
+    <!-- Explorer History (visible to all logged-in users) -->
+    <div x-data="explorerHistory()" style="margin-top:32px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="lms-heading" style="font-size:1.3rem;margin:0;">Explorer History</h2>
+        <a href="explore.html" target="_blank" style="font-size:0.85rem;font-weight:600;color:#007AFF;text-decoration:none;">Take Assessment &rarr;</a>
+      </div>
+      <template x-if="loading">
+        <p class="lms-subheading" style="font-size:0.85rem;">Loading history...</p>
+      </template>
+      <template x-if="!loading && history.length === 0">
+        <div class="lms-module-card" style="padding:24px;text-align:center;">
+          <p style="font-size:1.4rem;margin-bottom:6px;">📊</p>
+          <p class="lms-subheading" style="margin-bottom:8px;font-size:0.9rem;">No assessments yet.</p>
+          <a href="explore.html" target="_blank" style="font-size:0.85rem;font-weight:600;color:#007AFF;text-decoration:none;">Take your first Explorer assessment</a>
+        </div>
+      </template>
+      <template x-if="!loading && history.length > 0">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <template x-for="h in history" :key="h.id">
+            <div class="lms-module-card" style="padding:16px 20px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                    <span style="font-size:1.5rem;font-weight:700;letter-spacing:-0.5px;" :style="'color:' + tierColor(h.score)" x-text="h.score"></span>
+                    <span style="font-weight:600;font-size:0.95rem;" x-text="h.tier"></span>
+                  </div>
+                  <p style="font-size:0.8rem;opacity:0.5;margin:0;" x-text="h.archetype"></p>
+                </div>
+                <div style="text-align:right;">
+                  <p style="font-size:0.8rem;opacity:0.5;margin:0;" x-text="formatDate(h.completedAt)"></p>
+                </div>
+              </div>
+              <!-- Mini dimension bars -->
+              <div style="display:flex;gap:4px;margin-top:10px;">
+                <template x-for="(dim, key) in h.scores" :key="key">
+                  <div style="flex:1;height:4px;border-radius:2px;background:rgba(128,128,128,0.2);overflow:hidden;">
+                    <div style="height:100%;border-radius:2px;transition:width 0.3s;" :style="'width:' + ((dim-1)/4*100) + '%;background:' + tierColor(h.score)"></div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
   </div>
 </div>
 
@@ -3010,9 +3057,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       if (user) {
         const banner = document.getElementById('auth-banner');
         const nameEl = document.getElementById('auth-name');
-        nameEl.textContent = user.displayName || user.email || 'User';
-        banner.style.display = 'block';
-        document.body.classList.add('has-auth-banner');
+        if (nameEl) nameEl.textContent = user.displayName || user.email || 'User';
+        if (banner) { banner.style.display = 'block'; document.body.classList.add('has-auth-banner'); }
       }
     });
   }
@@ -3340,6 +3386,45 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     });
   });
 
+  // Explorer history Alpine component
+  window.explorerHistory = function() {
+    return {
+      history: [],
+      loading: true,
+      init() {
+        var self = this;
+        var checkUser = setInterval(function() {
+          var user = Alpine.store('auth').user;
+          if (user) { clearInterval(checkUser); self.loadHistory(user.uid); }
+        }, 200);
+        setTimeout(function() { clearInterval(checkUser); self.loading = false; }, 5000);
+      },
+      async loadHistory(uid) {
+        this.loading = true;
+        try {
+          initFirebase();
+          var snapshot = await db.collection('users').doc(uid).collection('explorer_history')
+            .orderBy('completedAt', 'desc').limit(20).get();
+          this.history = snapshot.docs.map(function(doc) { return { id: doc.id, ...doc.data() }; });
+        } catch (e) {
+          console.warn('Explorer history:', e.message);
+        }
+        this.loading = false;
+      },
+      tierColor(score) {
+        if (score >= 80) return '#34C759';
+        if (score >= 60) return '#007AFF';
+        if (score >= 40) return '#FF9500';
+        return '#FF3B30';
+      },
+      formatDate(ts) {
+        if (!ts) return '';
+        var d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString('en-IE', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+    };
+  };
+
   // Admin panel Alpine component
   window.adminPanel = function() {
     return {
@@ -3347,7 +3432,16 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       users: [],
       loading: true,
       error: null,
-      init() { this.loadUsers(); },
+      init() {
+        var self = this;
+        // Wait for auth to be ready before loading
+        initFirebase();
+        var unsub = firebase.auth().onAuthStateChanged(function(user) {
+          unsub(); // only need it once
+          if (user) self.loadUsers();
+          else { self.loading = false; self.error = 'Not signed in.'; }
+        });
+      },
       async loadUsers() {
         this.loading = true;
         this.error = null;
@@ -3357,6 +3451,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
             this.error = 'No users found (or not authorised).';
             this.users = [];
           } else {
+            allUsers.forEach(function(u) { u.toggling = false; });
             this.users = allUsers.sort(function(a, b) {
               var da = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
               var db = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
@@ -3369,15 +3464,20 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.loading = false;
       },
       async toggleEnrolled(u) {
-        u.toggling = true;
         var newVal = !u.enrolled;
-        var result = await setUserEnrolled(u.id, newVal);
-        if (result.success) {
+        console.log('Toggle', u.email, 'to enrolled=' + newVal, 'uid=' + u.id);
+        try {
+          await firebase.firestore().collection('users').doc(u.id).set(
+            { enrolled: newVal, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+            { merge: true }
+          );
           u.enrolled = newVal;
-        } else {
-          this.error = 'Failed to update: ' + (result.error || 'unknown error');
+          this.users = [...this.users];
+          console.log('Success: enrolled=' + newVal);
+        } catch (e) {
+          console.error('Toggle failed:', e);
+          this.error = 'Failed: ' + e.message;
         }
-        u.toggling = false;
       },
       formatDate(ts) {
         if (!ts) return 'Unknown';

@@ -2339,6 +2339,8 @@ async function saveAssessment() {
   try {
     const docId = userBaseline ? 'final' : 'baseline';
     await db.collection('users').doc(currentUser.uid).collection('assessments').doc(docId).set(assessmentData);
+    // Also save to history for progress tracking
+    await db.collection('users').doc(currentUser.uid).collection('explorer_history').add(assessmentData);
 
     btn.textContent = 'Saved';
     btn.style.background = 'var(--green)';
