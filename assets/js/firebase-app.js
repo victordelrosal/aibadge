@@ -59,8 +59,9 @@ async function signInWithGoogle() {
   initFirebase();
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
-    const credential = await auth.signInWithPopup(provider);
-    return { success: true, user: credential.user };
+    await auth.signInWithRedirect(provider);
+    // Page will redirect; result handled by onAuthStateChanged
+    return { success: true };
   } catch (error) {
     return { success: false, error: _friendlyAuthError(error) };
   }
