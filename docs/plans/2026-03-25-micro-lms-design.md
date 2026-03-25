@@ -46,7 +46,7 @@ modules/{moduleId}
 
   /lessons/{lessonId}
     title: string           // "Writing HTML"
-    type: string            // "video" | "reading"
+    type: string            // "video" | "reading" | "quiz"
     youtubeId: string       // YouTube video ID (for video type)
     durationMinutes: number
     order: number           // position within module
@@ -143,7 +143,33 @@ Table of enrolled users: email, enrolled date, progress percentage. Toggle enrol
 
 ### Stack
 
-Same as current: pure HTML/CSS/JS, Firebase Auth (email/password), Firestore, Firebase Hosting. No framework.
+Alpine.js (15kb) as the reactive layer on top of static HTML/CSS/JS. Firebase Auth (email/password), Firestore, Firebase Hosting. No build step.
+
+Alpine was chosen over vanilla JS (too much DOM spaghetti for this complexity) and full frameworks like React (overkill, requires build pipeline). If the Alpine spike reveals friction, Preact is the fallback.
+
+### File Structure
+
+```
+index.html              <- shell, Alpine x-data root, CSS
+js/
+  router.js             <- hash-based routing
+  store.js              <- shared state (auth, user, enrollment)
+  components/
+    modal.js            <- reusable modal component
+    progress-bar.js     <- progress bar component
+    lesson-card.js      <- lesson list item (used in admin + student)
+  admin/
+    modules.js          <- module CRUD, drag-and-drop
+    users.js            <- enrollment management
+  student/
+    dashboard.js        <- module cards, expand/collapse
+    lesson.js           <- lesson view, video player, mark complete
+  services/
+    firebase.js         <- auth + Firestore helpers
+    unlock.js           <- prerequisite/unlock logic
+```
+
+All JS loaded as ES modules. `components/` holds reusable Alpine components shared across admin and student views.
 
 ### Routing
 
@@ -162,18 +188,29 @@ Extend current rules:
 
 ### Content Migration
 
-The three existing Code Guides lessons seed as modules:
+**Code Guides (sBs/code/)**: Migrate and deprecate. The three existing lessons seed as the first modules:
 1. Hello World (Beginner, 5 min)
 2. Deploy to GitHub (Beginner, 15 min)
 3. OpenCode Setup (Intermediate, 35 min)
 
-Their existing HTML content becomes the `content` field on initial lessons. YouTube IDs left blank until recorded.
+Their existing HTML content becomes the `content` field on initial lessons. YouTube IDs left blank until recorded. Once LMS versions are live, redirect victordelrosal.com/code/ to AI Badge.
+
+**Assessment tool (explore.html)**: Absorb as "Module 0: Assess Your AI Capability" in the LMS. Natural onboarding step giving every new student an immediate first completion. The explore.html functionality gets integrated as a lesson type within the SPA.
+
+## Resolved Decisions
+
+| Decision | Resolution | Rationale |
+|----------|-----------|-----------|
+| Framework | Alpine.js | Too complex for vanilla, too simple for React. No build step. |
+| Code Guides site | Migrate into LMS, deprecate /code/ | One home for content, no maintenance split |
+| Assessment tool | Module 0 in the LMS | Natural onboarding, prevents orphaned code |
+| MCQs | Schema supports `type: "quiz"`, no UI yet | Zero effort now, no migration later |
+| File structure | ES modules with components/ shared dir | Prevents duplication across admin/student |
 
 ## What's NOT in V1
 
 - Payment integration (enrollment is manual)
-- Multiple choice / comprehension checks (future)
+- Quiz UI (schema supports it, build later)
 - Certificates or badge generation
 - Discussion / comments on lessons
 - Analytics dashboard
-- Assessment tool integration (explore.html stays standalone for now)
