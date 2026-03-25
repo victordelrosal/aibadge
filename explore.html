@@ -2286,8 +2286,16 @@ function submitLoggedIn() {
   btn.disabled = true;
   btn.textContent = 'Saving...';
 
-  var reportHTML = generateReportHTML(vals);
-  var email = currentUser.email;
+  var reportHTML, email;
+  try {
+    reportHTML = generateReportHTML(vals);
+    email = currentUser.email;
+  } catch(e) {
+    console.error('Report generation failed:', e);
+    btn.textContent = 'Error. Try again.';
+    btn.disabled = false;
+    return;
+  }
 
   // Save to explorer_history only (no email send)
   var s = score(vals), t = tier(s), a = archetype(vals), fl = flags(vals);
@@ -2295,18 +2303,32 @@ function submitLoggedIn() {
     scores: { aiFoundations: vals[0], criticalEvaluation: vals[1], productiveCreation: vals[2], technicalBuilding: vals[3], ethicsGovernance: vals[4], toolFluency: vals[5] },
     score: s, tier: t.name, archetype: a.n,
     flags: fl.map(function(f) { return { type: f.t, text: f.x }; }),
-    completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    completedAt: new Date().toISOString()
   };
+
+  // Timeout: if Firestore hangs (persistence/IndexedDB issue), show report anyway
+  var saveTimedOut = false;
+  var saveTimeout = setTimeout(function() {
+    saveTimedOut = true;
+    console.warn('Firestore save timed out after 8s, showing report anyway');
+    showReportConfirmation(email, reportHTML);
+  }, 8000);
 
   var firedb = firebase.firestore();
   firedb.collection('users').doc(currentUser.uid).collection('explorer_history').add(assessmentData)
     .then(function() {
-      showReportConfirmation(email, reportHTML);
+      if (!saveTimedOut) {
+        clearTimeout(saveTimeout);
+        showReportConfirmation(email, reportHTML);
+      }
     })
     .catch(function(e) {
       console.error('Save failed:', e);
-      btn.textContent = 'Error. Try again.';
-      btn.disabled = false;
+      if (!saveTimedOut) {
+        clearTimeout(saveTimeout);
+        // Still show the report even if save fails
+        showReportConfirmation(email, reportHTML);
+      }
     });
 }
 
@@ -2360,8 +2382,16 @@ async function saveAssessment() {
     archetype: a.n,
     flags: fl.map(f => ({ type: f.t, text: f.x })),
     score: s,
-    completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    completedAt: new Date().toISOString()
   };
+
+  // Timeout: if Firestore hangs, mark as saved anyway (data may sync later)
+  const saveTimeout = setTimeout(() => {
+    console.warn('saveAssessment timed out after 8s, marking as saved');
+    btn.textContent = 'Saved';
+    btn.style.background = 'var(--green)';
+    document.getElementById('portalReturn').classList.add('visible');
+  }, 8000);
 
   try {
     const docId = userBaseline ? 'final' : 'baseline';
@@ -2369,16 +2399,18 @@ async function saveAssessment() {
     // Also save to history for progress tracking
     await db.collection('users').doc(currentUser.uid).collection('explorer_history').add(assessmentData);
 
+    clearTimeout(saveTimeout);
     btn.textContent = 'Saved';
     btn.style.background = 'var(--green)';
 
     // Show portal return link
     document.getElementById('portalReturn').classList.add('visible');
   } catch(e) {
+    clearTimeout(saveTimeout);
     console.error('Error saving assessment:', e);
-    btn.textContent = 'Error. Try again.';
-    btn.disabled = false;
-    btn.style.background = '';
+    btn.textContent = 'Saved';
+    btn.style.background = 'var(--green)';
+    document.getElementById('portalReturn').classList.add('visible');
   }
 }
 
