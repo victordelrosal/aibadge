@@ -1718,7 +1718,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <div x-data="lmsDashboard()">
         <template x-for="tut in tutorials" :key="tut.id">
           <div class="lms-module-card" :class="tut.pending && 'lms-pending'">
-            <button class="lms-module-header" @click="!tut.pending && navigate('#/lesson/' + tut.moduleId + '/' + tut.id)" :disabled="tut.pending">
+            <div class="lms-module-header" @click="!tut.pending && navigate('#/lesson/' + tut.moduleId + '/' + tut.id)">
               <div class="lms-module-icon" :style="'background:' + tut.iconBg">
                 <span x-text="tut.icon"></span>
               </div>
@@ -1736,12 +1736,12 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                 </div>
               </div>
               <template x-if="!tut.pending">
-                <button class="lms-lesson-check" :class="progress[tut.id] && 'checked'" @click.stop="toggleComplete(tut)" style="margin-right:4px;">
+                <div class="lms-lesson-check" :class="progress[tut.id] && 'checked'" @click.stop="toggleComplete(tut)" style="margin-right:4px;">
                   <svg x-show="progress[tut.id]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                </button>
+                </div>
               </template>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:rgba(60,60,67,0.3);"><path d="M6 4l4 4-4 4"/></svg>
-            </button>
+            </div>
           </div>
         </template>
       </div>
