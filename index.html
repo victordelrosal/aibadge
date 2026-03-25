@@ -1727,10 +1727,545 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
 <!-- ===================== LESSON VIEW ===================== -->
 <div id="view-lesson" x-show="$store.ui.view === 'lesson'" x-transition:enter.opacity.duration.200ms style="display:none">
-  <div style="max-width:672px;margin:0 auto;padding:32px 20px;text-align:center;">
-    <p style="color:rgba(60,60,67,0.6);">Lesson view placeholder. (Task 4)</p>
-    <a href="#/" style="color:#007AFF;font-weight:500;">Back to Dashboard</a>
+
+<!-- Code Guides styles (scoped to lesson view) -->
+<style>
+  /* Import IBM Plex fonts */
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
+  #view-lesson { position:relative; }
+
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Moving background pattern */
+  .cg-lesson::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('assets/img/pattern-bg.png');
+    background-repeat: repeat;
+    background-size: 650px 650px;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 0;
+    animation: cgBgScroll 90s linear infinite;
+  }
+  @keyframes cgBgScroll {
+    from { background-position: 0 0; }
+    to { background-position: 650px 0; }
+  }
+
+  /* Gradient glow */
+  .cg-lesson::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Topbar */
+  .cg-topbar {
+    position: sticky; top: 0; z-index: 100;
+    height: 56px;
+    background: rgba(0, 0, 54, 0.95);
+    border-bottom: 1px solid rgba(0, 102, 255, 0.2);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.5rem;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar a:hover { color: #fff; }
+  .cg-topbar .cg-logo { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 600; color: #5CE1E6; display: flex; align-items: center; gap: 0.35rem; }
+  .cg-topbar .cg-breadcrumb { font-size: 0.85rem; color: var(--cg-text-tertiary); display: flex; align-items: center; gap: 0.5rem; }
+  .cg-topbar .cg-breadcrumb span { color: var(--cg-text-muted); }
+
+  /* Main content */
+  .cg-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Course header */
+  .cg-course-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--cg-border);
+    text-align: center;
+  }
+  .cg-course-header h1 {
+    font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta {
+    display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem;
+    color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center;
+  }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+
+  /* Video placeholder */
+  .cg-video-wrapper {
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--cg-border);
+    box-shadow: var(--cg-card-shadow);
+  }
+  .cg-video-wrapper iframe {
+    width: 100%; aspect-ratio: 16/9; display: block; border: none;
+  }
+  .cg-video-placeholder {
+    width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.4); color: var(--cg-text-muted); font-size: 1.1rem;
+    flex-direction: column; gap: 0.5rem;
+  }
+  .cg-video-placeholder svg { opacity: 0.4; }
+
+  /* Sessions/Accordions */
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: #0a0a2e;
+    border: 1px solid var(--cg-border);
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--cg-card-shadow);
+    position: relative; overflow: hidden;
+  }
+  .cg-session-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.1) 20%, rgba(0, 212, 255, 0.2) 50%, rgba(0, 212, 255, 0.1) 80%, transparent 100%);
+  }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number {
+    width: 48px; height: 48px; min-width: 48px;
+    background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan));
+    border-radius: 0.75rem;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+  }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session-header:hover .cg-session-toggle { color: var(--cg-cyan); }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content {
+    display: none;
+    padding: 1.5rem;
+    background: #0a0a2e;
+    border: 1px solid var(--cg-border);
+    border-top: none;
+    border-radius: 0 0 1rem 1rem;
+    position: relative;
+  }
+  .cg-session.open .cg-session-content { display: block; }
+
+  /* Content typography */
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; color: var(--cg-cyan); }
+  .cg-session-content code {
+    background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px;
+    font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace;
+  }
+  .cg-session-content strong { color: var(--cg-ice); }
+
+  /* Code blocks */
+  .cg-code-block {
+    margin: 1rem 0;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--cg-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  .cg-code-block pre {
+    margin: 0; background: none; border: none;
+    white-space: pre-wrap; word-wrap: break-word;
+    font-size: 1.25rem; line-height: 1.5; padding: 1rem;
+    color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace;
+  }
+  .cg-code-footer {
+    display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem;
+    background: rgba(0, 0, 0, 0.15);
+  }
+  .cg-copy-btn {
+    background: transparent; border: none; border-radius: 4px;
+    padding: 0.35rem 0.6rem; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s;
+  }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+
+  /* Callouts */
+  .cg-callout {
+    padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;
+    border-left: 4px solid; backdrop-filter: blur(20px);
+  }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+
+  /* Step cards */
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cg-border);
+    border-radius: 0.75rem; padding: 1.25rem;
+    transition: all 0.2s ease;
+  }
+  .cg-step-card:hover { border-color: var(--cg-cyan); background: rgba(0, 102, 255, 0.1); transform: translateY(-2px); }
+  .cg-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice));
+    border-radius: 50%; font-weight: 700; font-size: 0.9rem;
+    margin-bottom: 0.75rem; color: #000;
+  }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+
+  /* Concept cards */
+  .cg-concept-card {
+    background: rgba(0, 102, 255, 0.1);
+    border: 1px solid rgba(0, 180, 255, 0.2);
+    border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0;
+  }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+
+  /* Keyboard table */
+  .cg-kbd-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .cg-kbd-table th, .cg-kbd-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--cg-border); color: var(--cg-text-secondary); }
+  .cg-kbd-table th { background: rgba(0, 102, 255, 0.15); font-weight: 600; color: var(--cg-cyan); }
+  .cg-session-content kbd {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 0.2rem 0.5rem; border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: #fff;
+  }
+
+  /* Filename compare */
+  .cg-filename-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .cg-filename-box { padding: 1rem; border-radius: 0.5rem; text-align: center; }
+  .cg-filename-box.wrong { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
+  .cg-filename-box.right { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); }
+  .cg-filename-box h5 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .cg-filename-box.wrong h5 { color: var(--cg-error); }
+  .cg-filename-box.right h5 { color: var(--cg-success); }
+  .cg-filename-box code { display: block; margin: 0.25rem 0; }
+
+  /* Mark Complete button */
+  .cg-complete-btn {
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    width: 100%; max-width: 300px; margin: 2rem auto 0;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan));
+    border: none; border-radius: 12px;
+    font: 600 17px/1.3 'IBM Plex Sans', -apple-system, sans-serif;
+    color: #fff; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 102, 255, 0.4);
+    transition: all 0.2s;
+  }
+  .cg-complete-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 102, 255, 0.5); }
+  .cg-complete-btn svg { width: 20px; height: 20px; }
+
+  /* Footer */
+  .cg-footer {
+    text-align: center; padding: 1.5rem; color: var(--cg-text-muted);
+    font-size: 0.85rem; position: relative; z-index: 2;
+    border-top: 1px solid var(--cg-border);
+    display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .cg-step-grid { grid-template-columns: 1fr; }
+    .cg-filename-compare { grid-template-columns: 1fr; }
+    .cg-course-header h1 { font-size: 1.75rem; }
+  }
+</style>
+
+<!-- Lesson content wrapper -->
+<div class="cg-lesson" x-data="lessonView()">
+
+  <!-- Topbar -->
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <a href="#/" class="cg-logo"><span style="font-weight:700;">&gt;_</span> Code</a>
+      <div class="cg-breadcrumb">
+        <span>/</span>
+        <a href="#/" style="color:var(--cg-text-tertiary);">Dashboard</a>
+        <span>/</span>
+        <span style="color:var(--cg-cyan);" x-text="currentLesson?.title || 'Lesson'"></span>
+      </div>
+    </div>
+    <a href="#/" style="font-size:0.85rem;">Back to Dashboard</a>
   </div>
+
+  <!-- Main content -->
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>Hello World Guide</h1>
+      <p class="cg-subtitle">Coding Your First Web Page</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>5-Minute Setup</span>
+      </div>
+    </div>
+
+    <!-- YouTube Video Placeholder -->
+    <div class="cg-video-wrapper">
+      <div class="cg-video-placeholder">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Video coming soon</span>
+      </div>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: 5-Minute Cheat Sheet</h2>
+          <span class="cg-session-meta">Get your first Hello World running fast</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <div class="cg-step-grid">
+          <div class="cg-step-card">
+            <div class="cg-step-num">1</div>
+            <h5>Get Code from an LLM</h5>
+            <p>Go to <a href="https://chatgpt.com" target="_blank">chatgpt.com</a>, <a href="https://gemini.google.com" target="_blank">gemini.google.com</a>, or <a href="https://claude.ai" target="_blank">claude.ai</a></p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">2</div>
+            <h5>Install Sublime Text</h5>
+            <p>Download from <a href="https://sublimetext.com" target="_blank">sublimetext.com</a> and install</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">3</div>
+            <h5>Paste &amp; Save Code</h5>
+            <p>Save as <code>helloworld.html</code> on Desktop</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">4</div>
+            <h5>Open in Browser</h5>
+            <p>Double-click the file to open in Chrome</p>
+          </div>
+        </div>
+
+        <h3>The Prompt to Use</h3>
+        <div class="cg-code-block">
+          <pre>Code my very first Hello World page. Output as a single-file HTML, JavaScript, CSS in less than 100 lines of code.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+        <p>Click the <strong>"Copy code"</strong> button on the grey code block that appears.</p>
+
+        <h3>Keyboard Shortcuts</h3>
+        <table class="cg-kbd-table">
+          <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Save As</td><td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td></tr>
+          </tbody>
+        </table>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Success!</h4>
+          <p>You should see your Hello World webpage! Congratulations!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Complete instructions with screenshots</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Part 1: Generate Your Code in a Large Language Model</h3>
+        <h4>Step 1: Open an LLM</h4>
+        <p>Go to <a href="https://chat.openai.com" target="_blank">chat.openai.com</a>, <a href="https://gemini.google.com" target="_blank">gemini.google.com</a>, or <a href="https://claude.ai" target="_blank">claude.ai</a></p>
+        <h4>Step 2: Enter the Prompt</h4>
+        <p>Copy and paste this exact text:</p>
+        <div class="cg-code-block">
+          <pre>Code my very first Hello World page. Output as a single-file HTML, JavaScript, CSS in less than 100 lines of code.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+        <h4>Step 3: Copy the Code</h4>
+        <p>The LLM will generate code in a grey box. Copy it using:</p>
+        <ul>
+          <li>Click the <strong>"Copy code"</strong> button (top-right of code block), OR</li>
+          <li>Click inside code, then <kbd>Cmd</kbd>+<kbd>A</kbd> / <kbd>Ctrl</kbd>+<kbd>A</kbd> (select all), then <kbd>Cmd</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd> (copy)</li>
+        </ul>
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Important</h4>
+          <p>Copy <strong>ALL</strong> the code: it must start with <code>&lt;!DOCTYPE html&gt;</code> and end with <code>&lt;/html&gt;</code></p>
+        </div>
+
+        <h3>Part 2: Install Sublime Text</h3>
+        <div class="cg-concept-card">
+          <h4>Mac Installation</h4>
+          <ul>
+            <li>Go to <a href="https://sublimetext.com" target="_blank">sublimetext.com</a> and click "Download for Mac"</li>
+            <li>Open the downloaded <code>.dmg</code> file from your Downloads folder</li>
+            <li>Drag the Sublime Text icon into the Applications folder</li>
+            <li>Open from Applications (if security warning appears: System Preferences > Security > Open Anyway)</li>
+          </ul>
+        </div>
+        <div class="cg-concept-card">
+          <h4>Windows Installation</h4>
+          <ul>
+            <li>Go to <a href="https://sublimetext.com" target="_blank">sublimetext.com</a> and click "Download for Windows"</li>
+            <li>Run the downloaded <code>.exe</code> file</li>
+            <li>Click Next > Next > Install > Finish</li>
+          </ul>
+        </div>
+
+        <h3>Part 3: Create and Save Your HTML File</h3>
+        <h4>Step 1: Paste Your Code</h4>
+        <p>Open Sublime Text > Click inside the window > Paste (<kbd>Cmd</kbd>+<kbd>V</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd>)</p>
+        <p>You should see colorful code.</p>
+        <h4>Step 2: Save As HTML</h4>
+        <ul>
+          <li>Go to <strong>File > Save As</strong> (or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>)</li>
+          <li>Navigate to your <strong>Desktop</strong> (so you can find it easily)</li>
+          <li>Type the filename: <code>helloworld.html</code></li>
+          <li>Click Save</li>
+        </ul>
+        <div class="cg-callout error">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Critical</h4>
+          <p>The <code>.html</code> extension is <strong>essential</strong>! Without it, browsers won't recognize your file as a webpage.</p>
+        </div>
+        <h4>Filename Examples</h4>
+        <div class="cg-filename-compare">
+          <div class="cg-filename-box wrong"><h5>Wrong</h5><code>helloworld</code><code>helloworld.txt</code></div>
+          <div class="cg-filename-box right"><h5>Correct</h5><code>helloworld.html</code><code>mypage.html</code></div>
+        </div>
+
+        <h3>Part 4: Open in Chrome</h3>
+        <p>Choose any method:</p>
+        <ul>
+          <li><strong>Double-click</strong> the <code>helloworld.html</code> file on your Desktop</li>
+          <li><strong>Drag &amp; drop</strong> the file into an open Chrome window</li>
+          <li><strong>Right-click</strong> > Open with > Google Chrome</li>
+        </ul>
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Congratulations!</h4>
+          <p>You've created your first webpage using HTML, CSS, and JavaScript!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common problems and solutions</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro Tip: Use AI as Your IT Support</h4>
+          <p style="margin-bottom: 0.75rem;">Stuck on an error? <strong>Paste the error message or screenshot directly into ChatGPT, Claude, or Gemini.</strong> These AI tools can read error messages and guide you step-by-step to fix problems.</p>
+        </div>
+        <h3>Common Issues</h3>
+        <div class="cg-concept-card"><h4>"File opens as text, not a webpage"</h4><p>File wasn't saved with <code>.html</code> extension. Rename the file or save again with the correct extension.</p></div>
+        <div class="cg-concept-card"><h4>"Can't find my file"</h4><p>Search for "helloworld" in Finder (Mac) or File Explorer (Windows).</p></div>
+        <div class="cg-concept-card"><h4>"Page is blank or shows weird characters"</h4><p>Re-copy the code from the LLM and paste into a new file. Make sure you copied ALL the code.</p></div>
+        <div class="cg-concept-card"><h4>"Sublime Text won't open on Mac"</h4><p>Go to System Preferences > Security &amp; Privacy > Click "Open Anyway"</p></div>
+        <h3>Common Mistakes to Avoid</h3>
+        <ul>
+          <li>Saving as <code>helloworld.txt</code> instead of <code>helloworld.html</code></li>
+          <li>Not copying ALL the code (must start with <code>&lt;!DOCTYPE html&gt;</code>)</li>
+          <li>File opens as text? Rename it to end in <code>.html</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Mark as Complete -->
+    <button class="cg-complete-btn" @click="markComplete()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <span x-text="isComplete ? 'Completed!' : 'Mark as Complete'"></span>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
 </div>
 
 <!-- ===================== ADMIN VIEW ===================== -->
@@ -2515,6 +3050,34 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       progressPercent(mod) {
         if (mod.lessons.length === 0) return 0;
         return Math.round((this.completedCount(mod) / mod.lessons.length) * 100);
+      }
+    };
+  };
+
+  // ---------- Lesson View Component ----------
+  window.lessonView = function() {
+    return {
+      isComplete: false,
+
+      get currentLesson() {
+        var ui = Alpine.store('ui');
+        // Find lesson from dashboard data (hardcoded for now)
+        var modules = window._lmsModules || [];
+        for (var m = 0; m < modules.length; m++) {
+          if (modules[m].id === ui.activeModuleId) {
+            for (var l = 0; l < modules[m].lessons.length; l++) {
+              if (modules[m].lessons[l].id === ui.activeLessonId) {
+                return modules[m].lessons[l];
+              }
+            }
+          }
+        }
+        return null;
+      },
+
+      markComplete() {
+        this.isComplete = !this.isComplete;
+        // Will persist to Firestore in Task 3
       }
     };
   };
