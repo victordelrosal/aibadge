@@ -1636,20 +1636,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-module-meta .dot { margin:0 6px; }
       .lms-progress-track { margin-top:8px; height:6px; background:rgba(120,120,128,0.12); border-radius:3px; overflow:hidden; }
       .lms-progress-fill { height:100%; border-radius:3px; background:#34C759; transition:width 0.3s ease; }
-      .lms-chevron { transition:transform 0.25s cubic-bezier(0.25,0.1,0.25,1); color:rgba(60,60,67,0.3); }
-      .lms-lesson-list { border-top:1px solid rgba(60,60,67,0.08); }
-      .lms-lesson-row { display:flex !important; flex-direction:row !important; align-items:center !important; gap:12px; padding:12px 20px; text-decoration:none !important; color:inherit; transition:background 0.15s; }
-      .lms-lesson-row:hover { background:rgba(0,0,0,0.03); }
-      .lms-lesson-row.locked { opacity:0.4; cursor:default; }
-      .lms-lesson-row.locked:hover { background:transparent; }
-      .lms-lesson-icon { width:24px; height:24px; min-width:24px; display:flex; align-items:center; justify-content:center; }
-      .lms-lesson-icon svg { display:block; }
-      .lms-lesson-info { flex:1; min-width:0; }
-      .lms-lesson-title { font-size:15px; line-height:1.4; color:#000; font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; }
-      .lms-lesson-row.locked .lms-lesson-title { color:rgba(60,60,67,0.5); }
-      .lms-lesson-subtitle { font-size:12px; line-height:1.33; color:rgba(60,60,67,0.6); margin-top:1px; font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; }
-      .lms-lesson-arrow { color:rgba(60,60,67,0.25); }
-      .lms-lesson-row, .lms-lesson-row:hover { color:inherit; text-decoration:none; }
+      .lms-module-header svg:last-child { color:rgba(60,60,67,0.3); }
       .lms-module-card a { color:inherit; }
       .lms-module-card a:hover { color:inherit; }
     </style>
@@ -1660,8 +1647,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <template x-for="mod in modules" :key="mod.id">
           <div class="lms-module-card">
 
-            <!-- Module header -->
-            <button class="lms-module-header" @click="mod.expanded = !mod.expanded">
+            <!-- Module header — click goes directly to first capsule -->
+            <button class="lms-module-header" @click="navigate('#/lesson/' + mod.id + '/' + mod.lessons[0].id)">
               <div class="lms-module-icon" :style="'background:' + mod.iconBg">
                 <span x-text="mod.icon"></span>
               </div>
@@ -1669,6 +1656,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                 <div class="lms-module-title" x-text="mod.title"></div>
                 <div class="lms-module-meta">
                   <span x-text="mod.level" style="text-transform:capitalize;"></span>
+                  <span class="dot">&#183;</span>
+                  <span x-text="mod.lessons.length + ' capsules'"></span>
                   <span class="dot">&#183;</span>
                   <span x-text="mod.durationMinutes + ' min'"></span>
                   <span class="dot">&#183;</span>
@@ -1678,45 +1667,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                   <div class="lms-progress-fill" :style="'width:' + progressPercent(mod) + '%'"></div>
                 </div>
               </div>
-              <svg class="lms-chevron" :style="mod.expanded && 'transform:rotate(180deg)'" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
             </button>
-
-            <!-- Lessons -->
-            <div x-show="mod.expanded" x-collapse>
-              <div class="lms-lesson-list">
-                <template x-for="(lesson, li) in mod.lessons" :key="lesson.id">
-                  <a @click.prevent="isLessonUnlocked(mod, li) && navigate('#/lesson/' + mod.id + '/' + lesson.id)"
-                     class="lms-lesson-row"
-                     :class="!isLessonUnlocked(mod, li) && 'locked'">
-
-                    <div class="lms-lesson-icon">
-                      <template x-if="isLessonCompleted(lesson)">
-                        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#34C759"/><path d="M6 10l3 3 5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </template>
-                      <template x-if="!isLessonCompleted(lesson) && isLessonUnlocked(mod, li)">
-                        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="#007AFF" stroke-width="2"/></svg>
-                      </template>
-                      <template x-if="!isLessonCompleted(lesson) && !isLessonUnlocked(mod, li)">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(60,60,67,0.3)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
-                      </template>
-                    </div>
-
-                    <div class="lms-lesson-info">
-                      <div class="lms-lesson-title" x-text="lesson.title"></div>
-                      <div class="lms-lesson-subtitle">
-                        <span x-text="lesson.type === 'video' ? 'Video' : lesson.type === 'reading' ? 'Reading' : 'Quiz'"></span>
-                        <span> &#183; </span>
-                        <span x-text="lesson.durationMinutes + ' min'"></span>
-                      </div>
-                    </div>
-
-                    <template x-if="isLessonUnlocked(mod, li)">
-                      <svg class="lms-lesson-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-                    </template>
-                  </a>
-                </template>
-              </div>
-            </div>
 
           </div>
         </template>
