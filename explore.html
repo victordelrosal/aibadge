@@ -2278,9 +2278,10 @@ function showLoggedInUI(user) {
     }
   });
 
-  // Show save button, hide email gate
+  // Show save button and pre-fill email for report
   document.getElementById('saveRow').classList.add('visible');
-  document.getElementById('layer2Section').style.display = 'none';
+  document.getElementById('emailInput').value = user.email;
+  document.getElementById('layer2Section').style.display = 'block';
 }
 
 function showPublicUI() {
