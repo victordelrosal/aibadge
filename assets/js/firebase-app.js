@@ -20,9 +20,9 @@ const ADMIN_EMAILS = ["victor@fiveinnolabs.com", "victordelrosal@gmail.com"];
    Initialisation
    -------------------------------------------------------------------------- */
 
-let app = null;
-let auth = null;
-let db = null;
+var app = null;
+var auth = null;
+var db = null;
 
 function initFirebase() {
   if (app) return; // already initialised
