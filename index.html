@@ -3365,6 +3365,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     const route = initRouter(Alpine);
 
     initFirebase();
+    // Process redirect result from Google Sign-In
+    auth.getRedirectResult().catch(function(e) { console.log('Redirect result:', e.message); });
     onAuthChange(async (user) => {
       const auth = Alpine.store('auth');
       if (user) {
