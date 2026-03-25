@@ -1105,7 +1105,7 @@ footer a:hover { text-decoration: underline; }
       <button class="save-btn" id="saveBtn" onclick="saveAssessment()">Save Assessment</button>
     </div>
     <div class="portal-return" id="portalReturn">
-      <a href="portal.html">Return to your portal &#8594;</a>
+      <a href="index.html#/">Return to your portal &#8594;</a>
     </div>
   </div>
 </div>
@@ -2247,12 +2247,12 @@ function showLoggedInUI(user) {
 
   // Show auth banner
   const banner = document.getElementById('authBanner');
-  banner.innerHTML = `Welcome back, <strong>${name}</strong>. <a href="portal.html">Go to your portal</a>`;
+  banner.innerHTML = `Welcome back, <strong>${name}</strong>. <a href="index.html#/">Go to your portal</a>`;
   banner.style.display = 'block';
 
   // Update nav
   document.getElementById('navBackLink').textContent = 'Back to portal';
-  document.getElementById('navBackLink').href = 'portal.html';
+  document.getElementById('navBackLink').href = 'index.html#/';
 
   // Show client context
   const ctx = document.getElementById('clientContext');
