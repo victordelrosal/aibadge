@@ -1713,57 +1713,35 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-dark .lms-pending { opacity:0.35; }
     </style>
 
-    <!-- Enrolled: Module cards -->
+    <!-- Enrolled: Tutorial cards (each tutorial = its own card) -->
     <template x-if="$store.auth.isEnrolled">
       <div x-data="lmsDashboard()">
-        <template x-for="mod in modules" :key="mod.id">
-          <div class="lms-module-card" :class="mod.pending && 'lms-pending'">
-
-            <!-- Module header — click expands tutorial list -->
-            <button class="lms-module-header" @click="mod.expanded = !mod.expanded" :disabled="mod.pending">
-              <div class="lms-module-icon" :style="'background:' + mod.iconBg">
-                <span x-text="mod.icon"></span>
+        <template x-for="tut in tutorials" :key="tut.id">
+          <div class="lms-module-card" :class="tut.pending && 'lms-pending'">
+            <button class="lms-module-header" @click="!tut.pending && navigate('#/lesson/' + tut.moduleId + '/' + tut.id)" :disabled="tut.pending">
+              <div class="lms-module-icon" :style="'background:' + tut.iconBg">
+                <span x-text="tut.icon"></span>
               </div>
               <div class="lms-module-info">
-                <div class="lms-module-title" x-text="mod.title"></div>
+                <div class="lms-module-title" x-text="tut.title"></div>
                 <div class="lms-module-meta">
-                  <span x-text="mod.level" style="text-transform:capitalize;"></span>
+                  <span x-text="tut.level" style="text-transform:capitalize;"></span>
                   <span class="dot">&#183;</span>
-                  <span x-text="mod.lessons.length + ' tutorials'"></span>
+                  <span x-text="tut.durationMinutes + ' min'"></span>
                   <span class="dot">&#183;</span>
-                  <span x-text="mod.durationMinutes + ' min'"></span>
-                  <span class="dot">&#183;</span>
-                  <span x-text="mod.pending ? 'Coming soon' : completedCount(mod) + '/' + mod.lessons.length + ' done'"></span>
+                  <span x-text="tut.pending ? 'Coming soon' : (progress[tut.id] ? 'Completed' : 'Not started')"></span>
                 </div>
                 <div class="lms-progress-track">
-                  <div class="lms-progress-fill" :style="'width:' + progressPercent(mod) + '%'"></div>
+                  <div class="lms-progress-fill" :style="'width:' + (progress[tut.id] ? 100 : 0) + '%'"></div>
                 </div>
               </div>
-              <svg class="lms-chevron" :style="mod.expanded && 'transform:rotate(90deg)'" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+              <template x-if="!tut.pending">
+                <button class="lms-lesson-check" :class="progress[tut.id] && 'checked'" @click.stop="toggleComplete(tut)" style="margin-right:4px;">
+                  <svg x-show="progress[tut.id]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+              </template>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:rgba(60,60,67,0.3);"><path d="M6 4l4 4-4 4"/></svg>
             </button>
-
-            <!-- Tutorial list (expandable) -->
-            <template x-if="!mod.pending">
-              <div x-show="mod.expanded" x-collapse class="lms-lesson-list">
-                <template x-for="(lesson, li) in mod.lessons" :key="lesson.id">
-                  <div class="lms-lesson-row">
-                    <button class="lms-lesson-check" @click.stop="toggleComplete(lesson)" :class="isLessonCompleted(lesson) && 'checked'">
-                      <svg x-show="isLessonCompleted(lesson)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                    </button>
-                    <a class="lms-lesson-link" @click.prevent="navigate('#/lesson/' + mod.id + '/' + lesson.id)">
-                      <span class="lms-lesson-title" x-text="lesson.title"></span>
-                      <span class="lms-lesson-subtitle">
-                        <span x-text="lesson.type === 'video' ? 'Video' : lesson.type === 'reading' ? 'Reading' : 'Quiz'"></span>
-                        <span> &#183; </span>
-                        <span x-text="lesson.durationMinutes + ' min'"></span>
-                      </span>
-                    </a>
-                    <svg class="lms-lesson-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-                  </div>
-                </template>
-              </div>
-            </template>
-
           </div>
         </template>
       </div>
@@ -3373,108 +3351,21 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   };
 
   // ---------- LMS Dashboard Component ----------
+  window._lmsTutorials = [
+    { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 7, type: 'video' },
+    { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 9, type: 'video' },
+    { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', durationMinutes: 30, type: 'video', pending: true },
+    { id: 'opencode-setup', moduleId: 'opencode-setup', title: 'OpenCode Setup', icon: '⚡', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', durationMinutes: 35, type: 'video', pending: true }
+  ];
+
   window.lmsDashboard = function() {
     return {
-      // Hardcoded progress (will be replaced by Firestore in Task 3)
       progress: {},
 
-      modules: [
-        {
-          id: 'hello-world',
-          title: 'Hello World',
-          description: 'Code your first webpage from scratch.',
-          icon: '🖥️',
-          iconBg: 'rgba(0,122,255,0.12)',
-          level: 'beginner',
-          durationMinutes: 16,
-          order: 0,
-          requiresPrevious: false,
-          expanded: false,
-          lessons: [
-            { id: 'what-is-html', title: 'Hello World', type: 'video', durationMinutes: 7, order: 0, requiresPrevious: false },
-            { id: 'hello-world-2', title: 'Hello World 2', type: 'video', durationMinutes: 9, order: 1, requiresPrevious: false }
-          ]
-        },
-        {
-          id: 'deploy-github',
-          title: 'Deploy to GitHub',
-          description: 'Ship your site to the world with GitHub Pages.',
-          icon: '🚀',
-          iconBg: 'rgba(88,86,214,0.12)',
-          level: 'beginner',
-          durationMinutes: 30,
-          order: 1,
-          requiresPrevious: true,
-          expanded: false,
-          pending: true,
-          lessons: [
-            { id: 'what-is-git', title: 'What is Git?', type: 'video', durationMinutes: 6, order: 0, requiresPrevious: false },
-            { id: 'create-repo', title: 'Create a Repository', type: 'video', durationMinutes: 8, order: 1, requiresPrevious: true },
-            { id: 'push-and-deploy', title: 'Push and Deploy', type: 'video', durationMinutes: 10, order: 2, requiresPrevious: true },
-            { id: 'key-concepts-git', title: 'Key Concepts', type: 'reading', durationMinutes: 6, order: 3, requiresPrevious: false }
-          ]
-        },
-        {
-          id: 'opencode-setup',
-          title: 'OpenCode Setup',
-          description: 'Set up your AI-powered coding environment.',
-          icon: '⚡',
-          iconBg: 'rgba(255,149,0,0.12)',
-          level: 'intermediate',
-          durationMinutes: 35,
-          order: 2,
-          requiresPrevious: true,
-          expanded: false,
-          pending: true,
-          lessons: [
-            { id: 'what-is-opencode', title: 'What is OpenCode?', type: 'video', durationMinutes: 5, order: 0, requiresPrevious: false },
-            { id: 'install-tools', title: 'Install the Tools', type: 'video', durationMinutes: 10, order: 1, requiresPrevious: true },
-            { id: 'first-ai-prompt', title: 'Your First AI Prompt', type: 'video', durationMinutes: 12, order: 2, requiresPrevious: true },
-            { id: 'key-concepts-opencode', title: 'Key Concepts', type: 'reading', durationMinutes: 8, order: 3, requiresPrevious: false }
-          ]
-        }
-      ],
+      tutorials: window._lmsTutorials.map(function(t) { return Object.assign({}, t); }),
 
-      isLessonCompleted(lesson) {
-        return !!this.progress[lesson.id];
-      },
-
-      isModuleCompleted(mod) {
-        return mod.lessons.every(l => this.progress[l.id]);
-      },
-
-      isModuleUnlocked(mod) {
-        if (!mod.requiresPrevious) return true;
-        var idx = this.modules.indexOf(mod);
-        if (idx <= 0) return true;
-        return this.isModuleCompleted(this.modules[idx - 1]);
-      },
-
-      isLessonUnlocked(mod, lessonIndex) {
-        // Module must be unlocked first
-        if (!this.isModuleUnlocked(mod)) return false;
-        var lesson = mod.lessons[lessonIndex];
-        // Lessons with requiresPrevious: false are always accessible
-        if (!lesson.requiresPrevious) return true;
-        // First lesson in module is always unlocked
-        if (lessonIndex === 0) return true;
-        // Previous lesson must be completed
-        var prev = mod.lessons[lessonIndex - 1];
-        return !!this.progress[prev.id];
-      },
-
-      completedCount(mod) {
-        return mod.lessons.filter(l => this.progress[l.id]).length;
-      },
-
-      progressPercent(mod) {
-        if (mod.lessons.length === 0) return 0;
-        return Math.round((this.completedCount(mod) / mod.lessons.length) * 100);
-      },
-
-      toggleComplete(lesson) {
-        this.progress[lesson.id] = !this.progress[lesson.id];
-        // Will persist to Firestore in Task 3
+      toggleComplete(tut) {
+        this.progress[tut.id] = !this.progress[tut.id];
       }
     };
   };
@@ -3495,16 +3386,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
       get currentLesson() {
         var ui = Alpine.store('ui');
-        // Find lesson from dashboard data (hardcoded for now)
-        var modules = window._lmsModules || [];
-        for (var m = 0; m < modules.length; m++) {
-          if (modules[m].id === ui.activeModuleId) {
-            for (var l = 0; l < modules[m].lessons.length; l++) {
-              if (modules[m].lessons[l].id === ui.activeLessonId) {
-                return modules[m].lessons[l];
-              }
-            }
-          }
+        var tutorials = window._lmsTutorials || [];
+        for (var i = 0; i < tutorials.length; i++) {
+          if (tutorials[i].id === ui.activeLessonId) return tutorials[i];
         }
         return null;
       },
