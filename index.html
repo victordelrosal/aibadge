@@ -1801,7 +1801,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   }
   .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
   .cg-topbar a:hover { color: #fff; }
-  .cg-topbar .cg-logo { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 600; color: #5CE1E6; display: flex; align-items: center; gap: 0.35rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
   .cg-topbar .cg-breadcrumb { font-size: 0.85rem; color: var(--cg-text-tertiary); display: flex; align-items: center; gap: 0.5rem; }
   .cg-topbar .cg-breadcrumb span { color: var(--cg-text-muted); }
 
@@ -2059,7 +2059,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1); }
   .cg-lesson.light-mode .cg-topbar a { color: #1a73e8; }
   .cg-lesson.light-mode .cg-topbar a:hover { color: #174ea6; }
-  .cg-lesson.light-mode .cg-logo { color: #1a73e8 !important; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-logo .logo-ai { color: #000036; }
+  .cg-lesson.light-mode .cg-logo .logo-badge { color: #000036; }
   .cg-lesson.light-mode .cg-breadcrumb span { color: #80868b; }
 
   .cg-lesson.light-mode .cg-theme-toggle { border-color: #dadce0; color: #5f6368; }
@@ -2129,7 +2131,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <!-- Topbar -->
   <div class="cg-topbar">
     <div style="display:flex;align-items:center;gap:1rem;">
-      <a href="#/" class="cg-logo"><span style="font-weight:700;">&gt;_</span> Code</a>
+      <a href="#/" class="cg-logo"><img src="assets/img/ai-badge.png" alt="AI Badge" style="height:24px;width:auto;"><span class="logo-ai">AI</span><span class="logo-badge">Badge</span></a>
       <div class="cg-breadcrumb">
         <span>/</span>
         <a href="#/" style="color:var(--cg-text-tertiary);">Dashboard</a>
@@ -2138,7 +2140,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:0.75rem;">
-      <button class="cg-theme-toggle" onclick="document.querySelector('.cg-lesson').classList.toggle('light-mode')" title="Toggle theme">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
         <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
@@ -3152,6 +3154,15 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   window.lessonView = function() {
     return {
       isComplete: false,
+
+      init() {
+        var theme = localStorage.getItem('lesson-theme') || 'light';
+        if (theme === 'light') {
+          this.$el.classList.add('light-mode');
+        } else {
+          this.$el.classList.remove('light-mode');
+        }
+      },
 
       get currentLesson() {
         var ui = Alpine.store('ui');
