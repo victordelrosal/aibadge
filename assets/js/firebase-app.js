@@ -13,8 +13,8 @@ const firebaseConfig = {
   appId: "1:835112059960:web:1c30e27f6daff9f55292cd"
 };
 
-// Admin email for elevated access
-const ADMIN_EMAIL = "victor@fiveinnolabs.com";
+// Admin emails for elevated access
+const ADMIN_EMAILS = ["victor@fiveinnolabs.com", "victordelrosal@gmail.com"];
 
 /* --------------------------------------------------------------------------
    Initialisation
@@ -304,7 +304,7 @@ async function savePublicAssessment(email, assessmentData) {
 async function getAllActiveUsers() {
   initFirebase();
   const user = getCurrentUser();
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (!user || !ADMIN_EMAILS.includes(user.email)) {
     console.warn("getAllActiveUsers: not authorised.");
     return [];
   }

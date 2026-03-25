@@ -2172,7 +2172,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       loading: true,
       get isLoggedIn() { return !!this.user; },
       get isEnrolled() { return this.profile?.enrolled === true; },
-      get isAdmin() { return this.user?.email === 'victor@fiveinnolabs.com'; },
+      get isAdmin() { return ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(this.user?.email); },
       setUser(user) { this.user = user; },
       setProfile(profile) { this.profile = profile; },
       setLoading(val) { this.loading = val; }
@@ -2226,8 +2226,13 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       const auth = Alpine.store('auth');
       if (user) {
         auth.setUser({ uid: user.uid, email: user.email });
-        const profile = await getUserProfile(user.uid);
-        auth.setProfile(profile);
+        var profile = await getUserProfile(user.uid);
+        // Auto-enroll admin users on first sign-in
+        if (!profile && ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email)) {
+          await updateUserProfile(user.uid, { email: user.email, enrolled: true });
+          profile = { email: user.email, enrolled: true };
+        }
+        auth.setProfile(profile || {});
       } else {
         auth.setUser(null);
         auth.setProfile(null);
