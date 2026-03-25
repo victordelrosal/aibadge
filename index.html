@@ -2103,6 +2103,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <!-- Main content -->
   <div class="cg-main">
 
+    <!-- ===== LESSON: what-is-html (Hello World 1) ===== -->
+    <template x-if="$store.ui.activeLessonId === 'what-is-html'">
+    <div>
+
     <!-- Course header -->
     <div class="cg-course-header">
       <h1>Hello World Guide</h1>
@@ -2367,6 +2371,214 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <p>Welcome, and thank you for completing this. You can now mark this tutorial as completed.</p>
       </div>
     </div>
+
+    </div>
+    </template>
+    <!-- ===== END LESSON: what-is-html ===== -->
+
+    <!-- ===== LESSON: hello-world-2 ===== -->
+    <template x-if="$store.ui.activeLessonId === 'hello-world-2'">
+    <div>
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>Hello World 2</h1>
+      <p class="cg-subtitle">Modifying and Experimenting with Your Code</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>10-Minute Tutorial</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/69KTw0ViJYY" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides + Mark Complete row -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="tutorials/hello-world-2/hello-world-2.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+      <button class="cg-complete-btn" @click="markComplete()" style="margin:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span x-text="isComplete ? 'Completed!' : 'Mark as Complete'"></span>
+      </button>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start</h2>
+          <span class="cg-session-meta">Modify your Hello World page</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Prerequisites</h3>
+        <p>Make sure you have completed <strong>Hello World 1</strong> and have your <code>helloworld.html</code> file in your AI Projects folder, Sublime Text installed, and ChatGPT open.</p>
+
+        <h3>The Prompt to Use</h3>
+        <div class="cg-code-block">
+          <pre>Make changes to the page. Add a button that will change background color and make the hello world text bounce around the page. Keep it as a single-file HTML, JavaScript, CSS.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+        <p><strong>Important:</strong> Paste this in the <em>same ChatGPT conversation</em> as your first Hello World, not a new one.</p>
+
+        <h3>Steps</h3>
+        <div class="cg-step-grid">
+          <div class="cg-step-card">
+            <div class="cg-step-num">1</div>
+            <h5>Paste Prompt in Same Chat</h5>
+            <p>Continue the conversation where you generated your first Hello World</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">2</div>
+            <h5>Copy the New Code</h5>
+            <p>Click the copy button on the generated code block</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">3</div>
+            <h5>Replace in Sublime Text</h5>
+            <p>Select All (<kbd>Cmd</kbd>+<kbd>A</kbd>), delete, paste new code, save</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">4</div>
+            <h5>Refresh Browser</h5>
+            <p>Refresh the page to see your changes</p>
+          </div>
+        </div>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Keep Going!</h4>
+          <p>After completing this tutorial, keep making changes: try increasing font size, adding shapes, changing colours, or even asking ChatGPT to "surprise me" with any change it likes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Complete instructions for modifying your code</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Part 1: Requesting Changes to Existing Code</h3>
+        <p>The key concept here is that you can ask ChatGPT to <strong>modify code it already generated</strong>. You don't need to start from scratch.</p>
+        <p>Go back to the same ChatGPT conversation where you generated your Hello World page. Paste the prompt below the previous response:</p>
+        <div class="cg-code-block">
+          <pre>Make changes to the page. Add a button that will change background color and make the hello world text bounce around the page. Keep it as a single-file HTML, JavaScript, CSS.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+
+        <h3>Part 2: Replacing Your Code</h3>
+        <h4>Step 1: Copy the new code from ChatGPT</h4>
+        <p>Click the copy button or select all the generated code.</p>
+        <h4>Step 2: Open your file in Sublime Text</h4>
+        <p>If you closed Sublime Text, go to your AI Projects folder, right-click on <code>helloworld.html</code>, and choose <strong>Open With > Sublime Text</strong> (not Chrome).</p>
+        <h4>Step 3: Select All and Replace</h4>
+        <p>Press <kbd>Cmd</kbd>+<kbd>A</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>A</kbd> (Windows) to select everything, then delete it. Paste the new code.</p>
+        <p><strong>Important:</strong> Make sure there are no strange characters at the top of the code. The code should start with <code>&lt;!DOCTYPE html&gt;</code> or <code>&lt;html&gt;</code>.</p>
+        <h4>Step 4: Save</h4>
+        <p>Press <kbd>Cmd</kbd>+<kbd>S</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>S</kbd> (Windows).</p>
+        <h4>Step 5: Refresh Browser</h4>
+        <p>Go back to your browser tab and refresh. You should see the new features: a button to change background colour and bouncing text.</p>
+
+        <h3>Part 3: The "Surprise Me" Exercise</h3>
+        <p>Try typing this into the same ChatGPT conversation:</p>
+        <div class="cg-code-block">
+          <pre>Surprise me with any change you like</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+        <p>ChatGPT will come up with something unexpected (pulsing effects, new animations, different layouts). This proves that you don't have to tell it exactly what you want; it can generate creative variations on its own.</p>
+
+        <h3>Keyboard Shortcuts</h3>
+        <table class="cg-kbd-table">
+          <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Select All</td><td><kbd>Cmd</kbd> + <kbd>A</kbd></td><td><kbd>Ctrl</kbd> + <kbd>A</kbd></td></tr>
+            <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Save</td><td><kbd>Cmd</kbd> + <kbd>S</kbd></td><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td></tr>
+          </tbody>
+        </table>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Well Done!</h4>
+          <p>You've learned how to iterate on your code by asking the LLM for modifications. Keep practising: try changing fonts, adding geometric shapes, or requesting special effects.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <p>Welcome back to the Hello World 2 tutorial.</p>
+
+        <h3>Reviewing Hello World 1</h3>
+        <p>We're going to look at what we created in the first tutorial. The rendering of the page you got could be very different from mine. You might have a colourful page, a white background, so don't worry if it looks different. The underlying code that you generated will have HTML tags at the top and bottom.</p>
+
+        <h3>Modifying Existing Code</h3>
+        <p>The question is: can we request changes to existing code that ChatGPT or other LLMs generated? The answer is yes, most definitely. We're assuming you already have everything set up: Sublime Text, your AI Projects folder, and the file from the first tutorial.</p>
+        <p>The new prompt asks to add a button that will change the background colour and make the Hello World text bounce around the page, keeping it as a single-file HTML, JavaScript, CSS.</p>
+
+        <h3>Using the Same Conversation</h3>
+        <p>Go to ChatGPT and paste the request right under where the original conversation was. We're not creating a new conversation. Whatever code you have will now be taken into consideration to create the second version. You're making changes to whatever original code you had. Every person will have something unique; it might look similar but will definitely not be exactly the same.</p>
+
+        <h3>Replacing Your Code</h3>
+        <p>Copy the response from ChatGPT. This next step is very important. In Sublime Text, you need to select everything (use <kbd>Cmd</kbd>+<kbd>A</kbd> or <kbd>Ctrl</kbd>+<kbd>A</kbd>), delete it, and paste the new code.</p>
+        <p>Watch out for funny characters at the top of the code. Get rid of those. All you need is the starting tag and the finishing tag. Then save the file with File > Save.</p>
+
+        <h3>Viewing Your Changes</h3>
+        <p>Go to the browser where your <code>helloworld.html</code> is open and refresh the page. You should see a button to change the background colour. Click it and the colours toggle. Toggle the bounce and the text bounces around. You've added features to your page.</p>
+
+        <h3>Keep Experimenting</h3>
+        <p>Can you make more changes? That's what I want you to do. Once this tutorial is over, keep going and requesting as many changes as you like: increase the font size, add different colours, request geometric shapes, add special effects, or even ask "surprise me" and the LLM will come up with something completely unexpected.</p>
+
+        <h3>Opening Files with Sublime Text</h3>
+        <p>If you need to access your code again, go to your AI Projects folder in Finder, right-click on <code>helloworld.html</code>, and choose "Open with" Sublime Text (not Chrome). Chrome shows you the webpage, Sublime Text shows you the code.</p>
+
+        <h3>The "Surprise Me" Exercise</h3>
+        <p>As a final exercise, try typing "surprise me with any change you like." ChatGPT will code something you're not even requesting. It's a very versatile machine. It might add a pulsing or breathing effect, or something else entirely. You don't have to tell it exactly what you want; it can think for itself.</p>
+
+        <h3>What You Achieved</h3>
+        <p>This completes Hello World Part 2. You've learned how to iterate on existing code by making requests in the same conversation. Go ahead and continue practising for another five or ten minutes. Well done!</p>
+      </div>
+    </div>
+
+    </div>
+    </template>
+    <!-- ===== END LESSON: hello-world-2 ===== -->
 
   </div>
 
@@ -3077,15 +3289,13 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           icon: '🖥️',
           iconBg: 'rgba(0,122,255,0.12)',
           level: 'beginner',
-          durationMinutes: 25,
+          durationMinutes: 16,
           order: 0,
           requiresPrevious: false,
           expanded: false,
           lessons: [
-            { id: 'what-is-html', title: 'What is HTML?', type: 'video', durationMinutes: 5, order: 0, requiresPrevious: false },
-            { id: 'your-first-page', title: 'Your First Page', type: 'video', durationMinutes: 8, order: 1, requiresPrevious: true },
-            { id: 'adding-style', title: 'Adding Style with CSS', type: 'video', durationMinutes: 7, order: 2, requiresPrevious: true },
-            { id: 'key-concepts-html', title: 'Key Concepts', type: 'reading', durationMinutes: 5, order: 3, requiresPrevious: false }
+            { id: 'what-is-html', title: 'Hello World', type: 'video', durationMinutes: 7, order: 0, requiresPrevious: false },
+            { id: 'hello-world-2', title: 'Hello World 2', type: 'video', durationMinutes: 9, order: 1, requiresPrevious: false }
           ]
         },
         {
