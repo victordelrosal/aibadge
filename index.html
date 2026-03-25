@@ -2025,6 +2025,97 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     display: flex; align-items: center; justify-content: center; gap: 0.75rem;
   }
 
+  /* Theme toggle button */
+  .cg-theme-toggle {
+    background: transparent; border: 1px solid var(--cg-border); border-radius: 8px;
+    padding: 0; cursor: pointer; color: var(--cg-text-secondary);
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+    height: 36px; width: 36px;
+  }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; }
+  .cg-theme-toggle .cg-moon { display: block; }
+
+  /* ===== LIGHT MODE ===== */
+  .cg-lesson.light-mode {
+    --cg-text-primary: #202124;
+    --cg-text-secondary: #5f6368;
+    --cg-text-tertiary: #80868b;
+    --cg-text-muted: #9aa0a6;
+    --cg-bg-dark: #ffffff;
+    --cg-border: #dadce0;
+    --cg-cyan: #1a73e8;
+    --cg-electric: #1a73e8;
+    --cg-ice: #1a73e8;
+    --cg-success: #1e8e3e;
+    --cg-warning: #f9ab00;
+    --cg-error: #d93025;
+    --cg-card-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    background: #f8f9fa;
+  }
+  .cg-lesson.light-mode::after { opacity: 0.067; }
+  .cg-lesson.light-mode::before { display: none; }
+
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1); }
+  .cg-lesson.light-mode .cg-topbar a { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-topbar a:hover { color: #174ea6; }
+  .cg-lesson.light-mode .cg-logo { color: #1a73e8 !important; }
+  .cg-lesson.light-mode .cg-breadcrumb span { color: #80868b; }
+
+  .cg-lesson.light-mode .cg-theme-toggle { border-color: #dadce0; color: #5f6368; }
+  .cg-lesson.light-mode .cg-theme-toggle:hover { background: #f1f3f4; border-color: #1a73e8; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-course-header .cg-meta svg { color: #1a73e8; }
+
+  .cg-lesson.light-mode .cg-video-placeholder { background: #e8eaed; color: #5f6368; }
+
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-header::before { display: none; }
+  .cg-lesson.light-mode .cg-session.open .cg-session-header { border-radius: 12px 12px 0 0; }
+  .cg-lesson.light-mode .cg-session-header:hover { border-color: #1a73e8; background: #fff; transform: translateY(-2px); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 12px 12px; }
+  .cg-lesson.light-mode .cg-session-content h3 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content strong { color: var(--cg-text-primary); font-weight: 600; }
+  .cg-lesson.light-mode .cg-session-content kbd { background: #f1f3f4; border: 1px solid #dadce0; color: #202124; }
+
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-code-footer { background: #f1f3f4; }
+  .cg-lesson.light-mode .cg-copy-btn:hover { background: rgba(26, 115, 232, 0.1); color: #1a73e8; }
+
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; border-color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.info h4 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; border-color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-callout.success h4 { color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; border-color: #f9ab00; }
+  .cg-lesson.light-mode .cg-callout.warning h4 { color: #f9ab00; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; border-color: #d93025; }
+  .cg-lesson.light-mode .cg-callout.error h4 { color: #d93025; }
+
+  .cg-lesson.light-mode .cg-step-card { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-step-card:hover { border-color: #1a73e8; background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-step-num { background: #1a73e8; color: #fff; }
+
+  .cg-lesson.light-mode .cg-concept-card { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-concept-card h4 { color: #1a73e8; }
+
+  .cg-lesson.light-mode .cg-kbd-table th { background: #f1f3f4; color: #202124; }
+
+  .cg-lesson.light-mode .cg-filename-box.wrong { background: #fce8e6; border-color: #d93025; }
+  .cg-lesson.light-mode .cg-filename-box.wrong h5 { color: #d93025; }
+  .cg-lesson.light-mode .cg-filename-box.right { background: #e6f4ea; border-color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-filename-box.right h5 { color: #1e8e3e; }
+
+  .cg-lesson.light-mode .cg-complete-btn { background: #1a73e8; box-shadow: 0 4px 20px rgba(26, 115, 232, 0.3); }
+  .cg-lesson.light-mode .cg-complete-btn:hover { box-shadow: 0 8px 30px rgba(26, 115, 232, 0.4); }
+
+  .cg-lesson.light-mode .cg-footer { background: #fff; border-top: 1px solid #dadce0; }
+
   @media (max-width: 768px) {
     .cg-step-grid { grid-template-columns: 1fr; }
     .cg-filename-compare { grid-template-columns: 1fr; }
@@ -2046,7 +2137,13 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <span style="color:var(--cg-cyan);" x-text="currentLesson?.title || 'Lesson'"></span>
       </div>
     </div>
-    <a href="#/" style="font-size:0.85rem;">Back to Dashboard</a>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="document.querySelector('.cg-lesson').classList.toggle('light-mode')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="#/" style="font-size:0.85rem;">Back to Dashboard</a>
+    </div>
   </div>
 
   <!-- Main content -->
