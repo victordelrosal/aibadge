@@ -1,8 +1,7 @@
-# AI Badge: Micro-LMS Handoff Document
+# AI Badge: Handoff Document
 
-**Date:** 2026-03-25 (evening session)
-**Author:** Claudus (session handoff)
-**Commit:** `2095555`
+**Last updated:** 2026-03-25 (late evening, post-emergency fix session)
+**Latest commit:** `d997dd6`
 
 ---
 
@@ -15,9 +14,7 @@ AI Badge is a **micro-LMS** (Udemy/Coursera style) for AI competency training. E
 
 ---
 
-## Current State
-
-### Architecture
+## Architecture
 
 - **Single `index.html` SPA** with Alpine.js, hash-based routing (`#/`, `#/lesson/{moduleId}/{lessonId}`, `#/admin`)
 - **`explore.html`**: Standalone AI Competency Explorer assessment page (also detects logged-in users)
@@ -25,57 +22,102 @@ AI Badge is a **micro-LMS** (Udemy/Coursera style) for AI competency training. E
 - **Firebase Hosting** + **Firestore** + **Firebase Auth** (Google popup + email/password)
 - **Cloudflare Worker** for email reports via Resend (public assessment flow only)
 - **No build step**: vanilla JS, Alpine.js from CDN, Firebase compat SDK from CDN
+- **Firebase SDK version: 10.8.0** across ALL pages (version alignment is critical; see Lessons Learned)
 
-### What's Built and Working
+---
+
+## Critical Lessons Learned (2026-03-25)
+
+These are hard-won. Read before touching anything.
+
+### 1. Firestore Persistence is DISABLED (on purpose)
+
+`firebase-app.js` no longer calls `db.enablePersistence()`. It was causing IndexedDB hangs that blocked both sign-in (getUserProfile hung) and assessment saves (explorer_history writes hung). Symptoms: buttons stuck at "Saving...", users unable to reach dashboard after Google sign-in, no errors in console (operations queued silently).
+
+**Do NOT re-enable persistence** without thorough multi-tab testing across fresh and returning users.
+
+### 2. Firebase SDK Version Must Match Across ALL Pages
+
+`explore.html` was on SDK 10.12.0 while `index.html` was on 10.8.0. Different SDK versions sharing IndexedDB with multi-tab persistence caused writes to hang. Currently all pages use **10.8.0**.
+
+If upgrading the SDK, update ALL HTML files in one go:
+- `index.html`
+- `explore.html`
+- `portal.html`
+- `login.html`
+
+### 3. COOP Header Required for Google Sign-In Popup
+
+`firebase.json` includes `Cross-Origin-Opener-Policy: same-origin-allow-popups` on all HTML pages. Without this, the Google Sign-In popup cannot communicate the auth result back to the parent window. Do NOT remove this header.
+
+### 4. Auth Flow Has a 5-Second Timeout
+
+In `index.html`, the `onAuthChange` callback wraps `getUserProfile()` and `updateUserProfile()` in `Promise.race` with 5s timeouts. If Firestore is slow or unreachable, the user still gets signed in with a fallback profile. This prevents the dashboard from being permanently stuck on "loading".
+
+### 5. Assessment Save Has an 8-Second Timeout
+
+In `explore.html`, both `submitLoggedIn()` and `saveAssessment()` have 8s timeouts. If the Firestore write hangs, the report is shown anyway. The save may sync later if the connection recovers.
+
+### 6. `completedAt` Uses ISO Strings, Not serverTimestamp
+
+Assessment saves use `new Date().toISOString()` instead of `firebase.firestore.FieldValue.serverTimestamp()`. Server timestamps require a round-trip and could hang. The `formatDate` helper in explorer history handles both Firestore timestamps and ISO strings.
+
+### 7. JS Cache Header is 1 Year
+
+`firebase.json` sets `max-age=31536000` on `assets/js/**`. After changing `firebase-app.js`, users MUST hard-refresh or clear cache. Consider adding cache-busting query params (e.g., `firebase-app.js?v=2`) or reducing the TTL.
+
+### 8. Deploy Firestore Rules Explicitly
+
+`firebase deploy --only hosting` does NOT deploy Firestore rules. If you change `firestore.rules`, run:
+```
+firebase deploy --only hosting,firestore:rules
+```
+
+### 9. Firestore Rules: Admin Can Write to All Subcollections
+
+As of this session, `isAdmin()` has write access to all subcollections (assessments, explorer_history, weeks, exercises). Previously only `isOwner()` could write, which was technically correct but adding admin as belt-and-suspenders.
+
+---
+
+## What's Built and Working
 
 1. **SPA Shell + Auth**
    - Sign-in modal (Apple sheet style) with Google sign-in + email/password + create account
-   - Google auth uses `signInWithPopup` (redirect doesn't work across custom domains; COOP console warnings are harmless)
+   - Google auth uses `signInWithPopup` (redirect fails across custom domains)
    - Three auth states: unauthenticated (landing), logged in not enrolled (access required), logged in enrolled (dashboard)
    - Admin detection for both `victor@fiveinnolabs.com` and `victordelrosal@gmail.com`
-   - Auto-creates Firestore profile for ALL new users with `{ email, enrolled: false, createdAt }`
+   - Auto-creates Firestore profile for ALL new users
    - Admin emails auto-enrolled on first sign-in
 
 2. **Student Dashboard**
-   - Flat tutorial cards (NOT grouped modules; each tutorial is independent)
+   - Flat tutorial cards (each tutorial is independent, NOT grouped modules)
    - Dark/light mode toggle with localStorage persistence
-   - Scrolling code background pattern
-   - Completion checkmarks on dashboard cards (only place for completion tracking, removed from lesson views)
+   - Completion checkmarks on dashboard cards (only place for completion tracking)
    - "Explorer" link in topbar opens `explore.html` in new tab
    - "Admin" link visible only to admin emails
-   - Explorer History section at bottom showing past assessment scores with mini dimension bars
+   - Explorer History section at bottom showing past assessment scores
 
 3. **Lesson View**
-   - Data-driven with `x-if` per `activeLessonId`
-   - Two tutorials live: `what-is-html` (Hello World) and `hello-world-2` (Hello World 2)
+   - Two tutorials live: `what-is-html`, `hello-world-2`
    - Two tutorials pending (greyed out): `deploy-github`, `opencode-setup`
    - Each lesson has: YouTube embed, slides PDF download, quick start guide, transcript
-   - Dark topbar matching dashboard style
 
 4. **Admin Panel** (`#/admin`)
    - Shows all registered users with email, signup date, enrollment status
-   - iOS-style toggle switches to enable/disable enrollment
-   - **KNOWN ISSUE**: Toggle may not work. The `toggleEnrolled` function writes directly to Firestore (`firebase.firestore().collection('users').doc(u.id).set(...)`) but this hasn't been confirmed working yet. Debug by checking browser console when clicking toggle.
-   - Dark/light mode support
+   - iOS-style toggle switches for enrollment
+   - **Note**: Toggle may have issues; verify in console when clicking
 
 5. **AI Competency Explorer** (`explore.html`)
-   - Detects logged-in users via Firebase auth (fixed variable scoping: `firebase-app.js` uses `var` for `app`, `auth`, `db`)
-   - Post-load script block calls `setupAuthListener()` after `firebase-app.js` loads
-   - Logged-in users see "Save & View Report" button (no email input, saves Resend credits)
-   - Saves to `users/{uid}/explorer_history/{auto-id}` for progress tracking
-   - Public users still get email gate flow with Resend email
-   - All `portal.html` references replaced with `index.html#/`
+   - Logged-in users see "Save & View Report" button (no email needed)
+   - Saves to `users/{uid}/explorer_history/{auto-id}`
+   - Public users get email gate flow with Resend email
+   - 8s save timeout with graceful fallback
 
-6. **YouTube Upload Pipeline**
-   - Script at `~/.youtube-upload-credentials/upload_youtube.py`
-   - OAuth2 with cached token, Google Cloud project `ai-badge-2026`
-   - Usage: `python3 upload_youtube.py --file VIDEO.mp4 --title "Title" --privacy unlisted`
+6. **Pricing**: Weekly: EUR 75/week (EUR 450 total), Upfront: EUR 395
 
-7. **Pricing**
-   - Weekly: €75/week (€450 total for 6 weeks)
-   - Upfront: €395 (save €55)
+---
 
-### Firestore Structure
+## Firestore Structure
 
 ```
 users/{uid}
@@ -91,37 +133,6 @@ programmes/default
 public_assessments/{auto-id}
 ```
 
-### Firestore Rules (`firestore.rules`)
-
-- `isAdmin()` checks both admin emails
-- Users can read/write their own docs
-- Admin can read AND write all user docs (needed for enrollment toggle)
-- `explorer_history` subcollection: owner read/write, admin read
-
-### Tutorial Data Model
-
-Flat array in `window._lmsTutorials`:
-```javascript
-{ id, moduleId, title, icon, iconBg, level, durationMinutes, type, pending? }
-```
-
-Tutorial assets convention: `tutorials/{id}/{id}.mp4`, `{id}.pdf`, `{id}.pptx`
-
-### Key Technical Decisions
-
-- **`var` not `let`** in `firebase-app.js` for `app`, `auth`, `db`: required because `explore.html` accesses these from a separate `<script>` block
-- **Popup not redirect** for Google Sign-In: redirect loses auth state between `firebaseapp.com` and custom domain `aibadge.fiveinnolabs.com`
-- **No build step**: everything is vanilla JS, CDN libraries, single HTML files
-- **Completion tracking only on dashboard**: removed "Mark as Complete" buttons from lesson views to avoid duplication
-
-### Known Issues / TODO
-
-1. **Admin toggle**: needs verification that the enrollment toggle actually works (Firestore write). Check console for errors when clicking.
-2. **Explorer save stuck on "Saving..."**: was fixed by using `firebase.firestore()` directly, but needs confirmation.
-3. **`getAllUsers: not authorised` console warning**: fires when admin panel code runs before auth is ready. Harmless (auth listener retries), but noisy.
-4. **Pending tutorials**: "Deploy to GitHub" and "OpenCode Setup" are greyed out, need content.
-5. **`assets/js/firebase-app.js` cache header** is set to 1 year immutable. After changes, users may need hard refresh. Consider adding cache-busting query param.
-
 ---
 
 ## File Map
@@ -130,9 +141,29 @@ Tutorial assets convention: `tutorials/{id}/{id}.mp4`, `{id}.pdf`, `{id}.pptx`
 |------|---------|
 | `index.html` | Main SPA (landing, dashboard, lesson views, admin, sign-in modal) |
 | `explore.html` | AI Competency Explorer (standalone assessment) |
-| `assets/js/firebase-app.js` | Firebase integration layer |
+| `assets/js/firebase-app.js` | Firebase integration layer (auth, Firestore CRUD) |
 | `firestore.rules` | Firestore security rules |
-| `firebase.json` | Firebase hosting config |
+| `firebase.json` | Firebase hosting config (headers, caching, COOP) |
 | `docs/HANDOFF.md` | This file |
 | `tutorials/hello-world/` | First tutorial assets |
 | `tutorials/hello-world-2/` | Second tutorial assets |
+
+---
+
+## Key Technical Decisions
+
+- **`var` not `let`** in `firebase-app.js` for `app`, `auth`, `db`: required because `explore.html` accesses these from a separate `<script>` block
+- **Popup not redirect** for Google Sign-In: redirect loses auth state between `firebaseapp.com` and custom domain
+- **No build step**: everything is vanilla JS, CDN libraries, single HTML files
+- **No Firestore persistence**: disabled due to IndexedDB hangs (see Lessons Learned)
+- **Completion tracking only on dashboard**: removed from lesson views to avoid duplication
+
+---
+
+## TODO / Open Items
+
+1. **JS cache-busting**: Add version query params to script tags or reduce `max-age` on `assets/js/**`
+2. **API key restrictions**: Add HTTP referrer restrictions in Google Cloud Console (Firebase key is public by design, but restrict to `aibadge.fiveinnolabs.com` and `ai-badge-2026.web.app`)
+3. **Admin toggle verification**: Confirm enrollment toggle works end-to-end
+4. **Pending tutorials**: "Deploy to GitHub" and "OpenCode Setup" need content
+5. **Google email warning**: Addressed in API key restrictions above; not a security emergency
