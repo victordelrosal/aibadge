@@ -2270,8 +2270,8 @@ function showLoggedInUI(user) {
     }
   });
 
-  // Show save button; replace email gate with direct "Save & View Report" for logged-in users
-  document.getElementById('saveRow').classList.add('visible');
+  // Hide the separate Save Assessment button (we use the inline one instead)
+  document.getElementById('saveRow').classList.remove('visible');
   var gate = document.getElementById('emailGate');
   gate.innerHTML = `
     <h3>Your Report</h3>
@@ -2298,7 +2298,8 @@ function submitLoggedIn() {
     completedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  db.collection('users').doc(currentUser.uid).collection('explorer_history').add(assessmentData)
+  var firedb = firebase.firestore();
+  firedb.collection('users').doc(currentUser.uid).collection('explorer_history').add(assessmentData)
     .then(function() {
       showReportConfirmation(email, reportHTML);
     })
