@@ -1596,36 +1596,65 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 </div><!-- /view-landing -->
 
 <!-- ===================== DASHBOARD VIEW ===================== -->
-<div id="view-dashboard" x-show="$store.ui.view === 'dashboard'" x-transition:enter.opacity.duration.200ms style="display:none">
+<div id="view-dashboard" x-show="$store.ui.view === 'dashboard'" x-transition:enter.opacity.duration.200ms style="display:none"
+     x-data="{ darkMode: localStorage.getItem('dashboard-theme') === 'dark' }"
+     :class="darkMode ? 'lms-dark' : ''">
+
+  <!-- Scrolling code background -->
+  <div class="lms-bg-pattern"></div>
+
   <!-- LMS top bar -->
-  <header class="lms-topbar" style="position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,0.06);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;">
-    <a href="#/" style="font-weight:700;font-size:1.1rem;color:#000036;text-decoration:none;display:flex;align-items:center;gap:8px;">
+  <header class="lms-topbar">
+    <a href="#/" class="lms-topbar-logo">
       <img src="assets/img/ai-badge.png" alt="AI Badge" style="height:28px;width:auto;">
       AI Badge
     </a>
     <div style="display:flex;align-items:center;gap:16px;">
       <template x-if="$store.auth.isAdmin">
-        <a href="#/admin" style="font-size:0.85rem;font-weight:500;color:rgba(60,60,67,0.6);text-decoration:none;">Admin</a>
+        <a href="#/admin" class="lms-topbar-link">Admin</a>
       </template>
-      <span style="font-size:0.85rem;color:rgba(60,60,67,0.6);" x-text="$store.auth.user?.email"></span>
-      <button @click="signOut().then(() => { $store.auth.setUser(null); $store.auth.setProfile(null); window.location.hash = '#/'; })" style="font-size:0.85rem;font-weight:500;color:#FF3B30;background:none;border:none;cursor:pointer;padding:8px 0;min-height:44px;">Sign Out</button>
+      <span class="lms-topbar-link" x-text="$store.auth.user?.email"></span>
+      <button class="lms-theme-toggle" @click="darkMode = !darkMode; localStorage.setItem('dashboard-theme', darkMode ? 'dark' : 'light')" title="Toggle theme">
+        <svg x-show="!darkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg x-show="darkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button @click="signOut().then(() => { $store.auth.setUser(null); $store.auth.setProfile(null); window.location.hash = '#/'; })" class="lms-signout-btn">Sign Out</button>
     </div>
   </header>
-  <!-- Dashboard content placeholder -->
-  <div style="max-width:672px;margin:0 auto;padding:32px 20px;">
-    <h1 style="font:700 28px/1.2 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;margin-bottom:8px;">Your Learning</h1>
-    <p style="font:400 17px/1.47 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:rgba(60,60,67,0.6);margin-bottom:32px;" x-text="$store.auth.isEnrolled ? 'Continue where you left off.' : 'You are not yet enrolled in a programme.'"></p>
+  <!-- Dashboard content -->
+  <div style="max-width:672px;margin:0 auto;padding:32px 20px;position:relative;z-index:2;">
+    <h1 class="lms-heading">Your Learning</h1>
+    <p class="lms-subheading" x-text="$store.auth.isEnrolled ? 'Continue where you left off.' : 'You are not yet enrolled in a programme.'"></p>
 
     <!-- Not enrolled state -->
     <template x-if="!$store.auth.isEnrolled">
-      <div style="background:#fff;border-radius:14px;padding:32px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+      <div class="lms-module-card" style="padding:32px;text-align:center;">
         <p style="font:600 17px/1.3 -apple-system,sans-serif;margin-bottom:8px;">Access Required</p>
-        <p style="font:400 15px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);">Contact victor@fiveinnolabs.com to get enrolled.</p>
+        <p class="lms-subheading" style="margin-bottom:0;">Contact victor@fiveinnolabs.com to get enrolled.</p>
       </div>
     </template>
 
     <!-- LMS Dashboard Styles -->
     <style>
+      /* Dashboard container */
+      #view-dashboard { position:relative; min-height:100vh; background:#f5f5f7; transition:background 0.3s, color 0.3s; }
+
+      /* Scrolling code background */
+      .lms-bg-pattern { position:fixed; top:0; left:0; right:0; bottom:0; background-image:url('assets/img/pattern-bg.png'); background-repeat:repeat; background-size:650px 650px; opacity:0.04; pointer-events:none; z-index:0; animation:cgBgScroll 90s linear infinite; }
+
+      /* Topbar */
+      .lms-topbar { position:sticky; top:0; z-index:100; background:rgba(255,255,255,0.72); backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px); border-bottom:1px solid rgba(0,0,0,0.06); padding:0 20px; height:52px; display:flex; align-items:center; justify-content:space-between; }
+      .lms-topbar-logo { font-weight:700; font-size:1.1rem; color:#000036; text-decoration:none; display:flex; align-items:center; gap:8px; }
+      .lms-topbar-link { font-size:0.85rem; font-weight:500; color:rgba(60,60,67,0.6); text-decoration:none; }
+      .lms-signout-btn { font-size:0.85rem; font-weight:500; color:#FF3B30; background:none; border:none; cursor:pointer; padding:8px 0; min-height:44px; }
+      .lms-theme-toggle { background:none; border:1px solid rgba(60,60,67,0.15); border-radius:8px; padding:6px; cursor:pointer; color:rgba(60,60,67,0.6); display:flex; align-items:center; }
+      .lms-theme-toggle:hover { border-color:rgba(60,60,67,0.3); color:#000; }
+
+      /* Headings */
+      .lms-heading { font:700 28px/1.2 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; margin-bottom:8px; color:#000; }
+      .lms-subheading { font:400 17px/1.47 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; color:rgba(60,60,67,0.6); margin-bottom:32px; }
+
+      /* Module cards */
       .lms-module-card { background:#fff; border-radius:14px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.08); overflow:hidden; }
       .lms-module-header { width:100%; padding:16px 20px; display:flex !important; flex-direction:row !important; align-items:center !important; gap:14px; background:none; border:none; cursor:pointer; text-align:left; font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; }
       .lms-module-header:hover { background:rgba(0,0,0,0.02); }
@@ -1636,19 +1665,62 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-module-meta .dot { margin:0 6px; }
       .lms-progress-track { margin-top:8px; height:6px; background:rgba(120,120,128,0.12); border-radius:3px; overflow:hidden; }
       .lms-progress-fill { height:100%; border-radius:3px; background:#34C759; transition:width 0.3s ease; }
-      .lms-module-header svg:last-child { color:rgba(60,60,67,0.3); }
+      .lms-chevron { color:rgba(60,60,67,0.3); transition:transform 0.25s ease; }
       .lms-module-card a { color:inherit; }
       .lms-module-card a:hover { color:inherit; }
+
+      /* Pending modules */
+      .lms-pending { opacity:0.45; }
+      .lms-pending .lms-module-header { cursor:default; }
+      .lms-pending .lms-module-header:hover { background:none; }
+
+      /* Tutorial list inside module */
+      .lms-lesson-list { border-top:1px solid rgba(60,60,67,0.08); }
+      .lms-lesson-row { display:flex; align-items:center; gap:12px; padding:12px 20px; transition:background 0.15s; }
+      .lms-lesson-row:hover { background:rgba(0,0,0,0.02); }
+      .lms-lesson-check { width:24px; height:24px; min-width:24px; border-radius:50%; border:2px solid rgba(60,60,67,0.25); background:none; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; padding:0; }
+      .lms-lesson-check.checked { background:#34C759; border-color:#34C759; color:#fff; }
+      .lms-lesson-check:hover { border-color:#34C759; }
+      .lms-lesson-link { flex:1; min-width:0; text-decoration:none; color:inherit; cursor:pointer; }
+      .lms-lesson-title { display:block; font-size:15px; line-height:1.4; color:#000; font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; }
+      .lms-lesson-subtitle { display:block; font-size:12px; line-height:1.33; color:rgba(60,60,67,0.6); margin-top:1px; font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; }
+      .lms-lesson-arrow { color:rgba(60,60,67,0.25); }
+
+      /* ===== DARK MODE ===== */
+      .lms-dark { background:#000010; color:#f5f5f5; }
+      .lms-dark .lms-bg-pattern { opacity:0.06; }
+      .lms-dark .lms-topbar { background:rgba(0,0,16,0.8); border-bottom:1px solid rgba(255,255,255,0.08); }
+      .lms-dark .lms-topbar-logo { color:#fff; }
+      .lms-dark .lms-topbar-link { color:rgba(255,255,255,0.5); }
+      .lms-dark .lms-signout-btn { color:#FF453A; }
+      .lms-dark .lms-theme-toggle { border-color:rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); }
+      .lms-dark .lms-theme-toggle:hover { border-color:rgba(255,255,255,0.3); color:#fff; }
+      .lms-dark .lms-heading { color:#f5f5f5; }
+      .lms-dark .lms-subheading { color:rgba(255,255,255,0.5); }
+      .lms-dark .lms-module-card { background:rgba(255,255,255,0.06); box-shadow:0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06) inset; }
+      .lms-dark .lms-module-header:hover { background:rgba(255,255,255,0.04); }
+      .lms-dark .lms-module-title { color:#f5f5f5; }
+      .lms-dark .lms-module-meta { color:rgba(255,255,255,0.5); }
+      .lms-dark .lms-chevron { color:rgba(255,255,255,0.3); }
+      .lms-dark .lms-progress-track { background:rgba(255,255,255,0.08); }
+      .lms-dark .lms-lesson-list { border-top-color:rgba(255,255,255,0.06); }
+      .lms-dark .lms-lesson-row:hover { background:rgba(255,255,255,0.04); }
+      .lms-dark .lms-lesson-check { border-color:rgba(255,255,255,0.25); }
+      .lms-dark .lms-lesson-check:hover { border-color:#34C759; }
+      .lms-dark .lms-lesson-title { color:#f5f5f5; }
+      .lms-dark .lms-lesson-subtitle { color:rgba(255,255,255,0.45); }
+      .lms-dark .lms-lesson-arrow { color:rgba(255,255,255,0.2); }
+      .lms-dark .lms-pending { opacity:0.35; }
     </style>
 
     <!-- Enrolled: Module cards -->
     <template x-if="$store.auth.isEnrolled">
       <div x-data="lmsDashboard()">
         <template x-for="mod in modules" :key="mod.id">
-          <div class="lms-module-card">
+          <div class="lms-module-card" :class="mod.pending && 'lms-pending'">
 
-            <!-- Module header — click goes directly to first capsule -->
-            <button class="lms-module-header" @click="navigate('#/lesson/' + mod.id + '/' + mod.lessons[0].id)">
+            <!-- Module header — click expands tutorial list -->
+            <button class="lms-module-header" @click="mod.expanded = !mod.expanded" :disabled="mod.pending">
               <div class="lms-module-icon" :style="'background:' + mod.iconBg">
                 <span x-text="mod.icon"></span>
               </div>
@@ -1661,14 +1733,36 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                   <span class="dot">&#183;</span>
                   <span x-text="mod.durationMinutes + ' min'"></span>
                   <span class="dot">&#183;</span>
-                  <span x-text="completedCount(mod) + '/' + mod.lessons.length + ' done'"></span>
+                  <span x-text="mod.pending ? 'Coming soon' : completedCount(mod) + '/' + mod.lessons.length + ' done'"></span>
                 </div>
                 <div class="lms-progress-track">
                   <div class="lms-progress-fill" :style="'width:' + progressPercent(mod) + '%'"></div>
                 </div>
               </div>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+              <svg class="lms-chevron" :style="mod.expanded && 'transform:rotate(90deg)'" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
             </button>
+
+            <!-- Tutorial list (expandable) -->
+            <template x-if="!mod.pending">
+              <div x-show="mod.expanded" x-collapse class="lms-lesson-list">
+                <template x-for="(lesson, li) in mod.lessons" :key="lesson.id">
+                  <div class="lms-lesson-row">
+                    <button class="lms-lesson-check" @click.stop="toggleComplete(lesson)" :class="isLessonCompleted(lesson) && 'checked'">
+                      <svg x-show="isLessonCompleted(lesson)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                    <a class="lms-lesson-link" @click.prevent="navigate('#/lesson/' + mod.id + '/' + lesson.id)">
+                      <span class="lms-lesson-title" x-text="lesson.title"></span>
+                      <span class="lms-lesson-subtitle">
+                        <span x-text="lesson.type === 'video' ? 'Video' : lesson.type === 'reading' ? 'Reading' : 'Quiz'"></span>
+                        <span> &#183; </span>
+                        <span x-text="lesson.durationMinutes + ' min'"></span>
+                      </span>
+                    </a>
+                    <svg class="lms-lesson-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+                  </div>
+                </template>
+              </div>
+            </template>
 
           </div>
         </template>
@@ -2592,9 +2686,12 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 </div>
 
 <!-- ===================== ADMIN VIEW ===================== -->
-<div id="view-admin" x-show="$store.ui.view === 'admin'" x-transition:enter.opacity.duration.200ms style="display:none">
-  <div style="max-width:672px;margin:0 auto;padding:32px 20px;text-align:center;">
-    <p style="color:rgba(60,60,67,0.6);">Admin panel placeholder. (Task 5)</p>
+<div id="view-admin" x-show="$store.ui.view === 'admin'" x-transition:enter.opacity.duration.200ms style="display:none"
+     x-data="{ darkMode: localStorage.getItem('dashboard-theme') === 'dark' }"
+     :class="darkMode ? 'lms-dark' : ''" :style="'min-height:100vh;background:' + (darkMode ? '#000010' : '#f5f5f7')">
+  <div class="lms-bg-pattern"></div>
+  <div style="max-width:672px;margin:0 auto;padding:32px 20px;text-align:center;position:relative;z-index:2;">
+    <p class="lms-subheading">Admin panel placeholder. (Task 5)</p>
     <a href="#/" style="color:#007AFF;font-weight:500;">Back to Dashboard</a>
   </div>
 </div>
@@ -3309,6 +3406,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           order: 1,
           requiresPrevious: true,
           expanded: false,
+          pending: true,
           lessons: [
             { id: 'what-is-git', title: 'What is Git?', type: 'video', durationMinutes: 6, order: 0, requiresPrevious: false },
             { id: 'create-repo', title: 'Create a Repository', type: 'video', durationMinutes: 8, order: 1, requiresPrevious: true },
@@ -3327,6 +3425,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           order: 2,
           requiresPrevious: true,
           expanded: false,
+          pending: true,
           lessons: [
             { id: 'what-is-opencode', title: 'What is OpenCode?', type: 'video', durationMinutes: 5, order: 0, requiresPrevious: false },
             { id: 'install-tools', title: 'Install the Tools', type: 'video', durationMinutes: 10, order: 1, requiresPrevious: true },
@@ -3371,6 +3470,11 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       progressPercent(mod) {
         if (mod.lessons.length === 0) return 0;
         return Math.round((this.completedCount(mod) / mod.lessons.length) * 100);
+      },
+
+      toggleComplete(lesson) {
+        this.progress[lesson.id] = !this.progress[lesson.id];
+        // Will persist to Firestore in Task 3
       }
     };
   };
