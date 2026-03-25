@@ -30,14 +30,8 @@ function initFirebase() {
   auth = firebase.auth();
   db = firebase.firestore();
 
-  // Enable offline persistence (best-effort, fails silently in some browsers)
-  db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
-    if (err.code === "failed-precondition") {
-      console.warn("Firestore persistence unavailable: multiple tabs open.");
-    } else if (err.code === "unimplemented") {
-      console.warn("Firestore persistence not supported in this browser.");
-    }
-  });
+  // Persistence disabled: was causing IndexedDB hangs that blocked
+  // both sign-in and assessment saves for users with multiple tabs.
 }
 
 /* --------------------------------------------------------------------------

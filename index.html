@@ -3361,11 +3361,25 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       const auth = Alpine.store('auth');
       if (user) {
         auth.setUser({ uid: user.uid, email: user.email });
-        var profile = await getUserProfile(user.uid);
+        var profile = null;
+        try {
+          // Race profile load against 5s timeout to prevent hanging
+          profile = await Promise.race([
+            getUserProfile(user.uid),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+          ]);
+        } catch(e) {
+          console.warn('Profile load timeout/error, using fallback:', e.message);
+        }
         if (!profile) {
-          // First sign-in: create profile. Auto-enroll admins.
+          // First sign-in or timeout: create/update profile. Auto-enroll admins.
           var isAdmin = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email);
-          await updateUserProfile(user.uid, { email: user.email, enrolled: isAdmin, createdAt: new Date().toISOString() });
+          try {
+            await Promise.race([
+              updateUserProfile(user.uid, { email: user.email, enrolled: isAdmin, createdAt: new Date().toISOString() }),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+            ]);
+          } catch(e) { console.warn('Profile create timeout:', e.message); }
           profile = { email: user.email, enrolled: isAdmin };
         }
         auth.setProfile(profile || {});
