@@ -2118,12 +2118,16 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <iframe src="https://www.youtube.com/embed/IUHs60kWwdE" allowfullscreen></iframe>
     </div>
 
-    <!-- Slides PDF -->
-    <div style="text-align:center;margin:1rem 0 1.5rem;">
-      <a href="tutorials/hello-world/slides.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+    <!-- Slides + Mark Complete row -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="tutorials/hello-world/hello-world.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
         Download Slides (PDF)
       </a>
+      <button class="cg-complete-btn" @click="markComplete()" style="margin:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span x-text="isComplete ? 'Completed!' : 'Mark as Complete'"></span>
+      </button>
     </div>
 
     <!-- QUICK START -->
@@ -2308,11 +2312,62 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       </div>
     </div>
 
-    <!-- Mark as Complete -->
-    <button class="cg-complete-btn" @click="markComplete()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      <span x-text="isComplete ? 'Completed!' : 'Mark as Complete'"></span>
-    </button>
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <p>Welcome to the AI Badge by fiveinnolabs and Victor del Rosal.</p>
+
+        <h3>Introduction</h3>
+        <p>We're going to get started with this Hello World tutorial using ChatGPT. If you haven't used a large language model such as ChatGPT for coding, no panic. It's normal to be a little bit overwhelmed if you haven't seen much code recently, or ever. But you'll see how powerful and useful these AI and large language models (ChatGPT, Gemini, Claude, and others) are for code generation and for many other purposes.</p>
+        <p>This first tutorial should take about 10 minutes or just under.</p>
+
+        <h3>What You Need</h3>
+        <ul>
+          <li>A <strong>free ChatGPT account</strong> (upgraded is fine too)</li>
+          <li><strong>Sublime Text</strong> installed: a notepad editor. Download it from <a href="https://sublimetext.com" target="_blank">sublimetext.com</a> for your version (Mac or Windows)</li>
+          <li>An <strong>AI Projects folder</strong> on your computer: a simple folder where all the projects you do during this course will be stored and saved</li>
+        </ul>
+        <p>Feel free to pause the video now so you can install Sublime Text and get set up with ChatGPT.</p>
+
+        <h3>The Prompt</h3>
+        <p>The prompt we're going to use is very simple and straightforward. We are asking ChatGPT to code your very first Hello World page. What we're asking the large language model to deliver is a bit of code in:</p>
+        <ul>
+          <li><strong>HTML</strong>: a universally understood language for browsers (Chrome, Firefox, Explorer all understand this Hypertext Markup Language)</li>
+          <li><strong>JavaScript</strong>: for functions like buttons you can click</li>
+          <li><strong>CSS</strong>: for styling</li>
+        </ul>
+        <p>These three work together as a tech stack. We want it all in a single file because we want to save it in the simplest manner to demonstrate how this works.</p>
+
+        <h3>Using ChatGPT</h3>
+        <p>Copy the prompt text and go to ChatGPT in a fresh new window. Paste it in and send it. Notice 50 lines of code is not a lot. It's very small, what we are requesting of ChatGPT.</p>
+        <p>Watch how it starts performing the request. It starts at the top with HTML and ends with similar HTML and a forward slash. That's how you know the code is correct.</p>
+
+        <h3>Saving Your Code</h3>
+        <p>Now we want to see what this looks like. Select all of the generated code, go all the way down, and copy all of it. You can right-click or just click the copy button.</p>
+        <p>Once you have Sublime Text installed, open a fresh new window and paste the code you got from ChatGPT.</p>
+        <p>To save the file: click on <strong>File > Save As</strong>, then go to your AI Projects folder. Name it <code>helloworld</code>, but make sure you add <code>.html</code> after it. This is super important, otherwise it will not work. You can write whatever you want for the first part, but it must end with <code>.html</code>.</p>
+
+        <h3>Viewing Your Page</h3>
+        <p>Go to your folder and there it is: your <code>helloworld.html</code> page. This is the code you just generated. Double-click it and there's your Hello World page. You can click on the button and there's movement.</p>
+        <p>You can also right-click on the file in your AI Projects folder and choose "Open with" Chrome.</p>
+
+        <h3>Why Does Everyone Get Different Code?</h3>
+        <p>A common question: "I used the exact same prompt and I'm getting different code." The code may be similar in many cases but not identical (different colours, different buttons, different layouts). We will explore why large language models do this (why the exact same phrase, word for word, might give you different code) in future tutorials.</p>
+
+        <h3>What You Achieved</h3>
+        <p>You should feel very proud. You have requested AI to code a page for you, saved it as HTML code, and you're able to visualise it and see it in your browser. We're going to do a lot more exercises, not only with coding but with many different variations and styles of coding with AI.</p>
+        <p>Welcome, and thank you for completing this. You can now mark this tutorial as completed.</p>
+      </div>
+    </div>
+
   </div>
 
   <!-- Footer -->
