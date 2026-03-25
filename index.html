@@ -2702,6 +2702,206 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     </template>
     <!-- ===== END LESSON: hello-world-2 ===== -->
 
+    <!-- ===== LESSON: retro-game ===== -->
+    <template x-if="$store.ui.activeLessonId === 'retro-game'">
+    <div>
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>Retro Game</h1>
+      <p class="cg-subtitle">Code a Classic Game with AI</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>12-Minute Tutorial</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <!-- TODO: Replace with YouTube embed once uploaded: <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe> -->
+    <div class="cg-video-wrapper">
+      <video controls playsinline style="width:100%;height:100%;position:absolute;top:0;left:0;">
+        <source src="tutorials/retro-game/retro-game.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+    <!-- Slides + Mark Complete row -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="tutorials/retro-game/retro-game.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: Code a Retro Game</h2>
+          <span class="cg-session-meta">Get a playable game running in minutes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <div class="cg-step-grid">
+          <div class="cg-step-card">
+            <div class="cg-step-num">1</div>
+            <h5>Open Your LLM</h5>
+            <p>Go to <a href="https://chatgpt.com" target="_blank">chatgpt.com</a>, <a href="https://gemini.google.com" target="_blank">gemini.google.com</a>, or <a href="https://claude.ai" target="_blank">claude.ai</a></p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">2</div>
+            <h5>Enter the Prompt</h5>
+            <p>Paste the prompt below to generate a retro game</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">3</div>
+            <h5>Save as HTML</h5>
+            <p>Copy the code into Sublime Text and save as <code>retrogame.html</code></p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">4</div>
+            <h5>Open and Play</h5>
+            <p>Open the file in your browser and play!</p>
+          </div>
+        </div>
+
+        <h3>The Prompt to Use</h3>
+        <div class="cg-code-block">
+          <pre>Code a simple and fun retro game. Output as single-file HTML, JS, CSS.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Tip</h4>
+          <p>Every person will get a different game. You might get Pong, Breakout, Snake, or something completely unique. That's the beauty of generative AI!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Complete instructions for both exercises</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Part 1: Code a Simple Retro Game</h3>
+        <h4>Step 1: Open Your LLM</h4>
+        <p>Go to <a href="https://chatgpt.com" target="_blank">chatgpt.com</a>, <a href="https://gemini.google.com" target="_blank">gemini.google.com</a>, or <a href="https://claude.ai" target="_blank">claude.ai</a></p>
+        <h4>Step 2: Enter the Prompt</h4>
+        <p>Copy and paste this prompt:</p>
+        <div class="cg-code-block">
+          <pre>Code a simple and fun retro game. Output as single-file HTML, JS, CSS.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+        <h4>Step 3: Copy and Save the Code</h4>
+        <p>Open Sublime Text, paste the generated code, and save as <code>retrogame.html</code> in a folder you can easily find (e.g. your AI Projects folder on the Desktop).</p>
+        <h4>Step 4: Run the Game</h4>
+        <p>Open your browser, go to File > Open (or drag the file into the browser window), and navigate to your <code>retrogame.html</code> file. Your game should load and be playable immediately.</p>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Nice!</h4>
+          <p>You now have a playable retro game, generated entirely by AI. Take a moment to play it and see what you got!</p>
+        </div>
+
+        <h4>Step 5: Talk to the Code</h4>
+        <p>In the same conversation, ask the LLM to make improvements. For example:</p>
+        <ul>
+          <li>"Make the game faster and add a score counter"</li>
+          <li>"Add sound effects"</li>
+          <li>"Change the colours to neon"</li>
+          <li>"Add a second level"</li>
+        </ul>
+        <p>Each time, copy the new code, replace everything in Sublime Text (<kbd>Cmd</kbd>+<kbd>A</kbd>, delete, paste), save, and refresh.</p>
+
+        <h3>Part 2: Code Space Invaders</h3>
+        <h4>Step 1: Start a New Conversation</h4>
+        <p>Open a new chat in your LLM and paste this prompt:</p>
+        <div class="cg-code-block">
+          <pre>Code Space Invaders. Output as single-file HTML, JS, CSS.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+        <h4>Step 2: Save and Run</h4>
+        <p>Copy the code, open Sublime Text, paste it, and save as <code>spaceInvaders.html</code>. Open it in your browser to play.</p>
+        <h4>Step 3: Personalise and Iterate</h4>
+        <p>Keep the conversation going. Ask for changes:</p>
+        <ul>
+          <li>"Add power-ups that drop from destroyed enemies"</li>
+          <li>"Make the aliens move faster each wave"</li>
+          <li>"Add a high score display"</li>
+          <li>"Change the ship to a different design"</li>
+        </ul>
+
+        <h3>Keyboard Shortcuts</h3>
+        <table class="cg-kbd-table">
+          <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Select All</td><td><kbd>Cmd</kbd> + <kbd>A</kbd></td><td><kbd>Ctrl</kbd> + <kbd>A</kbd></td></tr>
+            <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Save</td><td><kbd>Cmd</kbd> + <kbd>S</kbd></td><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td></tr>
+          </tbody>
+        </table>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Well Done!</h4>
+          <p>You've coded two games using AI: a random retro game and Space Invaders. The key takeaway is that AI can generate complete, playable applications from a single prompt, and you can iterate to make them your own.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <p>Welcome to the Retro Game tutorial. In this session we're going to use AI to generate complete, playable games from a single prompt.</p>
+
+        <h3>Part 1: A Simple Retro Game</h3>
+        <p>We start by asking the LLM to code a simple and fun retro game as a single HTML file with JavaScript and CSS. The output will be different for everyone. You might get Pong, Breakout, Snake, or something entirely original.</p>
+        <p>Once the code is generated, open your text editor (Sublime Text), paste the code, and save it as <code>retrogame.html</code> in a folder you can find. Then open it in your browser. You should have a fully playable game.</p>
+        <p>The next step is to talk to the code. In the same conversation, ask the LLM to make improvements. You can request faster gameplay, score counters, sound effects, colour changes, or anything you can think of. Each time, copy the updated code, replace everything in your editor, save, and refresh.</p>
+
+        <h3>Part 2: Space Invaders</h3>
+        <p>For the second exercise, we go bigger. Ask the LLM to code Space Invaders as a single HTML file. Save it as <code>spaceInvaders.html</code> and open it in your browser.</p>
+        <p>Then personalise it. Ask for power-ups, faster aliens, high score displays, or a completely different visual style. The LLM will modify the existing code each time you make a request.</p>
+
+        <h3>What You Achieved</h3>
+        <p>You've generated two complete games using nothing but natural language prompts. You've also practised iterating on code by continuing the conversation with the LLM. This is the same workflow used for any kind of web application: prompt, generate, save, run, iterate.</p>
+      </div>
+    </div>
+
+    </div>
+    </template>
+    <!-- ===== END LESSON: retro-game ===== -->
+
   </div>
 
   <!-- Footer -->
@@ -3581,7 +3781,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 7, type: 'video' },
     { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 9, type: 'video' },
     { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', durationMinutes: 30, type: 'video', pending: true },
-    { id: 'opencode-setup', moduleId: 'opencode-setup', title: 'OpenCode Setup', icon: '⚡', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', durationMinutes: 35, type: 'video', pending: true }
+    { id: 'opencode-setup', moduleId: 'opencode-setup', title: 'OpenCode Setup', icon: '⚡', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', durationMinutes: 35, type: 'video', pending: true },
+    { id: 'retro-game', moduleId: 'retro-game', title: 'Retro Game', icon: '🎮', iconBg: 'rgba(255,59,48,0.12)', level: 'beginner', durationMinutes: 12, type: 'video' }
   ];
 
   window.lmsDashboard = function() {
