@@ -1338,7 +1338,7 @@ function flags(v) {
 
 let vals = [1,1,1,1,1,1], dv = [1,1,1,1,1,1], ov = null;
 let comparing = false, af = null, activePreset = null, lps = [];
-let currentUser = null;
+var currentUser = null;
 let userBaseline = null;
 let capturedEmail = null;
 
@@ -2215,19 +2215,12 @@ function generateReportHTML(v) {
 
 // ===== FIREBASE INTEGRATION =====
 
-let db = null;
-let auth = null;
+var db = null;
+var auth = null;
 
 function initFirebase() {
   try {
-    // Check if Firebase is available and config exists
     if (typeof firebase === 'undefined') return;
-
-    // Try loading external config first
-    const script = document.querySelector('script[src*="firebase-app.js"]');
-    if (script) return; // Let external config handle it
-
-    // Fallback: check if already initialized
     if (firebase.apps.length > 0) {
       auth = firebase.auth();
       db = firebase.firestore();
@@ -2441,8 +2434,18 @@ init();
 </script>
 
 <!-- External Firebase config (loaded after main script so it can override) -->
-<script src="assets/js/firebase-app.js" onerror="console.log('firebase-app.js not found. Running standalone.')"
-  onload="initFirebase(); auth = firebase.auth(); db = firebase.firestore(); setupAuthListener();"></script>
+<script src="assets/js/firebase-app.js" onerror="console.log('firebase-app.js not found. Running standalone.')"></script>
+<script>
+// After firebase-app.js loads and initializes, connect local vars and start auth listener
+(function() {
+  if (typeof firebase === 'undefined') return;
+  // Ensure Firebase app is initialized (firebase-app.js does this)
+  if (firebase.apps.length === 0) initFirebase();
+  auth = firebase.auth();
+  db = firebase.firestore();
+  setupAuthListener();
+})();
+</script>
 
 </body>
 </html>
