@@ -321,6 +321,31 @@ async function getAllActiveUsers() {
   }
 }
 
+async function getAllUsers() {
+  initFirebase();
+  const user = getCurrentUser();
+  if (!user || !ADMIN_EMAILS.includes(user.email)) {
+    console.warn("getAllUsers: not authorised.");
+    return [];
+  }
+  try {
+    const snapshot = await db.collection("users").get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("getAllUsers:", error);
+    return [];
+  }
+}
+
+async function setUserEnrolled(userId, enrolled) {
+  initFirebase();
+  const user = getCurrentUser();
+  if (!user || !ADMIN_EMAILS.includes(user.email)) {
+    return { success: false, error: "Not authorised" };
+  }
+  return updateUserProfile(userId, { enrolled: enrolled });
+}
+
 /* --------------------------------------------------------------------------
    Helpers
    -------------------------------------------------------------------------- */

@@ -1711,6 +1711,17 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-dark .lms-lesson-subtitle { color:rgba(255,255,255,0.45); }
       .lms-dark .lms-lesson-arrow { color:rgba(255,255,255,0.2); }
       .lms-dark .lms-pending { opacity:0.35; }
+
+      /* ===== ADMIN PANEL ===== */
+      .admin-user-row { display:flex; align-items:center; gap:16px; padding:16px 20px; background:rgba(255,255,255,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+      .admin-user-row-dark { background:rgba(255,255,255,0.08); }
+      .admin-toggle { position:relative; width:51px; height:31px; border-radius:16px; border:none; background:rgba(120,120,128,0.32); cursor:pointer; transition:background 0.25s; padding:0; flex-shrink:0; }
+      .admin-toggle-on { background:#34C759; }
+      .admin-toggle-knob { position:absolute; top:2px; left:2px; width:27px; height:27px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.15); transition:transform 0.25s; }
+      .admin-toggle-on .admin-toggle-knob { transform:translateX(20px); }
+      .admin-toggle:disabled { opacity:0.5; cursor:not-allowed; }
+      #view-admin.lms-dark { background:#000010; color:#f5f5f5; }
+      #view-admin.lms-dark .admin-user-row-dark p:first-child { color:#f5f5f5; }
     </style>
 
     <!-- Enrolled: Tutorial cards (each tutorial = its own card) -->
@@ -2665,12 +2676,73 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
 <!-- ===================== ADMIN VIEW ===================== -->
 <div id="view-admin" x-show="$store.ui.view === 'admin'" x-transition:enter.opacity.duration.200ms style="display:none"
-     x-data="{ darkMode: localStorage.getItem('dashboard-theme') === 'dark' }"
+     x-data="adminPanel()"
      :class="darkMode ? 'lms-dark' : ''" :style="'min-height:100vh;background:' + (darkMode ? '#000010' : '#f5f5f7')">
   <div class="lms-bg-pattern"></div>
-  <div style="max-width:672px;margin:0 auto;padding:32px 20px;text-align:center;position:relative;z-index:2;">
-    <p class="lms-subheading">Admin panel placeholder. (Task 5)</p>
-    <a href="#/" style="color:#007AFF;font-weight:500;">Back to Dashboard</a>
+
+  <!-- Admin topbar -->
+  <header class="lms-topbar">
+    <a href="#/" class="lms-topbar-logo">
+      <img src="assets/img/ai-badge.png" alt="AI Badge" style="height:28px;width:auto;">
+      AI Badge
+    </a>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <a href="#/" class="lms-topbar-link">Dashboard</a>
+      <button class="lms-theme-toggle" @click="darkMode = !darkMode; localStorage.setItem('dashboard-theme', darkMode ? 'dark' : 'light')" title="Toggle theme">
+        <svg x-show="!darkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg x-show="darkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button @click="signOut().then(() => { $store.auth.setUser(null); $store.auth.setProfile(null); window.location.hash = '#/'; })" class="lms-signout-btn">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Admin content -->
+  <div style="max-width:800px;margin:0 auto;padding:32px 20px;position:relative;z-index:2;">
+    <h1 class="lms-heading" style="margin-bottom:4px;">User Management</h1>
+    <p class="lms-subheading" style="margin-bottom:24px;" x-text="users.length + ' registered user' + (users.length !== 1 ? 's' : '')"></p>
+
+    <!-- Loading state -->
+    <div x-show="loading" style="text-align:center;padding:40px 0;">
+      <p class="lms-subheading">Loading users...</p>
+    </div>
+
+    <!-- Error state -->
+    <div x-show="error" style="text-align:center;padding:24px;background:rgba(255,59,48,0.08);border-radius:12px;margin-bottom:16px;">
+      <p style="color:#FF3B30;font-weight:500;" x-text="error"></p>
+    </div>
+
+    <!-- User list -->
+    <div x-show="!loading && users.length > 0" style="display:flex;flex-direction:column;gap:1px;border-radius:14px;overflow:hidden;">
+      <template x-for="u in users" :key="u.id">
+        <div class="admin-user-row" :class="darkMode ? 'admin-user-row-dark' : ''">
+          <div style="flex:1;min-width:0;">
+            <p style="font-weight:600;font-size:0.95rem;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="u.email"></p>
+            <p style="font-size:0.8rem;margin:4px 0 0;opacity:0.5;" x-text="'Signed up: ' + formatDate(u.createdAt)"></p>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+            <span style="font-size:0.8rem;font-weight:500;"
+                  :style="'color:' + (u.enrolled ? '#34C759' : 'rgba(142,142,147,0.8)')"
+                  x-text="u.enrolled ? 'Enrolled' : 'Pending'"></span>
+            <button class="admin-toggle" :class="u.enrolled ? 'admin-toggle-on' : ''"
+                    @click="toggleEnrolled(u)"
+                    :disabled="u.toggling">
+              <span class="admin-toggle-knob"></span>
+            </button>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Empty state -->
+    <div x-show="!loading && users.length === 0 && !error" style="text-align:center;padding:60px 0;">
+      <p style="font-size:2rem;margin:0 0 8px;">👥</p>
+      <p class="lms-subheading">No users have signed up yet.</p>
+    </div>
+
+    <!-- Refresh button -->
+    <div x-show="!loading" style="text-align:center;margin-top:24px;">
+      <button @click="loadUsers()" style="font-size:0.85rem;font-weight:500;color:#007AFF;background:none;border:none;cursor:pointer;padding:8px 16px;">Refresh</button>
+    </div>
   </div>
 </div>
 
@@ -3252,10 +3324,11 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       if (user) {
         auth.setUser({ uid: user.uid, email: user.email });
         var profile = await getUserProfile(user.uid);
-        // Auto-enroll admin users on first sign-in
-        if (!profile && ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email)) {
-          await updateUserProfile(user.uid, { email: user.email, enrolled: true });
-          profile = { email: user.email, enrolled: true };
+        if (!profile) {
+          // First sign-in: create profile. Auto-enroll admins.
+          var isAdmin = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email);
+          await updateUserProfile(user.uid, { email: user.email, enrolled: isAdmin, createdAt: new Date().toISOString() });
+          profile = { email: user.email, enrolled: isAdmin };
         }
         auth.setProfile(profile || {});
       } else {
@@ -3266,6 +3339,53 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       route();
     });
   });
+
+  // Admin panel Alpine component
+  window.adminPanel = function() {
+    return {
+      darkMode: localStorage.getItem('dashboard-theme') === 'dark',
+      users: [],
+      loading: true,
+      error: null,
+      init() { this.loadUsers(); },
+      async loadUsers() {
+        this.loading = true;
+        this.error = null;
+        try {
+          var allUsers = await getAllUsers();
+          if (!allUsers || allUsers.length === 0) {
+            this.error = 'No users found (or not authorised).';
+            this.users = [];
+          } else {
+            this.users = allUsers.sort(function(a, b) {
+              var da = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
+              var db = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
+              return db - da;
+            });
+          }
+        } catch (e) {
+          this.error = 'Failed to load users: ' + e.message;
+        }
+        this.loading = false;
+      },
+      async toggleEnrolled(u) {
+        u.toggling = true;
+        var newVal = !u.enrolled;
+        var result = await setUserEnrolled(u.id, newVal);
+        if (result.success) {
+          u.enrolled = newVal;
+        } else {
+          this.error = 'Failed to update: ' + (result.error || 'unknown error');
+        }
+        u.toggling = false;
+      },
+      formatDate(ts) {
+        if (!ts) return 'Unknown';
+        var d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString('en-IE', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+    };
+  };
 
   // Sign-in form Alpine component
   window.signinForm = function() {
