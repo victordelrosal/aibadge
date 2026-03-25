@@ -55,6 +55,27 @@ async function signIn(email, password) {
   }
 }
 
+async function signInWithGoogle() {
+  initFirebase();
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const credential = await auth.signInWithPopup(provider);
+    return { success: true, user: credential.user };
+  } catch (error) {
+    return { success: false, error: _friendlyAuthError(error) };
+  }
+}
+
+async function createAccount(email, password) {
+  initFirebase();
+  try {
+    const credential = await auth.createUserWithEmailAndPassword(email, password);
+    return { success: true, user: credential.user };
+  } catch (error) {
+    return { success: false, error: _friendlyAuthError(error) };
+  }
+}
+
 async function signOut() {
   initFirebase();
   try {

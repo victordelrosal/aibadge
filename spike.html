@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpine.js Spike: Module Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-page: #F8F9FA;
+  --bg-card: #FFFFFF;
+  --gold: #D4AF37;
+  --gold-light: #F5E7A0;
+  --blue-deep: #000036;
+  --blue-accent: #0066ff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --success: #34C759;
+  --border: rgba(0,0,0,0.08);
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
+  --radius: 14px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding: 2rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--blue-deep);
+}
+
+.spike-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Module Card */
+.module-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.module-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.module-header:hover {
+  background: rgba(0,0,0,0.015);
+}
+
+.module-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e8ecf3, #d1d5db);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.module-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.module-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.module-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tag-beginner { background: #dcfce7; color: #166534; }
+.tag-intermediate { background: #dbeafe; color: #1e40af; }
+
+.module-duration {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.module-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--success);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Lesson List */
+.lesson-list {
+  border-top: 1px solid var(--border);
+}
+
+.lesson-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem 0.85rem 2rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.lesson-item:last-child {
+  border-bottom: none;
+}
+
+.lesson-item.unlocked {
+  cursor: pointer;
+}
+
+.lesson-item.unlocked:hover {
+  background: rgba(0,102,255,0.03);
+}
+
+.lesson-item.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.lesson-item.completed {
+  opacity: 0.7;
+}
+
+/* Completion / Lock icons */
+.lesson-status {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--success);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-open {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--blue-accent);
+  background: white;
+}
+
+.status-lock {
+  color: var(--text-muted);
+}
+
+.lesson-type-icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.lesson-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lesson-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.lesson-item.completed .lesson-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.lesson-duration {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Complete button for spike */
+.complete-btn {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--success);
+  background: white;
+  color: var(--success);
+  cursor: pointer;
+  font-weight: 500;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.complete-btn:hover {
+  background: var(--success);
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<h1>AI Badge: Alpine.js Spike</h1>
+<p class="spike-label">Module card with expand/collapse, unlock logic, completion toggle</p>
+
+<!-- Module Card Component -->
+<div x-data="moduleCard()" class="module-card">
+
+  <!-- Header (click to expand/collapse) -->
+  <div class="module-header" @click="expanded = !expanded">
+    <div class="module-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+      </svg>
+    </div>
+    <div class="module-info">
+      <div class="module-title" x-text="module.title"></div>
+      <div class="module-meta">
+        <span class="tag tag-beginner" x-text="module.level"></span>
+        <span class="module-duration" x-text="module.durationMinutes + ' min'"></span>
+      </div>
+      <div class="module-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" :style="'width:' + progressPercent + '%'"></div>
+        </div>
+        <span class="progress-text" x-text="completedCount + '/' + module.lessons.length + ' complete'"></span>
+      </div>
+    </div>
+    <svg class="chevron" :class="{ open: expanded }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </div>
+
+  <!-- Lesson list (shown when expanded) -->
+  <div class="lesson-list" x-show="expanded" x-collapse>
+    <template x-for="(lesson, index) in module.lessons" :key="lesson.id">
+      <div
+        class="lesson-item"
+        :class="{
+          completed: lesson.completed,
+          locked: !isUnlocked(index),
+          unlocked: isUnlocked(index) && !lesson.completed
+        }"
+      >
+        <!-- Status icon -->
+        <div class="lesson-status">
+          <template x-if="lesson.completed">
+            <div class="status-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </template>
+          <template x-if="!lesson.completed && isUnlocked(index)">
+            <div class="status-open"></div>
+          </template>
+          <template x-if="!lesson.completed && !isUnlocked(index)">
+            <div class="status-lock">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+          </template>
+        </div>
+
+        <!-- Type icon -->
+        <div class="lesson-type-icon">
+          <template x-if="lesson.type === 'video'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+          </template>
+          <template x-if="lesson.type === 'reading'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+          </template>
+        </div>
+
+        <!-- Lesson info -->
+        <div class="lesson-info">
+          <div class="lesson-title" x-text="lesson.title"></div>
+        </div>
+
+        <!-- Duration -->
+        <span class="lesson-duration" x-text="lesson.durationMinutes + ' min'"></span>
+
+        <!-- Complete button (only for unlocked, incomplete) -->
+        <template x-if="isUnlocked(index) && !lesson.completed">
+          <button class="complete-btn" @click.stop="markComplete(index)">Complete</button>
+        </template>
+      </div>
+    </template>
+  </div>
+</div>
+
+<!-- Second module to test module-level locking -->
+<div x-data="moduleCard2()" class="module-card">
+  <div class="module-header" @click="expanded = !expanded">
+    <div class="module-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+    </div>
+    <div class="module-info">
+      <div class="module-title" x-text="module.title"></div>
+      <div class="module-meta">
+        <span class="tag tag-beginner" x-text="module.level"></span>
+        <span class="module-duration" x-text="module.durationMinutes + ' min'"></span>
+      </div>
+      <div class="module-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" :style="'width:' + progressPercent + '%'"></div>
+        </div>
+        <span class="progress-text" x-text="completedCount + '/' + module.lessons.length + ' complete'"></span>
+      </div>
+    </div>
+    <svg class="chevron" :class="{ open: expanded }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </div>
+
+  <div class="lesson-list" x-show="expanded" x-collapse>
+    <template x-for="(lesson, index) in module.lessons" :key="lesson.id">
+      <div class="lesson-item"
+        :class="{
+          completed: lesson.completed,
+          locked: !isUnlocked(index),
+          unlocked: isUnlocked(index) && !lesson.completed
+        }">
+        <div class="lesson-status">
+          <template x-if="lesson.completed">
+            <div class="status-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </template>
+          <template x-if="!lesson.completed && isUnlocked(index)">
+            <div class="status-open"></div>
+          </template>
+          <template x-if="!lesson.completed && !isUnlocked(index)">
+            <div class="status-lock">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+          </template>
+        </div>
+        <div class="lesson-type-icon">
+          <template x-if="lesson.type === 'video'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+          </template>
+          <template x-if="lesson.type === 'reading'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+          </template>
+        </div>
+        <div class="lesson-info">
+          <div class="lesson-title" x-text="lesson.title"></div>
+        </div>
+        <span class="lesson-duration" x-text="lesson.durationMinutes + ' min'"></span>
+        <template x-if="isUnlocked(index) && !lesson.completed">
+          <button class="complete-btn" @click.stop="markComplete(index)">Complete</button>
+        </template>
+      </div>
+    </template>
+  </div>
+</div>
+
+<script>
+// Unlock logic: checks if a lesson is accessible based on requiresPrevious flag
+function checkUnlock(lessons, index) {
+  const lesson = lessons[index];
+  if (!lesson.requiresPrevious) return true;
+  if (index === 0) return true;
+  // Find the previous lesson in order
+  return lessons[index - 1].completed;
+}
+
+function moduleCard() {
+  return {
+    expanded: true,
+    module: {
+      title: 'Hello World',
+      level: 'Beginner',
+      durationMinutes: 11,
+      requiresPrevious: false,
+      lessons: [
+        { id: 'hw-1', title: 'What we\'re building',   type: 'video',   durationMinutes: 2, requiresPrevious: false, completed: false },
+        { id: 'hw-2', title: 'Writing HTML',            type: 'video',   durationMinutes: 3, requiresPrevious: true,  completed: false },
+        { id: 'hw-3', title: 'Adding CSS',              type: 'video',   durationMinutes: 2, requiresPrevious: true,  completed: false },
+        { id: 'hw-4', title: 'Adding JavaScript',       type: 'video',   durationMinutes: 2, requiresPrevious: true,  completed: false },
+        { id: 'hw-5', title: 'Key concepts',            type: 'reading', durationMinutes: 2, requiresPrevious: false, completed: false },
+      ]
+    },
+
+    get completedCount() {
+      return this.module.lessons.filter(l => l.completed).length;
+    },
+
+    get progressPercent() {
+      return (this.completedCount / this.module.lessons.length) * 100;
+    },
+
+    isUnlocked(index) {
+      return checkUnlock(this.module.lessons, index);
+    },
+
+    markComplete(index) {
+      if (this.isUnlocked(index)) {
+        this.module.lessons[index].completed = true;
+      }
+    }
+  };
+}
+
+function moduleCard2() {
+  return {
+    expanded: false,
+    module: {
+      title: 'Deploy to GitHub',
+      level: 'Beginner',
+      durationMinutes: 15,
+      requiresPrevious: true,
+      lessons: [
+        { id: 'gh-1', title: 'What is GitHub?',         type: 'video',   durationMinutes: 3, requiresPrevious: false, completed: false },
+        { id: 'gh-2', title: 'Creating a repository',   type: 'video',   durationMinutes: 4, requiresPrevious: true,  completed: false },
+        { id: 'gh-3', title: 'Pushing your code',       type: 'video',   durationMinutes: 4, requiresPrevious: true,  completed: false },
+        { id: 'gh-4', title: 'GitHub Pages setup',      type: 'video',   durationMinutes: 2, requiresPrevious: true,  completed: false },
+        { id: 'gh-5', title: 'Going live checklist',    type: 'reading', durationMinutes: 2, requiresPrevious: false, completed: false },
+      ]
+    },
+
+    get completedCount() {
+      return this.module.lessons.filter(l => l.completed).length;
+    },
+
+    get progressPercent() {
+      return (this.completedCount / this.module.lessons.length) * 100;
+    },
+
+    isUnlocked(index) {
+      return checkUnlock(this.module.lessons, index);
+    },
+
+    markComplete(index) {
+      if (this.isUnlocked(index)) {
+        this.module.lessons[index].completed = true;
+      }
+    }
+  };
+}
+</script>
+
+</body>
+</html>
