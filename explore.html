@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23000036'/><stop offset='100%25' stop-color='%2302066F'/></linearGradient></defs><polygon points='50,3 93,28 93,72 50,97 7,72 7,28' fill='url(%23g)' rx='6'/><text x='50' y='58' text-anchor='middle' font-family='Inter,sans-serif' font-size='36' font-weight='700' fill='%23D4AF37'>AI</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -167,7 +167,11 @@ body::before {
   color: #D4AF37;
   letter-spacing: 0.02em;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+.nav-logo-text { white-space: nowrap; }
 .nav-right {
   display: flex;
   align-items: center;
@@ -224,7 +228,7 @@ body::before {
 .hero {
   position: relative;
   z-index: 1;
-  padding: 28px 24px 8px;
+  padding: 12px 24px 0;
   max-width: 1440px;
   margin: 0 auto;
   text-align: center;
@@ -248,7 +252,8 @@ body::before {
   font-size: 15px;
   font-weight: 400;
   color: var(--label-secondary);
-  margin-top: 4px;
+  margin-top: 2px;
+  margin-bottom: 0;
 }
 
 /* ===== LAYOUT GRID ===== */
@@ -257,26 +262,40 @@ body::before {
   z-index: 1;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 8px 24px 40px;
+  padding: 4px 24px 40px;
   display: grid;
   grid-template-columns: 320px 1fr 380px;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* ===== CARDS ===== */
 .card {
-  background: var(--bg-card);
   backdrop-filter: var(--card-blur);
   -webkit-backdrop-filter: var(--card-blur);
-  border-radius: 20px;
-  border: 1px solid var(--card-border);
-  box-shadow: var(--card-shadow);
+  border-radius: 18px;
   padding: 24px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+  transition: border-color 0.3s ease, box-shadow 0.2s ease, background 0.4s ease, transform 0.2s ease;
 }
-.card:hover { border-color: var(--card-border-hover); }
+[data-theme="dark"] .card {
+  background: linear-gradient(180deg, rgba(212,175,55,0.10) 0%, rgba(212,175,55,0.03) 100%);
+  border: 1px solid rgba(212,175,55,0.25);
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.12) inset, 0 4px 16px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.08);
+}
+[data-theme="dark"] .card:hover {
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.15) inset, 0 8px 28px rgba(212,175,55,0.15), 0 2px 6px rgba(0,0,0,0.10);
+  transform: translateY(-1px);
+}
+[data-theme="light"] .card {
+  background: linear-gradient(180deg, rgba(212,175,55,0.08) 0%, rgba(255,255,255,0.9) 100%);
+  border: 1px solid rgba(184,134,11,0.2);
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.6) inset, 0 4px 16px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.05);
+}
+[data-theme="light"] .card:hover {
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.7) inset, 0 8px 28px rgba(184,134,11,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
 
 .card-title {
   font-size: 11px;
@@ -287,8 +306,51 @@ body::before {
   margin-bottom: 20px;
 }
 
+/* ===== SLIDER HINT (hand-drawn arrow + text) ===== */
+.slider-hint {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px 2px;
+  opacity: 1;
+  transition: opacity 0.5s ease, max-height 0.5s ease, padding 0.5s ease;
+  max-height: 200px;
+  overflow: hidden;
+}
+.slider-hint.hidden {
+  opacity: 0;
+  max-height: 0;
+  padding-bottom: 0;
+}
+.slider-hint-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2px;
+  /* Position so arrow tip centers over the 320px Dimensions column */
+  margin-left: 130px;
+}
+.slider-hint-text {
+  font-family: 'Caveat', 'Segoe Script', 'Comic Sans MS', cursive;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d2d2d;
+  line-height: 1.3;
+  padding-top: 2px;
+}
+[data-theme="dark"] .slider-hint-text {
+  color: #e0e0e0;
+}
+.slider-hint-arrow {
+  width: 53px;
+  height: auto;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
 /* ===== SLIDERS ===== */
-.sliders-panel { grid-column: 1; grid-row: 1 / 3; }
+.sliders-panel { grid-column: 1; grid-row: 1 / 4; }
 
 .slider-group { margin-bottom: 18px; }
 .slider-group:last-of-type { margin-bottom: 0; }
@@ -374,6 +436,30 @@ input[type=range]::-moz-range-thumb {
 }
 .info-btn:hover { background: var(--accent); color: #000036; }
 
+/* Inline level hint below each slider */
+.slider-level-hint {
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  border: 1px solid var(--separator);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+.slider-level-hint .hint-quote {
+  font-size: 12px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--label-primary);
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+.slider-level-hint .hint-desc {
+  font-size: 11px;
+  color: var(--label-secondary);
+  line-height: 1.4;
+}
+
 /* ===== RADAR ===== */
 .radar-panel {
   grid-column: 2; grid-row: 1;
@@ -385,8 +471,11 @@ input[type=range]::-moz-range-thumb {
 }
 canvas#radar { max-width: 100%; max-height: 520px; }
 
+/* ===== EMAIL PANEL (inside grid) ===== */
+.email-panel { grid-column: 2; grid-row: 2; }
+
 /* ===== PRESETS ===== */
-.presets-panel { grid-column: 2; grid-row: 2; }
+.presets-panel { grid-column: 2; grid-row: 3; }
 .presets-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .preset-chip {
@@ -445,8 +534,8 @@ canvas#radar { max-width: 100%; max-height: 520px; }
 
 /* ===== SUMMARY ===== */
 .summary-panel {
-  grid-column: 3; grid-row: 1 / 3;
-  overflow-y: auto; max-height: calc(100vh - 130px);
+  grid-column: 3; grid-row: 1 / 4;
+  overflow-y: visible; max-height: none;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
@@ -687,15 +776,105 @@ canvas#radar { max-width: 100%; max-height: 520px; }
 }
 
 /* ===== LAYER 2: EMAIL GATE + CALIBRATION ===== */
-.layer2-section {
-  position: relative;
-  z-index: 1;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 24px 60px;
-}
-
 .email-gate {
+  text-align: center;
+  padding: 24px 24px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(212,175,55,0.25);
+  background: linear-gradient(180deg, rgba(212,175,55,0.10) 0%, rgba(212,175,55,0.03) 100%);
+  backdrop-filter: var(--card-blur);
+  -webkit-backdrop-filter: var(--card-blur);
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.12) inset, 0 4px 16px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.08);
+  cursor: default;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.email-gate:hover {
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.15) inset, 0 8px 28px rgba(212,175,55,0.15), 0 2px 6px rgba(0,0,0,0.10);
+  transform: translateY(-1px);
+}
+[data-theme="light"] .email-gate {
+  background: linear-gradient(180deg, rgba(212,175,55,0.08) 0%, rgba(255,255,255,0.9) 100%);
+  border-color: rgba(184,134,11,0.2);
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.6) inset, 0 4px 16px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.05);
+}
+[data-theme="light"] .email-gate:hover {
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.7) inset, 0 8px 28px rgba(184,134,11,0.12), 0 2px 6px rgba(0,0,0,0.06);
+}
+.email-gate h3 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--label-primary);
+}
+[data-theme="dark"] .email-gate h3 {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E7A0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.email-gate p {
+  font-size: 13px;
+  color: var(--label-secondary);
+  margin-bottom: 14px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.45;
+}
+.email-form {
+  display: flex;
+  gap: 10px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.email-input {
+  flex: 1;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  color: var(--label-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+[data-theme="dark"] .email-input { background: rgba(255,255,255,0.12); }
+[data-theme="light"] .email-input { background: #fff; }
+.email-input:focus { border-color: var(--accent); }
+.email-input::placeholder { color: var(--label-tertiary); }
+.email-submit {
+  height: 40px;
+  padding: 0 28px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #E8C84A 0%, #D4AF37 50%, #B8960E 100%);
+  color: #1a1a00;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.25) inset, 0 -1px 0 0 rgba(0,0,0,0.15) inset, 0 2px 6px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.1);
+  text-shadow: 0 0.5px 0 rgba(255,255,255,0.2);
+}
+.email-submit:hover {
+  background: linear-gradient(180deg, #F5E7A0 0%, #E8C84A 50%, #D4AF37 100%);
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.3) inset, 0 -1px 0 0 rgba(0,0,0,0.12) inset, 0 4px 12px rgba(212,175,55,0.3), 0 2px 4px rgba(0,0,0,0.1);
+  transform: translateY(-0.5px);
+}
+.email-submit:active {
+  transform: translateY(0.5px);
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.15) inset, 0 -1px 0 0 rgba(0,0,0,0.2) inset, 0 1px 3px rgba(0,0,0,0.15);
+  background: linear-gradient(180deg, #C9A52E 0%, #B8960E 50%, #9E7E00 100%);
+}
+.email-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Email confirmation */
+.email-confirmation {
   text-align: center;
   padding: 48px 32px;
   border-radius: 20px;
@@ -706,20 +885,20 @@ canvas#radar { max-width: 100%; max-height: 520px; }
   box-shadow: var(--card-shadow);
   margin-top: 40px;
 }
-.email-gate h3 {
+.email-confirmation h3 {
   font-family: var(--font-display);
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 8px;
   color: var(--label-primary);
 }
-[data-theme="dark"] .email-gate h3 {
+[data-theme="dark"] .email-confirmation h3 {
   background: linear-gradient(135deg, #D4AF37 0%, #F5E7A0 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.email-gate p {
+.email-confirmation p {
   font-size: 15px;
   color: var(--label-secondary);
   margin-bottom: 24px;
@@ -727,224 +906,6 @@ canvas#radar { max-width: 100%; max-height: 520px; }
   margin-left: auto;
   margin-right: auto;
   line-height: 1.5;
-}
-.email-form {
-  display: flex;
-  gap: 10px;
-  max-width: 440px;
-  margin: 0 auto;
-}
-.email-input {
-  flex: 1;
-  height: 48px;
-  padding: 0 16px;
-  border-radius: 12px;
-  border: 1px solid var(--card-border);
-  background: var(--bg-inset);
-  color: var(--label-primary);
-  font-family: var(--font-body);
-  font-size: 15px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.email-input:focus { border-color: var(--accent); }
-.email-input::placeholder { color: var(--label-tertiary); }
-.email-submit {
-  height: 48px;
-  padding: 0 24px;
-  border: none;
-  border-radius: 12px;
-  background: #D4AF37;
-  color: #000036;
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-.email-submit:hover { background: #F5E7A0; box-shadow: 0 4px 20px rgba(212,175,55,0.3); }
-.email-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* Calibration questions */
-.calibration-section {
-  margin-top: 40px;
-  display: none;
-}
-.calibration-section.visible { display: block; }
-
-.calibration-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-.calibration-header h3 {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--label-primary);
-}
-[data-theme="dark"] .calibration-header h3 {
-  background: linear-gradient(135deg, #D4AF37 0%, #F5E7A0 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.calibration-header p {
-  font-size: 14px;
-  color: var(--label-secondary);
-  line-height: 1.5;
-}
-
-.cal-dimension {
-  margin-bottom: 28px;
-  padding: 24px;
-  border-radius: 16px;
-  border: 1px solid var(--card-border);
-  background: var(--bg-card);
-  backdrop-filter: var(--card-blur);
-  -webkit-backdrop-filter: var(--card-blur);
-}
-.cal-dim-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 16px;
-  letter-spacing: -0.01em;
-}
-.cal-question {
-  margin-bottom: 16px;
-}
-.cal-question:last-child { margin-bottom: 0; }
-.cal-q-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--label-primary);
-  margin-bottom: 8px;
-  line-height: 1.45;
-}
-.cal-options {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.cal-option {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--separator);
-  background: var(--bg-inset);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 13px;
-  color: var(--label-primary);
-  line-height: 1.4;
-}
-.cal-option:hover {
-  border-color: var(--card-border-hover);
-  background: var(--bg-card-hover);
-}
-.cal-option.selected {
-  border-color: var(--accent);
-  background: var(--accent-subtle);
-  box-shadow: 0 0 0 1px var(--accent);
-}
-.cal-option input[type=radio] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  border: 2px solid var(--label-tertiary);
-  flex-shrink: 0;
-  margin-top: 1px;
-  transition: all 0.2s ease;
-  position: relative;
-}
-.cal-option.selected input[type=radio] {
-  border-color: var(--accent);
-  background: var(--accent);
-}
-.cal-option.selected input[type=radio]::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #000036;
-}
-.cal-option-text { flex: 1; }
-
-.calibration-submit {
-  display: block;
-  width: 100%;
-  max-width: 400px;
-  margin: 32px auto 0;
-  height: 52px;
-  border: none;
-  border-radius: 14px;
-  background: #D4AF37;
-  color: #000036;
-  font-family: var(--font-body);
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.calibration-submit:hover { background: #F5E7A0; box-shadow: 0 4px 24px rgba(212,175,55,0.35); }
-.calibration-submit:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* Recalibrated results */
-.recalibrated-results {
-  margin-top: 32px;
-  text-align: center;
-  display: none;
-}
-.recalibrated-results.visible { display: block; }
-.recalibrated-results h3 {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--label-primary);
-  margin-bottom: 16px;
-}
-[data-theme="dark"] .recalibrated-results h3 {
-  background: linear-gradient(135deg, #D4AF37 0%, #F5E7A0 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.recalibrated-details {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 20px 0;
-}
-.recal-dim {
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid var(--separator);
-  background: var(--bg-inset);
-  text-align: center;
-}
-.recal-dim-name {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--label-tertiary);
-  margin-bottom: 4px;
-}
-.recal-dim-vals {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--label-primary);
-}
-.recal-dim-vals .arrow {
-  color: var(--accent);
-  margin: 0 4px;
 }
 
 .coaching-cta {
@@ -1071,9 +1032,9 @@ footer a:hover { text-decoration: underline; }
 <div class="page-content" id="pageContent">
 
 <nav class="nav-bar" id="navBar">
-  <a href="index.html" class="nav-logo">AI Badge</a>
+  <a href="index.html" class="nav-logo"><span class="nav-logo-text">AI Badge</span></a>
   <div class="nav-right">
-    <a href="#" class="nav-link" id="navBackLink">Back to site</a>
+    <a href="index.html" class="nav-link" id="navBackLink">Back to site</a>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">&#9788;</button>
   </div>
 </nav>
@@ -1089,6 +1050,13 @@ footer a:hover { text-decoration: underline; }
 <!-- Client context (shown for logged-in users) -->
 <div class="client-context" id="clientContext"></div>
 
+<div class="slider-hint" id="sliderHint">
+  <div class="slider-hint-inner">
+    <img src="assets/img/arrow.avif" alt="" class="slider-hint-arrow">
+    <div class="slider-hint-text">please choose your level for each dimension</div>
+  </div>
+</div>
+
 <div class="layout">
   <div class="card sliders-panel">
     <div class="card-title">Dimensions</div>
@@ -1097,6 +1065,28 @@ footer a:hover { text-decoration: underline; }
 
   <div class="card radar-panel">
     <canvas id="radar" width="540" height="520"></canvas>
+  </div>
+
+  <div class="email-panel" id="layer2Section">
+    <div class="email-gate" id="emailGate">
+      <h3>Get a Report</h3>
+      <p>Enter your email and we'll send you a personalised breakdown of your AI competency profile.</p>
+      <div class="email-form" id="emailForm">
+        <input type="email" class="email-input" id="emailInput" placeholder="Your email address" autocomplete="email">
+        <button class="email-submit" id="emailSubmit" onclick="submitEmail()">Submit</button>
+      </div>
+      <p style="font-size:12px; color:var(--label-tertiary); margin-top:12px; margin-bottom:0;">We will only use this to send your results. No spam, ever.</p>
+    </div>
+    <div class="email-confirmation" id="emailConfirmation" style="display:none;">
+      <h3>Your Report</h3>
+      <p>A copy will be sent to <strong id="confirmedEmail"></strong>.</p>
+      <div id="reportContent"></div>
+      <div class="coaching-cta" style="margin-top:24px;">
+        <h4>Interested in structured coaching?</h4>
+        <p>AI Badge is a 6-week one-to-one programme that takes you from your current level to measurable, demonstrable competency. Every session is personalised to your goals.</p>
+        <a href="mailto:victor@fiveinnolabs.com?subject=AI Badge coaching enquiry" class="coaching-cta-btn">Let's talk</a>
+      </div>
+    </div>
   </div>
 
   <div class="card presets-panel">
@@ -1120,43 +1110,6 @@ footer a:hover { text-decoration: underline; }
   </div>
 </div>
 
-<!-- Layer 2: Email gate + calibration (public visitors only) -->
-<div class="layer2-section" id="layer2Section">
-
-  <!-- Email gate -->
-  <div class="email-gate" id="emailGate">
-    <h3>Get Your Calibrated Assessment</h3>
-    <p>Your initial score is a starting point. Answer 12 targeted questions to refine your profile with greater accuracy.</p>
-    <div class="email-form" id="emailForm">
-      <input type="email" class="email-input" id="emailInput" placeholder="Your email address" autocomplete="email">
-      <button class="email-submit" id="emailSubmit" onclick="submitEmail()">Continue</button>
-    </div>
-    <p style="font-size:12px; color:var(--label-tertiary); margin-top:12px; margin-bottom:0;">We will only use this to send your results. No spam, ever.</p>
-  </div>
-
-  <!-- Calibration questions (hidden until email submitted) -->
-  <div class="calibration-section" id="calibrationSection">
-    <div class="calibration-header">
-      <h3>Calibration Questions</h3>
-      <p>These scenario-based questions help refine your initial self-assessment. Your score may adjust up or down based on your responses.</p>
-    </div>
-    <div id="calibrationQuestions"></div>
-    <button class="calibration-submit" id="calibrationSubmit" onclick="submitCalibration()" disabled>Submit Calibration</button>
-  </div>
-
-  <!-- Recalibrated results (hidden until calibration submitted) -->
-  <div class="recalibrated-results" id="recalibratedResults">
-    <h3>Your Calibrated Assessment</h3>
-    <div id="recalibratedSummary"></div>
-
-    <div class="coaching-cta">
-      <h4>Interested in structured coaching?</h4>
-      <p>AI Badge is a 6-week one-to-one programme that takes you from your current level to measurable, demonstrable competency. Every session is personalised to your goals.</p>
-      <a href="mailto:victor@fiveinnolabs.com?subject=AI Badge coaching enquiry" class="coaching-cta-btn">Let's talk</a>
-    </div>
-  </div>
-
-</div>
 
 <footer>Victor del Rosal &nbsp;&middot;&nbsp; <a href="https://fiveinnolabs.com">fiveinnolabs</a> &nbsp;&middot;&nbsp; 2026</footer>
 </div>
@@ -1290,6 +1243,69 @@ const FRAMEWORKS_LIGHT = [
 
 function getFrameworks() { return isDark() ? FRAMEWORKS_DARK : FRAMEWORKS_LIGHT; }
 
+// Framework descriptions and level interpretations for reports
+const FRAMEWORK_INFO = {
+  'UNESCO': {
+    fullName: 'UNESCO AI Competency Framework',
+    desc: 'The UNESCO framework (2024) defines three progressive stages of AI competency for educators and professionals worldwide.',
+    levels: {
+      'Understand': 'You are at the foundational stage. You are building awareness of what AI is, how it works, and its societal implications. Focus on deepening your conceptual understanding before moving to application.',
+      'Apply': 'You can apply AI tools and concepts in practical contexts. You use AI purposefully in your work and can evaluate its outputs critically. You are ready to move toward creative and strategic AI use.',
+      'Create': 'You are at the highest UNESCO level. You create with AI, design AI-augmented workflows, and can guide others in responsible AI adoption.'
+    }
+  },
+  'Turing Institute': {
+    fullName: 'Alan Turing Institute AI Skills Framework',
+    desc: 'The Turing Institute framework defines three tiers of AI engagement for the UK workforce, from everyday citizens to organisational leaders.',
+    levels: {
+      'AI Citizen': 'You are an AI Citizen: someone who can interact with AI systems safely and understands their basic impact on society. Your next step is developing practical AI skills for your professional context.',
+      'AI Worker': 'You are an AI Worker: you actively use AI tools in your professional role, can evaluate their outputs, and understand their limitations. You are building toward leadership capability.',
+      'AI Leader': 'You are an AI Leader: you can guide AI strategy, evaluate AI investments, and lead teams in responsible AI adoption. You shape how your organisation uses AI.'
+    }
+  },
+  'DigComp 3.0': {
+    fullName: 'European Digital Competence Framework 3.0',
+    desc: 'DigComp 3.0 (2024) is the EU reference framework for digital skills, updated to include AI competencies across four proficiency bands.',
+    levels: {
+      'Foundation': 'You are at Foundation level. You can identify AI systems in everyday life and understand basic AI concepts. Focus on building practical digital skills and AI tool familiarity.',
+      'Intermediate': 'You are at Intermediate level. You can use AI tools for routine tasks, understand data basics, and recognise ethical considerations. Push toward advanced multi-tool fluency.',
+      'Advanced': 'You are at Advanced level. You can use AI creatively, evaluate complex outputs, and apply AI across professional domains. You are approaching specialist territory.',
+      'Highly Specialised': 'You are at the Highly Specialised level. You can solve complex problems using AI, create new solutions, and contribute to the field. You operate at expert level across the digital competence spectrum.'
+    }
+  },
+  'SFIA 9': {
+    fullName: 'Skills Framework for the Information Age (SFIA 9)',
+    desc: 'SFIA 9 is the global framework used by IT professionals and organisations to define skills and competency levels on a 1 to 7 scale, from Follow to Set Strategy.',
+    levels: {
+      '1': 'SFIA Level 1 (Follow): You work under close supervision and follow instructions. You are at the very beginning of your AI skills journey.',
+      '2': 'SFIA Level 2 (Assist): You can assist with AI-related tasks under routine direction. You are developing basic understanding and practical skills.',
+      '3': 'SFIA Level 3 (Apply): You can apply AI skills in defined contexts with some autonomy. You understand standard practices and can work within established guidelines.',
+      '4': 'SFIA Level 4 (Enable): You work with broad direction and enable AI solutions within your domain. You can evaluate options and make technical decisions.',
+      '5': 'SFIA Level 5 (Ensure/Advise): You ensure AI approaches are sound and advise others. You have significant expertise and influence over AI practices in your area.',
+      '6': 'SFIA Level 6 (Initiate/Influence): You initiate AI strategies and influence organisational direction. You have deep expertise and broad professional recognition.',
+      '7': 'SFIA Level 7 (Set Strategy/Inspire): You set AI strategy at the highest level and inspire industry-wide change. You are among the most capable AI professionals.'
+    }
+  },
+  'EU AI Act': {
+    fullName: 'EU AI Act Readiness',
+    desc: 'The EU AI Act (2024) is the world\'s first comprehensive AI regulation. This mapping indicates your readiness to operate within its requirements.',
+    levels: {
+      'Foundation': 'You are at Foundation level for EU AI Act readiness. You are aware that AI regulation exists but may not understand specific requirements. If your organisation deploys AI systems, you should prioritise learning about risk categories, prohibited practices, and transparency obligations.',
+      'Compliant': 'You are at Compliant level. You understand AI risk categories, can conduct basic impact assessments, and know the key obligations. You can help ensure your organisation meets regulatory requirements for AI deployment.',
+      'Strategic': 'You are at Strategic level. You can map AI deployments to regulatory requirements, design governance frameworks, and advise on compliance strategy. You are equipped to lead your organisation\'s AI Act readiness.'
+    }
+  },
+  'OECD/EC AILit': {
+    fullName: 'OECD/European Commission AI Literacy Framework',
+    desc: 'The OECD and European Commission AI Literacy framework defines three stages of AI literacy for the general population and workforce.',
+    levels: {
+      'Foundational': 'You are at the Foundational level. You can recognise AI in everyday life and understand its basic principles. Focus on building practical skills and critical awareness of AI outputs.',
+      'Developing': 'You are at the Developing level. You actively use AI tools, can evaluate their quality, and understand ethical dimensions. You are building toward full proficiency.',
+      'Proficient': 'You are at the Proficient level. You demonstrate comprehensive AI literacy: you use AI strategically, evaluate it critically, build with it technically, and understand its governance implications.'
+    }
+  }
+};
+
 // ===== ARCHETYPES =====
 
 function archetype(v) {
@@ -1317,145 +1333,14 @@ function flags(v) {
   return fl;
 }
 
-// ===== LAYER 2 CALIBRATION QUESTIONS =====
-
-const CALIBRATION_QUESTIONS = [
-  {
-    dim: 0, // AI Foundations
-    questions: [
-      {
-        text: 'When someone mentions "hallucination" in AI, I...',
-        options: [
-          { label: 'Can explain what it means and why it happens', mod: 0.5 },
-          { label: 'Have heard the term but couldn\'t explain the mechanism', mod: 0 },
-          { label: 'Am not sure what that refers to in an AI context', mod: -0.5 }
-        ]
-      },
-      {
-        text: 'I could explain the difference between a language model and a search engine to a colleague.',
-        options: [
-          { label: 'Confidently, including why it matters for how you use them', mod: 0.5 },
-          { label: 'Roughly, though I might get some details wrong', mod: 0 },
-          { label: 'Not really, they seem similar to me', mod: -0.5 }
-        ]
-      }
-    ]
-  },
-  {
-    dim: 1, // Critical Evaluation
-    questions: [
-      {
-        text: 'When I get an AI-generated answer, I...',
-        options: [
-          { label: 'Systematically verify key claims against reliable sources', mod: 0.5 },
-          { label: 'Occasionally check if something feels off', mod: 0 },
-          { label: 'Generally trust it if it sounds reasonable', mod: -0.5 }
-        ]
-      },
-      {
-        text: 'I can identify when an AI tool is likely to give unreliable results based on the type of task.',
-        options: [
-          { label: 'Yes, consistently. I know the failure modes well.', mod: 0.5 },
-          { label: 'Sometimes, for the tools I use most often', mod: 0 },
-          { label: 'Rarely. I tend to try and see what happens.', mod: -0.5 }
-        ]
-      }
-    ]
-  },
-  {
-    dim: 2, // Productive Creation
-    questions: [
-      {
-        text: 'In my daily work, I use AI tools...',
-        options: [
-          { label: 'Multiple times daily for varied tasks across different tools', mod: 0.5 },
-          { label: 'A few times a week for specific tasks', mod: 0 },
-          { label: 'Rarely or never in a structured way', mod: -0.5 }
-        ]
-      },
-      {
-        text: 'I have created a multi-step workflow or process that involves AI.',
-        options: [
-          { label: 'Yes, several. I design workflows that chain AI tools together.', mod: 0.5 },
-          { label: 'One or two simple ones', mod: 0 },
-          { label: 'Not yet', mod: -0.5 }
-        ]
-      }
-    ]
-  },
-  {
-    dim: 3, // Technical Building
-    questions: [
-      {
-        text: 'I have connected an AI tool to another system using an API or automation platform.',
-        options: [
-          { label: 'Yes, I\'ve built integrations that run in production or daily use', mod: 0.5 },
-          { label: 'I\'ve tried it or followed a tutorial', mod: 0 },
-          { label: 'No, I wouldn\'t know where to start', mod: -0.5 }
-        ]
-      },
-      {
-        text: 'If asked to build a simple AI-powered tool, I would...',
-        options: [
-          { label: 'Know where to start, what stack to use, and how to deploy it', mod: 0.5 },
-          { label: 'Need significant guidance but could follow along', mod: 0 },
-          { label: 'Not know where to begin', mod: -0.5 }
-        ]
-      }
-    ]
-  },
-  {
-    dim: 4, // Ethics & Governance
-    questions: [
-      {
-        text: 'I can name specific provisions of the EU AI Act that affect my industry.',
-        options: [
-          { label: 'Yes, I understand risk categories and compliance requirements', mod: 0.5 },
-          { label: 'I\'m aware of the Act but not its specific provisions', mod: 0 },
-          { label: 'I\'m not familiar with the EU AI Act', mod: -0.5 }
-        ]
-      },
-      {
-        text: 'Before using AI on sensitive data, I consider...',
-        options: [
-          { label: 'Data protection, bias, transparency, and organisational policy', mod: 0.5 },
-          { label: 'Privacy mainly', mod: 0 },
-          { label: 'I don\'t usually think about it', mod: -0.5 }
-        ]
-      }
-    ]
-  },
-  {
-    dim: 5, // Tool Fluency
-    questions: [
-      {
-        text: 'Beyond ChatGPT, I regularly use...',
-        options: [
-          { label: '3+ different AI tools for different purposes (e.g., Claude, Midjourney, Copilot, Perplexity)', mod: 0.5 },
-          { label: '1-2 other tools occasionally', mod: 0 },
-          { label: 'Just ChatGPT or one similar tool', mod: -0.5 }
-        ]
-      },
-      {
-        text: 'I have used AI tools through a command line, API, or developer interface.',
-        options: [
-          { label: 'Regularly, it\'s part of my workflow', mod: 0.5 },
-          { label: 'Once or twice to experiment', mod: 0 },
-          { label: 'Never', mod: -0.5 }
-        ]
-      }
-    ]
-  }
-];
 
 // ===== STATE =====
 
-let vals = [3,3,3,3,3,3], dv = [3,3,3,3,3,3], ov = null;
+let vals = [1,1,1,1,1,1], dv = [1,1,1,1,1,1], ov = null;
 let comparing = false, af = null, activePreset = null, lps = [];
 let currentUser = null;
 let userBaseline = null;
 let capturedEmail = null;
-let calibrationAnswers = {};
 
 // ===== CANVAS SETUP =====
 
@@ -1521,23 +1406,43 @@ function buildSliders() {
   const el = document.getElementById('sliders'); el.innerHTML = '';
   DIMS.forEach((dim,i) => {
     const g = document.createElement('div'); g.className = 'slider-group';
+    const lv = DIM_LEVELS[dim][vals[i]-1];
     g.innerHTML = `<div class="slider-header">
       <span class="slider-name">${dim}<button class="info-btn" onclick="openDimPanel(${i})">i</button></span>
       <span class="slider-badge" id="sv${i}">${vals[i]}</span>
-    </div><input type="range" min="1" max="5" step="1" value="${vals[i]}" id="sl${i}">`;
+    </div><input type="range" min="1" max="5" step="1" value="${vals[i]}" id="sl${i}">
+    <div class="slider-level-hint" id="hint${i}">
+      <div class="hint-quote">"${lv.q}"</div>
+      <div class="hint-desc">${lv.d}</div>
+    </div>`;
     el.appendChild(g);
     g.querySelector('input').addEventListener('input', function() {
       vals[i] = +this.value;
       document.getElementById('sv'+i).textContent = vals[i];
+      updateHint(i);
+      // Dismiss the instructional hint on first interaction
+      var sh = document.getElementById('sliderHint');
+      if (sh && !sh.classList.contains('hidden')) sh.classList.add('hidden');
       activePreset = null; hlPreset(); updateColors(); anim(vals);
+      // Re-enable report submission if user changes sliders after getting a report
+      resetReportGate();
     });
   });
+}
+
+function updateHint(i) {
+  const hint = document.getElementById('hint'+i);
+  if (!hint) return;
+  const lv = DIM_LEVELS[DIMS[i]][vals[i]-1];
+  hint.querySelector('.hint-quote').textContent = '"' + lv.q + '"';
+  hint.querySelector('.hint-desc').textContent = lv.d;
 }
 
 function syncSliders() {
   DIMS.forEach((_,i) => {
     const sl=document.getElementById('sl'+i), sv=document.getElementById('sv'+i);
     if(sl) sl.value=vals[i]; if(sv) sv.textContent=vals[i];
+    updateHint(i);
   });
   updateColors();
 }
@@ -1819,6 +1724,24 @@ function onScroll() {
 }
 window.addEventListener('scroll', onScroll, { passive: true });
 
+// ===== REPORT GATE RESET =====
+
+function resetReportGate() {
+  if (!capturedEmail) return;
+  // If a report was already shown, swap back to the submit form
+  const conf = document.getElementById('emailConfirmation');
+  const gate = document.getElementById('emailGate');
+  if (conf && conf.style.display !== 'none') {
+    conf.style.display = 'none';
+    gate.style.display = '';
+    const btn = document.getElementById('emailSubmit');
+    btn.disabled = false;
+    btn.textContent = 'Submit';
+    // Pre-fill the email
+    document.getElementById('emailInput').value = capturedEmail;
+  }
+}
+
 // ===== EMAIL CAPTURE =====
 
 function submitEmail() {
@@ -1832,15 +1755,49 @@ function submitEmail() {
   input.style.borderColor = '';
   capturedEmail = email;
 
-  // Hide the email gate
+  // Disable submit button while processing
+  const btn = document.getElementById('emailSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  // Generate the report
+  const reportText = generateReport(vals, email);
+  const reportHTML = generateReportHTML(vals);
+  const s = score(vals), t = tier(s), a = archetype(vals), fl = flags(vals);
+
+  // Save to Firestore + send email via Cloudflare Worker (in parallel)
+  const emailPayload = {
+    email: email,
+    scores: {
+      aiFoundations: vals[0], criticalEvaluation: vals[1],
+      productiveCreation: vals[2], technicalBuilding: vals[3],
+      ethicsGovernance: vals[4], toolFluency: vals[5]
+    },
+    score: s, tier: t.name, archetype: a.n,
+    flags: fl.map(f => ({ type: f.t, text: f.x })),
+    report: reportText
+  };
+
+  Promise.allSettled([
+    savePublicAssessment(email, vals, reportText),
+    fetch('https://aibadge-report-mailer.victordelrosal.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(emailPayload)
+    })
+  ]).then(() => {
+    showReportConfirmation(email, reportHTML);
+  }).catch(() => {
+    showReportConfirmation(email, reportHTML);
+  });
+}
+
+function showReportConfirmation(email, reportHTML) {
   document.getElementById('emailGate').style.display = 'none';
-
-  // Build and show calibration questions
-  buildCalibrationQuestions();
-  document.getElementById('calibrationSection').classList.add('visible');
-
-  // Smooth scroll to the calibration section
-  document.getElementById('calibrationSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('confirmedEmail').textContent = email;
+  document.getElementById('reportContent').innerHTML = reportHTML;
+  document.getElementById('emailConfirmation').style.display = 'block';
+  document.getElementById('emailConfirmation').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Handle enter key in email input
@@ -1848,119 +1805,412 @@ document.getElementById('emailInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') submitEmail();
 });
 
-// ===== CALIBRATION QUESTIONS =====
 
-function buildCalibrationQuestions() {
-  const container = document.getElementById('calibrationQuestions');
-  container.innerHTML = '';
+// ===== REPORT GENERATOR =====
+// Compositional approach: 6 dimensions × 5 levels = 15,625 permutations
+// handled by combining per-dimension narratives, cross-dimension pattern
+// detection, and personalised next-step recommendations.
 
-  CALIBRATION_QUESTIONS.forEach((dimGroup, dgi) => {
-    const dimDiv = document.createElement('div');
-    dimDiv.className = 'cal-dimension';
-    let h = `<div class="cal-dim-title">${DIMS[dimGroup.dim]}</div>`;
+const DIM_REPORT = {
+  'AI Foundations': {
+    short: 'AF',
+    strengths: [
+      null,
+      null,
+      'You understand the core mechanics of how AI works, including training data, hallucinations, and the difference between AI and traditional software.',
+      'You have a solid grasp of transformer concepts, context windows, tokens, temperature, and the difference between fine-tuning and prompting.',
+      'You understand embeddings, attention mechanisms, and RAG trade-offs at a working level. You can engage in model selection discussions with confidence.',
+      'You could hold your own with an ML engineer. You can evaluate architectures, discuss training dynamics, and engage with frontier research.'
+    ],
+    growth: [
+      null,
+      'Start by learning the basics: what training data is, why AI hallucinates, and how language models differ from search engines. A short course or a few well-chosen articles will make a big difference.',
+      'Dig into the mechanics: learn about context windows, tokens, and temperature settings. Understanding these will help you get much better results from every AI tool you use.',
+      'Explore embeddings, retrieval-augmented generation (RAG), and attention mechanisms. This knowledge will let you make informed decisions about which models to use and when.',
+      'You are close to expert level. Stay current with research, experiment with new architectures, and consider contributing to open-source AI projects.',
+      'You are at the frontier. Keep pushing: publish, mentor, and shape the direction of AI development.'
+    ]
+  },
+  'Critical Evaluation': {
+    short: 'CE',
+    strengths: [
+      null,
+      null,
+      'You know AI can be wrong and you double-check the important things. This habit puts you ahead of most users.',
+      'You systematically evaluate AI outputs before using them. You compare across models, identify bias and hallucination, and can articulate why output is good or bad.',
+      'You have built evaluation rubrics for your team. You create multi-dimensional quality criteria and design prompts to test AI limitations.',
+      'You design evaluation frameworks at the organisational level. You assess systems for systematic bias and build automated evaluation pipelines.'
+    ],
+    growth: [
+      null,
+      'Develop the habit of questioning AI output. Start with a simple rule: never use an AI-generated claim in important work without checking it against a second source.',
+      'Move from occasional fact-checking to systematic evaluation. Before using any AI output, ask: is this factually correct? Is it biased? Is it complete?',
+      'Create evaluation rubrics for your most common AI tasks. Define what "good" looks like across multiple dimensions (accuracy, tone, completeness, bias).',
+      'Scale your evaluation skills to your team. Build shared rubrics, train colleagues, and design prompts that stress-test AI limitations.',
+      'You are an evaluation leader. Consider publishing your frameworks and contributing to industry standards.'
+    ]
+  },
+  'Productive Creation': {
+    short: 'PC',
+    strengths: [
+      null,
+      null,
+      'You use AI to draft emails and summarise documents. You are starting to develop a real workflow.',
+      'AI is part of your daily workflow across multiple tasks: documents, presentations, data analysis, and code. You iterate effectively.',
+      'You design AI-augmented workflows and build with coding assistants. You use Custom GPTs, Claude Projects, and chain tools together for complex outputs.',
+      'You architect AI-powered applications for production. You build with APIs and design end-to-end AI-augmented pipelines.'
+    ],
+    growth: [
+      null,
+      'Move beyond single questions. Try using AI for drafting, summarising, or brainstorming. Use it for tasks you do repeatedly to build a habit.',
+      'Expand your use cases. Try AI for presentations, data analysis, or code generation. Learn to iterate: refine your prompts based on what you get back.',
+      'Start chaining tools together. Use AI output from one tool as input to another. Build Custom GPTs or Claude Projects for recurring workflows.',
+      'Think about designing workflows that others can use. Build templates, automation chains, and shared processes that multiply your impact.',
+      'You are a production-grade creator. Focus on scaling your workflows and mentoring others to reach your level.'
+    ]
+  },
+  'Technical Building': {
+    short: 'TB',
+    strengths: [
+      null,
+      null,
+      'You know APIs exist and understand them conceptually. This awareness is the foundation for technical growth.',
+      'You have built a simple app with AI help. You can work with basic Python or JavaScript and make API calls with guidance.',
+      'You are comfortable with APIs, SDKs, and CLI tools. You build AI-integrated applications, understand deployment, and implement RAG pipelines.',
+      'You architect multi-agent systems and deploy to production. You work with MCP servers, orchestration layers, and custom tooling.'
+    ],
+    growth: [
+      null,
+      'Start by exploring what APIs are and how they work. Watch a tutorial on making your first API call. No-code tools like Zapier or Make can bridge the gap.',
+      'Try building something simple: a chatbot, a document processor, or a summariser. Use AI-assisted coding (Cursor, Copilot) to lower the barrier.',
+      'Push into SDKs and CLI tools. Try building an application that calls an AI API directly. Learn about deployment basics.',
+      'Explore multi-agent architectures, MCP servers, and orchestration frameworks. Build systems that coordinate multiple AI components.',
+      'You are at the top. Focus on mentoring builders, contributing to tooling, and pushing the boundaries of what AI systems can do.'
+    ]
+  },
+  'Ethics & Governance': {
+    short: 'EG',
+    strengths: [
+      null,
+      null,
+      'You can name the big concerns: bias, privacy, and job displacement. You know the EU AI Act exists.',
+      'You can apply ethical frameworks to real scenarios. You understand EU AI Act risk categories and conduct basic impact assessments.',
+      'You design AI usage policies for your organisation. You understand GDPR implications for AI and advise teams on responsible practices.',
+      'You build governance programmes and compliance frameworks. You map deployments to regulatory requirements and train others.'
+    ],
+    growth: [
+      null,
+      'Start by learning the three big ethical concerns in AI: bias, privacy, and transparency. Read about the EU AI Act at a high level.',
+      'Go deeper: learn about EU AI Act risk categories, understand what constitutes high-risk AI, and think about consent and attribution in your own work.',
+      'Start applying frameworks to your daily decisions. Before deploying AI in any sensitive context, run through a basic impact assessment.',
+      'Build organisational policies. Create guidelines for your team on acceptable AI use, data handling, and risk assessment.',
+      'You are a governance leader. Share your frameworks with the wider community and contribute to standards development.'
+    ]
+  },
+  'Tool Fluency': {
+    short: 'TF',
+    strengths: [
+      null,
+      null,
+      'You use a few AI tools and know which one is better for specific tasks. You work with file uploads and custom instructions.',
+      'You use Artifacts, Code Interpreter, image generation, and multi-modal features. You work with project features and system prompts.',
+      'You work in Cursor or similar developer AI tools and are starting to use the terminal for AI tasks.',
+      'You are tool-agnostic and CLI-fluent. You work with APIs directly, use multi-agent frameworks, and pick the right tool for every job.'
+    ],
+    growth: [
+      null,
+      'Try a second AI tool beyond ChatGPT. Claude, Perplexity, or Gemini each have different strengths. Compare the same task across two tools.',
+      'Explore advanced features: file uploads, custom instructions, system prompts. Learn which tool is best for which type of task.',
+      'Move into developer tools. Try Cursor or GitHub Copilot for code. Experiment with image generation and multi-modal workflows.',
+      'Start using the terminal and CLI tools for AI work. Try Claude Code or API-direct workflows. Build comfort with command-line interfaces.',
+      'You have mastered the tool landscape. Stay current with new releases, evaluate emerging tools, and help others navigate the ecosystem.'
+    ]
+  }
+};
 
-    dimGroup.questions.forEach((q, qi) => {
-      const qKey = `${dgi}_${qi}`;
-      h += `<div class="cal-question">`;
-      h += `<div class="cal-q-text">${q.text}</div>`;
-      h += `<div class="cal-options">`;
-      q.options.forEach((opt, oi) => {
-        h += `<label class="cal-option" data-key="${qKey}" data-oi="${oi}" onclick="selectCalOption(this, '${qKey}', ${oi}, ${opt.mod}, ${dimGroup.dim})">`;
-        h += `<input type="radio" name="cal_${qKey}">`;
-        h += `<span class="cal-option-text">${opt.label}</span>`;
-        h += `</label>`;
-      });
-      h += `</div></div>`;
-    });
+// Cross-dimension pattern detection
+function detectPatterns(v) {
+  const [f,c,p,t,e,l] = v;
+  const avg = v.reduce((a,b)=>a+b,0)/6;
+  const patterns = [];
 
-    dimDiv.innerHTML = h;
-    container.appendChild(dimDiv);
-  });
+  // Imbalance patterns
+  if ((t>=4||l>=4) && e<=2)
+    patterns.push({type:'risk', title:'Builder without guardrails', text:'Your technical skills are strong, but your ethics and governance awareness is low. This combination can lead to building things that create unintended harm. Prioritise learning about the EU AI Act and responsible AI practices before scaling your technical work.'});
+  if (p>=4 && c<=2)
+    patterns.push({type:'risk', title:'Uncritical creator', text:'You are producing at scale without systematic evaluation. This means errors, biases, and hallucinations may be flowing into your work undetected. Build an evaluation habit before expanding your AI-powered workflows.'});
+  if (l>=4 && f<=2)
+    patterns.push({type:'risk', title:'Tool-dependent', text:'You are fluent with AI interfaces but may not understand what is happening underneath. This makes you vulnerable to misusing tools or being unable to troubleshoot when things go wrong. Invest time in understanding how AI models actually work.'});
+  if (f>=4 && e>=4 && p<=2 && l<=2)
+    patterns.push({type:'opportunity', title:'Strong theoretical base', text:'You have excellent understanding and governance awareness. The next step is to put that knowledge into practice. Start with simple AI-assisted tasks and build your tool fluency.'});
+
+  // Strength clusters
+  if (f>=4 && c>=4)
+    patterns.push({type:'strength', title:'Analytical powerhouse', text:'Your combination of deep understanding and critical evaluation means you can assess AI capabilities and limitations better than most. Consider roles in AI strategy, evaluation, or policy.'});
+  if (t>=4 && l>=4)
+    patterns.push({type:'strength', title:'Full-stack builder', text:'Your technical building and tool fluency form a powerful combination. You can not only use AI tools effectively but build new ones. Consider contributing to open-source AI tools or building products.'});
+  if (p>=4 && l>=4)
+    patterns.push({type:'strength', title:'Productivity multiplier', text:'You combine productive creation with broad tool fluency. You likely save significant time each week through AI-augmented workflows. Consider documenting and sharing your workflows with your team.'});
+  if (c>=4 && e>=4)
+    patterns.push({type:'strength', title:'Responsible AI advocate', text:'Your critical evaluation and ethics awareness make you a natural champion for responsible AI use. Your organisation needs people like you to set standards and guide others.'});
+
+  // Balance
+  const sd = Math.sqrt(v.reduce((s,x)=>s+Math.pow(x-avg,2),0)/6);
+  if (sd < 0.6 && avg >= 3)
+    patterns.push({type:'strength', title:'Well-rounded profile', text:'Your skills are balanced across all six dimensions. This is relatively rare and means you can contribute to AI initiatives in multiple capacities.'});
+  if (sd > 1.5)
+    patterns.push({type:'info', title:'Specialist profile', text:'You have significant variation across dimensions. This is not necessarily a problem, as many valuable roles require depth in specific areas. However, be aware of your gaps and seek complementary skills in your team.'});
+
+  return patterns;
 }
 
-function selectCalOption(el, key, oi, mod, dim) {
-  // Deselect siblings
-  el.closest('.cal-options').querySelectorAll('.cal-option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
+// Next-step recommendations based on weakest areas and overall profile
+function generateRecommendations(v) {
+  const dimNames = [...DIMS];
+  const indexed = v.map((val,i) => ({val, i, name: dimNames[i]}));
+  const sorted = [...indexed].sort((a,b) => a.val - b.val);
+  const recs = [];
 
-  // Store answer
-  if (!calibrationAnswers[dim]) calibrationAnswers[dim] = [];
-  calibrationAnswers[dim] = calibrationAnswers[dim].filter(a => a.key !== key);
-  calibrationAnswers[dim].push({ key, mod });
-
-  // Check if all questions answered
-  checkCalibrationComplete();
-}
-
-function checkCalibrationComplete() {
-  let totalQuestions = 0;
-  let answeredQuestions = 0;
-  CALIBRATION_QUESTIONS.forEach(dg => {
-    totalQuestions += dg.questions.length;
-  });
-  Object.values(calibrationAnswers).forEach(answers => {
-    answeredQuestions += answers.length;
-  });
-  document.getElementById('calibrationSubmit').disabled = answeredQuestions < totalQuestions;
-}
-
-function submitCalibration() {
-  // Calculate calibrated scores
-  const calibratedVals = [...vals];
-  Object.keys(calibrationAnswers).forEach(dim => {
-    const dimIndex = parseInt(dim);
-    const answers = calibrationAnswers[dim];
-    let totalMod = 0;
-    answers.forEach(a => { totalMod += a.mod; });
-    // Average the modifiers for this dimension
-    const avgMod = totalMod / answers.length;
-    calibratedVals[dimIndex] = Math.max(1, Math.min(5, Math.round((calibratedVals[dimIndex] + avgMod) * 2) / 2));
-    // Round to nearest integer for the final value
-    calibratedVals[dimIndex] = Math.max(1, Math.min(5, Math.round(calibratedVals[dimIndex])));
+  // Top 2 weakest dimensions get specific recommendations
+  const weakest = sorted.slice(0, 2).filter(d => d.val <= 3);
+  weakest.forEach(d => {
+    const report = DIM_REPORT[d.name];
+    if (report && report.growth[d.val]) {
+      recs.push({dim: d.name, level: d.val, text: report.growth[d.val]});
+    }
   });
 
-  // Update the main Explorer with calibrated values
-  const originalVals = [...vals];
-  vals = calibratedVals;
-  syncSliders();
-  anim(vals);
+  // Strongest dimension gets reinforcement
+  const strongest = sorted[sorted.length - 1];
+  if (strongest.val >= 3) {
+    const report = DIM_REPORT[strongest.name];
+    if (report && report.growth[strongest.val]) {
+      recs.push({dim: strongest.name, level: strongest.val, text: report.growth[strongest.val]});
+    }
+  }
 
-  // Hide calibration, show recalibrated results
-  document.getElementById('calibrationSection').classList.remove('visible');
-  document.getElementById('calibrationSection').style.display = 'none';
-
-  // Build recalibrated results summary
-  showRecalibratedResults(originalVals, calibratedVals);
-
-  // Save to Firestore (publicAssessments collection)
-  savePublicAssessment(capturedEmail, originalVals, calibratedVals);
+  return recs;
 }
 
-function showRecalibratedResults(original, calibrated) {
-  const container = document.getElementById('recalibratedResults');
-  const summaryDiv = document.getElementById('recalibratedSummary');
+function generateReport(v, email) {
+  const s = score(v);
+  const t = tier(s);
+  const a = archetype(v);
+  const fl = flags(v);
+  const patterns = detectPatterns(v);
+  const recs = generateRecommendations(v);
+  const avg = v.reduce((a,b)=>a+b,0)/6;
+  const date = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
 
-  const s = score(calibrated), t = tier(s);
+  let r = '';
 
-  let h = `<p style="font-size:15px; color:var(--label-secondary); margin-bottom:20px;">Your scores have been recalibrated based on your responses. The radar chart above reflects your updated profile.</p>`;
+  // Header
+  r += `AI COMPETENCY PROFILE REPORT\n`;
+  r += `Generated: ${date}\n`;
+  r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-  h += `<div class="recalibrated-details">`;
+  // Overall score
+  r += `OVERALL SCORE: ${s}/100\n`;
+  r += `TIER: ${t.name}\n`;
+  r += `${t.desc}\n\n`;
+
+  // Archetype
+  r += `PROFILE TYPE: ${a.n}\n`;
+  r += `${a.d}\n\n`;
+
+  // Dimension breakdown
+  r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  r += `DIMENSION BREAKDOWN\n`;
+  r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
   DIMS.forEach((dim, i) => {
-    const changed = original[i] !== calibrated[i];
-    h += `<div class="recal-dim" style="${changed ? 'border-color: var(--accent);' : ''}">`;
-    h += `<div class="recal-dim-name">${dim.replace('& ','&amp; ')}</div>`;
-    if (changed) {
-      h += `<div class="recal-dim-vals">${original[i]} <span class="arrow">${calibrated[i] > original[i] ? '\u2191' : '\u2193'}</span> ${calibrated[i]}</div>`;
-    } else {
-      h += `<div class="recal-dim-vals">${calibrated[i]}</div>`;
+    const lv = v[i];
+    const lvData = DIM_LEVELS[dim][lv - 1];
+    const report = DIM_REPORT[dim];
+    r += `${dim.toUpperCase()}: Level ${lv}/5\n`;
+    r += `"${lvData.q}"\n`;
+    r += `${lvData.d}\n`;
+    if (report.strengths[lv]) {
+      r += `\n${report.strengths[lv]}\n`;
+    }
+    r += `\n`;
+  });
+
+  // Patterns
+  if (patterns.length) {
+    r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    r += `KEY OBSERVATIONS\n`;
+    r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    patterns.forEach(p => {
+      const icon = p.type === 'risk' ? '⚠' : p.type === 'strength' ? '✦' : 'ℹ';
+      r += `${icon} ${p.title}\n`;
+      r += `${p.text}\n\n`;
+    });
+  }
+
+  // Recommendations
+  if (recs.length) {
+    r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    r += `PERSONALISED RECOMMENDATIONS\n`;
+    r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    recs.forEach((rec, i) => {
+      r += `${i+1}. ${rec.dim} (currently Level ${rec.level})\n`;
+      r += `${rec.text}\n\n`;
+    });
+  }
+
+  // Framework mapping
+  r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  r += `FRAMEWORK MAPPING\n`;
+  r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+  r += `Your score of ${s}/100 maps to the following levels across six established AI competency frameworks. Each framework approaches AI literacy from a different angle; together they give a comprehensive picture of where you stand.\n\n`;
+  getFrameworks().forEach(fw => {
+    const seg = getActiveSegment(fw, s);
+    const info = FRAMEWORK_INFO[fw.name];
+    if (info) {
+      r += `─ ${info.fullName}\n`;
+      r += `  Your level: ${seg.label}\n`;
+      r += `  ${info.desc}\n`;
+      if (info.levels[seg.label]) {
+        r += `  ${info.levels[seg.label]}\n`;
+      }
+      // Show all levels for context
+      r += `  Levels: ${fw.segments.map(s => s.label).join(' → ')}\n`;
+      r += `\n`;
+    }
+  });
+
+  r += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  r += `WHAT'S NEXT?\n`;
+  r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+  r += `AI Badge is a 6-week one-to-one coaching programme that takes you from your current level to measurable, demonstrable AI competency. Every session is personalised to your goals and your profile.\n\n`;
+  r += `Interested? Reply to this email or contact victor@fiveinnolabs.com\n\n`;
+  r += `—\nAI Badge by Victor del Rosal | fiveinnolabs.com\n`;
+
+  return r;
+}
+
+// Build HTML version of the report for on-screen display
+function generateReportHTML(v) {
+  const s = score(v);
+  const t = tier(s);
+  const a = archetype(v);
+  const patterns = detectPatterns(v);
+  const recs = generateRecommendations(v);
+  const date = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+
+  let h = '';
+
+  h += `<div style="margin-bottom:20px;">`;
+  h += `<div style="font-size:11px;color:var(--label-tertiary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Your AI Competency Report · ${date}</div>`;
+
+  // Score + tier
+  h += `<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">`;
+  h += `<div style="width:64px;height:64px;border-radius:16px;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#000036;">${s}</div>`;
+  h += `<div><div style="font-size:20px;font-weight:700;color:${t.color};">${t.name}</div>`;
+  h += `<div style="font-size:13px;color:var(--label-secondary);">${t.desc}</div></div></div>`;
+
+  // Archetype
+  h += `<div style="padding:12px 16px;border-radius:12px;background:var(--bg-inset);border:1px solid var(--separator);margin-bottom:20px;">`;
+  h += `<span style="font-size:11px;font-weight:600;color:var(--label-tertiary);text-transform:uppercase;letter-spacing:0.06em;">Profile</span> `;
+  h += `<span style="font-size:15px;font-weight:700;">${a.n}</span> `;
+  h += `<span style="font-size:13px;color:var(--label-secondary);">· ${a.d}</span></div>`;
+
+  // Dimension scores
+  h += `<div style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Dimensions</div>`;
+  DIMS.forEach((dim, i) => {
+    const lv = v[i];
+    const lvData = DIM_LEVELS[dim][lv - 1];
+    const report = DIM_REPORT[dim];
+    const c = lc(lv);
+    h += `<div style="margin-bottom:14px;padding:14px 16px;border-radius:14px;border:1px solid var(--separator);background:var(--bg-inset);">`;
+    h += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">`;
+    h += `<span style="font-size:14px;font-weight:600;">${dim}</span>`;
+    h += `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:22px;padding:0 6px;border-radius:6px;background:${c};color:#fff;font-size:12px;font-weight:700;">${lv}</span></div>`;
+    h += `<div style="font-size:12px;font-style:italic;color:var(--label-primary);margin-bottom:4px;">"${lvData.q}"</div>`;
+    if (report.strengths[lv]) {
+      h += `<div style="font-size:12px;color:var(--label-secondary);line-height:1.4;">${report.strengths[lv]}</div>`;
     }
     h += `</div>`;
   });
-  h += `</div>`;
 
-  summaryDiv.innerHTML = h;
-  container.classList.add('visible');
-  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Patterns
+  if (patterns.length) {
+    h += `<div style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin:20px 0 10px;">Key observations</div>`;
+    patterns.forEach(p => {
+      const bg = p.type === 'risk' ? 'rgba(255,159,10,0.08)' : p.type === 'strength' ? 'rgba(48,209,88,0.08)' : 'rgba(10,132,255,0.08)';
+      const border = p.type === 'risk' ? 'rgba(255,159,10,0.18)' : p.type === 'strength' ? 'rgba(48,209,88,0.18)' : 'rgba(10,132,255,0.15)';
+      h += `<div style="padding:12px 14px;border-radius:12px;background:${bg};border:1px solid ${border};margin-bottom:8px;">`;
+      h += `<div style="font-size:13px;font-weight:600;margin-bottom:4px;">${p.title}</div>`;
+      h += `<div style="font-size:12px;color:var(--label-secondary);line-height:1.4;">${p.text}</div></div>`;
+    });
+  }
+
+  // Recommendations
+  if (recs.length) {
+    h += `<div style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin:20px 0 10px;">What to focus on next</div>`;
+    recs.forEach((rec, i) => {
+      h += `<div style="padding:12px 14px;border-radius:12px;border:1px solid var(--separator);background:var(--bg-inset);margin-bottom:8px;">`;
+      h += `<div style="font-size:13px;font-weight:600;margin-bottom:4px;">${rec.dim} <span style="color:var(--label-tertiary);font-weight:500;">(Level ${rec.level})</span></div>`;
+      h += `<div style="font-size:12px;color:var(--label-secondary);line-height:1.4;">${rec.text}</div></div>`;
+    });
+  }
+
+  // Framework mapping
+  h += `<div style="font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin:20px 0 10px;">Framework mapping</div>`;
+  h += `<div style="font-size:12px;color:var(--label-secondary);line-height:1.4;margin-bottom:14px;">Your score of ${s}/100 maps to the following levels across six established AI competency frameworks.</div>`;
+
+  getFrameworks().forEach(fw => {
+    const seg = getActiveSegment(fw, s);
+    const info = FRAMEWORK_INFO[fw.name];
+    if (!info) return;
+
+    h += `<div style="padding:14px 16px;border-radius:14px;border:1px solid var(--separator);background:var(--bg-inset);margin-bottom:10px;">`;
+
+    // Header: framework name + current level
+    h += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">`;
+    h += `<span style="font-size:14px;font-weight:700;">${fw.name}</span>`;
+    h += `<span style="font-size:13px;font-weight:700;color:var(--accent);">${seg.label}</span></div>`;
+
+    // Full name
+    h += `<div style="font-size:11px;color:var(--label-tertiary);margin-bottom:6px;">${info.fullName}</div>`;
+
+    // Progress bar showing all segments
+    h += `<div style="display:flex;height:6px;border-radius:99px;overflow:hidden;background:var(--gauge-bg);gap:1.5px;margin-bottom:6px;">`;
+    let prevMax = 0;
+    fw.segments.forEach(fwSeg => {
+      const width = fwSeg.max - prevMax;
+      const isFilled = s >= fwSeg.max;
+      const isActive = s > prevMax && s <= fwSeg.max;
+      const fillPct = isActive ? ((s - prevMax) / width) * 100 : (isFilled ? 100 : 0);
+      h += `<div style="flex:${width};position:relative;overflow:hidden;border-radius:1px;">`;
+      h += `<div style="position:absolute;top:0;left:0;height:100%;width:${fillPct}%;background:${fwSeg.color};border-radius:inherit;"></div></div>`;
+      prevMax = fwSeg.max;
+    });
+    h += `</div>`;
+
+    // Level labels
+    h += `<div style="display:flex;gap:1.5px;margin-bottom:8px;">`;
+    prevMax = 0;
+    fw.segments.forEach(fwSeg => {
+      const w = fwSeg.max - prevMax;
+      const isActive = s > prevMax && s <= fwSeg.max;
+      h += `<span style="flex:${w};font-size:10px;font-weight:${isActive?'700':'500'};color:${isActive?'var(--label-primary)':'var(--label-tertiary)'};text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fwSeg.label}</span>`;
+      prevMax = fwSeg.max;
+    });
+    h += `</div>`;
+
+    // Description + level interpretation
+    h += `<div style="font-size:11px;color:var(--label-secondary);line-height:1.45;margin-bottom:4px;">${info.desc}</div>`;
+    if (info.levels[seg.label]) {
+      h += `<div style="font-size:12px;color:var(--label-primary);line-height:1.45;margin-top:6px;padding-top:6px;border-top:1px solid var(--separator);">${info.levels[seg.label]}</div>`;
+    }
+
+    h += `</div>`;
+  });
+
+  h += `</div>`;
+  return h;
 }
 
 // ===== FIREBASE INTEGRATION =====
@@ -2103,32 +2353,24 @@ async function saveAssessment() {
   }
 }
 
-async function savePublicAssessment(email, originalScores, calibratedScores) {
+async function savePublicAssessment(email, scores, reportText) {
   if (!db) return;
   try {
     await db.collection('publicAssessments').add({
       email: email,
-      originalScores: {
-        aiFoundations: originalScores[0],
-        criticalEvaluation: originalScores[1],
-        productiveCreation: originalScores[2],
-        technicalBuilding: originalScores[3],
-        ethicsGovernance: originalScores[4],
-        toolFluency: originalScores[5]
+      scores: {
+        aiFoundations: scores[0],
+        criticalEvaluation: scores[1],
+        productiveCreation: scores[2],
+        technicalBuilding: scores[3],
+        ethicsGovernance: scores[4],
+        toolFluency: scores[5]
       },
-      calibratedScores: {
-        aiFoundations: calibratedScores[0],
-        criticalEvaluation: calibratedScores[1],
-        productiveCreation: calibratedScores[2],
-        technicalBuilding: calibratedScores[3],
-        ethicsGovernance: calibratedScores[4],
-        toolFluency: calibratedScores[5]
-      },
-      originalScore: score(originalScores),
-      calibratedScore: score(calibratedScores),
-      tier: tier(score(calibratedScores)).name,
-      archetype: archetype(calibratedScores).n,
-      calibrationAnswers: calibrationAnswers,
+      score: score(scores),
+      tier: tier(score(scores)).name,
+      archetype: archetype(scores).n,
+      flags: flags(scores).map(f => ({ type: f.t, text: f.x })),
+      report: reportText || '',
       completedAt: new Date().toISOString()
     });
   } catch(e) {
@@ -2139,6 +2381,13 @@ async function savePublicAssessment(email, originalScores, calibratedScores) {
 // ===== INIT =====
 
 function init() {
+  // Read URL params (from index.html slider redirect: ?d0=3&d1=1&...)
+  const params = new URLSearchParams(window.location.search);
+  for (let i = 0; i < 6; i++) {
+    const v = parseInt(params.get('d' + i));
+    if (v >= 1 && v <= 5) vals[i] = v;
+  }
+
   setupCanvas();
   buildSliders();
   buildPresets();

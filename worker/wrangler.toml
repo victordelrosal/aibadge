@@ -1,0 +1,6 @@
+name = "aibadge-report-mailer"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+FROM_EMAIL = "AI Badge <victor@fiveinnolabs.com>"
