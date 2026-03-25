@@ -2717,12 +2717,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     </div>
 
     <!-- Tutorial Video -->
-    <!-- TODO: Replace with YouTube embed once uploaded: <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe> -->
     <div class="cg-video-wrapper">
-      <video controls playsinline style="width:100%;height:100%;position:absolute;top:0;left:0;">
-        <source src="tutorials/retro-game/retro-game.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
+      <iframe src="https://www.youtube.com/embed/QeEE1cOq5Sw" allowfullscreen></iframe>
     </div>
 
     <!-- Slides + Mark Complete row -->
@@ -2777,10 +2773,22 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             </button>
           </div>
         </div>
+        <p>Click the <strong>"Copy code"</strong> button on the grey code block that appears.</p>
 
-        <div class="cg-callout info">
-          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Tip</h4>
-          <p>Every person will get a different game. You might get Pong, Breakout, Snake, or something completely unique. That's the beauty of generative AI!</p>
+        <h3>Keyboard Shortcuts</h3>
+        <table class="cg-kbd-table">
+          <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Save</td><td><kbd>Cmd</kbd> + <kbd>S</kbd></td><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td></tr>
+            <tr><td>Open File</td><td><kbd>Cmd</kbd> + <kbd>O</kbd></td><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td></tr>
+          </tbody>
+        </table>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Success!</h4>
+          <p>You should have a playable retro game in your browser! Every person gets something different.</p>
         </div>
       </div>
     </div>
@@ -2798,9 +2806,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <div class="cg-session-content">
         <h3>Part 1: Code a Simple Retro Game</h3>
         <h4>Step 1: Open Your LLM</h4>
-        <p>Go to <a href="https://chatgpt.com" target="_blank">chatgpt.com</a>, <a href="https://gemini.google.com" target="_blank">gemini.google.com</a>, or <a href="https://claude.ai" target="_blank">claude.ai</a></p>
+        <p>For this exercise, try using a different LLM from the one you used in Hello World. The tutorial demonstrates both <a href="https://claude.ai" target="_blank">claude.ai</a> and <a href="https://gemini.google.com" target="_blank">gemini.google.com</a> side by side. If you're happy with ChatGPT, you can stay there, but it's a good idea to explore others.</p>
         <h4>Step 2: Enter the Prompt</h4>
-        <p>Copy and paste this prompt:</p>
+        <p>Copy and paste this prompt. The tech stack is the same as before: HTML, JavaScript, and CSS in a single file.</p>
         <div class="cg-code-block">
           <pre>Code a simple and fun retro game. Output as single-file HTML, JS, CSS.</pre>
           <div class="cg-code-footer">
@@ -2811,28 +2819,32 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           </div>
         </div>
         <h4>Step 3: Copy and Save the Code</h4>
-        <p>Open Sublime Text, paste the generated code, and save as <code>retrogame.html</code> in a folder you can easily find (e.g. your AI Projects folder on the Desktop).</p>
+        <p>Copy the generated code. Open Sublime Text, paste it, and check for the opening and closing HTML tags. Save as <code>retrogame.html</code> in your AI Projects folder.</p>
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Important</h4>
+          <p>Remember: the file must end with <code>.html</code> otherwise your browser won't recognise it as a webpage.</p>
+        </div>
         <h4>Step 4: Run the Game</h4>
-        <p>Open your browser, go to File > Open (or drag the file into the browser window), and navigate to your <code>retrogame.html</code> file. Your game should load and be playable immediately.</p>
+        <p>Open your browser and use <kbd>Cmd</kbd>+<kbd>O</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>O</kbd> (Windows) to open the file. Navigate to your AI Projects folder and select the file. Your game should load and be playable immediately.</p>
 
         <div class="cg-callout success">
           <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Nice!</h4>
-          <p>You now have a playable retro game, generated entirely by AI. Take a moment to play it and see what you got!</p>
+          <p>You now have a playable retro game generated entirely by AI. Take a moment to play it!</p>
         </div>
 
         <h4>Step 5: Talk to the Code</h4>
         <p>In the same conversation, ask the LLM to make improvements. For example:</p>
         <ul>
-          <li>"Make the game faster and add a score counter"</li>
-          <li>"Add sound effects"</li>
-          <li>"Change the colours to neon"</li>
-          <li>"Add a second level"</li>
+          <li>"Change the background colours"</li>
+          <li>"Change the colour palette"</li>
+          <li>"Make the game faster"</li>
+          <li>"Add a score counter"</li>
         </ul>
-        <p>Each time, copy the new code, replace everything in Sublime Text (<kbd>Cmd</kbd>+<kbd>A</kbd>, delete, paste), save, and refresh.</p>
+        <p>Each time, copy the new code, replace everything in Sublime Text (<kbd>Cmd</kbd>+<kbd>A</kbd>, delete, paste), save, and refresh the browser.</p>
 
         <h3>Part 2: Code Space Invaders</h3>
-        <h4>Step 1: Start a New Conversation</h4>
-        <p>Open a new chat in your LLM and paste this prompt:</p>
+        <h4>Step 1: Enter the Prompt</h4>
+        <p>You can ask for a specific game. Copy this prompt into your LLM:</p>
         <div class="cg-code-block">
           <pre>Code Space Invaders. Output as single-file HTML, JS, CSS.</pre>
           <div class="cg-code-footer">
@@ -2843,9 +2855,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           </div>
         </div>
         <h4>Step 2: Save and Run</h4>
-        <p>Copy the code, open Sublime Text, paste it, and save as <code>spaceInvaders.html</code>. Open it in your browser to play.</p>
+        <p>Copy the code, open a new tab in Sublime Text (<kbd>Cmd</kbd>+<kbd>N</kbd> / <kbd>Ctrl</kbd>+<kbd>N</kbd>), paste the code, and check the HTML tags at the top and bottom. Save as <code>spaceInvaders.html</code> in your AI Projects folder. Open it in your browser to play.</p>
         <h4>Step 3: Personalise and Iterate</h4>
-        <p>Keep the conversation going. Ask for changes:</p>
+        <p>Keep the conversation going. Ask for changes and keep saving and refreshing:</p>
         <ul>
           <li>"Add power-ups that drop from destroyed enemies"</li>
           <li>"Make the aliens move faster each wave"</li>
@@ -2861,13 +2873,44 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
             <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
             <tr><td>Save</td><td><kbd>Cmd</kbd> + <kbd>S</kbd></td><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td></tr>
+            <tr><td>New Tab</td><td><kbd>Cmd</kbd> + <kbd>N</kbd></td><td><kbd>Ctrl</kbd> + <kbd>N</kbd></td></tr>
+            <tr><td>Open File</td><td><kbd>Cmd</kbd> + <kbd>O</kbd></td><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td></tr>
           </tbody>
         </table>
 
         <div class="cg-callout success">
           <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Well Done!</h4>
-          <p>You've coded two games using AI: a random retro game and Space Invaders. The key takeaway is that AI can generate complete, playable applications from a single prompt, and you can iterate to make them your own.</p>
+          <p>You've coded two games using AI. The same workflow applies to any web application: prompt, generate, save, run, iterate.</p>
         </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common problems and solutions</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro Tip: Use AI as Your IT Support</h4>
+          <p style="margin-bottom: 0.75rem;">Game not working? <strong>Take a screenshot of the problem and paste it directly into your LLM conversation.</strong> Tell it "the game doesn't work" and it will try to fix the code for you. This is a great skill for debugging.</p>
+        </div>
+        <h3>Common Issues</h3>
+        <div class="cg-concept-card"><h4>"Game doesn't load or shows a blank screen"</h4><p>The generated code may have a bug. Take a screenshot of what you see and paste it back into the LLM conversation with "the game doesn't work." It will analyse the issue and generate fixed code.</p></div>
+        <div class="cg-concept-card"><h4>"Game crashes when I click to start"</h4><p>Some LLMs generate code where game objects aren't initialised until you click, but the draw function runs immediately. Send a screenshot back to the LLM and it will fix the initialisation order.</p></div>
+        <div class="cg-concept-card"><h4>"File opens as text, not a game"</h4><p>File wasn't saved with <code>.html</code> extension. Rename the file or save again with the correct extension.</p></div>
+        <div class="cg-concept-card"><h4>"Can't find my file"</h4><p>Search for the filename in Finder (Mac) or File Explorer (Windows). Make sure you saved it in your AI Projects folder.</p></div>
+        <h3>Common Mistakes to Avoid</h3>
+        <ul>
+          <li>Saving as <code>retrogame.txt</code> instead of <code>retrogame.html</code></li>
+          <li>Not copying ALL the code (must start with <code>&lt;!DOCTYPE html&gt;</code> or <code>&lt;html&gt;</code>)</li>
+          <li>When replacing code, forgetting to Select All (<kbd>Cmd</kbd>+<kbd>A</kbd>) before pasting the new version</li>
+        </ul>
       </div>
     </div>
 
@@ -2882,19 +2925,44 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
       </div>
       <div class="cg-session-content">
-        <p>Welcome to the Retro Game tutorial. In this session we're going to use AI to generate complete, playable games from a single prompt.</p>
+        <p>Welcome back and we're going to code a retro game for this tutorial.</p>
 
-        <h3>Part 1: A Simple Retro Game</h3>
-        <p>We start by asking the LLM to code a simple and fun retro game as a single HTML file with JavaScript and CSS. The output will be different for everyone. You might get Pong, Breakout, Snake, or something entirely original.</p>
-        <p>Once the code is generated, open your text editor (Sublime Text), paste the code, and save it as <code>retrogame.html</code> in a folder you can find. Then open it in your browser. You should have a fully playable game.</p>
-        <p>The next step is to talk to the code. In the same conversation, ask the LLM to make improvements. You can request faster gameplay, score counters, sound effects, colour changes, or anything you can think of. Each time, copy the updated code, replace everything in your editor, save, and refresh.</p>
+        <h3>Introduction</h3>
+        <p>As I'd like to say, we must keep things fun and if you only use AI for work, you're going to get bored and sick of it. So let's go ahead and ask AI to help us code a retro game. Now this would have been impossible a couple of years ago, or very hard, unless you knew what you were doing in terms of programming. But the prompt is quite simple.</p>
+
+        <h3>The Prompt</h3>
+        <p>We're going to take the prompt: code a simple and fun retro game. We're going to keep the tech stack similar, the same stack we've used before: HTML, JavaScript (JS), and CSS. So we copy that.</p>
+        <p>For this exercise, I want you to try, if you can, claude.ai. Again, same thing or similar to ChatGPT. But we're exploring different large language models. So give it a go. If you're happy enough with ChatGPT, you can stay there, but it's also a good idea to explore a few other ones. The third one that I also like to recommend is Gemini. So you could definitely try that as well for this exercise.</p>
+
+        <h3>Comparing LLMs Side by Side</h3>
+        <p>While we're doing that, just to show you and compare the speed of them both, I'm going to put in the same prompt in Gemini. So same thing. For Gemini, we're going to do a fast version of it. So again, we've seen ChatGPT before, now Claude, and the third LLM that I recommend in 2026: Google Gemini.</p>
+        <p>Notice, even though we got started before with Claude, Gemini has taken the lead in terms of the speed of coding. So we'll try to do two versions side by side.</p>
+
+        <h3>Saving and Running the Gemini Version</h3>
+        <p>So we have the code from Google Gemini. We copy that into a notepad. Paste the code. There it is. The closing tag, the opening tag, it looks good. Save it in our AI Projects folder as <code>retrogame-gemini.html</code> just so we know where it came from.</p>
+        <p>Another way to open your HTML files: you can hit <kbd>Cmd</kbd>+<kbd>O</kbd> or <kbd>Ctrl</kbd>+<kbd>O</kbd> to open, then go to your AI Projects folder and select the file. And there it is. It looks like a Snake game. Let's see if we can play it. And look, it is playable!</p>
+
+        <h3>Testing the Claude Version</h3>
+        <p>Now let's see Claude. Notice here, it has a preview, a working preview. It might be able to start. There might be some issues. That's okay. So it looks like there might be issues with the preview. There's an error there. But we click on the code tab, copy the code, go back to notepad, open a new tab, paste the code. Save it as <code>retrogame-claude.html</code>. Remember, always <code>.html</code>.</p>
+
+        <h3>Dealing with Errors</h3>
+        <p>Let's see if it'll work. Okay, so look, there's issues here. And that's fine. This is the first glitch we've encountered. Here's something important: you're going to have to go back and say "look, it didn't work" or "did not work as expected."</p>
+        <p>And this is actually a great skill. We take a screenshot. Notice I took a screenshot. I can drop the file and say "the game doesn't work." So there's other ways to report errors. We'll get more technical in the next few sessions with things called console errors and console logging to see what is happening under the hood. But we won't do that just now.</p>
+        <p>It's telling us that it does see the issue: the game objects aren't initialised until you click, but draw runs immediately and crashes trying to access them. So it'll take a while and hopefully get it fixed.</p>
 
         <h3>Part 2: Space Invaders</h3>
-        <p>For the second exercise, we go bigger. Ask the LLM to code Space Invaders as a single HTML file. Save it as <code>spaceInvaders.html</code> and open it in your browser.</p>
-        <p>Then personalise it. Ask for power-ups, faster aliens, high score displays, or a completely different visual style. The LLM will modify the existing code each time you make a request.</p>
+        <p>While we're waiting on Claude to fix it, we're going to move to the next bit of the exercise. We can ask for a specific game. So you can say Space Invaders or any other game. For this one, the second part of the exercise, we copy the prompt.</p>
+        <p>I think we had good success with Gemini, so let's go back to Gemini. Submit the prompt, and it starts coding right away. You notice how quick it is. Speed has always been a mark of Gemini models.</p>
+        <p>Copy the code, open a new tab in Sublime Text, paste it. There are your HTML tags, bottom and top. Save it as <code>spaceInvaders-gemini.html</code>. Open it in the browser and there it is, Space Invaders. And it works. It's playable!</p>
+
+        <h3>Back to the Claude Fix</h3>
+        <p>Let's have a final look, see if Claude's fix will work. In this case, Claude is giving us the option to download the file directly. We can do that. Just note that it downloads to your Downloads folder, not your project folder. Open it directly and let's see if the fix is working. Okay, looks like it is. It does work! And I'm using the mouse to control the game. So that was Claude creating a cool-looking, nicely polished game after we said it wasn't working.</p>
 
         <h3>What You Achieved</h3>
-        <p>You've generated two complete games using nothing but natural language prompts. You've also practised iterating on code by continuing the conversation with the LLM. This is the same workflow used for any kind of web application: prompt, generate, save, run, iterate.</p>
+        <p>Is there any other game you'd like to go ahead and code? Same drill, same principles: you get the code, save it in Sublime Text or similar editor, and run it as an HTML file locally.</p>
+        <p>This concludes the first part of coding that we're going to do. We're going to do more coding examples later. But if you've completed the Hello World and these retro games, you're in a very good position in terms of managing your code, opening it, visualising it, and also requesting changes.</p>
+        <p>Feel free to keep going to personalise a bit more. For any of these games, you can ask for changes: different colours, different palettes, new features. I would encourage you to do that as practice. Keep chatting in the same window, keep making those changes and saving. Remember, you go back to the notepad file, replace the code with the new updated code, then go back to refresh the Chrome tab where you have it open.</p>
+        <p>Well done, good job, and I'll see you in the next tutorial. Thank you. Cheers.</p>
       </div>
     </div>
 
@@ -3780,9 +3848,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   window._lmsTutorials = [
     { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 7, type: 'video' },
     { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 9, type: 'video' },
+    { id: 'retro-game', moduleId: 'retro-game', title: 'Retro Game', icon: '🎮', iconBg: 'rgba(255,59,48,0.12)', level: 'beginner', durationMinutes: 12, type: 'video' },
     { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', durationMinutes: 30, type: 'video', pending: true },
-    { id: 'opencode-setup', moduleId: 'opencode-setup', title: 'OpenCode Setup', icon: '⚡', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', durationMinutes: 35, type: 'video', pending: true },
-    { id: 'retro-game', moduleId: 'retro-game', title: 'Retro Game', icon: '🎮', iconBg: 'rgba(255,59,48,0.12)', level: 'beginner', durationMinutes: 12, type: 'video' }
+    { id: 'opencode-setup', moduleId: 'opencode-setup', title: 'OpenCode Setup', icon: '⚡', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', durationMinutes: 35, type: 'video', pending: true }
   ];
 
   window.lmsDashboard = function() {
