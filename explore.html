@@ -2278,10 +2278,43 @@ function showLoggedInUI(user) {
     }
   });
 
-  // Show save button and pre-fill email for report
+  // Show save button; replace email gate with direct "Save & View Report" for logged-in users
   document.getElementById('saveRow').classList.add('visible');
-  document.getElementById('emailInput').value = user.email;
+  var gate = document.getElementById('emailGate');
+  gate.innerHTML = `
+    <h3>Your Report</h3>
+    <p>Save your results to track your progress over time.</p>
+    <button class="email-submit" id="loggedInSubmit" onclick="submitLoggedIn()">Save &amp; View Report</button>
+  `;
   document.getElementById('layer2Section').style.display = 'block';
+}
+
+function submitLoggedIn() {
+  var btn = document.getElementById('loggedInSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  var reportHTML = generateReportHTML(vals);
+  var email = currentUser.email;
+
+  // Save to explorer_history only (no email send)
+  var s = score(vals), t = tier(s), a = archetype(vals), fl = flags(vals);
+  var assessmentData = {
+    scores: { aiFoundations: vals[0], criticalEvaluation: vals[1], productiveCreation: vals[2], technicalBuilding: vals[3], ethicsGovernance: vals[4], toolFluency: vals[5] },
+    score: s, tier: t.name, archetype: a.n,
+    flags: fl.map(function(f) { return { type: f.t, text: f.x }; }),
+    completedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  db.collection('users').doc(currentUser.uid).collection('explorer_history').add(assessmentData)
+    .then(function() {
+      showReportConfirmation(email, reportHTML);
+    })
+    .catch(function(e) {
+      console.error('Save failed:', e);
+      btn.textContent = 'Error. Try again.';
+      btn.disabled = false;
+    });
 }
 
 function showPublicUI() {
@@ -2408,7 +2441,8 @@ init();
 </script>
 
 <!-- External Firebase config (loaded after main script so it can override) -->
-<script src="assets/js/firebase-app.js" onerror="console.log('firebase-app.js not found. Running standalone.')"></script>
+<script src="assets/js/firebase-app.js" onerror="console.log('firebase-app.js not found. Running standalone.')"
+  onload="initFirebase(); auth = firebase.auth(); db = firebase.firestore(); setupAuthListener();"></script>
 
 </body>
 </html>
