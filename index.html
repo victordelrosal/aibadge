@@ -3873,6 +3873,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           profile = { email: user.email, enrolled: isAdmin };
         }
         auth.setProfile(profile || {});
+        // Close sign-in modal now that profile is ready (prevents "Access Required" flash)
+        Alpine.store('ui').closeModal();
       } else {
         auth.setUser(null);
         auth.setProfile(null);
@@ -4049,11 +4051,11 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.submitting = true;
         const result = await signInWithGoogle();
         if (result.success) {
-          Alpine.store('ui').closeModal();
+          // Modal closed by onAuthStateChanged after profile loads
         } else {
           this.error = result.error;
+          this.submitting = false;
         }
-        this.submitting = false;
       },
 
       async handleRegister() {
@@ -4090,14 +4092,13 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.submitting = true;
         const result = await signIn(this.email, this.password);
         if (result.success) {
-          // Auth listener handles the rest
-          Alpine.store('ui').closeModal();
+          // Modal closed by onAuthStateChanged after profile loads
           this.email = '';
           this.password = '';
         } else {
           this.error = result.error;
+          this.submitting = false;
         }
-        this.submitting = false;
       },
 
       async handleForgotPassword() {
