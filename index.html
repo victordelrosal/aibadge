@@ -3148,6 +3148,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <div style="flex:1;min-width:0;">
               <p style="font-weight:600;font-size:0.95rem;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="u.email"></p>
               <p style="font-size:0.8rem;margin:4px 0 0;opacity:0.5;" x-text="'Signed up: ' + formatDate(u.createdAt)"></p>
+            <p style="font-size:0.7rem;margin:2px 0 0;opacity:0.3;font-family:monospace;" x-text="'UID: ' + u.id"></p>
             </div>
             <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
               <span style="font-size:0.8rem;font-weight:500;"
@@ -3880,7 +3881,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           profile.email = user.email;
           try { await updateUserProfile(user.uid, { email: user.email }); } catch(e) {}
         }
-        console.log('[AUTH] Profile loaded:', JSON.stringify(profile));
+        console.log('[AUTH] UID:', user.uid);
+        console.log('[AUTH] Profile keys:', profile ? Object.keys(profile).join(', ') : 'null');
+        console.log('[AUTH] enrolled:', profile ? profile.enrolled : 'N/A');
+        console.log('[AUTH] email:', profile ? profile.email : 'N/A');
         auth.setProfile(profile || {});
         Alpine.store('ui').closeModal();
       } else {
