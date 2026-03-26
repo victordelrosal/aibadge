@@ -3854,27 +3854,29 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         auth.setUser({ uid: user.uid, email: user.email });
         var profile = null;
         try {
-          // Race profile load against 5s timeout to prevent hanging
           profile = await Promise.race([
             getUserProfile(user.uid),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
           ]);
         } catch(e) {
           console.warn('Profile load timeout/error, using fallback:', e.message);
         }
         if (!profile) {
-          // First sign-in or timeout: create/update profile. Auto-enroll admins.
+          // New user only: set email and createdAt. NEVER overwrite enrolled.
           var isAdmin = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email);
+          var newData = { email: user.email, createdAt: new Date().toISOString() };
+          if (isAdmin) newData.enrolled = true;
           try {
             await Promise.race([
-              updateUserProfile(user.uid, { email: user.email, enrolled: isAdmin, createdAt: new Date().toISOString() }),
+              updateUserProfile(user.uid, newData),
               new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
             ]);
           } catch(e) { console.warn('Profile create timeout:', e.message); }
-          profile = { email: user.email, enrolled: isAdmin };
+          // Try reading one more time (might have been a transient failure)
+          try { profile = await getUserProfile(user.uid); } catch(e) {}
+          if (!profile) profile = { email: user.email, enrolled: isAdmin };
         }
         auth.setProfile(profile || {});
-        // Close sign-in modal now that profile is ready (prevents "Access Required" flash)
         Alpine.store('ui').closeModal();
       } else {
         auth.setUser(null);
@@ -4052,7 +4054,12 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.submitting = true;
         const result = await signInWithGoogle();
         if (result.success) {
-          // Modal closed by onAuthStateChanged after profile loads
+          // Wait for onAuthStateChanged to finish loading the profile
+          var maxWait = 80;
+          while (Alpine.store('auth').loading && maxWait-- > 0) {
+            await new Promise(r => setTimeout(r, 100));
+          }
+          Alpine.store('ui').closeModal();
         } else {
           this.error = result.error;
           this.submitting = false;
@@ -4093,7 +4100,12 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.submitting = true;
         const result = await signIn(this.email, this.password);
         if (result.success) {
-          // Modal closed by onAuthStateChanged after profile loads
+          // Wait for onAuthStateChanged to finish loading the profile
+          var maxWait = 80;
+          while (Alpine.store('auth').loading && maxWait-- > 0) {
+            await new Promise(r => setTimeout(r, 100));
+          }
+          Alpine.store('ui').closeModal();
           this.email = '';
           this.password = '';
         } else {
