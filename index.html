@@ -3890,10 +3890,6 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           profile.email = user.email;
           try { await updateUserProfile(user.uid, { email: user.email }); } catch(e) {}
         }
-        console.log('[AUTH] UID:', user.uid);
-        console.log('[AUTH] Profile keys:', profile ? Object.keys(profile).join(', ') : 'null');
-        console.log('[AUTH] enrolled:', profile ? profile.enrolled : 'N/A');
-        console.log('[AUTH] email:', profile ? profile.email : 'N/A');
         auth.setProfile(profile || {});
         Alpine.store('ui').closeModal();
       } else {
