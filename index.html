@@ -1703,10 +1703,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <!-- Dashboard content -->
   <div style="max-width:672px;margin:0 auto;padding:32px 20px;position:relative;z-index:2;">
     <h1 class="lms-heading">Your Learning</h1>
-    <p class="lms-subheading" x-text="$store.auth.isEnrolled ? 'Continue where you left off.' : 'You are not yet enrolled in a programme.'"></p>
+    <p class="lms-subheading" x-text="$store.auth.loading ? 'Loading...' : ($store.auth.isEnrolled ? 'Continue where you left off.' : 'You are not yet enrolled in a programme.')"></p>
 
-    <!-- Not enrolled state -->
-    <template x-if="!$store.auth.isEnrolled">
+    <!-- Not enrolled state (hidden while profile is loading) -->
+    <template x-if="!$store.auth.isEnrolled && !$store.auth.loading">
       <div class="lms-module-card" style="padding:32px;text-align:center;">
         <p style="font:600 17px/1.3 -apple-system,sans-serif;margin-bottom:8px;">Access Required</p>
         <p class="lms-subheading" style="margin-bottom:0;">Contact victor@fiveinnolabs.com to get enrolled.</p>
@@ -3850,6 +3850,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     onAuthChange(async (user) => {
       const auth = Alpine.store('auth');
       if (user) {
+        auth.setLoading(true);
         auth.setUser({ uid: user.uid, email: user.email });
         var profile = null;
         try {
