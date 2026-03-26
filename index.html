@@ -3876,6 +3876,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           try { profile = await getUserProfile(user.uid); } catch(e) {}
           if (!profile) profile = { email: user.email, enrolled: isAdmin };
         }
+        console.log('[AUTH] Profile loaded:', JSON.stringify(profile));
         auth.setProfile(profile || {});
         Alpine.store('ui').closeModal();
       } else {
