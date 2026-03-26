@@ -45,6 +45,19 @@ service cloud.firestore {
           allow write: if isOwner(userId) || isAdmin();
         }
       }
+
+      // Login history subcollection
+      match /logins/{loginId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) || isAdmin();
+        allow update, delete: if false;
+      }
+
+      // Tutorial completion subcollection
+      match /tutorial_completions/{tutorialId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isOwner(userId) || isAdmin();
+      }
     }
 
     // ----------------------------------------------------------------

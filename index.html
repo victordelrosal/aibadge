@@ -1801,6 +1801,50 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .admin-toggle:disabled { opacity:0.5; cursor:not-allowed; }
       #view-admin.lms-dark { background:#000010; color:#f5f5f5; }
       #view-admin.lms-dark .admin-user-row-dark p:first-child { color:#f5f5f5; }
+
+      /* Admin user detail panel */
+      .admin-user-row { cursor:pointer; transition:background 0.15s; }
+      .admin-user-row:hover { filter:brightness(0.97); }
+      .admin-detail { padding:0 20px 20px; background:rgba(245,245,247,0.6); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+      .admin-detail-dark { background:rgba(255,255,255,0.04); }
+      .admin-detail-section { margin-bottom:16px; }
+      .admin-detail-title { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:rgba(60,60,67,0.5); margin-bottom:8px; }
+      .admin-detail-dark .admin-detail-title { color:rgba(235,235,245,0.4); }
+      .admin-detail-empty { font-size:0.82rem; color:rgba(60,60,67,0.4); font-style:italic; }
+      .admin-detail-dark .admin-detail-empty { color:rgba(235,235,245,0.3); }
+
+      /* Assessment cards */
+      .admin-assessment { background:rgba(255,255,255,0.7); border-radius:10px; padding:12px 14px; margin-bottom:8px; border:1px solid rgba(0,0,0,0.04); }
+      .admin-detail-dark .admin-assessment { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.06); }
+      .admin-assessment-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+      .admin-assessment-score { font-size:1.4rem; font-weight:700; }
+      .admin-assessment-meta { font-size:0.78rem; color:rgba(60,60,67,0.5); }
+      .admin-detail-dark .admin-assessment-meta { color:rgba(235,235,245,0.4); }
+      .admin-dim-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 16px; }
+      .admin-dim-row { display:flex; justify-content:space-between; align-items:center; font-size:0.82rem; padding:3px 0; }
+      .admin-dim-label { color:rgba(60,60,67,0.7); }
+      .admin-detail-dark .admin-dim-label { color:rgba(235,235,245,0.5); }
+      .admin-dim-val { font-weight:600; min-width:24px; text-align:right; }
+      .admin-dim-bar { flex:1; height:4px; border-radius:2px; background:rgba(0,0,0,0.06); margin:0 8px; position:relative; overflow:hidden; }
+      .admin-detail-dark .admin-dim-bar { background:rgba(255,255,255,0.08); }
+      .admin-dim-fill { position:absolute; top:0; left:0; height:100%; border-radius:2px; transition:width 0.3s; }
+
+      /* Tutorial list */
+      .admin-tut-row { display:flex; align-items:center; gap:8px; font-size:0.85rem; padding:4px 0; }
+      .admin-tut-check { width:16px; height:16px; border-radius:50%; border:2px solid rgba(0,0,0,0.12); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+      .admin-tut-check.done { background:#34C759; border-color:#34C759; }
+      .admin-detail-dark .admin-tut-check { border-color:rgba(255,255,255,0.15); }
+
+      /* Login log */
+      .admin-login-row { font-size:0.82rem; padding:3px 0; color:rgba(60,60,67,0.7); }
+      .admin-detail-dark .admin-login-row { color:rgba(235,235,245,0.5); }
+      .admin-login-count { font-size:0.85rem; font-weight:600; margin-bottom:6px; }
+      .admin-stat-row { display:flex; gap:16px; margin-bottom:12px; flex-wrap:wrap; }
+      .admin-stat { background:rgba(255,255,255,0.7); border-radius:10px; padding:10px 14px; flex:1; min-width:120px; border:1px solid rgba(0,0,0,0.04); }
+      .admin-detail-dark .admin-stat { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.06); }
+      .admin-stat-label { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:rgba(60,60,67,0.5); margin-bottom:2px; }
+      .admin-detail-dark .admin-stat-label { color:rgba(235,235,245,0.4); }
+      .admin-stat-value { font-size:1.1rem; font-weight:700; }
     </style>
 
     <!-- Enrolled: Tutorial cards (each tutorial = its own card) -->
@@ -3099,20 +3143,120 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <!-- User list -->
     <div x-show="!loading && users.length > 0" style="display:flex;flex-direction:column;gap:1px;border-radius:14px;overflow:hidden;">
       <template x-for="u in users" :key="u.id">
-        <div class="admin-user-row" :class="darkMode ? 'admin-user-row-dark' : ''">
-          <div style="flex:1;min-width:0;">
-            <p style="font-weight:600;font-size:0.95rem;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="u.email"></p>
-            <p style="font-size:0.8rem;margin:4px 0 0;opacity:0.5;" x-text="'Signed up: ' + formatDate(u.createdAt)"></p>
+        <div>
+          <div class="admin-user-row" :class="darkMode ? 'admin-user-row-dark' : ''" @click="toggleDetail(u)">
+            <div style="flex:1;min-width:0;">
+              <p style="font-weight:600;font-size:0.95rem;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="u.email"></p>
+              <p style="font-size:0.8rem;margin:4px 0 0;opacity:0.5;" x-text="'Signed up: ' + formatDate(u.createdAt)"></p>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+              <span style="font-size:0.8rem;font-weight:500;"
+                    :style="'color:' + (u.enrolled ? '#34C759' : 'rgba(142,142,147,0.8)')"
+                    x-text="u.enrolled ? 'Enrolled' : 'Pending'"></span>
+              <button class="admin-toggle" :class="u.enrolled ? 'admin-toggle-on' : ''"
+                      @click.stop="toggleEnrolled(u)"
+                      :disabled="u.toggling">
+                <span class="admin-toggle-knob"></span>
+              </button>
+              <svg :style="'transform:rotate(' + (expandedUser === u.id ? '90' : '0') + 'deg);transition:transform 0.2s'" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-            <span style="font-size:0.8rem;font-weight:500;"
-                  :style="'color:' + (u.enrolled ? '#34C759' : 'rgba(142,142,147,0.8)')"
-                  x-text="u.enrolled ? 'Enrolled' : 'Pending'"></span>
-            <button class="admin-toggle" :class="u.enrolled ? 'admin-toggle-on' : ''"
-                    @click="toggleEnrolled(u)"
-                    :disabled="u.toggling">
-              <span class="admin-toggle-knob"></span>
-            </button>
+
+          <!-- Expandable detail panel -->
+          <div x-show="expandedUser === u.id" x-collapse class="admin-detail" :class="darkMode ? 'admin-detail-dark' : ''">
+
+            <!-- Loading -->
+            <div x-show="detailLoading" style="padding:16px 0;text-align:center;">
+              <p style="font-size:0.85rem;opacity:0.5;">Loading user data...</p>
+            </div>
+
+            <div x-show="!detailLoading">
+
+              <!-- Quick stats -->
+              <div class="admin-stat-row" style="margin-top:12px;">
+                <div class="admin-stat">
+                  <div class="admin-stat-label">Assessments</div>
+                  <div class="admin-stat-value" x-text="detailData.assessments ? detailData.assessments.length : 0"></div>
+                </div>
+                <div class="admin-stat">
+                  <div class="admin-stat-label">Tutorials Done</div>
+                  <div class="admin-stat-value" x-text="detailData.tutorialsDone || 0"></div>
+                </div>
+                <div class="admin-stat">
+                  <div class="admin-stat-label">Total Logins</div>
+                  <div class="admin-stat-value" x-text="detailData.logins ? detailData.logins.length : 0"></div>
+                </div>
+                <div class="admin-stat">
+                  <div class="admin-stat-label">Last Active</div>
+                  <div class="admin-stat-value" style="font-size:0.85rem;" x-text="formatDate(u.lastActiveAt)"></div>
+                </div>
+              </div>
+
+              <!-- Assessment History -->
+              <div class="admin-detail-section">
+                <div class="admin-detail-title">Assessment History</div>
+                <template x-if="!detailData.assessments || detailData.assessments.length === 0">
+                  <p class="admin-detail-empty">No assessments taken yet.</p>
+                </template>
+                <template x-for="a in (detailData.assessments || [])" :key="a.id">
+                  <div class="admin-assessment">
+                    <div class="admin-assessment-header">
+                      <div>
+                        <span class="admin-assessment-score" :style="'color:' + tierColor(a.score)" x-text="a.score + '%'"></span>
+                        <span style="font-size:0.82rem;font-weight:500;margin-left:6px;" x-text="a.tier || ''"></span>
+                      </div>
+                      <span class="admin-assessment-meta" x-text="formatDateTime(a.completedAt)"></span>
+                    </div>
+                    <div class="admin-dim-grid">
+                      <template x-for="dim in dimensionList" :key="dim.key">
+                        <div class="admin-dim-row">
+                          <span class="admin-dim-label" x-text="dim.label"></span>
+                          <div class="admin-dim-bar">
+                            <div class="admin-dim-fill" :style="'width:' + ((a.scores && a.scores[dim.key]) || 0) + '%;background:' + tierColor((a.scores && a.scores[dim.key]) || 0)"></div>
+                          </div>
+                          <span class="admin-dim-val" x-text="(a.scores && a.scores[dim.key]) || 0"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Tutorial Completions -->
+              <div class="admin-detail-section">
+                <div class="admin-detail-title">Tutorial Progress</div>
+                <template x-if="!detailData.tutorials || Object.keys(detailData.tutorials).length === 0">
+                  <p class="admin-detail-empty">No tutorials completed yet.</p>
+                </template>
+                <template x-for="tut in allTutorials" :key="tut.id">
+                  <div class="admin-tut-row">
+                    <div class="admin-tut-check" :class="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completed ? 'done' : ''">
+                      <template x-if="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completed">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                      </template>
+                    </div>
+                    <span x-text="tut.title" style="flex:1;"></span>
+                    <span class="admin-assessment-meta" x-text="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completedAt ? formatDateTime(detailData.tutorials[tut.id].completedAt) : ''"></span>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Login History -->
+              <div class="admin-detail-section">
+                <div class="admin-detail-title">Login History</div>
+                <template x-if="!detailData.logins || detailData.logins.length === 0">
+                  <p class="admin-detail-empty">No login records yet.</p>
+                </template>
+                <template x-if="detailData.logins && detailData.logins.length > 0">
+                  <div>
+                    <template x-for="login in detailData.logins" :key="login.id">
+                      <div class="admin-login-row" x-text="formatDateTime(login.timestamp)"></div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+
+            </div>
           </div>
         </div>
       </template>
@@ -3784,12 +3928,23 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       users: [],
       loading: true,
       error: null,
+      expandedUser: null,
+      detailLoading: false,
+      detailData: { assessments: [], tutorials: {}, logins: [], tutorialsDone: 0 },
+      dimensionList: [
+        { key: 'aiFoundations', label: 'AI Foundations' },
+        { key: 'criticalEvaluation', label: 'Critical Evaluation' },
+        { key: 'productiveCreation', label: 'Productive Creation' },
+        { key: 'technicalBuilding', label: 'Technical Building' },
+        { key: 'ethicsGovernance', label: 'Ethics & Governance' },
+        { key: 'toolFluency', label: 'Tool Fluency' }
+      ],
+      allTutorials: (window._lmsTutorials || []).filter(function(t) { return !t.pending; }),
       init() {
         var self = this;
-        // Wait for auth to be ready before loading
         initFirebase();
         var unsub = firebase.auth().onAuthStateChanged(function(user) {
-          unsub(); // only need it once
+          unsub();
           if (user) self.loadUsers();
           else { self.loading = false; self.error = 'Not signed in.'; }
         });
@@ -3806,14 +3961,42 @@ document.querySelectorAll('#navLinks a').forEach(a => {
             allUsers.forEach(function(u) { u.toggling = false; });
             this.users = allUsers.sort(function(a, b) {
               var da = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
-              var db = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
-              return db - da;
+              var db2 = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
+              return db2 - da;
             });
           }
         } catch (e) {
           this.error = 'Failed to load users: ' + e.message;
         }
         this.loading = false;
+      },
+      async toggleDetail(u) {
+        if (this.expandedUser === u.id) {
+          this.expandedUser = null;
+          return;
+        }
+        this.expandedUser = u.id;
+        this.detailLoading = true;
+        this.detailData = { assessments: [], tutorials: {}, logins: [], tutorialsDone: 0 };
+        try {
+          var results = await Promise.all([
+            getAdminUserHistory(u.id),
+            getAdminTutorialCompletions(u.id),
+            getAdminLoginHistory(u.id)
+          ]);
+          var tutorials = results[1] || {};
+          var done = 0;
+          Object.keys(tutorials).forEach(function(k) { if (tutorials[k].completed) done++; });
+          this.detailData = {
+            assessments: results[0] || [],
+            tutorials: tutorials,
+            logins: results[2] || [],
+            tutorialsDone: done
+          };
+        } catch (e) {
+          console.error('Detail load failed:', e);
+        }
+        this.detailLoading = false;
       },
       async toggleEnrolled(u) {
         var newVal = !u.enrolled;
@@ -3831,10 +4014,22 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           this.error = 'Failed: ' + e.message;
         }
       },
+      tierColor(score) {
+        if (score >= 80) return '#34C759';
+        if (score >= 60) return '#007AFF';
+        if (score >= 40) return '#FF9500';
+        return '#FF3B30';
+      },
       formatDate(ts) {
         if (!ts) return 'Unknown';
         var d = ts.toDate ? ts.toDate() : new Date(ts);
         return d.toLocaleDateString('en-IE', { day: 'numeric', month: 'short', year: 'numeric' });
+      },
+      formatDateTime(ts) {
+        if (!ts) return '';
+        var d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString('en-IE', { day: 'numeric', month: 'short', year: 'numeric' }) +
+          ', ' + d.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' });
       }
     };
   };
@@ -3937,8 +4132,27 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
       tutorials: window._lmsTutorials.map(function(t) { return Object.assign({}, t); }),
 
+      init() {
+        var self = this;
+        var checkUser = setInterval(function() {
+          var user = Alpine.store('auth').user;
+          if (user) {
+            clearInterval(checkUser);
+            getTutorialCompletions(user.uid).then(function(completions) {
+              Object.keys(completions).forEach(function(tutId) {
+                if (completions[tutId].completed) self.progress[tutId] = true;
+              });
+            });
+          }
+        }, 200);
+        setTimeout(function() { clearInterval(checkUser); }, 5000);
+      },
+
       toggleComplete(tut) {
-        this.progress[tut.id] = !this.progress[tut.id];
+        var newVal = !this.progress[tut.id];
+        this.progress[tut.id] = newVal;
+        var user = Alpine.store('auth').user;
+        if (user) saveTutorialCompletion(user.uid, tut.id, newVal);
       }
     };
   };
@@ -3968,7 +4182,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
       markComplete() {
         this.isComplete = !this.isComplete;
-        // Will persist to Firestore in Task 3
+        var user = Alpine.store('auth').user;
+        var lesson = this.currentLesson;
+        if (user && lesson) saveTutorialCompletion(user.uid, lesson.id, this.isComplete);
       }
     };
   };

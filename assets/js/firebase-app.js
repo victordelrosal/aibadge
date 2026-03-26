@@ -43,6 +43,7 @@ async function signIn(email, password) {
   try {
     const credential = await auth.signInWithEmailAndPassword(email, password);
     await updateLastActive(credential.user.uid);
+    logLogin(credential.user.uid);
     return { success: true, user: credential.user };
   } catch (error) {
     return { success: false, error: _friendlyAuthError(error) };
@@ -54,6 +55,8 @@ async function signInWithGoogle() {
   try {
     const provider = new firebase.auth.GoogleAuthProvider();
     const credential = await auth.signInWithPopup(provider);
+    await updateLastActive(credential.user.uid);
+    logLogin(credential.user.uid);
     return { success: true, user: credential.user };
   } catch (error) {
     return { success: false, error: _friendlyAuthError(error) };
@@ -292,6 +295,55 @@ async function savePublicAssessment(email, assessmentData) {
 }
 
 /* --------------------------------------------------------------------------
+   Login Logging (Firestore: users/{userId}/logins/{autoId})
+   -------------------------------------------------------------------------- */
+
+async function logLogin(userId) {
+  initFirebase();
+  try {
+    await db.collection("users").doc(userId).collection("logins").add({
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      method: "web"
+    });
+  } catch (error) {
+    console.warn("logLogin:", error);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Tutorial Completions (Firestore: users/{userId}/tutorial_completions/{tutorialId})
+   -------------------------------------------------------------------------- */
+
+async function saveTutorialCompletion(userId, tutorialId, completed) {
+  initFirebase();
+  try {
+    var data = completed
+      ? { completed: true, completedAt: firebase.firestore.FieldValue.serverTimestamp() }
+      : { completed: false, completedAt: null };
+    await db.collection("users").doc(userId).collection("tutorial_completions").doc(tutorialId).set(data, { merge: true });
+    return { success: true };
+  } catch (error) {
+    console.warn("saveTutorialCompletion:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+async function getTutorialCompletions(userId) {
+  initFirebase();
+  try {
+    var snapshot = await db.collection("users").doc(userId).collection("tutorial_completions").get();
+    var result = {};
+    snapshot.docs.forEach(function(doc) {
+      result[doc.id] = doc.data();
+    });
+    return result;
+  } catch (error) {
+    console.warn("getTutorialCompletions:", error);
+    return {};
+  }
+}
+
+/* --------------------------------------------------------------------------
    Admin Queries
    -------------------------------------------------------------------------- */
 
@@ -338,6 +390,50 @@ async function setUserEnrolled(userId, enrolled) {
     return { success: false, error: "Not authorised" };
   }
   return updateUserProfile(userId, { enrolled: enrolled });
+}
+
+async function getAdminUserHistory(userId) {
+  initFirebase();
+  var user = getCurrentUser();
+  if (!user || !ADMIN_EMAILS.includes(user.email)) return [];
+  try {
+    var snapshot = await db.collection("users").doc(userId)
+      .collection("explorer_history").orderBy("completedAt", "desc").get();
+    return snapshot.docs.map(function(doc) { return { id: doc.id, ...doc.data() }; });
+  } catch (error) {
+    console.warn("getAdminUserHistory:", error);
+    return [];
+  }
+}
+
+async function getAdminTutorialCompletions(userId) {
+  initFirebase();
+  var user = getCurrentUser();
+  if (!user || !ADMIN_EMAILS.includes(user.email)) return {};
+  try {
+    var snapshot = await db.collection("users").doc(userId)
+      .collection("tutorial_completions").get();
+    var result = {};
+    snapshot.docs.forEach(function(doc) { result[doc.id] = doc.data(); });
+    return result;
+  } catch (error) {
+    console.warn("getAdminTutorialCompletions:", error);
+    return {};
+  }
+}
+
+async function getAdminLoginHistory(userId) {
+  initFirebase();
+  var user = getCurrentUser();
+  if (!user || !ADMIN_EMAILS.includes(user.email)) return [];
+  try {
+    var snapshot = await db.collection("users").doc(userId)
+      .collection("logins").orderBy("timestamp", "desc").limit(50).get();
+    return snapshot.docs.map(function(doc) { return { id: doc.id, ...doc.data() }; });
+  } catch (error) {
+    console.warn("getAdminLoginHistory:", error);
+    return [];
+  }
 }
 
 /* --------------------------------------------------------------------------
