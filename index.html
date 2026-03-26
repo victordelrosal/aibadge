@@ -962,6 +962,66 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   margin-bottom:1.5rem;
 }
 
+/* === AVAILABILITY INDICATOR === */
+.availability{
+  text-align:center;
+  margin-bottom:2.5rem;
+}
+.availability-slots{
+  display:flex;
+  justify-content:center;
+  gap:0.6rem;
+  margin-bottom:0.75rem;
+}
+.availability-dot{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:2px solid var(--gold-premium);
+  background:transparent;
+  position:relative;
+  transition:all 0.3s ease;
+}
+.availability-dot.taken{
+  background:var(--grey-medium);
+  border-color:var(--grey-medium);
+  opacity:0.5;
+}
+.availability-dot.available{
+  animation:slotPulse 2.5s ease-in-out infinite;
+}
+.availability-dot.available::after{
+  content:'';
+  position:absolute;
+  inset:4px;
+  border-radius:50%;
+  background:var(--gold-premium);
+  opacity:0.2;
+}
+@keyframes slotPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}
+  50%{box-shadow:0 0 0 4px rgba(212,175,55,0.15)}
+}
+.availability-label{
+  font-size:0.95rem;
+  font-weight:600;
+  color:var(--black-soft);
+  letter-spacing:-0.01em;
+}
+.availability-label span{
+  color:var(--gold-premium);
+  font-weight:700;
+}
+.availability-sublabel{
+  font-size:0.82rem;
+  color:var(--grey-dark);
+  margin-top:0.2rem;
+}
+@media(max-width:600px){
+  .availability-dot{width:22px;height:22px}
+  .availability-slots{gap:0.45rem}
+}
+
 /* === FAQ === */
 .faq-container{max-width:800px;margin:0 auto}
 .faq-item{
@@ -1454,14 +1514,32 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <div class="container">
     <h2 class="section-title text-center fade-in">Investment</h2>
 
+    <!-- Availability indicator — update taken/available counts as enrolments change -->
+    <div class="availability fade-in">
+      <div class="availability-slots">
+        <div class="availability-dot taken"></div>
+        <div class="availability-dot available"></div>
+        <div class="availability-dot available"></div>
+        <div class="availability-dot available"></div>
+        <div class="availability-dot available"></div>
+        <div class="availability-dot available"></div>
+        <div class="availability-dot available"></div>
+        <div class="availability-dot available"></div>
+        <div class="availability-dot available"></div>
+        <div class="availability-dot available"></div>
+      </div>
+      <div class="availability-label"><span>9</span> of 10 slots available</div>
+      <div class="availability-sublabel">One-to-one coaching, limited by design</div>
+    </div>
+
     <div class="pricing-grid">
 
       <!-- Weekly Option -->
       <div class="pricing-card fade-in">
         <div class="pricing-plan-name">Weekly</div>
-        <div class="pricing-amount">&euro;75</div>
+        <div class="pricing-amount">&euro;90</div>
         <div class="pricing-per">per week</div>
-        <div class="pricing-total">&euro;450 total for 6 weeks</div>
+        <div class="pricing-total">&euro;540 total for 6 weeks</div>
 
         <ul class="pricing-list">
           <li><span class="tick">&#10003;</span>Full AI Competency Assessment (baseline + end-of-programme)</li>
@@ -1474,16 +1552,16 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </ul>
 
         <a href="#" class="btn-cta" id="startJourneyBtn">Start Your Journey</a>
-        <p class="pricing-note">Payment via Revolut. Limited availability.</p>
+        <p class="pricing-note"></p>
       </div>
 
       <!-- Upfront Option (featured) -->
       <div class="pricing-card featured fade-in">
         <div class="pricing-badge">Best Value</div>
         <div class="pricing-plan-name">Pay Upfront</div>
-        <div class="pricing-amount">&euro;395</div>
+        <div class="pricing-amount">&euro;495</div>
         <div class="pricing-per">one-time payment</div>
-        <div class="pricing-savings">Save &euro;55</div>
+        <div class="pricing-savings">Save &euro;45</div>
 
         <ul class="pricing-list">
           <li><span class="tick">&#10003;</span>Full AI Competency Assessment (baseline + end-of-programme)</li>
@@ -1496,7 +1574,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </ul>
 
         <a href="#" class="btn-cta">Start Your Journey</a>
-        <p class="pricing-note">Payment via Revolut. Limited availability.</p>
+        <p class="pricing-note"></p>
       </div>
 
     </div>

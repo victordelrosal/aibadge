@@ -1,7 +1,7 @@
 # AI Badge: Handoff Document
 
-**Last updated:** 2026-03-25 (late evening, post-emergency fix session)
-**Latest commit:** `d997dd6`
+**Last updated:** 2026-03-25 (night, post-tutorial pipeline session)
+**Latest commit:** `2c1c128`
 
 ---
 
@@ -98,9 +98,10 @@ As of this session, `isAdmin()` has write access to all subcollections (assessme
    - Explorer History section at bottom showing past assessment scores
 
 3. **Lesson View**
-   - Two tutorials live: `what-is-html`, `hello-world-2`
+   - Three tutorials live: `what-is-html`, `hello-world-2`, `retro-game`
    - Two tutorials pending (greyed out): `deploy-github`, `opencode-setup`
-   - Each lesson has: YouTube embed, slides PDF download, quick start guide, transcript
+   - Each lesson has: YouTube embed, slides PDF download, quick start, detailed guide, troubleshooting (most), transcript
+   - Retro Game YouTube ID: `QeEE1cOq5Sw` (unlisted, fiveinnolabs account)
 
 4. **Admin Panel** (`#/admin`)
    - Shows all registered users with email, signup date, enrollment status
@@ -145,8 +146,9 @@ public_assessments/{auto-id}
 | `firestore.rules` | Firestore security rules |
 | `firebase.json` | Firebase hosting config (headers, caching, COOP) |
 | `docs/HANDOFF.md` | This file |
-| `tutorials/hello-world/` | First tutorial assets |
-| `tutorials/hello-world-2/` | Second tutorial assets |
+| `tutorials/hello-world/` | First tutorial assets (mp4, pdf, pptx) |
+| `tutorials/hello-world-2/` | Second tutorial assets (mp4, pdf, pptx) |
+| `tutorials/retro-game/` | Third tutorial assets (mp4, pdf, pptx) |
 
 ---
 
@@ -160,6 +162,29 @@ public_assessments/{auto-id}
 
 ---
 
+## Tutorial Pipeline
+
+A standardised skill exists for adding new tutorials: `aibadge-tutorial` (in `~/.claude/skills/aibadge-tutorial/SKILL.md`).
+
+**Full e2e pipeline:** User provides video file, then:
+1. Copy video to `tutorials/{id}/{id}.mp4`
+2. Convert pptx to PDF via PowerPoint AppleScript
+3. Upload video to YouTube (unlisted) via `~/.youtube-upload-credentials/upload_youtube.py`
+4. Extract transcript from video via faster-whisper (not fabricated)
+5. Add entry to `_lmsTutorials` array (active tutorials before pending ones)
+6. Create lesson HTML template with 4 sections: Quick Start, Detailed Guide, Troubleshooting, Transcript
+
+**YouTube IDs:**
+| Tutorial | YouTube ID |
+|----------|-----------|
+| Hello World | `IUHs60kWwdE` |
+| Hello World 2 | `69KTw0ViJYY` |
+| Retro Game | `QeEE1cOq5Sw` |
+
+**Upload credentials:** `~/.youtube-upload-credentials/` (fiveinnolabs@gmail.com OAuth, cached token).
+
+---
+
 ## TODO / Open Items
 
 1. **JS cache-busting**: Add version query params to script tags or reduce `max-age` on `assets/js/**`
@@ -167,3 +192,4 @@ public_assessments/{auto-id}
 3. **Admin toggle verification**: Confirm enrollment toggle works end-to-end
 4. **Pending tutorials**: "Deploy to GitHub" and "OpenCode Setup" need content
 5. **Google email warning**: Addressed in API key restrictions above; not a security emergency
+6. **Dark mode card styling**: Cards updated to `rgba(30,30,50,0.85)` for better opacity; monitor if it looks right across different screens
