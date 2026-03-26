@@ -3862,7 +3862,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           console.warn('Profile load timeout/error, using fallback:', e.message);
         }
         if (!profile) {
-          // New user only: set email and createdAt. NEVER overwrite enrolled.
+          // Brand new user: set email and createdAt. NEVER overwrite enrolled.
           var isAdmin = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email);
           var newData = { email: user.email, createdAt: new Date().toISOString() };
           if (isAdmin) newData.enrolled = true;
@@ -3872,9 +3872,13 @@ document.querySelectorAll('#navLinks a').forEach(a => {
               new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
             ]);
           } catch(e) { console.warn('Profile create timeout:', e.message); }
-          // Try reading one more time (might have been a transient failure)
           try { profile = await getUserProfile(user.uid); } catch(e) {}
           if (!profile) profile = { email: user.email, enrolled: isAdmin };
+        }
+        // Ensure profile always has email (fixes sparse docs from Google sign-in UID mismatch)
+        if (profile && !profile.email) {
+          profile.email = user.email;
+          try { await updateUserProfile(user.uid, { email: user.email }); } catch(e) {}
         }
         console.log('[AUTH] Profile loaded:', JSON.stringify(profile));
         auth.setProfile(profile || {});
@@ -3893,13 +3897,21 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     return {
       history: [],
       loading: true,
+      _lastUid: null,
       init() {
         var self = this;
-        var checkUser = setInterval(function() {
+        // Poll for user and reload if user changes (sign-out/sign-in cycle)
+        setInterval(function() {
           var user = Alpine.store('auth').user;
-          if (user) { clearInterval(checkUser); self.loadHistory(user.uid); }
-        }, 200);
-        setTimeout(function() { clearInterval(checkUser); self.loading = false; }, 5000);
+          var uid = user ? user.uid : null;
+          if (uid && uid !== self._lastUid) {
+            self._lastUid = uid;
+            self.loadHistory(uid);
+          } else if (!uid) {
+            self._lastUid = null;
+            self.history = [];
+          }
+        }, 300);
       },
       async loadHistory(uid) {
         this.loading = true;
