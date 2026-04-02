@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Guide | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cg-lesson::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .cg-topbar {
+    position: sticky; top: 0; z-index: 100;
+    height: 56px;
+    background: rgba(0, 0, 54, 0.95);
+    border-bottom: 1px solid rgba(0, 102, 255, 0.2);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.5rem;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar a:hover { color: #fff; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-topbar .cg-breadcrumb { font-size: 0.85rem; color: var(--cg-text-tertiary); display: flex; align-items: center; gap: 0.5rem; }
+  .cg-topbar .cg-breadcrumb span { color: var(--cg-text-muted); }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-video-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); color: var(--cg-text-muted); font-size: 1.1rem; flex-direction: column; gap: 0.5rem; }
+  .cg-video-placeholder svg { opacity: 0.4; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.1) 20%, rgba(0, 212, 255, 0.2) 50%, rgba(0, 212, 255, 0.1) 80%, transparent 100%); }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session-header:hover .cg-session-toggle { color: var(--cg-cyan); }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; color: var(--cg-cyan); }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 1.25rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; backdrop-filter: blur(20px); }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; transition: all 0.2s ease; }
+  .cg-step-card:hover { border-color: var(--cg-cyan); background: rgba(0, 102, 255, 0.1); transform: translateY(-2px); }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-kbd-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .cg-kbd-table th, .cg-kbd-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--cg-border); color: var(--cg-text-secondary); }
+  .cg-kbd-table th { background: rgba(0, 102, 255, 0.15); font-weight: 600; color: var(--cg-cyan); }
+  .cg-session-content kbd { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.2rem 0.5rem; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: #fff; }
+  .cg-filename-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .cg-filename-box { padding: 1rem; border-radius: 0.5rem; text-align: center; }
+  .cg-filename-box.wrong { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
+  .cg-filename-box.right { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); }
+  .cg-filename-box h5 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .cg-filename-box.wrong h5 { color: var(--cg-error); }
+  .cg-filename-box.right h5 { color: var(--cg-success); }
+  .cg-filename-box code { display: block; margin: 0.25rem 0; }
+  .cg-complete-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; max-width: 300px; margin: 2rem auto 0; padding: 14px 24px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 12px; font: 600 17px/1.3 'IBM Plex Sans', -apple-system, sans-serif; color: #fff; cursor: pointer; box-shadow: 0 4px 20px rgba(0, 102, 255, 0.4); transition: all 0.2s; }
+  .cg-complete-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 102, 255, 0.5); }
+  .cg-complete-btn svg { width: 20px; height: 20px; }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; }
+  .cg-theme-toggle .cg-moon { display: block; }
+  /* ===== LIGHT MODE ===== */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; --cg-card-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15); background: #f8f9fa; }
+  .cg-lesson.light-mode::after { opacity: 0; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1); }
+  .cg-lesson.light-mode .cg-topbar a { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-topbar a:hover { color: #174ea6; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle { border-color: #dadce0; color: #5f6368; }
+  .cg-lesson.light-mode .cg-theme-toggle:hover { background: #f1f3f4; border-color: #1a73e8; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-course-header .cg-meta svg { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-video-placeholder { background: #e8eaed; color: #5f6368; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-header::before { display: none; }
+  .cg-lesson.light-mode .cg-session.open .cg-session-header { border-radius: 12px 12px 0 0; }
+  .cg-lesson.light-mode .cg-session-header:hover { border-color: #1a73e8; background: #fff; transform: translateY(-2px); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 12px 12px; }
+  .cg-lesson.light-mode .cg-session-content h3 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content strong { color: var(--cg-text-primary); font-weight: 600; }
+  .cg-lesson.light-mode .cg-session-content kbd { background: #f1f3f4; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-code-footer { background: #f1f3f4; }
+  .cg-lesson.light-mode .cg-copy-btn:hover { background: rgba(26, 115, 232, 0.1); color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; border-color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.info h4 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; border-color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-callout.success h4 { color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; border-color: #f9ab00; }
+  .cg-lesson.light-mode .cg-callout.warning h4 { color: #f9ab00; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; border-color: #d93025; }
+  .cg-lesson.light-mode .cg-callout.error h4 { color: #d93025; }
+  .cg-lesson.light-mode .cg-step-card { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-step-card:hover { border-color: #1a73e8; background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-step-num { background: #1a73e8; color: #fff; }
+  .cg-lesson.light-mode .cg-concept-card { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-concept-card h4 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-kbd-table th { background: #f1f3f4; color: #202124; }
+  .cg-lesson.light-mode .cg-filename-box.wrong { background: #fce8e6; border-color: #d93025; }
+  .cg-lesson.light-mode .cg-filename-box.wrong h5 { color: #d93025; }
+  .cg-lesson.light-mode .cg-filename-box.right { background: #e6f4ea; border-color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-filename-box.right h5 { color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-complete-btn { background: #1a73e8; box-shadow: 0 4px 20px rgba(26, 115, 232, 0.3); }
+  .cg-lesson.light-mode .cg-complete-btn:hover { box-shadow: 0 8px 30px rgba(26, 115, 232, 0.4); }
+  .cg-lesson.light-mode .cg-footer { background: #fff; border-top: 1px solid #dadce0; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-filename-compare { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>GitHub Guide</h1>
+      <p class="cg-subtitle">Put Your First Website Online (For Free!)</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>11-Minute Tutorial</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/5Z5TzFY29cA" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="GitHub.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: Deploy to GitHub</h2>
+          <span class="cg-session-meta">4 steps to put your website online</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> First: Create a GitHub Account</h4>
+          <p style="margin-bottom: 0;">Don't have an account yet? Go to <a href="https://github.com" target="_blank">github.com</a> and click <strong>Sign up</strong>. Use Google sign-in to keep it simple. See the section below for full instructions.</p>
+        </div>
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card">
+            <div class="cg-step-num">1</div>
+            <h5>Organise Your Files</h5>
+            <p>Put your HTML file inside a folder and rename it to <code>index.html</code></p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">2</div>
+            <h5>Create a Repository</h5>
+            <p>Go to <a href="https://github.com/new" target="_blank">github.com/new</a>, name it to match your folder</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">3</div>
+            <h5>Upload Your Code</h5>
+            <p>In the <strong style="color:var(--cg-electric);">blue box</strong>, click <strong>"creating a new file"</strong>, name it <code>index.html</code>, paste your code</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">4</div>
+            <h5>Enable GitHub Pages</h5>
+            <p>Settings &rarr; Pages &rarr; Branch: <code>main</code> &rarr; Save. Wait 90 seconds, refresh.</p>
+          </div>
+        </div>
+
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Why index.html?</h4>
+          <p style="margin-bottom: 0;">If your file is named <code>index.html</code>, your URL stays clean: <code>username.github.io/myproject/</code>. Any other filename (e.g. <code>retrogame.html</code>) requires the full path: <code>username.github.io/myproject/retrogame.html</code>.</p>
+        </div>
+
+        <h3>Understand the Difference</h3>
+        <div class="cg-step-grid">
+          <div class="cg-concept-card">
+            <h4>GitHub Page (Your Website)</h4>
+            <p style="font-size: 0.9rem;"><code>https://username.github.io/myproject/</code></p>
+            <p style="font-size: 0.85rem; margin-bottom: 0;">This is your <strong>live website</strong> that anyone can visit. Share this link!</p>
+          </div>
+          <div class="cg-concept-card">
+            <h4>GitHub Repository (Your Code)</h4>
+            <p style="font-size: 0.9rem;"><code>https://github.com/username/myproject</code></p>
+            <p style="font-size: 0.85rem; margin-bottom: 0;">This is where your <strong>code lives</strong>, like a folder for your project.</p>
+          </div>
+        </div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Success!</h4>
+          <p>Your website is live on the internet! Anyone with the link can see it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE ACCOUNT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Don't Have an Account? Create One First</h2>
+          <span class="cg-session-meta">Sign up for free in 2 minutes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Sign Up for GitHub</h3>
+        <ol>
+          <li>Go to <a href="https://github.com" target="_blank">github.com</a></li>
+          <li>Click the <strong>"Sign up"</strong> button (top right)</li>
+          <li>Enter your email address</li>
+          <li>Create a password</li>
+          <li>Choose a username</li>
+        </ol>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Choosing a Username</h4>
+          <p>Your username becomes part of your website URL (<code>username.github.io</code>), so choose wisely!</p>
+          <ul style="margin: 0.5rem 0 0 1rem; font-size: 0.9rem;">
+            <li><strong>Good:</strong> <code>johndoe</code>, <code>jane-smith</code>, <code>jsmith2026</code></li>
+            <li><strong>Avoid:</strong> <code>xXx_gamer_xXx</code>, <code>temp123456</code></li>
+          </ul>
+        </div>
+
+        <ol start="6">
+          <li>Complete the verification puzzle (proves you're human)</li>
+          <li>Check your email and click the verification link</li>
+          <li>Answer the personalisation questions (or skip them)</li>
+          <li>Select the <strong>Free</strong> plan</li>
+        </ol>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Account Created!</h4>
+          <p>You now have a GitHub account. Go back to the Quick Start guide above!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Complete walkthrough matching the video</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Part 1: Organise Your Local Files</h3>
+        <p>Before uploading to GitHub, organise the files from your previous tutorials. Instead of loose <code>.html</code> files, put each project inside its own folder and rename the file to <code>index.html</code>.</p>
+        <h4>How to Organise</h4>
+        <ol>
+          <li>Open your <strong>AI Projects</strong> folder (the one from earlier tutorials)</li>
+          <li>Create a new folder for each project (e.g. <code>retro-game-gemini</code>)</li>
+          <li>Drag the corresponding <code>.html</code> file into the folder</li>
+          <li><strong>Rename the file to <code>index.html</code></strong></li>
+        </ol>
+        <p>Here's what your AI Projects folder should look like after organising:</p>
+        <div class="cg-code-block">
+          <pre>ai-projects/
+  helloworld/
+    index.html
+  retro-game-claude/
+    index.html
+  retro-game-gemini/
+    index.html
+  space-invaders-gemini/
+    index.html</pre>
+        </div>
+        <p>Each project gets its own folder, and every file is renamed to <code>index.html</code>. Each of these folders can become its own GitHub repository and live website.</p>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Why Rename to index.html?</h4>
+          <p>Naming your file <code>index.html</code> means your URL stays clean. Instead of <code>username.github.io/project/retrogame.html</code>, you get <code>username.github.io/project/</code>. This is a web convention: browsers automatically look for <code>index.html</code> in any folder.</p>
+        </div>
+
+        <h3>Part 2: Create the Repository on GitHub</h3>
+        <h4>Step 1: Go to github.com/new</h4>
+        <p>This takes you straight to the "Create a new repository" page. Name your repository to match your local folder name (e.g. <code>retro-game-gemini</code>). Leave everything else as default (Public is fine). Click <strong>Create repository</strong>.</p>
+        <img src="img/github-step1a.png" alt="Create new repository form" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <img src="img/github-step1b.png" alt="Create repository button" style="display:block;max-width:200px;margin:1rem 0;border-radius:8px;">
+
+        <h4>Step 2: Create the file in the blue box</h4>
+        <p>After creating the repository, you'll see a page with a <strong style="color:var(--cg-electric);">blue "Quick setup" box</strong> at the top. This is the key area:</p>
+        <img src="img/github-step2a.png" alt="Quick setup box with creating a new file link" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Look for the Link Inside the Blue Box</h4>
+          <p style="margin-bottom: 0;">Below the "Quick setup" heading, look for: <em>"Get started by <strong>creating a new file</strong> or uploading an existing file."</em> Click the <strong>"creating a new file"</strong> link. This is easy to miss!</p>
+        </div>
+
+        <h4>Step 3: Paste your code</h4>
+        <ol>
+          <li>In the filename field at the top, type <code>index.html</code></li>
+          <li>Open your local <code>index.html</code> in Sublime Text (right-click &rarr; Open with Sublime Text)</li>
+          <li><strong>Copy</strong> the code (<kbd>Cmd</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd>). Make sure to <strong>copy, not cut</strong>, so you keep the local copy.</li>
+          <li><strong>Paste</strong> into the GitHub editor (<kbd>Cmd</kbd>+<kbd>V</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd>)</li>
+        </ol>
+        <img src="img/github-step2b.png" alt="GitHub editor with index.html code" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+
+        <h4>Step 4: Commit changes</h4>
+        <ol>
+          <li>Click the green <strong>Commit changes...</strong> button</li>
+          <li>Copilot may suggest a commit message automatically. Otherwise, type <code>initial commit</code></li>
+          <li>Leave the extended description blank</li>
+          <li>Click <strong>Commit changes</strong> again to confirm</li>
+        </ol>
+        <img src="img/github-step2c.png" alt="Commit changes dialog" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <p>Your code now lives on the cloud in your GitHub repository.</p>
+
+        <h3>Part 3: Enable GitHub Pages</h3>
+        <h4>Step 1: Open Settings</h4>
+        <p>From your repository page, click the <strong>Settings</strong> tab at the top.</p>
+        <h4>Step 2: Navigate to Pages</h4>
+        <p>In the left-hand sidebar, scroll down and click <strong>Pages</strong>.</p>
+        <img src="img/github-step3a.png" alt="Settings sidebar with Pages option" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <h4>Step 3: Set the branch</h4>
+        <ol>
+          <li>Under <strong>Branch</strong>, click the dropdown that says <code>None</code></li>
+          <li>Select <code>main</code></li>
+          <li>Click <strong>Save</strong></li>
+        </ol>
+        <img src="img/github-step3b.png" alt="GitHub Pages settings with branch dropdown" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <p>Wait about 60 to 90 seconds, then refresh the page. Your live URL will appear at the top.</p>
+
+        <h3>Part 4: Visit Your Live Site</h3>
+        <p>After refreshing, you'll see a banner with your live URL:</p>
+        <img src="img/github-step4a.png" alt="GitHub Pages showing site is live with Visit site button" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <p>Click <strong>Visit site</strong>. Your project is now live on the internet, playable and shareable with anyone!</p>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Well Done!</h4>
+          <p>You went from generating code in your LLM, to saving it locally, to deploying it on the internet. This workflow will become second nature. Repeat it for all your projects!</p>
+        </div>
+
+        <h3>Keyboard Shortcuts</h3>
+        <table class="cg-kbd-table">
+          <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Select All</td><td><kbd>Cmd</kbd> + <kbd>A</kbd></td><td><kbd>Ctrl</kbd> + <kbd>A</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common problems and solutions</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro Tip: Use AI for Help</h4>
+          <p style="margin-bottom: 0;">Stuck? Describe your problem to your LLM of choice (ChatGPT, Claude, Gemini). You can even share screenshots; AI can read images!</p>
+        </div>
+
+        <h3>Common Issues</h3>
+        <div class="cg-concept-card"><h4>"404 - Page Not Found"</h4>
+          <ul style="margin: 0.5rem 0 0 1rem; font-size: 0.9rem;">
+            <li>Wait about 60 to 90 seconds; GitHub Pages needs time to build your site</li>
+            <li>Make sure your file is named exactly <code>index.html</code> (not <code>Index.html</code> or <code>index.HTML</code>)</li>
+            <li>Check that GitHub Pages is enabled in Settings &rarr; Pages</li>
+            <li>Make sure the Branch is set to <code>main</code> (not "None")</li>
+          </ul>
+        </div>
+        <div class="cg-concept-card"><h4>"I can't find the 'creating a new file' link"</h4><p style="font-size: 0.9rem;">Look inside the <strong>blue "Quick setup" box</strong> that appears after creating an empty repository. The link is below the heading text. If your repository already has files, click the <strong>Add file</strong> button instead, then select <strong>Create new file</strong>.</p></div>
+        <div class="cg-concept-card"><h4>"I can't find the Settings or Pages option"</h4><p style="font-size: 0.9rem;">Make sure you're on your repository page (not your profile page). The URL should look like: <code>github.com/username/myproject</code></p></div>
+        <div class="cg-concept-card"><h4>"My changes aren't showing up"</h4>
+          <ul style="margin: 0.5rem 0 0 1rem; font-size: 0.9rem;">
+            <li>Wait about 60 to 90 seconds after committing</li>
+            <li>Hard refresh your browser: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (Windows)</li>
+            <li>Try opening in an incognito/private window</li>
+          </ul>
+        </div>
+        <div class="cg-concept-card"><h4>"The page shows raw code instead of my website"</h4><p style="font-size: 0.9rem;">You're looking at the GitHub repository view, not the GitHub Pages view. Your live site is at <code>username.github.io/project/</code>, not <code>github.com/username/project</code>.</p></div>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <p>Hello, you're very welcome back to the AI Badge. Great to have you and well done on completing the previous tutorial.</p>
+
+        <h3>Introduction</h3>
+        <p>So today we're looking at GitHub: how to showcase your work. You've been coding, creating your first few pages, perhaps more. Now you want to share those as live links that anyone can access publicly.</p>
+
+        <h3>Getting Started</h3>
+        <p>Once you create your GitHub account (fairly straightforward at <a href="https://github.com" target="_blank">github.com</a>), I recommend you use something like Google sign-in just to make it very simple, no need to remember an email or password, up to you. Once you do that, we're going to start with the very first step.</p>
+        <p>Remember, you already have the code from previous tutorials, so we're going to use that as the first example here.</p>
+
+        <h3>Organising Your Files</h3>
+        <p>Previously, I had asked you to save files directly in your AI Projects folder. You can see the various files created: Hello World, retro games, et cetera. What we're going to do now is see that it's way more useful to have folders instead of files.</p>
+        <p>So we right-click and create a new folder, for example <code>retro-game-gemini</code>. We drag the file into that folder, and here's the crucial thing: <strong>rename the file to <code>index.html</code></strong>. This is going to be very important, you'll see why in a moment.</p>
+        <p>I recommend you do the same for your other projects: put them in folders and rename each file to <code>index.html</code>.</p>
+
+        <h3>Creating the Repository</h3>
+        <p>Now we have our <code>index.html</code> ready. We want to open it with Sublime Text (right-click and open with Sublime Text) and there is the code. That's all we need for now.</p>
+        <p>So in <a href="https://github.com/new" target="_blank">github.com/new</a>, we go straight to the page to create a repository. A repository is basically a folder on GitHub where your code will live. What I recommend is match the repository name to the folder name we just created, so <code>retro-game-gemini</code>. Leave everything else blank, make it public, and click <strong>Create repository</strong>.</p>
+
+        <h3>Uploading Your Code</h3>
+        <p>Now we have our repository. The next step is to go into the blue box area. We see here "Quick setup, if you've done this kind of thing before." We want to click <strong>"creating a new file"</strong> in that area.</p>
+        <p>Once we have that, all we need to do is copy the code from Sublime Text. Make sure you only <strong>copy</strong> (not cut), so you keep the local version. Paste it in the GitHub editor. Name the file <code>index.html</code>, which is what we had in our local folder, the exact same code.</p>
+        <p>Then click <strong>Commit changes</strong>. Copilot may think of a commit message automatically, which is just notes to specify what you're saving. You can also type <code>initial commit</code> manually. Leave the extended description blank, click <strong>Commit changes</strong> again.</p>
+
+        <h3>Enabling GitHub Pages</h3>
+        <p>Now the code that we had locally, only on our computer, lives on the cloud in your GitHub account under that specific repository. Click into the file and you can see the code right there.</p>
+        <p>Next, click <strong>Settings</strong>, then <strong>Pages</strong> in the sidebar. Under Branch, select <code>main</code> instead of "None", and click <strong>Save</strong>. That's all you're doing.</p>
+
+        <h3>The Important Distinction</h3>
+        <p>Here's what happens. What you had before, the link to that index file on GitHub, was the raw code. It's not human readable for most people, not the published page. If you recall, your retro game that you created previously, you could right-click and open it in Chrome to see it locally. But that only lives on your computer; it's not on the cloud.</p>
+        <p>GitHub Pages makes this code available as your own website link.</p>
+
+        <h3>Viewing Your Live Site</h3>
+        <p>We waited about 60 to 90 seconds. If you refresh the Pages settings, you should see the live link. Your site is live at your own URL: <code>username.github.io/retro-game-gemini/</code>.</p>
+        <p>If we click on that link, we now have a link that we can share with anyone in the world. And the game works, it's playable!</p>
+
+        <h3>Why index.html Matters</h3>
+        <p>Notice: the URL has nothing after the folder name. If you click on <code>index.html</code> at the end, it still works, it's the same. However, the convention is that if you name your HTML file <code>index.html</code>, you don't need to spell it out in the URL. It works without the longer filename. You can verify this in an incognito window; anyone can access it.</p>
+
+        <h3>Wrapping Up</h3>
+        <p>This pretty much concludes our tutorial. You can visit your site, follow the steps here, and check the troubleshooting guide as usual.</p>
+        <p>Now you can share anything you want. As long as you have it in HTML format, save it to a folder, make sure inside that folder is an <code>index.html</code>, and follow the steps. Practice it a few times just to make sure you're confident how it works. Well done, thanks very much, and I'll see you in the next tutorial.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+var t=localStorage.getItem('lesson-theme');if(t==='light')document.querySelector('.cg-lesson').classList.add('light-mode');
+</script>
+</body>
+</html>

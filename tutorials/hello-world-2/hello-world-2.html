@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World 2 | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cg-lesson::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .cg-topbar {
+    position: sticky; top: 0; z-index: 100;
+    height: 56px;
+    background: rgba(0, 0, 54, 0.95);
+    border-bottom: 1px solid rgba(0, 102, 255, 0.2);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.5rem;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar a:hover { color: #fff; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-topbar .cg-breadcrumb { font-size: 0.85rem; color: var(--cg-text-tertiary); display: flex; align-items: center; gap: 0.5rem; }
+  .cg-topbar .cg-breadcrumb span { color: var(--cg-text-muted); }
+  .cg-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+  .cg-course-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--cg-border);
+    text-align: center;
+  }
+  .cg-course-header h1 {
+    font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta {
+    display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem;
+    color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center;
+  }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper {
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--cg-border);
+    box-shadow: var(--cg-card-shadow);
+  }
+  .cg-video-wrapper iframe {
+    width: 100%; aspect-ratio: 16/9; display: block; border: none;
+  }
+  .cg-video-placeholder {
+    width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.4); color: var(--cg-text-muted); font-size: 1.1rem;
+    flex-direction: column; gap: 0.5rem;
+  }
+  .cg-video-placeholder svg { opacity: 0.4; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: #0a0a2e;
+    border: 1px solid var(--cg-border);
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--cg-card-shadow);
+    position: relative; overflow: hidden;
+  }
+  .cg-session-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.1) 20%, rgba(0, 212, 255, 0.2) 50%, rgba(0, 212, 255, 0.1) 80%, transparent 100%);
+  }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number {
+    width: 48px; height: 48px; min-width: 48px;
+    background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan));
+    border-radius: 0.75rem;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+  }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session-header:hover .cg-session-toggle { color: var(--cg-cyan); }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content {
+    display: none;
+    padding: 1.5rem;
+    background: #0a0a2e;
+    border: 1px solid var(--cg-border);
+    border-top: none;
+    border-radius: 0 0 1rem 1rem;
+    position: relative;
+  }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; color: var(--cg-cyan); }
+  .cg-session-content code {
+    background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px;
+    font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace;
+  }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block {
+    margin: 1rem 0;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--cg-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  .cg-code-block pre {
+    margin: 0; background: none; border: none;
+    white-space: pre-wrap; word-wrap: break-word;
+    font-size: 1.25rem; line-height: 1.5; padding: 1rem;
+    color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace;
+  }
+  .cg-code-footer {
+    display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem;
+    background: rgba(0, 0, 0, 0.15);
+  }
+  .cg-copy-btn {
+    background: transparent; border: none; border-radius: 4px;
+    padding: 0.35rem 0.6rem; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s;
+  }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-callout {
+    padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;
+    border-left: 4px solid; backdrop-filter: blur(20px);
+  }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cg-border);
+    border-radius: 0.75rem; padding: 1.25rem;
+    transition: all 0.2s ease;
+  }
+  .cg-step-card:hover { border-color: var(--cg-cyan); background: rgba(0, 102, 255, 0.1); transform: translateY(-2px); }
+  .cg-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice));
+    border-radius: 50%; font-weight: 700; font-size: 0.9rem;
+    margin-bottom: 0.75rem; color: #000;
+  }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card {
+    background: rgba(0, 102, 255, 0.1);
+    border: 1px solid rgba(0, 180, 255, 0.2);
+    border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0;
+  }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-kbd-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .cg-kbd-table th, .cg-kbd-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--cg-border); color: var(--cg-text-secondary); }
+  .cg-kbd-table th { background: rgba(0, 102, 255, 0.15); font-weight: 600; color: var(--cg-cyan); }
+  .cg-session-content kbd {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 0.2rem 0.5rem; border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: #fff;
+  }
+  .cg-filename-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .cg-filename-box { padding: 1rem; border-radius: 0.5rem; text-align: center; }
+  .cg-filename-box.wrong { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
+  .cg-filename-box.right { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); }
+  .cg-filename-box h5 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .cg-filename-box.wrong h5 { color: var(--cg-error); }
+  .cg-filename-box.right h5 { color: var(--cg-success); }
+  .cg-filename-box code { display: block; margin: 0.25rem 0; }
+  .cg-complete-btn {
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    width: 100%; max-width: 300px; margin: 2rem auto 0;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan));
+    border: none; border-radius: 12px;
+    font: 600 17px/1.3 'IBM Plex Sans', -apple-system, sans-serif;
+    color: #fff; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 102, 255, 0.4);
+    transition: all 0.2s;
+  }
+  .cg-complete-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 102, 255, 0.5); }
+  .cg-complete-btn svg { width: 20px; height: 20px; }
+  .cg-footer {
+    text-align: center; padding: 1.5rem; color: var(--cg-text-muted);
+    font-size: 0.85rem; position: relative; z-index: 2;
+    border-top: 1px solid var(--cg-border);
+    display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+  }
+  .cg-theme-toggle {
+    background: transparent; border: 1px solid var(--cg-border); border-radius: 8px;
+    padding: 0; cursor: pointer; color: var(--cg-text-secondary);
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+    height: 36px; width: 36px;
+  }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; }
+  .cg-theme-toggle .cg-moon { display: block; }
+  /* ===== LIGHT MODE ===== */
+  .cg-lesson.light-mode {
+    --cg-text-primary: #202124;
+    --cg-text-secondary: #5f6368;
+    --cg-text-tertiary: #80868b;
+    --cg-text-muted: #9aa0a6;
+    --cg-bg-dark: #ffffff;
+    --cg-border: #dadce0;
+    --cg-cyan: #1a73e8;
+    --cg-electric: #1a73e8;
+    --cg-ice: #1a73e8;
+    --cg-success: #1e8e3e;
+    --cg-warning: #f9ab00;
+    --cg-error: #d93025;
+    --cg-card-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    background: #f8f9fa;
+  }
+  .cg-lesson.light-mode::after { opacity: 0; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1); }
+  .cg-lesson.light-mode .cg-topbar a { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-topbar a:hover { color: #174ea6; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-logo .logo-ai { color: #000036; }
+  .cg-lesson.light-mode .cg-logo .logo-badge { color: #000036; }
+  .cg-lesson.light-mode .cg-breadcrumb span { color: #80868b; }
+  .cg-lesson.light-mode .cg-theme-toggle { border-color: #dadce0; color: #5f6368; }
+  .cg-lesson.light-mode .cg-theme-toggle:hover { background: #f1f3f4; border-color: #1a73e8; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-course-header .cg-meta svg { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-video-placeholder { background: #e8eaed; color: #5f6368; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-header::before { display: none; }
+  .cg-lesson.light-mode .cg-session.open .cg-session-header { border-radius: 12px 12px 0 0; }
+  .cg-lesson.light-mode .cg-session-header:hover { border-color: #1a73e8; background: #fff; transform: translateY(-2px); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 12px 12px; }
+  .cg-lesson.light-mode .cg-session-content h3 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content strong { color: var(--cg-text-primary); font-weight: 600; }
+  .cg-lesson.light-mode .cg-session-content kbd { background: #f1f3f4; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-code-footer { background: #f1f3f4; }
+  .cg-lesson.light-mode .cg-copy-btn:hover { background: rgba(26, 115, 232, 0.1); color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; border-color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.info h4 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; border-color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-callout.success h4 { color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; border-color: #f9ab00; }
+  .cg-lesson.light-mode .cg-callout.warning h4 { color: #f9ab00; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; border-color: #d93025; }
+  .cg-lesson.light-mode .cg-callout.error h4 { color: #d93025; }
+  .cg-lesson.light-mode .cg-step-card { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-step-card:hover { border-color: #1a73e8; background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-step-num { background: #1a73e8; color: #fff; }
+  .cg-lesson.light-mode .cg-concept-card { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-concept-card h4 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-kbd-table th { background: #f1f3f4; color: #202124; }
+  .cg-lesson.light-mode .cg-filename-box.wrong { background: #fce8e6; border-color: #d93025; }
+  .cg-lesson.light-mode .cg-filename-box.wrong h5 { color: #d93025; }
+  .cg-lesson.light-mode .cg-filename-box.right { background: #e6f4ea; border-color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-filename-box.right h5 { color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-complete-btn { background: #1a73e8; box-shadow: 0 4px 20px rgba(26, 115, 232, 0.3); }
+  .cg-lesson.light-mode .cg-complete-btn:hover { box-shadow: 0 8px 30px rgba(26, 115, 232, 0.4); }
+  .cg-lesson.light-mode .cg-footer { background: #fff; border-top: 1px solid #dadce0; }
+  @media (max-width: 768px) {
+    .cg-step-grid { grid-template-columns: 1fr; }
+    .cg-filename-compare { grid-template-columns: 1fr; }
+    .cg-course-header h1 { font-size: 1.75rem; }
+  }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>Hello World 2</h1>
+      <p class="cg-subtitle">Modifying and Experimenting with Your Code</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>10-Minute Tutorial</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/69KTw0ViJYY" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="hello-world-2.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start</h2>
+          <span class="cg-session-meta">Modify your Hello World page</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Prerequisites</h3>
+        <p>Make sure you have completed <strong>Hello World 1</strong> and have your <code>helloworld.html</code> file in your AI Projects folder, Sublime Text installed, and ChatGPT open.</p>
+
+        <h3>The Prompt to Use</h3>
+        <div class="cg-code-block">
+          <pre>Make changes to the page. Add a button that will change background color and make the hello world text bounce around the page. Keep it as a single-file HTML, JavaScript, CSS.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+        <p><strong>Important:</strong> Paste this in the <em>same ChatGPT conversation</em> as your first Hello World, not a new one.</p>
+
+        <h3>Steps</h3>
+        <div class="cg-step-grid">
+          <div class="cg-step-card">
+            <div class="cg-step-num">1</div>
+            <h5>Paste Prompt in Same Chat</h5>
+            <p>Continue the conversation where you generated your first Hello World</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">2</div>
+            <h5>Copy the New Code</h5>
+            <p>Click the copy button on the generated code block</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">3</div>
+            <h5>Replace in Sublime Text</h5>
+            <p>Select All (<kbd>Cmd</kbd>+<kbd>A</kbd>), delete, paste new code, save</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">4</div>
+            <h5>Refresh Browser</h5>
+            <p>Refresh the page to see your changes</p>
+          </div>
+        </div>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Keep Going!</h4>
+          <p>After completing this tutorial, keep making changes: try increasing font size, adding shapes, changing colours, or even asking ChatGPT to "surprise me" with any change it likes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Complete instructions for modifying your code</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Part 1: Requesting Changes to Existing Code</h3>
+        <p>The key concept here is that you can ask ChatGPT to <strong>modify code it already generated</strong>. You don't need to start from scratch.</p>
+        <p>Go back to the same ChatGPT conversation where you generated your Hello World page. Paste the prompt below the previous response:</p>
+        <div class="cg-code-block">
+          <pre>Make changes to the page. Add a button that will change background color and make the hello world text bounce around the page. Keep it as a single-file HTML, JavaScript, CSS.</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+
+        <h3>Part 2: Replacing Your Code</h3>
+        <h4>Step 1: Copy the new code from ChatGPT</h4>
+        <p>Click the copy button or select all the generated code.</p>
+        <h4>Step 2: Open your file in Sublime Text</h4>
+        <p>If you closed Sublime Text, go to your AI Projects folder, right-click on <code>helloworld.html</code>, and choose <strong>Open With > Sublime Text</strong> (not Chrome).</p>
+        <h4>Step 3: Select All and Replace</h4>
+        <p>Press <kbd>Cmd</kbd>+<kbd>A</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>A</kbd> (Windows) to select everything, then delete it. Paste the new code.</p>
+        <p><strong>Important:</strong> Make sure there are no strange characters at the top of the code. The code should start with <code>&lt;!DOCTYPE html&gt;</code> or <code>&lt;html&gt;</code>.</p>
+        <h4>Step 4: Save</h4>
+        <p>Press <kbd>Cmd</kbd>+<kbd>S</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>S</kbd> (Windows).</p>
+        <h4>Step 5: Refresh Browser</h4>
+        <p>Go back to your browser tab and refresh. You should see the new features: a button to change background colour and bouncing text.</p>
+
+        <h3>Part 3: The "Surprise Me" Exercise</h3>
+        <p>Try typing this into the same ChatGPT conversation:</p>
+        <div class="cg-code-block">
+          <pre>Surprise me with any change you like</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy prompt',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+        <p>ChatGPT will come up with something unexpected (pulsing effects, new animations, different layouts). This proves that you don't have to tell it exactly what you want; it can generate creative variations on its own.</p>
+
+        <h3>Keyboard Shortcuts</h3>
+        <table class="cg-kbd-table">
+          <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Select All</td><td><kbd>Cmd</kbd> + <kbd>A</kbd></td><td><kbd>Ctrl</kbd> + <kbd>A</kbd></td></tr>
+            <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Save</td><td><kbd>Cmd</kbd> + <kbd>S</kbd></td><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td></tr>
+          </tbody>
+        </table>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Well Done!</h4>
+          <p>You've learned how to iterate on your code by asking the LLM for modifications. Keep practising: try changing fonts, adding geometric shapes, or requesting special effects.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <p>Welcome back to the Hello World 2 tutorial.</p>
+
+        <h3>Reviewing Hello World 1</h3>
+        <p>We're going to look at what we created in the first tutorial. The rendering of the page you got could be very different from mine. You might have a colourful page, a white background, so don't worry if it looks different. The underlying code that you generated will have HTML tags at the top and bottom.</p>
+
+        <h3>Modifying Existing Code</h3>
+        <p>The question is: can we request changes to existing code that ChatGPT or other LLMs generated? The answer is yes, most definitely. We're assuming you already have everything set up: Sublime Text, your AI Projects folder, and the file from the first tutorial.</p>
+        <p>The new prompt asks to add a button that will change the background colour and make the Hello World text bounce around the page, keeping it as a single-file HTML, JavaScript, CSS.</p>
+
+        <h3>Using the Same Conversation</h3>
+        <p>Go to ChatGPT and paste the request right under where the original conversation was. We're not creating a new conversation. Whatever code you have will now be taken into consideration to create the second version. You're making changes to whatever original code you had. Every person will have something unique; it might look similar but will definitely not be exactly the same.</p>
+
+        <h3>Replacing Your Code</h3>
+        <p>Copy the response from ChatGPT. This next step is very important. In Sublime Text, you need to select everything (use <kbd>Cmd</kbd>+<kbd>A</kbd> or <kbd>Ctrl</kbd>+<kbd>A</kbd>), delete it, and paste the new code.</p>
+        <p>Watch out for funny characters at the top of the code. Get rid of those. All you need is the starting tag and the finishing tag. Then save the file with File > Save.</p>
+
+        <h3>Viewing Your Changes</h3>
+        <p>Go to the browser where your <code>helloworld.html</code> is open and refresh the page. You should see a button to change the background colour. Click it and the colours toggle. Toggle the bounce and the text bounces around. You've added features to your page.</p>
+
+        <h3>Keep Experimenting</h3>
+        <p>Can you make more changes? That's what I want you to do. Once this tutorial is over, keep going and requesting as many changes as you like: increase the font size, add different colours, request geometric shapes, add special effects, or even ask "surprise me" and the LLM will come up with something completely unexpected.</p>
+
+        <h3>Opening Files with Sublime Text</h3>
+        <p>If you need to access your code again, go to your AI Projects folder in Finder, right-click on <code>helloworld.html</code>, and choose "Open with" Sublime Text (not Chrome). Chrome shows you the webpage, Sublime Text shows you the code.</p>
+
+        <h3>The "Surprise Me" Exercise</h3>
+        <p>As a final exercise, try typing "surprise me with any change you like." ChatGPT will code something you're not even requesting. It's a very versatile machine. It might add a pulsing or breathing effect, or something else entirely. You don't have to tell it exactly what you want; it can think for itself.</p>
+
+        <h3>What You Achieved</h3>
+        <p>This completes Hello World Part 2. You've learned how to iterate on existing code by making requests in the same conversation. Go ahead and continue practising for another five or ten minutes. Well done!</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+var t=localStorage.getItem('lesson-theme');if(t==='light')document.querySelector('.cg-lesson').classList.add('light-mode');
+</script>
+</body>
+</html>
