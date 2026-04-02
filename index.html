@@ -4539,13 +4539,31 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   window.lessonView = function() {
     return {
       isComplete: false,
+      lessonContent: '',
+      lessonLoading: false,
+      lessonError: false,
+      _lastLessonId: null,
 
       init() {
+        var self = this;
         var theme = localStorage.getItem('lesson-theme') || 'light';
         if (theme === 'light') {
           this.$el.classList.add('light-mode');
         } else {
           this.$el.classList.remove('light-mode');
+        }
+
+        this.$watch('$store.ui.activeLessonId', function(id) {
+          if (id && id !== self._lastLessonId) {
+            self._lastLessonId = id;
+            self.fetchLesson(id);
+          }
+        });
+
+        var initialId = Alpine.store('ui').activeLessonId;
+        if (initialId) {
+          this._lastLessonId = initialId;
+          this.fetchLesson(initialId);
         }
       },
 
@@ -4556,6 +4574,48 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           if (tutorials[i].id === ui.activeLessonId) return tutorials[i];
         }
         return null;
+      },
+
+      async fetchLesson(lessonId) {
+        var tutorials = window._lmsTutorials || [];
+        var tut = null;
+        for (var i = 0; i < tutorials.length; i++) {
+          if (tutorials[i].id === lessonId) { tut = tutorials[i]; break; }
+        }
+        if (!tut || !tut.lessonPath) {
+          this.lessonError = true;
+          this.lessonContent = '';
+          return;
+        }
+
+        this.lessonLoading = true;
+        this.lessonError = false;
+        this.lessonContent = '';
+
+        try {
+          var resp = await fetch(tut.lessonPath);
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          var html = await resp.text();
+
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(html, 'text/html');
+          var main = doc.querySelector('.cg-main');
+          if (!main) throw new Error('No .cg-main found in lesson file');
+
+          var basePath = tut.lessonPath.substring(0, tut.lessonPath.lastIndexOf('/') + 1);
+
+          var content = main.innerHTML;
+          content = content.replace(/\ssrc="(?!https?:\/\/|\/\/|data:)/g, ' src="' + basePath);
+          content = content.replace(/\shref="(?!https?:\/\/|\/\/|#|mailto:|javascript:)/g, ' href="' + basePath);
+
+          this.lessonContent = content;
+        } catch(e) {
+          console.error('Failed to load lesson:', e);
+          this.lessonError = true;
+          this.lessonContent = '';
+        }
+
+        this.lessonLoading = false;
       },
 
       markComplete() {
