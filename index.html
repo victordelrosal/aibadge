@@ -3101,6 +3101,334 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     </template>
     <!-- ===== END LESSON: retro-game ===== -->
 
+    <!-- ===== LESSON: deploy-github ===== -->
+    <template x-if="$store.ui.activeLessonId === 'deploy-github'">
+    <div>
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>GitHub Guide</h1>
+      <p class="cg-subtitle">Put Your First Website Online (For Free!)</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>11-Minute Tutorial</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/5Z5TzFY29cA" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides + Mark Complete row -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="tutorials/GitHub/GitHub.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: Deploy to GitHub</h2>
+          <span class="cg-session-meta">4 steps to put your website online</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> First: Create a GitHub Account</h4>
+          <p style="margin-bottom: 0;">Don't have an account yet? Go to <a href="https://github.com" target="_blank">github.com</a> and click <strong>Sign up</strong>. Use Google sign-in to keep it simple. See the section below for full instructions.</p>
+        </div>
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card">
+            <div class="cg-step-num">1</div>
+            <h5>Organise Your Files</h5>
+            <p>Put your HTML file inside a folder and rename it to <code>index.html</code></p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">2</div>
+            <h5>Create a Repository</h5>
+            <p>Go to <a href="https://github.com/new" target="_blank">github.com/new</a>, name it to match your folder</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">3</div>
+            <h5>Upload Your Code</h5>
+            <p>In the <strong style="color:var(--cg-electric);">blue box</strong>, click <strong>"creating a new file"</strong>, name it <code>index.html</code>, paste your code</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">4</div>
+            <h5>Enable GitHub Pages</h5>
+            <p>Settings &rarr; Pages &rarr; Branch: <code>main</code> &rarr; Save. Wait 90 seconds, refresh.</p>
+          </div>
+        </div>
+
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Why index.html?</h4>
+          <p style="margin-bottom: 0;">If your file is named <code>index.html</code>, your URL stays clean: <code>username.github.io/myproject/</code>. Any other filename (e.g. <code>retrogame.html</code>) requires the full path: <code>username.github.io/myproject/retrogame.html</code>.</p>
+        </div>
+
+        <h3>Understand the Difference</h3>
+        <div class="cg-step-grid">
+          <div class="cg-concept-card">
+            <h4>GitHub Page (Your Website)</h4>
+            <p style="font-size: 0.9rem;"><code>https://username.github.io/myproject/</code></p>
+            <p style="font-size: 0.85rem; margin-bottom: 0;">This is your <strong>live website</strong> that anyone can visit. Share this link!</p>
+          </div>
+          <div class="cg-concept-card">
+            <h4>GitHub Repository (Your Code)</h4>
+            <p style="font-size: 0.9rem;"><code>https://github.com/username/myproject</code></p>
+            <p style="font-size: 0.85rem; margin-bottom: 0;">This is where your <strong>code lives</strong>, like a folder for your project.</p>
+          </div>
+        </div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Success!</h4>
+          <p>Your website is live on the internet! Anyone with the link can see it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE ACCOUNT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Don't Have an Account? Create One First</h2>
+          <span class="cg-session-meta">Sign up for free in 2 minutes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Sign Up for GitHub</h3>
+        <ol>
+          <li>Go to <a href="https://github.com" target="_blank">github.com</a></li>
+          <li>Click the <strong>"Sign up"</strong> button (top right)</li>
+          <li>Enter your email address</li>
+          <li>Create a password</li>
+          <li>Choose a username</li>
+        </ol>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Choosing a Username</h4>
+          <p>Your username becomes part of your website URL (<code>username.github.io</code>), so choose wisely!</p>
+          <ul style="margin: 0.5rem 0 0 1rem; font-size: 0.9rem;">
+            <li><strong>Good:</strong> <code>johndoe</code>, <code>jane-smith</code>, <code>jsmith2026</code></li>
+            <li><strong>Avoid:</strong> <code>xXx_gamer_xXx</code>, <code>temp123456</code></li>
+          </ul>
+        </div>
+
+        <ol start="6">
+          <li>Complete the verification puzzle (proves you're human)</li>
+          <li>Check your email and click the verification link</li>
+          <li>Answer the personalisation questions (or skip them)</li>
+          <li>Select the <strong>Free</strong> plan</li>
+        </ol>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Account Created!</h4>
+          <p>You now have a GitHub account. Go back to the Quick Start guide above!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Complete walkthrough matching the video</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Part 1: Organise Your Local Files</h3>
+        <p>Before uploading to GitHub, organise the files from your previous tutorials. Instead of loose <code>.html</code> files, put each project inside its own folder and rename the file to <code>index.html</code>.</p>
+        <h4>How to Organise</h4>
+        <ol>
+          <li>Open your <strong>AI Projects</strong> folder (the one from earlier tutorials)</li>
+          <li>Create a new folder for each project (e.g. <code>retro-game-gemini</code>)</li>
+          <li>Drag the corresponding <code>.html</code> file into the folder</li>
+          <li><strong>Rename the file to <code>index.html</code></strong></li>
+        </ol>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Why Rename to index.html?</h4>
+          <p>Naming your file <code>index.html</code> means your URL stays clean. Instead of <code>username.github.io/project/retrogame.html</code>, you get <code>username.github.io/project/</code>. This is a web convention: browsers automatically look for <code>index.html</code> in any folder.</p>
+        </div>
+
+        <h3>Part 2: Create the Repository on GitHub</h3>
+        <h4>Step 1: Go to github.com/new</h4>
+        <p>This takes you straight to the "Create a new repository" page. Name your repository to match your local folder name (e.g. <code>retro-game-gemini</code>). Leave everything else as default (Public is fine). Click <strong>Create repository</strong>.</p>
+        <img src="tutorials/GitHub/img/github-step1a.png" alt="Create new repository form" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <img src="tutorials/GitHub/img/github-step1b.png" alt="Create repository button" style="display:block;max-width:200px;margin:1rem 0;border-radius:8px;">
+
+        <h4>Step 2: Create the file in the blue box</h4>
+        <p>After creating the repository, you'll see a page with a <strong style="color:var(--cg-electric);">blue "Quick setup" box</strong> at the top. This is the key area:</p>
+        <img src="tutorials/GitHub/img/github-step2a.png" alt="Quick setup box with creating a new file link" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Look for the Link Inside the Blue Box</h4>
+          <p style="margin-bottom: 0;">Below the "Quick setup" heading, look for: <em>"Get started by <strong>creating a new file</strong> or uploading an existing file."</em> Click the <strong>"creating a new file"</strong> link. This is easy to miss!</p>
+        </div>
+
+        <h4>Step 3: Paste your code</h4>
+        <ol>
+          <li>In the filename field at the top, type <code>index.html</code></li>
+          <li>Open your local <code>index.html</code> in Sublime Text (right-click &rarr; Open with Sublime Text)</li>
+          <li><strong>Copy</strong> the code (<kbd>Cmd</kbd>+<kbd>C</kbd> / <kbd>Ctrl</kbd>+<kbd>C</kbd>). Make sure to <strong>copy, not cut</strong>, so you keep the local copy.</li>
+          <li><strong>Paste</strong> into the GitHub editor (<kbd>Cmd</kbd>+<kbd>V</kbd> / <kbd>Ctrl</kbd>+<kbd>V</kbd>)</li>
+        </ol>
+        <img src="tutorials/GitHub/img/github-step2b.png" alt="GitHub editor with index.html code" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+
+        <h4>Step 4: Commit changes</h4>
+        <ol>
+          <li>Click the green <strong>Commit changes...</strong> button</li>
+          <li>Copilot may suggest a commit message automatically. Otherwise, type <code>initial commit</code></li>
+          <li>Leave the extended description blank</li>
+          <li>Click <strong>Commit changes</strong> again to confirm</li>
+        </ol>
+        <img src="tutorials/GitHub/img/github-step2c.png" alt="Commit changes dialog" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <p>Your code now lives on the cloud in your GitHub repository.</p>
+
+        <h3>Part 3: Enable GitHub Pages</h3>
+        <h4>Step 1: Open Settings</h4>
+        <p>From your repository page, click the <strong>Settings</strong> tab at the top.</p>
+        <h4>Step 2: Navigate to Pages</h4>
+        <p>In the left-hand sidebar, scroll down and click <strong>Pages</strong>.</p>
+        <img src="tutorials/GitHub/img/github-step3a.png" alt="Settings sidebar with Pages option" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <h4>Step 3: Set the branch</h4>
+        <ol>
+          <li>Under <strong>Branch</strong>, click the dropdown that says <code>None</code></li>
+          <li>Select <code>main</code></li>
+          <li>Click <strong>Save</strong></li>
+        </ol>
+        <img src="tutorials/GitHub/img/github-step3b.png" alt="GitHub Pages settings with branch dropdown" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <p>Wait about 60 to 90 seconds, then refresh the page. Your live URL will appear at the top.</p>
+
+        <h3>Part 4: Visit Your Live Site</h3>
+        <p>After refreshing, you'll see a banner with your live URL:</p>
+        <img src="tutorials/GitHub/img/github-step4a.png" alt="GitHub Pages showing site is live with Visit site button" style="display:block;max-width:100%;margin:1rem 0;border-radius:8px;">
+        <p>Click <strong>Visit site</strong>. Your project is now live on the internet, playable and shareable with anyone!</p>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Well Done!</h4>
+          <p>You went from generating code in your LLM, to saving it locally, to deploying it on the internet. This workflow will become second nature. Repeat it for all your projects!</p>
+        </div>
+
+        <h3>Keyboard Shortcuts</h3>
+        <table class="cg-kbd-table">
+          <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Select All</td><td><kbd>Cmd</kbd> + <kbd>A</kbd></td><td><kbd>Ctrl</kbd> + <kbd>A</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common problems and solutions</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro Tip: Use AI for Help</h4>
+          <p style="margin-bottom: 0;">Stuck? Describe your problem to your LLM of choice (ChatGPT, Claude, Gemini). You can even share screenshots; AI can read images!</p>
+        </div>
+
+        <h3>Common Issues</h3>
+        <div class="cg-concept-card"><h4>"404 - Page Not Found"</h4>
+          <ul style="margin: 0.5rem 0 0 1rem; font-size: 0.9rem;">
+            <li>Wait about 60 to 90 seconds; GitHub Pages needs time to build your site</li>
+            <li>Make sure your file is named exactly <code>index.html</code> (not <code>Index.html</code> or <code>index.HTML</code>)</li>
+            <li>Check that GitHub Pages is enabled in Settings &rarr; Pages</li>
+            <li>Make sure the Branch is set to <code>main</code> (not "None")</li>
+          </ul>
+        </div>
+        <div class="cg-concept-card"><h4>"I can't find the 'creating a new file' link"</h4><p style="font-size: 0.9rem;">Look inside the <strong>blue "Quick setup" box</strong> that appears after creating an empty repository. The link is below the heading text. If your repository already has files, click the <strong>Add file</strong> button instead, then select <strong>Create new file</strong>.</p></div>
+        <div class="cg-concept-card"><h4>"I can't find the Settings or Pages option"</h4><p style="font-size: 0.9rem;">Make sure you're on your repository page (not your profile page). The URL should look like: <code>github.com/username/myproject</code></p></div>
+        <div class="cg-concept-card"><h4>"My changes aren't showing up"</h4>
+          <ul style="margin: 0.5rem 0 0 1rem; font-size: 0.9rem;">
+            <li>Wait about 60 to 90 seconds after committing</li>
+            <li>Hard refresh your browser: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (Mac) or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (Windows)</li>
+            <li>Try opening in an incognito/private window</li>
+          </ul>
+        </div>
+        <div class="cg-concept-card"><h4>"The page shows raw code instead of my website"</h4><p style="font-size: 0.9rem;">You're looking at the GitHub repository view, not the GitHub Pages view. Your live site is at <code>username.github.io/project/</code>, not <code>github.com/username/project</code>.</p></div>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <p>Hello, you're very welcome back to the AI Badge. Great to have you and well done on completing the previous tutorial.</p>
+
+        <h3>Introduction</h3>
+        <p>So today we're looking at GitHub: how to showcase your work. You've been coding, creating your first few pages, perhaps more. Now you want to share those as live links that anyone can access publicly.</p>
+
+        <h3>Getting Started</h3>
+        <p>Once you create your GitHub account (fairly straightforward at <a href="https://github.com" target="_blank">github.com</a>), I recommend you use something like Google sign-in just to make it very simple, no need to remember an email or password, up to you. Once you do that, we're going to start with the very first step.</p>
+        <p>Remember, you already have the code from previous tutorials, so we're going to use that as the first example here.</p>
+
+        <h3>Organising Your Files</h3>
+        <p>Previously, I had asked you to save files directly in your AI Projects folder. You can see the various files created: Hello World, retro games, et cetera. What we're going to do now is see that it's way more useful to have folders instead of files.</p>
+        <p>So we right-click and create a new folder, for example <code>retro-game-gemini</code>. We drag the file into that folder, and here's the crucial thing: <strong>rename the file to <code>index.html</code></strong>. This is going to be very important, you'll see why in a moment.</p>
+        <p>I recommend you do the same for your other projects: put them in folders and rename each file to <code>index.html</code>.</p>
+
+        <h3>Creating the Repository</h3>
+        <p>Now we have our <code>index.html</code> ready. We want to open it with Sublime Text (right-click and open with Sublime Text) and there is the code. That's all we need for now.</p>
+        <p>So in <a href="https://github.com/new" target="_blank">github.com/new</a>, we go straight to the page to create a repository. A repository is basically a folder on GitHub where your code will live. What I recommend is match the repository name to the folder name we just created, so <code>retro-game-gemini</code>. Leave everything else blank, make it public, and click <strong>Create repository</strong>.</p>
+
+        <h3>Uploading Your Code</h3>
+        <p>Now we have our repository. The next step is to go into the blue box area. We see here "Quick setup, if you've done this kind of thing before." We want to click <strong>"creating a new file"</strong> in that area.</p>
+        <p>Once we have that, all we need to do is copy the code from Sublime Text. Make sure you only <strong>copy</strong> (not cut), so you keep the local version. Paste it in the GitHub editor. Name the file <code>index.html</code>, which is what we had in our local folder, the exact same code.</p>
+        <p>Then click <strong>Commit changes</strong>. Copilot may think of a commit message automatically, which is just notes to specify what you're saving. You can also type <code>initial commit</code> manually. Leave the extended description blank, click <strong>Commit changes</strong> again.</p>
+
+        <h3>Enabling GitHub Pages</h3>
+        <p>Now the code that we had locally, only on our computer, lives on the cloud in your GitHub account under that specific repository. Click into the file and you can see the code right there.</p>
+        <p>Next, click <strong>Settings</strong>, then <strong>Pages</strong> in the sidebar. Under Branch, select <code>main</code> instead of "None", and click <strong>Save</strong>. That's all you're doing.</p>
+
+        <h3>The Important Distinction</h3>
+        <p>Here's what happens. What you had before, the link to that index file on GitHub, was the raw code. It's not human readable for most people, not the published page. If you recall, your retro game that you created previously, you could right-click and open it in Chrome to see it locally. But that only lives on your computer; it's not on the cloud.</p>
+        <p>GitHub Pages makes this code available as your own website link.</p>
+
+        <h3>Viewing Your Live Site</h3>
+        <p>We waited about 60 to 90 seconds. If you refresh the Pages settings, you should see the live link. Your site is live at your own URL: <code>username.github.io/retro-game-gemini/</code>.</p>
+        <p>If we click on that link, we now have a link that we can share with anyone in the world. And the game works, it's playable!</p>
+
+        <h3>Why index.html Matters</h3>
+        <p>Notice: the URL has nothing after the folder name. If you click on <code>index.html</code> at the end, it still works, it's the same. However, the convention is that if you name your HTML file <code>index.html</code>, you don't need to spell it out in the URL. It works without the longer filename. You can verify this in an incognito window; anyone can access it.</p>
+
+        <h3>Wrapping Up</h3>
+        <p>This pretty much concludes our tutorial. You can visit your site, follow the steps here, and check the troubleshooting guide as usual.</p>
+        <p>Now you can share anything you want. As long as you have it in HTML format, save it to a folder, make sure inside that folder is an <code>index.html</code>, and follow the steps. Practice it a few times just to make sure you're confident how it works. Well done, thanks very much, and I'll see you in the next tutorial.</p>
+      </div>
+    </div>
+
+    </div>
+    </template>
+    <!-- ===== END LESSON: deploy-github ===== -->
+
   </div>
 
   <!-- Footer -->
@@ -4158,7 +4486,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 7, type: 'video' },
     { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 9, type: 'video' },
     { id: 'retro-game', moduleId: 'retro-game', title: 'Retro Game', icon: '🎮', iconBg: 'rgba(255,59,48,0.12)', level: 'beginner', durationMinutes: 12, type: 'video' },
-    { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', durationMinutes: 30, type: 'video', pending: true },
+    { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', durationMinutes: 11, type: 'video' },
     { id: 'opencode-setup', moduleId: 'opencode-setup', title: 'OpenCode Setup', icon: '⚡', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', durationMinutes: 35, type: 'video', pending: true }
   ];
 
