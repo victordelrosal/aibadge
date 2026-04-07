@@ -201,11 +201,11 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
   <tr><td style="padding-bottom:20px;">
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#000036;border-radius:16px;">
     <tr><td align="center" style="padding:40px 32px;">
-      <p style="font-size:22px;font-weight:700;color:#D4AF37;margin:0 0 10px;">Interested in structured coaching?</p>
-      <p style="font-size:14px;color:#9999bb;margin:0 0 24px;line-height:1.6;">AI Badge is a 6-week one-to-one programme that takes you from your current level to measurable, demonstrable competency. Every session is personalised to your goals.</p>
+      <p style="font-size:22px;font-weight:700;color:#D4AF37;margin:0 0 10px;">Ready to level up?</p>
+      <p style="font-size:14px;color:#9999bb;margin:0 0 24px;line-height:1.6;">AI Badge is a 6-week one-to-one coaching programme. Every session is personalised to your profile and goals. Start from &euro;90/week.</p>
       <table cellpadding="0" cellspacing="0" border="0"><tr>
         <td style="padding:14px 36px;border-radius:12px;background:#D4AF37;">
-          <a href="mailto:victor@fiveinnolabs.com?subject=AI Badge coaching enquiry" style="font-size:15px;font-weight:700;color:#1a1a00;text-decoration:none;">Let's talk</a>
+          <a href="https://aibadge.com/#pricing" style="font-size:15px;font-weight:700;color:#1a1a00;text-decoration:none;">See Plans &amp; Enrol</a>
         </td>
       </tr></table>
     </td></tr>

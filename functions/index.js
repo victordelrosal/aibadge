@@ -126,9 +126,9 @@ function buildEmailHTML(data, plainReport) {
 
     <!-- CTA -->
     <div style="background:linear-gradient(135deg,#000036,#02066F);border-radius:16px;padding:32px;text-align:center;margin-bottom:20px;">
-      <div style="font-size:20px;font-weight:700;color:#D4AF37;margin-bottom:8px;">Interested in structured coaching?</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:20px;line-height:1.5;">AI Badge is a 6-week one-to-one programme that takes you from your current level to measurable, demonstrable competency.</div>
-      <a href="mailto:victor@fiveinnolabs.com?subject=AI Badge coaching enquiry" style="display:inline-block;padding:14px 32px;border-radius:12px;background:#D4AF37;color:#000036;font-size:15px;font-weight:700;text-decoration:none;">Let's talk</a>
+      <div style="font-size:20px;font-weight:700;color:#D4AF37;margin-bottom:8px;">Ready to level up?</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:20px;line-height:1.5;">AI Badge is a 6-week one-to-one coaching programme. Every session is personalised to your profile and goals. Start from &euro;90/week.</div>
+      <a href="https://aibadge.com/#pricing" style="display:inline-block;padding:14px 32px;border-radius:12px;background:#D4AF37;color:#000036;font-size:15px;font-weight:700;text-decoration:none;">See Plans &amp; Enrol</a>
     </div>
 
     <!-- Footer -->
