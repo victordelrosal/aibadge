@@ -1443,7 +1443,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         &#x1F3AF; Meeting link sent before your first session
       </div>
     </div>
-    <a id="calendarDownloadBtn" href="#" style="display:block;width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:1rem;font-weight:700;text-align:center;text-decoration:none;margin-bottom:0.75rem;">Add 6 Sessions to Your Calendar</a>
+    <a id="gcalBtn" href="#" target="_blank" style="display:block;width:100%;padding:14px;border-radius:14px;background:#4285f4;color:#fff;font-size:1rem;font-weight:700;text-align:center;text-decoration:none;margin-bottom:0.5rem;">Add to Google Calendar</a>
+    <a id="calendarDownloadBtn" href="#" style="display:block;width:100%;padding:12px;border-radius:14px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:0.9rem;font-weight:600;text-align:center;text-decoration:none;margin-bottom:0.75rem;">Download .ics (Apple/Outlook)</a>
     <button class="btn-cta" onclick="document.getElementById('successModal').classList.remove('active');window.history.replaceState({},'',window.location.pathname);" style="width:100%;border-radius:14px;font-size:1rem;">Got It</button>
   </div>
 </div>
@@ -3889,6 +3890,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       if(bookedSlot){
         var dlBtn = document.getElementById('calendarDownloadBtn');
         if(dlBtn) dlBtn.href = API + '/calendar/' + bookedSlot;
+        var gcBtn = document.getElementById('gcalBtn');
+        if(gcBtn) gcBtn.href = API + '/gcal/' + bookedSlot;
       }
       loadSlots();
     }, 500);

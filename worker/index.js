@@ -63,6 +63,10 @@ export default {
       const slotId = path.replace("/api/calendar/", "");
       return handleCalendarDownload(slotId, env);
     }
+    if (path.startsWith("/api/gcal/") && request.method === "GET") {
+      const slotId = path.replace("/api/gcal/", "");
+      return handleGoogleCalendarLink(slotId, env);
+    }
 
     // ── Legacy: report mailer (POST to root) ──
     if (request.method === "POST" && (path === "/" || path === "")) {
@@ -415,6 +419,47 @@ async function handleCalendarDownload(slotId, env) {
 }
 
 // ══════════════════════════════════════════
+// GOOGLE CALENDAR LINK (redirect)
+// ══════════════════════════════════════════
+
+async function handleGoogleCalendarLink(slotId, env) {
+  const raw = await env.SLOTS.get(`slot:${slotId}`);
+  if (!raw) return jsonResponse({ error: "Slot not found" }, 404);
+
+  const slot = JSON.parse(raw);
+  if (slot.status !== "booked" || !slot.booking) {
+    return jsonResponse({ error: "Slot not booked" }, 400);
+  }
+
+  const def = DEFAULT_SLOTS.find(d => d.id === slotId);
+  const startDate = def?.startDate || START_WED;
+  const [hours, mins] = slot.time.split(":");
+
+  // Build start/end in YYYYMMDDTHHMMSS format (local time, paired with ctz)
+  const dateStr = startDate.replace(/-/g, "");
+  const startTime = `${hours}${mins}00`;
+  const endMins = parseInt(mins) + 20;
+  const endH = parseInt(hours) + Math.floor(endMins / 60);
+  const endM = endMins % 60;
+  const endTime = `${String(endH).padStart(2, "0")}${String(endM).padStart(2, "0")}00`;
+
+  const dates = `${dateStr}T${startTime}/${dateStr}T${endTime}`;
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: "AI Badge Coaching",
+    dates: dates,
+    details: `AI Badge coaching session with Victor del Rosal.\n20 minutes. Meeting link sent before your first session.\n\nhttps://aibadge.fiveinnolabs.com`,
+    recur: "RRULE:FREQ=WEEKLY;COUNT=6",
+    ctz: "Europe/Dublin",
+  });
+
+  const gcalUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;
+
+  return Response.redirect(gcalUrl, 302);
+}
+
+// ══════════════════════════════════════════
 // STRIPE WEBHOOK VERIFICATION
 // ══════════════════════════════════════════
 
@@ -598,7 +643,9 @@ async function sendBookingConfirmation(env, slot) {
     <p style="font-size:13px;color:#666;margin-top:20px;line-height:1.6;">Your coaching sessions are every ${slot.day} at ${slot.time}, 20 minutes each. You'll receive a meeting link before your first session.</p>
     <p style="font-size:12px;color:#888;margin-top:8px;">Your dates: ${getWeeklyDates(DEFAULT_SLOTS.find(d => d.id === slot.id)?.startDate || START_WED).join(", ")}</p>
     <div style="text-align:center;margin-top:20px;">
-      <a href="https://aibadge-report-mailer.victordelrosal.workers.dev/api/calendar/${slot.id}" style="display:inline-block;padding:12px 24px;border-radius:12px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:14px;font-weight:700;text-decoration:none;">Add All 6 Sessions to Your Calendar</a>
+      <a href="https://aibadge-report-mailer.victordelrosal.workers.dev/api/gcal/${slot.id}" style="display:inline-block;padding:12px 24px;border-radius:12px;background:#4285f4;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:8px;">Add to Google Calendar</a>
+      <br>
+      <a href="https://aibadge-report-mailer.victordelrosal.workers.dev/api/calendar/${slot.id}" style="display:inline-block;padding:10px 20px;border-radius:12px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:13px;font-weight:600;text-decoration:none;margin-top:8px;">Download .ics (Apple/Outlook)</a>
     </div>
   </div>
   <div style="text-align:center;font-size:11px;color:#999;padding:20px 0;">
