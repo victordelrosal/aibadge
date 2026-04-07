@@ -3699,6 +3699,15 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     el.classList.add('selected');
   };
 
+  function resetCheckoutBtn(){
+    var btn = document.getElementById('paymentCta');
+    if(btn){
+      btn.textContent = 'Continue to Payment';
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    }
+  }
+
   window.handleCheckout = function(){
     var btn = document.getElementById('paymentCta');
     btn.textContent = 'Redirecting...';
@@ -3706,6 +3715,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     btn.style.pointerEvents = 'none';
     window.location.href = PAYMENT_LINKS[selectedPlan];
   };
+
+  /* Reset button when user navigates back */
+  window.addEventListener('pageshow', function(e){ if(e.persisted) resetCheckoutBtn(); });
+  window.addEventListener('focus', resetCheckoutBtn);
 
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape') document.getElementById('paymentModal').classList.remove('active');
