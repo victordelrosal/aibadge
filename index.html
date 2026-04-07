@@ -3758,6 +3758,13 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         + '&#x1F534; <span style="font-size:13px;color:#999;text-decoration:line-through;">' + s.time + '</span></div>';
     }
     if(s.status === 'held'){
+      /* If this user owns the hold, let them click back in */
+      var myToken = null;
+      try { myToken = sessionStorage.getItem('holdToken_' + s.id); } catch(e){}
+      if(myToken){
+        return '<div onclick="window.selectSlot(\'' + s.id + '\',\'' + s.label + '\')" style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin:4px 0;border-radius:8px;background:#fef9c3;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background=\'#fef08a\'" onmouseout="this.style.background=\'#fef9c3\'" title="Your held slot, click to change plan">'
+          + '&#x1F7E1; <span style="font-size:13px;font-weight:500;color:#854d0e;">' + s.time + ' (your hold)</span></div>';
+      }
       return '<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin:4px 0;border-radius:8px;background:#fefce8;opacity:0.7;cursor:not-allowed;" title="Temporarily held">'
         + '&#x1F7E1; <span style="font-size:13px;color:#999;">' + s.time + ' (held)</span></div>';
     }
