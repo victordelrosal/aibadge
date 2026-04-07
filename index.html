@@ -3784,6 +3784,13 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       labelHtml += '<br><span style="font-size:12px;color:#666;">6 sessions: ' + dates.join(', ') + '</span>';
     }
     document.getElementById('selectedSlotLabel').innerHTML = labelHtml;
+    /* Restore name/email if user already entered them for this slot */
+    try {
+      var savedName = sessionStorage.getItem('holdName_' + id);
+      var savedEmail = sessionStorage.getItem('holdEmail_' + id);
+      if(savedName) document.getElementById('bookingName').value = savedName;
+      if(savedEmail) document.getElementById('bookingEmail').value = savedEmail;
+    } catch(e){}
     document.getElementById('paymentModal').classList.add('active');
     updatePaymentBtn();
   };
@@ -3835,8 +3842,12 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         return;
       }
 
-      /* Store holdToken so user can come back and switch plan */
-      try { sessionStorage.setItem('holdToken_' + selectedSlotId, data.holdToken); } catch(e){}
+      /* Store holdToken + user details so user can come back and switch plan */
+      try {
+        sessionStorage.setItem('holdToken_' + selectedSlotId, data.holdToken);
+        sessionStorage.setItem('holdName_' + selectedSlotId, name);
+        sessionStorage.setItem('holdEmail_' + selectedSlotId, email);
+      } catch(e){}
 
       /* Show hold timer */
       var timerEl = document.getElementById('holdTimer');
