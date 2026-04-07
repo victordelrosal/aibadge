@@ -1064,45 +1064,55 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   width:36px;
   height:36px;
   border-radius:50%;
-  border:2px solid var(--gold-premium);
-  background:transparent;
+  border:none;
   position:relative;
   transition:all 0.3s ease;
   cursor:default;
 }
+/* Taken: red 3D orb */
 .availability-dot.taken{
-  background:linear-gradient(135deg,#e8e4f0,#d1cde0);
-  border-color:#a8a0b8;
-  opacity:1;
+  background:radial-gradient(circle at 35% 30%, #ff6b6b, #e53935 50%, #b71c1c 100%);
+  box-shadow:
+    inset -3px -3px 6px rgba(0,0,0,0.3),
+    inset 2px 2px 4px rgba(255,255,255,0.2),
+    0 2px 8px rgba(229,57,53,0.4);
   overflow:hidden;
 }
 .availability-dot.taken svg{
-  opacity:0.7;
+  display:none;
 }
+/* Available: green 3D orb */
 .availability-dot.available{
-  animation:slotPulse 2.5s ease-in-out infinite;
+  background:radial-gradient(circle at 35% 30%, #81f59b, #43a047 50%, #2e7d32 100%);
+  box-shadow:
+    inset -3px -3px 6px rgba(0,0,0,0.25),
+    inset 2px 2px 4px rgba(255,255,255,0.25),
+    0 2px 8px rgba(67,160,71,0.35);
   cursor:pointer;
+  animation:slotGlow 2.5s ease-in-out infinite;
 }
 .availability-dot.available:hover{
   transform:scale(1.15);
-  border-color:var(--gold-rich);
-  box-shadow:0 0 12px rgba(212,175,55,0.35);
+  box-shadow:
+    inset -3px -3px 6px rgba(0,0,0,0.25),
+    inset 2px 2px 4px rgba(255,255,255,0.25),
+    0 4px 16px rgba(67,160,71,0.5);
 }
-.availability-dot.available::after{
+/* Highlight shine on both */
+.availability-dot::after{
   content:'';
   position:absolute;
-  inset:4px;
+  top:5px;
+  left:8px;
+  width:12px;
+  height:8px;
   border-radius:50%;
-  background:linear-gradient(135deg,var(--gold-premium),var(--gold-rich));
-  opacity:0.15;
-  transition:opacity 0.3s;
+  background:rgba(255,255,255,0.45);
+  filter:blur(1px);
 }
-.availability-dot.available:hover::after{
-  opacity:0.35;
-}
-@keyframes slotPulse{
-  0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}
-  50%{box-shadow:0 0 0 6px rgba(212,175,55,0.18)}
+@keyframes slotGlow{
+  0%,100%{box-shadow:inset -3px -3px 6px rgba(0,0,0,0.25),inset 2px 2px 4px rgba(255,255,255,0.25),0 2px 8px rgba(67,160,71,0.35)}
+  50%{box-shadow:inset -3px -3px 6px rgba(0,0,0,0.25),inset 2px 2px 4px rgba(255,255,255,0.25),0 4px 14px rgba(67,160,71,0.5)}
 }
 .availability-label{
   font-size:0.95rem;
@@ -1121,7 +1131,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 }
 @media(max-width:600px){
   .availability-dot{width:28px;height:28px}
-  .availability-dot.taken svg{width:28px;height:28px}
+  .availability-dot::after{top:4px;left:6px;width:9px;height:6px}
   .availability-slots{gap:0.5rem}
 }
 
