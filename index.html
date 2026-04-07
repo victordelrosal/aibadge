@@ -1443,6 +1443,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         &#x1F3AF; Meeting link sent before your first session
       </div>
     </div>
+    <a id="calendarDownloadBtn" href="#" style="display:block;width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:1rem;font-weight:700;text-align:center;text-decoration:none;margin-bottom:0.75rem;">Add 6 Sessions to Your Calendar</a>
     <button class="btn-cta" onclick="document.getElementById('successModal').classList.remove('active');window.history.replaceState({},'',window.location.pathname);" style="width:100%;border-radius:14px;font-size:1rem;">Got It</button>
   </div>
 </div>
@@ -3884,6 +3885,11 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   if(params.get('booking') === 'success'){
     setTimeout(function(){
       document.getElementById('successModal').classList.add('active');
+      var bookedSlot = params.get('slot');
+      if(bookedSlot){
+        var dlBtn = document.getElementById('calendarDownloadBtn');
+        if(dlBtn) dlBtn.href = API + '/calendar/' + bookedSlot;
+      }
       loadSlots();
     }, 500);
   }

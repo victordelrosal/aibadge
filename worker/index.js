@@ -59,6 +59,10 @@ export default {
     if (path === "/api/init" && request.method === "POST") {
       return handleInit(env);
     }
+    if (path.startsWith("/api/calendar/") && request.method === "GET") {
+      const slotId = path.replace("/api/calendar/", "");
+      return handleCalendarDownload(slotId, env);
+    }
 
     // ── Legacy: report mailer (POST to root) ──
     if (request.method === "POST" && (path === "/" || path === "")) {
@@ -359,6 +363,57 @@ async function handleInit(env) {
   return jsonResponse({ message: `Initialized ${DEFAULT_SLOTS.length} slots`, slots: DEFAULT_SLOTS.map(s => s.id) });
 }
 
+async function handleCalendarDownload(slotId, env) {
+  const raw = await env.SLOTS.get(`slot:${slotId}`);
+  if (!raw) return jsonResponse({ error: "Slot not found" }, 404);
+
+  const slot = JSON.parse(raw);
+  if (slot.status !== "booked" || !slot.booking) {
+    return jsonResponse({ error: "Slot not booked" }, 400);
+  }
+
+  const def = DEFAULT_SLOTS.find(d => d.id === slotId);
+  const startDate = def?.startDate || START_WED;
+  const [hours, mins] = slot.time.split(":");
+  const b = slot.booking;
+
+  let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//AI Badge//Coaching//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n";
+
+  for (let week = 0; week < 6; week++) {
+    const d = new Date(startDate + "T00:00:00");
+    d.setDate(d.getDate() + week * 7);
+    const dateStr = d.toISOString().split("T")[0].replace(/-/g, "");
+
+    const startTime = `${hours}${mins}00`;
+    const endMins = parseInt(mins) + 20;
+    const endH = parseInt(hours) + Math.floor(endMins / 60);
+    const endM = endMins % 60;
+    const endTime = `${String(endH).padStart(2, "0")}${String(endM).padStart(2, "0")}00`;
+
+    const uid = `aibadge-${slotId}-w${week + 1}@fiveinnolabs.com`;
+
+    ics += "BEGIN:VEVENT\r\n";
+    ics += `DTSTART;TZID=Europe/Dublin:${dateStr}T${startTime}\r\n`;
+    ics += `DTEND;TZID=Europe/Dublin:${dateStr}T${endTime}\r\n`;
+    ics += `SUMMARY:AI Badge Coaching (Week ${week + 1}/6)\r\n`;
+    ics += `DESCRIPTION:AI Badge coaching session with Victor del Rosal. Week ${week + 1} of 6.\\nSlot: ${slot.label}\r\n`;
+    ics += `UID:${uid}\r\n`;
+    ics += "STATUS:CONFIRMED\r\n";
+    ics += "BEGIN:VALARM\r\nTRIGGER:-PT10M\r\nACTION:DISPLAY\r\nDESCRIPTION:AI Badge session in 10 minutes\r\nEND:VALARM\r\n";
+    ics += "END:VEVENT\r\n";
+  }
+
+  ics += "END:VCALENDAR\r\n";
+
+  return new Response(ics, {
+    headers: {
+      "Content-Type": "text/calendar; charset=utf-8",
+      "Content-Disposition": `attachment; filename="ai-badge-${slotId}.ics"`,
+      ...corsHeaders(),
+    },
+  });
+}
+
 // ══════════════════════════════════════════
 // STRIPE WEBHOOK VERIFICATION
 // ══════════════════════════════════════════
@@ -542,6 +597,9 @@ async function sendBookingConfirmation(env, slot) {
     </table>
     <p style="font-size:13px;color:#666;margin-top:20px;line-height:1.6;">Your coaching sessions are every ${slot.day} at ${slot.time}, 20 minutes each. You'll receive a meeting link before your first session.</p>
     <p style="font-size:12px;color:#888;margin-top:8px;">Your dates: ${getWeeklyDates(DEFAULT_SLOTS.find(d => d.id === slot.id)?.startDate || START_WED).join(", ")}</p>
+    <div style="text-align:center;margin-top:20px;">
+      <a href="https://aibadge-report-mailer.victordelrosal.workers.dev/api/calendar/${slot.id}" style="display:inline-block;padding:12px 24px;border-radius:12px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:14px;font-weight:700;text-decoration:none;">Add All 6 Sessions to Your Calendar</a>
+    </div>
   </div>
   <div style="text-align:center;font-size:11px;color:#999;padding:20px 0;">
     AI Badge by Victor del Rosal &middot; <a href="https://fiveinnolabs.com" style="color:#D4AF37;">fiveinnolabs</a>
