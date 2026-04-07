@@ -1659,16 +1659,16 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
     <div class="payment-option selected" onclick="selectPayment(this,'weekly')" id="opt-weekly">
       <div class="payment-option-left">
-        <div class="payment-option-name">6 Weekly Payments</div>
-        <div class="payment-option-detail">&euro;90 per week for 6 weeks</div>
+        <div class="payment-option-name">Pay Per Session</div>
+        <div class="payment-option-detail">&euro;90 per session, book one at a time</div>
       </div>
-      <div class="payment-option-price">&euro;540</div>
+      <div class="payment-option-price">&euro;90</div>
     </div>
 
     <div class="payment-option" onclick="selectPayment(this,'upfront')" id="opt-upfront">
       <div class="payment-option-left">
-        <div class="payment-option-name">Pay Upfront</div>
-        <div class="payment-option-detail">One payment, done.</div>
+        <div class="payment-option-name">Full Programme (6 Weeks)</div>
+        <div class="payment-option-detail">All 6 sessions booked at once</div>
         <div class="payment-option-savings">Save &euro;45</div>
       </div>
       <div class="payment-option-price">&euro;495</div>
@@ -1679,10 +1679,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <span>I agree to the <a href="terms.html" target="_blank">Terms &amp; Conditions</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></span>
     </label>
 
-    <button class="btn-cta" id="paymentCta" onclick="handleCheckout()" disabled>Continue to Payment</button>
+    <button class="btn-cta" id="paymentCta" onclick="handleCheckout()" disabled>Choose Your Slot</button>
     <div class="payment-modal-secure">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      Secure checkout powered by Stripe
+      Secure checkout via Stripe &middot; Pick your time, then pay
     </div>
   </div>
 </div>
@@ -3677,10 +3677,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 (function(){
   let selectedPlan = 'weekly';
 
-  /* Stripe Payment Links (LIVE) */
-  const PAYMENT_LINKS = {
-    weekly:  'https://buy.stripe.com/00wbJ11mL4tD7Swbkrfw40b',
-    upfront: 'https://buy.stripe.com/7sY00j0iHbW57Sw1JRfw40c'
+  /* Cal.com booking links (with Stripe payment on booking) */
+  const BOOKING_LINKS = {
+    weekly:  'https://cal.com/victordelrosal/ai-badge',
+    upfront: 'https://cal.com/victordelrosal/ai-badge-full'
   };
 
   window.selectPayment = function(el, plan){
@@ -3693,7 +3693,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     var btn = document.getElementById('paymentCta');
     var check = document.getElementById('consentCheck');
     if(btn){
-      btn.textContent = 'Continue to Payment';
+      btn.textContent = 'Choose Your Slot';
       btn.style.opacity = '';
       btn.style.pointerEvents = '';
       btn.disabled = check ? !check.checked : false;
@@ -3702,10 +3702,11 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
   window.handleCheckout = function(){
     var btn = document.getElementById('paymentCta');
-    btn.textContent = 'Redirecting...';
+    btn.textContent = 'Opening scheduler...';
     btn.style.opacity = '0.7';
     btn.style.pointerEvents = 'none';
-    window.location.href = PAYMENT_LINKS[selectedPlan];
+    window.open(BOOKING_LINKS[selectedPlan], '_blank');
+    setTimeout(resetCheckoutBtn, 1500);
   };
 
   /* Reset button when user navigates back */
