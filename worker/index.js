@@ -119,8 +119,8 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
     </tr>`;
   }).join("");
 
-  // Escape HTML in report text
-  const safeReport = (report || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  // Format report text into styled HTML
+  const formattedReport = formatReportHTML(report || "");
 
   return `
 <!DOCTYPE html>
@@ -192,7 +192,7 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;">
     <tr><td style="padding:28px;">
       <p style="font-size:11px;font-weight:700;color:#D4AF37;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">Detailed Report</p>
-      <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:13px;color:#444;line-height:1.65;white-space:pre-wrap;word-wrap:break-word;margin:0;">${safeReport}</p>
+      ${formattedReport}
     </td></tr>
     </table>
   </td></tr>
@@ -205,7 +205,7 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
       <p style="font-size:14px;color:#9999bb;margin:0 0 24px;line-height:1.6;">AI Badge is a 6-week one-to-one coaching programme. Every session is personalised to your profile and goals. Start from &euro;90/week.</p>
       <table cellpadding="0" cellspacing="0" border="0"><tr>
         <td style="padding:14px 36px;border-radius:12px;background:#D4AF37;">
-          <a href="https://aibadge.com/#pricing" style="font-size:15px;font-weight:700;color:#1a1a00;text-decoration:none;">See Plans &amp; Enrol</a>
+          <a href="https://aibadge.fiveinnolabs.com/#pricing" style="font-size:15px;font-weight:700;color:#1a1a00;text-decoration:none;">See Plans &amp; Enrol</a>
         </td>
       </tr></table>
     </td></tr>
@@ -224,4 +224,77 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
 
 </body>
 </html>`;
+}
+
+function formatReportHTML(text) {
+  const safe = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const lines = safe.split("\n");
+  let html = "";
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    // Skip separator lines (━━━ or ───)
+    if (/^[━─]{4,}/.test(line)) { i++; continue; }
+
+    // Skip empty lines
+    if (!line) { i++; continue; }
+
+    // Section headers: ALL CAPS lines (e.g. "DIMENSION BREAKDOWN", "AI FOUNDATIONS: Level 2/5")
+    if (/^[A-Z][A-Z &\/\(\),:0-9]+$/.test(line) && line.length > 3) {
+      // Check if it's a top-level section (no colon with Level) or a dimension header
+      if (line.includes("LEVEL") || line.includes(": LEVEL") || /: Level/i.test(lines[i])) {
+        // Dimension sub-header
+        html += `<p style="font-size:14px;font-weight:700;color:#000036;margin:20px 0 4px;padding-top:16px;border-top:1px solid #f0f0f0;">${line}</p>`;
+      } else {
+        // Major section header
+        html += `<p style="font-size:12px;font-weight:700;color:#D4AF37;text-transform:uppercase;letter-spacing:0.06em;margin:24px 0 8px;padding-top:16px;border-top:2px solid #f0f0f0;">${line}</p>`;
+      }
+      i++; continue;
+    }
+
+    // Dimension headers with level (e.g. "AI FOUNDATIONS: Level 2/5")
+    if (/^[A-Z][A-Z &\/]+:/.test(line)) {
+      html += `<p style="font-size:14px;font-weight:700;color:#000036;margin:20px 0 4px;padding-top:16px;border-top:1px solid #f0f0f0;">${line}</p>`;
+      i++; continue;
+    }
+
+    // Quoted lines (dimension self-assessment quotes)
+    if (line.startsWith("&quot;") || line.startsWith('"') || line.startsWith("\u201C")) {
+      html += `<p style="font-size:13px;font-style:italic;color:#666;margin:4px 0 4px;padding-left:12px;border-left:3px solid #D4AF37;">${line}</p>`;
+      i++; continue;
+    }
+
+    // Numbered recommendations (1. 2. 3.)
+    if (/^\d+\./.test(line)) {
+      html += `<p style="font-size:13px;font-weight:600;color:#333;margin:16px 0 4px;">${line}</p>`;
+      i++; continue;
+    }
+
+    // Framework mapping lines starting with ─ or dash
+    if (line.startsWith("─") || line.startsWith("&amp;#x2500;")) {
+      const fwName = line.replace(/^─+\s*/, "");
+      html += `<p style="font-size:13px;font-weight:700;color:#000036;margin:16px 0 4px;">${fwName}</p>`;
+      i++; continue;
+    }
+
+    // Lines starting with "Your level:" or "Levels:"
+    if (line.startsWith("Your level:")) {
+      const level = line.replace("Your level:", "").trim();
+      html += `<p style="font-size:13px;margin:2px 0;color:#333;">Your level: <strong style="color:#D4AF37;">${level}</strong></p>`;
+      i++; continue;
+    }
+
+    if (line.startsWith("Levels:")) {
+      html += `<p style="font-size:11px;color:#999;margin:4px 0 12px;">${line}</p>`;
+      i++; continue;
+    }
+
+    // Regular paragraph text
+    html += `<p style="font-size:13px;color:#444;line-height:1.6;margin:4px 0;">${line}</p>`;
+    i++;
+  }
+
+  return html;
 }
