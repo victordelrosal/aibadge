@@ -149,7 +149,6 @@ async function handleHold(request, env) {
 
     if (plan === "weekly") {
       // Subscription: 6 weekly payments of €90
-      const sixWeeksFromNow = Math.floor(Date.now() / 1000) + (6 * 7 * 24 * 60 * 60);
       stripeParams = new URLSearchParams({
         "mode": "subscription",
         "success_url": `${env.SITE_URL}?booking=success&slot=${slotId}`,
@@ -166,7 +165,6 @@ async function handleHold(request, env) {
         "subscription_data[metadata][holdToken]": holdToken,
         "subscription_data[metadata][customerName]": name,
         "subscription_data[metadata][customerEmail]": email,
-        "subscription_data[cancel_at]": sixWeeksFromNow.toString(),
         "metadata[slotId]": slotId,
         "metadata[plan]": plan,
         "metadata[holdToken]": holdToken,
@@ -277,6 +275,19 @@ async function handleStripeWebhook(request, env) {
       bookedAt: new Date().toISOString(),
     };
     await env.SLOTS.put(`slot:${slotId}`, JSON.stringify(slot));
+
+    // Schedule subscription cancellation after 6 weeks
+    if (plan === "weekly" && session.subscription) {
+      const cancelAt = Math.floor(Date.now() / 1000) + (6 * 7 * 24 * 60 * 60);
+      await fetch(`https://api.stripe.com/v1/subscriptions/${session.subscription}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `cancel_at=${cancelAt}`,
+      });
+    }
 
     // Create Google Calendar events for all 6 sessions
     await createCalendarEvents(env, slot);
@@ -472,24 +483,14 @@ async function createCalendarEvents(env, slot) {
 
       const event = {
         summary: `AI Badge: ${b.name} (Week ${week + 1}/6)`,
-        description: `AI Badge coaching session with ${b.name} (${b.email}).\nPlan: ${b.plan}\nSlot: ${slot.label}`,
+        description: `AI Badge coaching session\n\nClient: ${b.name} (${b.email})\nPlan: ${b.plan}\nSlot: ${slot.label}\n\nAdd a Google Meet link manually or share one with the client.`,
         start: { dateTime: startISO, timeZone: "Europe/Dublin" },
         end: { dateTime: endISO, timeZone: "Europe/Dublin" },
-        attendees: [
-          { email: b.email, displayName: b.name },
-          { email: "victor@fiveinnolabs.com", displayName: "Victor del Rosal" },
-        ],
-        conferenceData: {
-          createRequest: {
-            requestId: `aibadge-${slot.id}-w${week + 1}-${Date.now()}`,
-            conferenceSolutionKey: { type: "hangoutsMeet" },
-          },
-        },
-        reminders: { useDefault: false, overrides: [{ method: "email", minutes: 60 }, { method: "popup", minutes: 10 }] },
+        reminders: { useDefault: false, overrides: [{ method: "popup", minutes: 10 }] },
       };
 
       const calRes = await fetch(
-        "https://www.googleapis.com/calendar/v3/calendars/fe025ce167a5b042f679c9b24648b785da74da9fd6aa2a17bcb42fe3bc955142%40group.calendar.google.com/events?conferenceDataVersion=1&sendUpdates=all",
+        "https://www.googleapis.com/calendar/v3/calendars/fe025ce167a5b042f679c9b24648b785da74da9fd6aa2a17bcb42fe3bc955142%40group.calendar.google.com/events",
         {
           method: "POST",
           headers: {
@@ -537,9 +538,9 @@ async function sendBookingConfirmation(env, slot) {
     <table style="width:100%;font-size:14px;color:#333;">
       <tr><td style="padding:8px 0;font-weight:600;color:#666;">Slot</td><td style="padding:8px 0;">${slot.label}</td></tr>
       <tr><td style="padding:8px 0;font-weight:600;color:#666;">Plan</td><td style="padding:8px 0;">${planLabel}</td></tr>
-      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Where</td><td style="padding:8px 0;">Google Meet (link sent separately)</td></tr>
+      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Where</td><td style="padding:8px 0;">Online (link sent before your first session)</td></tr>
     </table>
-    <p style="font-size:13px;color:#666;margin-top:20px;line-height:1.6;">You'll receive 6 Google Calendar invites (with Google Meet links) for your sessions: every ${slot.day} at ${slot.time}, 20 minutes each.</p>
+    <p style="font-size:13px;color:#666;margin-top:20px;line-height:1.6;">Your coaching sessions are every ${slot.day} at ${slot.time}, 20 minutes each. You'll receive a meeting link before your first session.</p>
     <p style="font-size:12px;color:#888;margin-top:8px;">Your dates: ${getWeeklyDates(DEFAULT_SLOTS.find(d => d.id === slot.id)?.startDate || START_WED).join(", ")}</p>
   </div>
   <div style="text-align:center;font-size:11px;color:#999;padding:20px 0;">
@@ -580,7 +581,7 @@ async function sendHostNotification(env, slot) {
       html: `<p><strong>${b.name}</strong> (${b.email}) just booked <strong>${slot.label}</strong>.</p>
              <p>Plan: ${planLabel}</p>
              <p>Stripe session: ${b.stripeSessionId}</p>
-             <p>6 Google Calendar events with Meet links have been created automatically.</p>`,
+             <p>6 calendar events created on AI Badge calendar. Add a Meet link to the first session.</p>`,
     }),
   });
 }
