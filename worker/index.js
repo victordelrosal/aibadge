@@ -107,7 +107,7 @@ async function handleGetSlots(env) {
 async function handleHold(request, env) {
   try {
     const body = await request.json();
-    const { slotId, plan, name, email } = body;
+    const { slotId, plan, name, email, holdToken: existingHoldToken } = body;
 
     if (!slotId || !plan || !name || !email) {
       return jsonResponse({ error: "Missing required fields: slotId, plan, name, email" }, 400);
@@ -123,9 +123,12 @@ async function handleHold(request, env) {
     const slot = JSON.parse(raw);
     const now = Date.now();
 
-    // Check if available (or held but expired)
+    // Check if available (or held but expired, or held by same user)
     if (slot.status === "held" && slot.holdUntil && slot.holdUntil > now) {
-      return jsonResponse({ error: "This slot is temporarily held by another user. Try again shortly." }, 409);
+      // Allow same user to re-hold (e.g. switching payment plan)
+      if (!existingHoldToken || slot.holdToken !== existingHoldToken) {
+        return jsonResponse({ error: "This slot is temporarily held by another user. Try again shortly." }, 409);
+      }
     }
     if (slot.status === "booked") {
       return jsonResponse({ error: "This slot is already booked." }, 409);
@@ -139,29 +142,58 @@ async function handleHold(request, env) {
     await env.SLOTS.put(`slot:${slotId}`, JSON.stringify(slot));
 
     // Create Stripe Checkout Session
-    const amount = plan === "upfront" ? 49500 : 9000;
     const dates = getWeeklyDates(slot.startDate || START_WED);
     const dateList = dates.join(", ");
-    const description = plan === "upfront"
-      ? `AI Badge: 6-week coaching (${slot.label}) — ${dateList}`
-      : `AI Badge: Coaching (${slot.label}) — 6 sessions: ${dateList}`;
 
-    const stripeParams = new URLSearchParams({
-      "mode": "payment",
-      "success_url": `${env.SITE_URL}?booking=success&slot=${slotId}`,
-      "cancel_url": `${env.SITE_URL}?booking=cancelled&slot=${slotId}`,
-      "line_items[0][price_data][currency]": "eur",
-      "line_items[0][price_data][unit_amount]": amount.toString(),
-      "line_items[0][price_data][product_data][name]": description,
-      "line_items[0][quantity]": "1",
-      "customer_email": email,
-      "metadata[slotId]": slotId,
-      "metadata[plan]": plan,
-      "metadata[holdToken]": holdToken,
-      "metadata[customerName]": name,
-      "metadata[customerEmail]": email,
-      "expires_at": Math.floor(Date.now() / 1000 + 1800).toString(),
-    });
+    let stripeParams;
+
+    if (plan === "weekly") {
+      // Subscription: 6 weekly payments of €90
+      const sixWeeksFromNow = Math.floor(Date.now() / 1000) + (6 * 7 * 24 * 60 * 60);
+      stripeParams = new URLSearchParams({
+        "mode": "subscription",
+        "success_url": `${env.SITE_URL}?booking=success&slot=${slotId}`,
+        "cancel_url": `${env.SITE_URL}?booking=cancelled&slot=${slotId}`,
+        "line_items[0][price_data][currency]": "eur",
+        "line_items[0][price_data][unit_amount]": "9000",
+        "line_items[0][price_data][recurring][interval]": "week",
+        "line_items[0][price_data][product_data][name]": `AI Badge: Weekly Coaching (${slot.label})`,
+        "line_items[0][price_data][product_data][description]": `6 weekly payments of €90. Sessions: ${dateList}`,
+        "line_items[0][quantity]": "1",
+        "customer_email": email,
+        "subscription_data[metadata][slotId]": slotId,
+        "subscription_data[metadata][plan]": plan,
+        "subscription_data[metadata][holdToken]": holdToken,
+        "subscription_data[metadata][customerName]": name,
+        "subscription_data[metadata][customerEmail]": email,
+        "subscription_data[cancel_at]": sixWeeksFromNow.toString(),
+        "metadata[slotId]": slotId,
+        "metadata[plan]": plan,
+        "metadata[holdToken]": holdToken,
+        "metadata[customerName]": name,
+        "metadata[customerEmail]": email,
+        "expires_at": Math.floor(Date.now() / 1000 + 1800).toString(),
+      });
+    } else {
+      // One-time payment: €495 upfront
+      stripeParams = new URLSearchParams({
+        "mode": "payment",
+        "success_url": `${env.SITE_URL}?booking=success&slot=${slotId}`,
+        "cancel_url": `${env.SITE_URL}?booking=cancelled&slot=${slotId}`,
+        "line_items[0][price_data][currency]": "eur",
+        "line_items[0][price_data][unit_amount]": "49500",
+        "line_items[0][price_data][product_data][name]": `AI Badge: 6-Week Coaching (${slot.label})`,
+        "line_items[0][price_data][product_data][description]": `Complete programme, one payment (save €45). Sessions: ${dateList}`,
+        "line_items[0][quantity]": "1",
+        "customer_email": email,
+        "metadata[slotId]": slotId,
+        "metadata[plan]": plan,
+        "metadata[holdToken]": holdToken,
+        "metadata[customerName]": name,
+        "metadata[customerEmail]": email,
+        "expires_at": Math.floor(Date.now() / 1000 + 1800).toString(),
+      });
+    }
 
     const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
@@ -240,7 +272,8 @@ async function handleStripeWebhook(request, env) {
       email: customerEmail,
       plan: plan,
       stripeSessionId: session.id,
-      stripePaymentIntent: session.payment_intent,
+      stripePaymentIntent: session.payment_intent || null,
+      stripeSubscription: session.subscription || null,
       bookedAt: new Date().toISOString(),
     };
     await env.SLOTS.put(`slot:${slotId}`, JSON.stringify(slot));

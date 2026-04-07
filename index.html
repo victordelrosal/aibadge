@@ -3777,10 +3777,17 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     btn.style.pointerEvents = 'none';
 
     try {
+      /* Send existing holdToken so same user can switch plan */
+      var existingToken = null;
+      try { existingToken = sessionStorage.getItem('holdToken_' + selectedSlotId); } catch(e){}
+
+      var holdBody = {slotId: selectedSlotId, plan: selectedPlan, name: name, email: email};
+      if(existingToken) holdBody.holdToken = existingToken;
+
       var res = await fetch(API + '/hold', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({slotId: selectedSlotId, plan: selectedPlan, name: name, email: email})
+        body: JSON.stringify(holdBody)
       });
       var data = await res.json();
 
@@ -3790,6 +3797,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         loadSlots();
         return;
       }
+
+      /* Store holdToken so user can come back and switch plan */
+      try { sessionStorage.setItem('holdToken_' + selectedSlotId, data.holdToken); } catch(e){}
 
       /* Show hold timer */
       var timerEl = document.getElementById('holdTimer');
