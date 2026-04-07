@@ -4,3 +4,8 @@ compatibility_date = "2024-01-01"
 
 [vars]
 FROM_EMAIL = "AI Badge <victor@fiveinnolabs.com>"
+SITE_URL = "https://aibadge.fiveinnolabs.com"
+
+[[kv_namespaces]]
+binding = "SLOTS"
+id = "e11a3cbfa9df4a52b4b41091db6e4250"

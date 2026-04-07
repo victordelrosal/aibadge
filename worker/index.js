@@ -1,81 +1,437 @@
-// Cloudflare Worker: AI Badge Report Mailer
-// Receives assessment data, sends formatted email via Resend
+// Cloudflare Worker: AI Badge Booking + Report Mailer
+// Handles: slot availability, temporary holds, Stripe Checkout, webhooks, email reports
+
+const HOLD_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+
+// ── Default 10 coaching slots (Wed/Thu) ──
+const DEFAULT_SLOTS = [
+  { id: "wed-1", day: "Wednesday", time: "11:00", label: "Wed 11:00 AM" },
+  { id: "wed-2", day: "Wednesday", time: "12:00", label: "Wed 12:00 PM" },
+  { id: "wed-3", day: "Wednesday", time: "14:00", label: "Wed 2:00 PM" },
+  { id: "wed-4", day: "Wednesday", time: "15:00", label: "Wed 3:00 PM" },
+  { id: "wed-5", day: "Wednesday", time: "16:00", label: "Wed 4:00 PM" },
+  { id: "thu-1", day: "Thursday",  time: "11:00", label: "Thu 11:00 AM" },
+  { id: "thu-2", day: "Thursday",  time: "12:00", label: "Thu 12:00 PM" },
+  { id: "thu-3", day: "Thursday",  time: "14:00", label: "Thu 2:00 PM" },
+  { id: "thu-4", day: "Thursday",  time: "15:00", label: "Thu 3:00 PM" },
+  { id: "thu-5", day: "Thursday",  time: "16:00", label: "Thu 4:00 PM" },
+];
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+
     // CORS preflight
     if (request.method === "OPTIONS") {
-      return new Response(null, {
-        headers: corsHeaders()
-      });
+      return new Response(null, { headers: corsHeaders() });
     }
 
-    if (request.method !== "POST") {
-      return jsonResponse({ error: "POST required" }, 405);
+    // ── Slot booking API ──
+    if (path === "/api/slots" && request.method === "GET") {
+      return handleGetSlots(env);
+    }
+    if (path === "/api/hold" && request.method === "POST") {
+      return handleHold(request, env);
+    }
+    if (path === "/api/webhook" && request.method === "POST") {
+      return handleStripeWebhook(request, env);
+    }
+    if (path === "/api/init" && request.method === "POST") {
+      return handleInit(env);
     }
 
-    try {
-      const body = await request.json();
-      const { email, scores, score, tier, archetype, flags, report } = body;
-
-      if (!email || !email.includes("@")) {
-        return jsonResponse({ error: "Valid email required" }, 400);
-      }
-
-      // Build HTML email
-      const html = buildEmailHTML({ scores, score, tier, archetype, flags, report });
-
-      // Send via Resend
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${env.RESEND_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          from: env.FROM_EMAIL,
-          to: email,
-          subject: `Your AI Competency Report: ${tier} (Score: ${score}/100)`,
-          html: html,
-          text: report || ""
-        })
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        console.error("Resend error:", result);
-        return jsonResponse({ error: "Email send failed", detail: result }, 500);
-      }
-
-      return jsonResponse({ success: true, id: result.id });
-
-    } catch (err) {
-      console.error("Worker error:", err);
-      return jsonResponse({ error: err.message }, 500);
+    // ── Legacy: report mailer (POST to root) ──
+    if (request.method === "POST" && (path === "/" || path === "")) {
+      return handleReportEmail(request, env);
     }
+
+    return jsonResponse({ error: "Not found" }, 404);
   }
 };
 
-function corsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type"
-  };
+// ══════════════════════════════════════════
+// SLOT MANAGEMENT
+// ══════════════════════════════════════════
+
+async function handleGetSlots(env) {
+  const slots = await getAllSlots(env);
+  // Release expired holds
+  const now = Date.now();
+  let changed = false;
+  for (const slot of slots) {
+    if (slot.status === "held" && slot.holdUntil && slot.holdUntil < now) {
+      slot.status = "available";
+      slot.holdUntil = null;
+      slot.holdToken = null;
+      await env.SLOTS.put(`slot:${slot.id}`, JSON.stringify(slot));
+      changed = true;
+    }
+  }
+  // Return public view (no internal tokens)
+  const publicSlots = slots.map(s => ({
+    id: s.id,
+    day: s.day,
+    time: s.time,
+    label: s.label,
+    status: s.status === "held" ? "held" : s.status
+  }));
+  return jsonResponse({ slots: publicSlots });
 }
 
-function jsonResponse(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      ...corsHeaders()
+async function handleHold(request, env) {
+  try {
+    const body = await request.json();
+    const { slotId, plan, name, email } = body;
+
+    if (!slotId || !plan || !name || !email) {
+      return jsonResponse({ error: "Missing required fields: slotId, plan, name, email" }, 400);
     }
+    if (!["weekly", "upfront"].includes(plan)) {
+      return jsonResponse({ error: "Plan must be 'weekly' or 'upfront'" }, 400);
+    }
+
+    // Read slot
+    const raw = await env.SLOTS.get(`slot:${slotId}`);
+    if (!raw) return jsonResponse({ error: "Slot not found" }, 404);
+
+    const slot = JSON.parse(raw);
+    const now = Date.now();
+
+    // Check if available (or held but expired)
+    if (slot.status === "held" && slot.holdUntil && slot.holdUntil > now) {
+      return jsonResponse({ error: "This slot is temporarily held by another user. Try again shortly." }, 409);
+    }
+    if (slot.status === "booked") {
+      return jsonResponse({ error: "This slot is already booked." }, 409);
+    }
+
+    // Create hold
+    const holdToken = crypto.randomUUID();
+    slot.status = "held";
+    slot.holdUntil = now + HOLD_DURATION_MS;
+    slot.holdToken = holdToken;
+    await env.SLOTS.put(`slot:${slotId}`, JSON.stringify(slot));
+
+    // Create Stripe Checkout Session
+    const amount = plan === "upfront" ? 49500 : 9000;
+    const description = plan === "upfront"
+      ? "AI Badge: Complete 6-week coaching programme"
+      : `AI Badge: Coaching session (${slot.label})`;
+
+    const stripeParams = new URLSearchParams({
+      "mode": "payment",
+      "success_url": `${env.SITE_URL}?booking=success&slot=${slotId}`,
+      "cancel_url": `${env.SITE_URL}?booking=cancelled&slot=${slotId}`,
+      "line_items[0][price_data][currency]": "eur",
+      "line_items[0][price_data][unit_amount]": amount.toString(),
+      "line_items[0][price_data][product_data][name]": description,
+      "line_items[0][quantity]": "1",
+      "customer_email": email,
+      "metadata[slotId]": slotId,
+      "metadata[plan]": plan,
+      "metadata[holdToken]": holdToken,
+      "metadata[customerName]": name,
+      "metadata[customerEmail]": email,
+      "expires_at": Math.floor(Date.now() / 1000 + 1800).toString(),
+    });
+
+    const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: stripeParams.toString(),
+    });
+
+    const session = await stripeRes.json();
+
+    if (!stripeRes.ok) {
+      // Release hold on Stripe error
+      slot.status = "available";
+      slot.holdUntil = null;
+      slot.holdToken = null;
+      await env.SLOTS.put(`slot:${slotId}`, JSON.stringify(slot));
+      console.error("Stripe error:", JSON.stringify(session));
+      return jsonResponse({ error: "Payment session creation failed", detail: session.error?.message }, 500);
+    }
+
+    return jsonResponse({
+      checkoutUrl: session.url,
+      holdToken: holdToken,
+      expiresAt: slot.holdUntil,
+    });
+
+  } catch (err) {
+    console.error("Hold error:", err);
+    return jsonResponse({ error: err.message }, 500);
+  }
+}
+
+async function handleStripeWebhook(request, env) {
+  const body = await request.text();
+  const sig = request.headers.get("stripe-signature");
+
+  // Verify webhook signature
+  let event;
+  try {
+    event = await verifyStripeWebhook(body, sig, env.STRIPE_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error("Webhook verification failed:", err.message);
+    return jsonResponse({ error: "Invalid signature" }, 400);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const slotId = session.metadata?.slotId;
+    const plan = session.metadata?.plan;
+    const holdToken = session.metadata?.holdToken;
+    const customerName = session.metadata?.customerName;
+    const customerEmail = session.metadata?.customerEmail;
+
+    if (!slotId) return jsonResponse({ received: true });
+
+    const raw = await env.SLOTS.get(`slot:${slotId}`);
+    if (!raw) return jsonResponse({ received: true });
+
+    const slot = JSON.parse(raw);
+
+    // Verify hold token matches (prevent race conditions)
+    if (slot.holdToken !== holdToken) {
+      console.error(`Hold token mismatch for slot ${slotId}`);
+      // Refund would be needed here in production
+      return jsonResponse({ received: true });
+    }
+
+    // Confirm booking
+    slot.status = "booked";
+    slot.holdUntil = null;
+    slot.holdToken = null;
+    slot.booking = {
+      name: customerName,
+      email: customerEmail,
+      plan: plan,
+      stripeSessionId: session.id,
+      stripePaymentIntent: session.payment_intent,
+      bookedAt: new Date().toISOString(),
+    };
+    await env.SLOTS.put(`slot:${slotId}`, JSON.stringify(slot));
+
+    // Send confirmation email
+    await sendBookingConfirmation(env, slot);
+
+    // Send notification to Victor
+    await sendHostNotification(env, slot);
+  }
+
+  if (event.type === "checkout.session.expired") {
+    const session = event.data.object;
+    const slotId = session.metadata?.slotId;
+    const holdToken = session.metadata?.holdToken;
+
+    if (slotId) {
+      const raw = await env.SLOTS.get(`slot:${slotId}`);
+      if (raw) {
+        const slot = JSON.parse(raw);
+        if (slot.holdToken === holdToken) {
+          slot.status = "available";
+          slot.holdUntil = null;
+          slot.holdToken = null;
+          await env.SLOTS.put(`slot:${slotId}`, JSON.stringify(slot));
+        }
+      }
+    }
+  }
+
+  return jsonResponse({ received: true });
+}
+
+// ══════════════════════════════════════════
+// SLOT HELPERS
+// ══════════════════════════════════════════
+
+async function getAllSlots(env) {
+  const slots = [];
+  for (const def of DEFAULT_SLOTS) {
+    const raw = await env.SLOTS.get(`slot:${def.id}`);
+    if (raw) {
+      slots.push(JSON.parse(raw));
+    } else {
+      // Auto-initialize missing slots
+      const slot = { ...def, status: "available", holdUntil: null, holdToken: null, booking: null };
+      await env.SLOTS.put(`slot:${def.id}`, JSON.stringify(slot));
+      slots.push(slot);
+    }
+  }
+  return slots;
+}
+
+async function handleInit(env) {
+  for (const def of DEFAULT_SLOTS) {
+    const slot = { ...def, status: "available", holdUntil: null, holdToken: null, booking: null };
+    await env.SLOTS.put(`slot:${def.id}`, JSON.stringify(slot));
+  }
+  return jsonResponse({ message: "Initialized 10 slots", slots: DEFAULT_SLOTS.map(s => s.id) });
+}
+
+// ══════════════════════════════════════════
+// STRIPE WEBHOOK VERIFICATION
+// ══════════════════════════════════════════
+
+async function verifyStripeWebhook(payload, sigHeader, secret) {
+  if (!sigHeader || !secret) throw new Error("Missing signature or secret");
+
+  const parts = {};
+  sigHeader.split(",").forEach(item => {
+    const [key, value] = item.split("=");
+    parts[key.trim()] = value;
+  });
+
+  const timestamp = parts["t"];
+  const signature = parts["v1"];
+  if (!timestamp || !signature) throw new Error("Invalid signature format");
+
+  // Check timestamp (allow 5 min tolerance)
+  const age = Math.abs(Date.now() / 1000 - parseInt(timestamp));
+  if (age > 300) throw new Error("Timestamp too old");
+
+  // Compute expected signature
+  const signedPayload = `${timestamp}.${payload}`;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signedPayload));
+  const expected = Array.from(new Uint8Array(mac)).map(b => b.toString(16).padStart(2, "0")).join("");
+
+  if (expected !== signature) throw new Error("Signature mismatch");
+
+  return JSON.parse(payload);
+}
+
+// ══════════════════════════════════════════
+// EMAILS
+// ══════════════════════════════════════════
+
+async function sendBookingConfirmation(env, slot) {
+  const b = slot.booking;
+  const planLabel = b.plan === "upfront" ? "Full Programme (6 weeks, €495)" : `Weekly Session (€90)`;
+
+  const html = `
+<!DOCTYPE html><html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,sans-serif;">
+<div style="max-width:600px;margin:0 auto;padding:32px 16px;">
+  <div style="text-align:center;margin-bottom:24px;">
+    <div style="font-size:24px;font-weight:800;color:#000036;">AI Badge</div>
+    <div style="font-size:12px;color:#888;margin-top:2px;">Booking Confirmation</div>
+  </div>
+  <div style="background:#fff;border-radius:16px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:48px;">&#x2705;</div>
+      <div style="font-size:22px;font-weight:700;color:#000036;margin-top:8px;">You're booked!</div>
+    </div>
+    <table style="width:100%;font-size:14px;color:#333;">
+      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Slot</td><td style="padding:8px 0;">${slot.label}</td></tr>
+      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Plan</td><td style="padding:8px 0;">${planLabel}</td></tr>
+      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Where</td><td style="padding:8px 0;">Google Meet (link sent separately)</td></tr>
+    </table>
+    <p style="font-size:13px;color:#666;margin-top:20px;line-height:1.6;">You'll receive a Google Calendar invite with the Meet link shortly. Sessions are 20 minutes, every week on ${slot.day} at ${slot.time}.</p>
+  </div>
+  <div style="text-align:center;font-size:11px;color:#999;padding:20px 0;">
+    AI Badge by Victor del Rosal &middot; <a href="https://fiveinnolabs.com" style="color:#D4AF37;">fiveinnolabs</a>
+  </div>
+</div>
+</body></html>`;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: env.FROM_EMAIL,
+      to: b.email,
+      subject: `Booking Confirmed: AI Badge ${slot.label}`,
+      html: html,
+    }),
   });
 }
 
-function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
+async function sendHostNotification(env, slot) {
+  const b = slot.booking;
+  const planLabel = b.plan === "upfront" ? "Full Programme (€495)" : "Weekly (€90)";
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: env.FROM_EMAIL,
+      to: "victor@fiveinnolabs.com",
+      subject: `New AI Badge Booking: ${b.name} (${slot.label})`,
+      html: `<p><strong>${b.name}</strong> (${b.email}) just booked <strong>${slot.label}</strong>.</p>
+             <p>Plan: ${planLabel}</p>
+             <p>Stripe session: ${b.stripeSessionId}</p>
+             <p>Please create a Google Calendar event with Google Meet for this slot.</p>`,
+    }),
+  });
+}
+
+// ══════════════════════════════════════════
+// REPORT MAILER (existing functionality)
+// ══════════════════════════════════════════
+
+async function handleReportEmail(request, env) {
+  try {
+    const body = await request.json();
+    const { email, scores, score, tier, archetype, flags, report } = body;
+
+    if (!email || !email.includes("@")) {
+      return jsonResponse({ error: "Valid email required" }, 400);
+    }
+
+    const html = buildReportEmailHTML({ scores, score, tier, archetype, flags, report });
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: env.FROM_EMAIL,
+        to: email,
+        subject: `Your AI Competency Report: ${tier} (Score: ${score}/100)`,
+        html: html,
+        text: report || "",
+      }),
+    });
+
+    const result = await res.json();
+    if (!res.ok) {
+      console.error("Resend error:", result);
+      return jsonResponse({ error: "Email send failed", detail: result }, 500);
+    }
+    return jsonResponse({ success: true, id: result.id });
+
+  } catch (err) {
+    console.error("Worker error:", err);
+    return jsonResponse({ error: err.message }, 500);
+  }
+}
+
+// ══════════════════════════════════════════
+// REPORT EMAIL HTML BUILDER
+// ══════════════════════════════════════════
+
+function buildReportEmailHTML({ scores, score, tier, archetype, flags, report }) {
   const s = score || 0;
   const dims = [
     { name: "AI Foundations", val: scores?.aiFoundations || 1 },
@@ -99,10 +455,8 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
       ${f.type === "warning" ? "\u26A0\uFE0F" : f.type === "caution" ? "\u25D0" : "\u2139\uFE0F"} ${f.text}
     </div>`).join("");
 
-  // Bar chart for each dimension (email-safe, table-based)
   const maxBar = 200;
   const dimBars = dims.map(d => {
-    const pct = (d.val / 5) * 100;
     const barW = Math.round((d.val / 5) * maxBar);
     return `
     <tr>
@@ -119,21 +473,18 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
     </tr>`;
   }).join("");
 
-  // Format report text into styled HTML
   const formattedReport = formatReportHTML(report || "");
+  const safeReport = (report || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
   return `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-
-<!-- Wrapper table for email client compatibility -->
 <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f5f5f7;">
 <tr><td align="center" style="padding:40px 16px;">
 <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;">
 
-  <!-- Header -->
   <tr><td align="center" style="padding-bottom:32px;">
     <table cellpadding="0" cellspacing="0" border="0"><tr>
       <td style="padding:10px 24px;border-radius:12px;background:#000036;">
@@ -143,27 +494,21 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
     <p style="font-size:12px;color:#999;margin:8px 0 0;">AI Competency Profile Report</p>
   </td></tr>
 
-  <!-- Score card -->
   <tr><td style="padding-bottom:20px;">
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;">
     <tr><td align="center" style="padding:40px 32px;">
-
-      <!-- Score circle using table + border trick -->
       <table cellpadding="0" cellspacing="0" border="0"><tr>
         <td align="center" style="width:120px;height:120px;border-radius:60px;border:6px solid #D4AF37;background:#ffffff;text-align:center;vertical-align:middle;">
           <span style="font-size:48px;font-weight:800;color:#D4AF37;line-height:1;">${s}</span><br>
           <span style="font-size:10px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.1em;">out of 100</span>
         </td>
       </tr></table>
-
       <p style="font-size:28px;font-weight:700;color:#000036;margin:20px 0 0;line-height:1.2;">${tier || "Unknown"}</p>
       <p style="font-size:14px;color:#666;margin:6px 0 0;">Profile type: <strong style="color:#333;">${archetype || "Unknown"}</strong></p>
-
     </td></tr>
     </table>
   </td></tr>
 
-  <!-- Dimensions -->
   <tr><td style="padding-bottom:20px;">
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;">
     <tr><td style="padding:28px;">
@@ -176,7 +521,6 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
   </td></tr>
 
   ${flagRows ? `
-  <!-- Observations -->
   <tr><td style="padding-bottom:20px;">
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;">
     <tr><td style="padding:28px;">
@@ -187,7 +531,6 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
   </td></tr>
   ` : ""}
 
-  <!-- Full report -->
   <tr><td style="padding-bottom:20px;">
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border-radius:16px;">
     <tr><td style="padding:28px;">
@@ -197,7 +540,6 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
     </table>
   </td></tr>
 
-  <!-- CTA -->
   <tr><td style="padding-bottom:20px;">
     <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#000036;border-radius:16px;">
     <tr><td align="center" style="padding:40px 32px;">
@@ -212,7 +554,6 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
     </table>
   </td></tr>
 
-  <!-- Footer -->
   <tr><td align="center" style="padding:20px 0;">
     <p style="font-size:11px;color:#bbb;margin:0;">Victor del Rosal &middot; <a href="https://fiveinnolabs.com" style="color:#D4AF37;text-decoration:none;">fiveinnolabs</a> &middot; 2026</p>
     <p style="font-size:10px;color:#ccc;margin:4px 0 0;">You received this because you requested an AI competency report at aibadge.com</p>
@@ -221,7 +562,6 @@ function buildEmailHTML({ scores, score, tier, archetype, flags, report }) {
 </table>
 </td></tr>
 </table>
-
 </body>
 </html>`;
 }
@@ -234,52 +574,39 @@ function formatReportHTML(text) {
 
   while (i < lines.length) {
     const line = lines[i].trim();
-
-    // Skip separator lines (━━━ or ───)
     if (/^[━─]{4,}/.test(line)) { i++; continue; }
-
-    // Skip empty lines
     if (!line) { i++; continue; }
 
-    // Section headers: ALL CAPS lines (e.g. "DIMENSION BREAKDOWN", "AI FOUNDATIONS: Level 2/5")
     if (/^[A-Z][A-Z &\/\(\),:0-9]+$/.test(line) && line.length > 3) {
-      // Check if it's a top-level section (no colon with Level) or a dimension header
-      if (line.includes("LEVEL") || line.includes(": LEVEL") || /: Level/i.test(lines[i])) {
-        // Dimension sub-header
+      if (line.includes("LEVEL") || /: Level/i.test(lines[i])) {
         html += `<p style="font-size:14px;font-weight:700;color:#000036;margin:20px 0 4px;padding-top:16px;border-top:1px solid #f0f0f0;">${line}</p>`;
       } else {
-        // Major section header
         html += `<p style="font-size:12px;font-weight:700;color:#D4AF37;text-transform:uppercase;letter-spacing:0.06em;margin:24px 0 8px;padding-top:16px;border-top:2px solid #f0f0f0;">${line}</p>`;
       }
       i++; continue;
     }
 
-    // Dimension headers with level (e.g. "AI FOUNDATIONS: Level 2/5")
     if (/^[A-Z][A-Z &\/]+:/.test(line)) {
       html += `<p style="font-size:14px;font-weight:700;color:#000036;margin:20px 0 4px;padding-top:16px;border-top:1px solid #f0f0f0;">${line}</p>`;
       i++; continue;
     }
 
-    // Quoted lines (dimension self-assessment quotes)
     if (line.startsWith("&quot;") || line.startsWith('"') || line.startsWith("\u201C")) {
       html += `<p style="font-size:13px;font-style:italic;color:#666;margin:4px 0 4px;padding-left:12px;border-left:3px solid #D4AF37;">${line}</p>`;
       i++; continue;
     }
 
-    // Numbered recommendations (1. 2. 3.)
     if (/^\d+\./.test(line)) {
       html += `<p style="font-size:13px;font-weight:600;color:#333;margin:16px 0 4px;">${line}</p>`;
       i++; continue;
     }
 
-    // Framework mapping lines starting with ─ or dash
     if (line.startsWith("─") || line.startsWith("&amp;#x2500;")) {
       const fwName = line.replace(/^─+\s*/, "");
       html += `<p style="font-size:13px;font-weight:700;color:#000036;margin:16px 0 4px;">${fwName}</p>`;
       i++; continue;
     }
 
-    // Lines starting with "Your level:" or "Levels:"
     if (line.startsWith("Your level:")) {
       const level = line.replace("Your level:", "").trim();
       html += `<p style="font-size:13px;margin:2px 0;color:#333;">Your level: <strong style="color:#D4AF37;">${level}</strong></p>`;
@@ -291,10 +618,27 @@ function formatReportHTML(text) {
       i++; continue;
     }
 
-    // Regular paragraph text
     html += `<p style="font-size:13px;color:#444;line-height:1.6;margin:4px 0;">${line}</p>`;
     i++;
   }
-
   return html;
+}
+
+// ══════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════
+
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+}
+
+function jsonResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", ...corsHeaders() },
+  });
 }
