@@ -18,7 +18,17 @@
       ".git/**",
       ".firebaserc",
       "docs/**",
-      "firebase-debug.log"
+      "firebase-debug.log",
+      "functions/**",
+      "worker/**",
+      "AI-Badge-slides/**",
+      "HELIOS-slides-Oct2025/**",
+      "ai-projects/**",
+      ".claude/**",
+      ".firebase/**",
+      "*.md",
+      "index-landing-backup.html",
+      ".DS_Store"
     ],
     "headers": [
       {

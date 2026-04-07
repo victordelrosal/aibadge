@@ -3,19 +3,38 @@
 
 const HOLD_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
-// ── Default 10 coaching slots (Wed/Thu) ──
+// ── 13 coaching slots (Wed/Thu), 20 min each + 10 min changeover ──
+// Start date: Wed 22 April 2026, recurring weekly for 6 weeks
+const START_WED = "2026-04-22";
+const START_THU = "2026-04-23";
+
 const DEFAULT_SLOTS = [
-  { id: "wed-1", day: "Wednesday", time: "11:00", label: "Wed 11:00 AM" },
-  { id: "wed-2", day: "Wednesday", time: "12:00", label: "Wed 12:00 PM" },
-  { id: "wed-3", day: "Wednesday", time: "14:00", label: "Wed 2:00 PM" },
-  { id: "wed-4", day: "Wednesday", time: "15:00", label: "Wed 3:00 PM" },
-  { id: "wed-5", day: "Wednesday", time: "16:00", label: "Wed 4:00 PM" },
-  { id: "thu-1", day: "Thursday",  time: "11:00", label: "Thu 11:00 AM" },
-  { id: "thu-2", day: "Thursday",  time: "12:00", label: "Thu 12:00 PM" },
-  { id: "thu-3", day: "Thursday",  time: "14:00", label: "Thu 2:00 PM" },
-  { id: "thu-4", day: "Thursday",  time: "15:00", label: "Thu 3:00 PM" },
-  { id: "thu-5", day: "Thursday",  time: "16:00", label: "Thu 4:00 PM" },
+  { id: "wed-1", day: "Wednesday", time: "12:00", label: "Wed 12:00 PM", startDate: START_WED },
+  { id: "wed-2", day: "Wednesday", time: "12:30", label: "Wed 12:30 PM", startDate: START_WED },
+  { id: "wed-3", day: "Wednesday", time: "13:00", label: "Wed 1:00 PM",  startDate: START_WED },
+  { id: "wed-4", day: "Wednesday", time: "13:30", label: "Wed 1:30 PM",  startDate: START_WED },
+  { id: "wed-5", day: "Wednesday", time: "14:00", label: "Wed 2:00 PM",  startDate: START_WED, preBooked: true },
+  { id: "wed-6", day: "Wednesday", time: "19:00", label: "Wed 7:00 PM",  startDate: START_WED },
+  { id: "wed-7", day: "Wednesday", time: "19:30", label: "Wed 7:30 PM",  startDate: START_WED },
+  { id: "thu-1", day: "Thursday",  time: "12:00", label: "Thu 12:00 PM", startDate: START_THU },
+  { id: "thu-2", day: "Thursday",  time: "12:30", label: "Thu 12:30 PM", startDate: START_THU },
+  { id: "thu-3", day: "Thursday",  time: "13:00", label: "Thu 1:00 PM",  startDate: START_THU },
+  { id: "thu-4", day: "Thursday",  time: "13:30", label: "Thu 1:30 PM",  startDate: START_THU },
+  { id: "thu-5", day: "Thursday",  time: "19:00", label: "Thu 7:00 PM",  startDate: START_THU },
+  { id: "thu-6", day: "Thursday",  time: "19:30", label: "Thu 7:30 PM",  startDate: START_THU },
 ];
+
+// Generate 6 weekly dates from a start date
+function getWeeklyDates(startDate) {
+  const dates = [];
+  const d = new Date(startDate + "T00:00:00");
+  for (let i = 0; i < 6; i++) {
+    const date = new Date(d);
+    date.setDate(d.getDate() + i * 7);
+    dates.push(date.toLocaleDateString("en-IE", { day: "numeric", month: "short" }));
+  }
+  return dates;
+}
 
 export default {
   async fetch(request, env) {
@@ -68,14 +87,20 @@ async function handleGetSlots(env) {
       changed = true;
     }
   }
-  // Return public view (no internal tokens)
-  const publicSlots = slots.map(s => ({
-    id: s.id,
-    day: s.day,
-    time: s.time,
-    label: s.label,
-    status: s.status === "held" ? "held" : s.status
-  }));
+  // Return public view (no internal tokens) with 6-week dates
+  const publicSlots = slots.map(s => {
+    const def = DEFAULT_SLOTS.find(d => d.id === s.id);
+    const startDate = def?.startDate || START_WED;
+    return {
+      id: s.id,
+      day: s.day,
+      time: s.time,
+      label: s.label,
+      status: s.status === "held" ? "held" : s.status,
+      startDate: startDate,
+      dates: getWeeklyDates(startDate),
+    };
+  });
   return jsonResponse({ slots: publicSlots });
 }
 
@@ -115,9 +140,11 @@ async function handleHold(request, env) {
 
     // Create Stripe Checkout Session
     const amount = plan === "upfront" ? 49500 : 9000;
+    const dates = getWeeklyDates(slot.startDate || START_WED);
+    const dateList = dates.join(", ");
     const description = plan === "upfront"
-      ? "AI Badge: Complete 6-week coaching programme"
-      : `AI Badge: Coaching session (${slot.label})`;
+      ? `AI Badge: 6-week coaching (${slot.label}) — ${dateList}`
+      : `AI Badge: Coaching (${slot.label}) — 6 sessions: ${dateList}`;
 
     const stripeParams = new URLSearchParams({
       "mode": "payment",
@@ -218,6 +245,9 @@ async function handleStripeWebhook(request, env) {
     };
     await env.SLOTS.put(`slot:${slotId}`, JSON.stringify(slot));
 
+    // Create Google Calendar events for all 6 sessions
+    await createCalendarEvents(env, slot);
+
     // Send confirmation email
     await sendBookingConfirmation(env, slot);
 
@@ -259,7 +289,12 @@ async function getAllSlots(env) {
       slots.push(JSON.parse(raw));
     } else {
       // Auto-initialize missing slots
-      const slot = { ...def, status: "available", holdUntil: null, holdToken: null, booking: null };
+      const slot = {
+        id: def.id, day: def.day, time: def.time, label: def.label,
+        status: def.preBooked ? "booked" : "available",
+        holdUntil: null, holdToken: null,
+        booking: def.preBooked ? { name: "Enrolled", email: "", plan: "weekly", bookedAt: "2026-04-07" } : null
+      };
       await env.SLOTS.put(`slot:${def.id}`, JSON.stringify(slot));
       slots.push(slot);
     }
@@ -269,10 +304,15 @@ async function getAllSlots(env) {
 
 async function handleInit(env) {
   for (const def of DEFAULT_SLOTS) {
-    const slot = { ...def, status: "available", holdUntil: null, holdToken: null, booking: null };
+    const slot = {
+      id: def.id, day: def.day, time: def.time, label: def.label,
+      status: def.preBooked ? "booked" : "available",
+      holdUntil: null, holdToken: null,
+      booking: def.preBooked ? { name: "Enrolled", email: "", plan: "weekly", bookedAt: "2026-04-07" } : null
+    };
     await env.SLOTS.put(`slot:${def.id}`, JSON.stringify(slot));
   }
-  return jsonResponse({ message: "Initialized 10 slots", slots: DEFAULT_SLOTS.map(s => s.id) });
+  return jsonResponse({ message: `Initialized ${DEFAULT_SLOTS.length} slots`, slots: DEFAULT_SLOTS.map(s => s.id) });
 }
 
 // ══════════════════════════════════════════
@@ -314,6 +354,133 @@ async function verifyStripeWebhook(payload, sigHeader, secret) {
 }
 
 // ══════════════════════════════════════════
+// GOOGLE CALENDAR
+// ══════════════════════════════════════════
+
+async function getGoogleAccessToken(env) {
+  const sa = JSON.parse(env.GOOGLE_SERVICE_ACCOUNT);
+  const now = Math.floor(Date.now() / 1000);
+
+  // Build JWT header + claim set
+  const header = { alg: "RS256", typ: "JWT" };
+  const claim = {
+    iss: sa.client_email,
+    scope: "https://www.googleapis.com/auth/calendar",
+    aud: "https://oauth2.googleapis.com/token",
+    iat: now,
+    exp: now + 3600,
+  };
+
+  const toBase64Url = (obj) =>
+    btoa(JSON.stringify(obj)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+  const unsigned = toBase64Url(header) + "." + toBase64Url(claim);
+
+  // Import RSA private key and sign
+  const pemBody = sa.private_key
+    .replace("-----BEGIN PRIVATE KEY-----", "")
+    .replace("-----END PRIVATE KEY-----", "")
+    .replace(/\s/g, "");
+  const keyData = Uint8Array.from(atob(pemBody), (c) => c.charCodeAt(0));
+
+  const cryptoKey = await crypto.subtle.importKey(
+    "pkcs8",
+    keyData.buffer,
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+
+  const signature = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    cryptoKey,
+    new TextEncoder().encode(unsigned)
+  );
+  const sig64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  const jwt = unsigned + "." + sig64;
+
+  // Exchange JWT for access token
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,
+  });
+
+  const tokenData = await tokenRes.json();
+  if (!tokenRes.ok) {
+    console.error("Google token error:", tokenData);
+    throw new Error("Failed to get Google access token");
+  }
+  return tokenData.access_token;
+}
+
+async function createCalendarEvents(env, slot) {
+  try {
+    const accessToken = await getGoogleAccessToken(env);
+    const b = slot.booking;
+    const startDate = DEFAULT_SLOTS.find((d) => d.id === slot.id)?.startDate || START_WED;
+
+    // Create 6 weekly events
+    for (let week = 0; week < 6; week++) {
+      const d = new Date(startDate + "T00:00:00");
+      d.setDate(d.getDate() + week * 7);
+      const dateStr = d.toISOString().split("T")[0]; // YYYY-MM-DD
+
+      const [hours, mins] = slot.time.split(":");
+      const startISO = `${dateStr}T${hours}:${mins}:00+01:00`; // IST (Ireland)
+      const endMins = parseInt(mins) + 20;
+      const endHours = parseInt(hours) + Math.floor(endMins / 60);
+      const endM = endMins % 60;
+      const endISO = `${dateStr}T${String(endHours).padStart(2, "0")}:${String(endM).padStart(2, "0")}:00+01:00`;
+
+      const event = {
+        summary: `AI Badge: ${b.name} (Week ${week + 1}/6)`,
+        description: `AI Badge coaching session with ${b.name} (${b.email}).\nPlan: ${b.plan}\nSlot: ${slot.label}`,
+        start: { dateTime: startISO, timeZone: "Europe/Dublin" },
+        end: { dateTime: endISO, timeZone: "Europe/Dublin" },
+        attendees: [
+          { email: b.email, displayName: b.name },
+          { email: "victor@fiveinnolabs.com", displayName: "Victor del Rosal" },
+        ],
+        conferenceData: {
+          createRequest: {
+            requestId: `aibadge-${slot.id}-w${week + 1}-${Date.now()}`,
+            conferenceSolutionKey: { type: "hangoutsMeet" },
+          },
+        },
+        reminders: { useDefault: false, overrides: [{ method: "email", minutes: 60 }, { method: "popup", minutes: 10 }] },
+      };
+
+      const calRes = await fetch(
+        "https://www.googleapis.com/calendar/v3/calendars/fe025ce167a5b042f679c9b24648b785da74da9fd6aa2a17bcb42fe3bc955142%40group.calendar.google.com/events?conferenceDataVersion=1&sendUpdates=all",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(event),
+        }
+      );
+
+      const calData = await calRes.json();
+      if (!calRes.ok) {
+        console.error(`Calendar event failed (week ${week + 1}):`, calData);
+      } else {
+        console.log(`Calendar event created (week ${week + 1}): ${calData.htmlLink}`);
+      }
+    }
+  } catch (err) {
+    console.error("Calendar integration error:", err);
+    // Non-blocking: booking still succeeds even if calendar fails
+  }
+}
+
+// ══════════════════════════════════════════
 // EMAILS
 // ══════════════════════════════════════════
 
@@ -339,7 +506,8 @@ async function sendBookingConfirmation(env, slot) {
       <tr><td style="padding:8px 0;font-weight:600;color:#666;">Plan</td><td style="padding:8px 0;">${planLabel}</td></tr>
       <tr><td style="padding:8px 0;font-weight:600;color:#666;">Where</td><td style="padding:8px 0;">Google Meet (link sent separately)</td></tr>
     </table>
-    <p style="font-size:13px;color:#666;margin-top:20px;line-height:1.6;">You'll receive a Google Calendar invite with the Meet link shortly. Sessions are 20 minutes, every week on ${slot.day} at ${slot.time}.</p>
+    <p style="font-size:13px;color:#666;margin-top:20px;line-height:1.6;">You'll receive 6 Google Calendar invites (with Google Meet links) for your sessions: every ${slot.day} at ${slot.time}, 20 minutes each.</p>
+    <p style="font-size:12px;color:#888;margin-top:8px;">Your dates: ${getWeeklyDates(DEFAULT_SLOTS.find(d => d.id === slot.id)?.startDate || START_WED).join(", ")}</p>
   </div>
   <div style="text-align:center;font-size:11px;color:#999;padding:20px 0;">
     AI Badge by Victor del Rosal &middot; <a href="https://fiveinnolabs.com" style="color:#D4AF37;">fiveinnolabs</a>
@@ -379,7 +547,7 @@ async function sendHostNotification(env, slot) {
       html: `<p><strong>${b.name}</strong> (${b.email}) just booked <strong>${slot.label}</strong>.</p>
              <p>Plan: ${planLabel}</p>
              <p>Stripe session: ${b.stripeSessionId}</p>
-             <p>Please create a Google Calendar event with Google Meet for this slot.</p>`,
+             <p>6 Google Calendar events with Meet links have been created automatically.</p>`,
     }),
   });
 }

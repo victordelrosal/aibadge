@@ -3689,6 +3689,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   }
 
   function renderSlots(slots){
+    window._lastSlots = slots;
     var grid = document.getElementById('slotGrid');
     var available = 0;
     var html = '';
@@ -3701,12 +3702,16 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     html += '<div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;">';
 
     /* Wednesday column */
-    html += '<div style="min-width:180px;"><div style="font-weight:600;font-size:13px;color:var(--blue-deep);margin-bottom:8px;">Wednesday</div>';
+    var wedStart = wed.length ? wed[0].dates : [];
+    html += '<div style="min-width:220px;"><div style="font-weight:600;font-size:14px;color:var(--blue-deep);margin-bottom:2px;">Wednesday</div>';
+    if(wedStart.length) html += '<div style="font-size:11px;color:#888;margin-bottom:8px;">Starting 22 Apr &middot; 6 weeks</div>';
     wed.forEach(function(s){ html += slotButton(s); if(s.status === 'available') available++; });
     html += '</div>';
 
     /* Thursday column */
-    html += '<div style="min-width:180px;"><div style="font-weight:600;font-size:13px;color:var(--blue-deep);margin-bottom:8px;">Thursday</div>';
+    var thuStart = thu.length ? thu[0].dates : [];
+    html += '<div style="min-width:220px;"><div style="font-weight:600;font-size:14px;color:var(--blue-deep);margin-bottom:2px;">Thursday</div>';
+    if(thuStart.length) html += '<div style="font-size:11px;color:#888;margin-bottom:8px;">Starting 23 Apr &middot; 6 weeks</div>';
     thu.forEach(function(s){ html += slotButton(s); if(s.status === 'available') available++; });
     html += '</div>';
 
@@ -3733,7 +3738,15 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   window.selectSlot = function(id, label){
     selectedSlotId = id;
     selectedSlotLabel = label;
-    document.getElementById('selectedSlotLabel').textContent = label;
+    /* Find slot data to get dates */
+    var slot = null;
+    try { slot = window._lastSlots.find(function(s){ return s.id === id; }); } catch(e){}
+    var dates = slot && slot.dates ? slot.dates : [];
+    var labelHtml = '<strong>' + label + '</strong>';
+    if(dates.length){
+      labelHtml += '<br><span style="font-size:12px;color:#666;">6 sessions: ' + dates.join(', ') + '</span>';
+    }
+    document.getElementById('selectedSlotLabel').innerHTML = labelHtml;
     document.getElementById('paymentModal').classList.add('active');
     updatePaymentBtn();
   };
