@@ -3682,12 +3682,16 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   };
 </script>
 
-<!-- Payment Modal Logic + Stripe Checkout -->
-<script src="https://js.stripe.com/v3/"></script>
+<!-- Payment Modal Logic + Stripe Payment Links -->
 <script>
 (function(){
-  /* --- Payment option selection --- */
   let selectedPlan = 'weekly';
+
+  /* Stripe Payment Links (LIVE) */
+  const PAYMENT_LINKS = {
+    weekly:  'https://buy.stripe.com/00wbJ11mL4tD7Swbkrfw40b',
+    upfront: 'https://buy.stripe.com/7sY00j0iHbW57Sw1JRfw40c'
+  };
 
   window.selectPayment = function(el, plan){
     selectedPlan = plan;
@@ -3695,48 +3699,18 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     el.classList.add('selected');
   };
 
-  /* --- Stripe Checkout --- */
-  /* Stripe Configuration for AI Badge (LIVE) */
-  const STRIPE_CONFIG = {
-    publishableKey: 'pk_live_51LSTkfEDRHdUKb4lzHy98nTH1gtJ2SHSGlrL19rwoW9uygLLKqfXO2Se1Aze4aHm90rSnIwwWbbtQcnu19jcMpCt00fYwSHIW9',
-    prices: {
-      weekly:  'price_1TJVRnEDRHdUKb4lQPJ7C9cA',   /* €90/week recurring (LIVE) */
-      upfront: 'price_1TJVS2EDRHdUKb4lJB0NfSmK'     /* €495 one-time (LIVE) */
-    }
-  };
-
   window.handleCheckout = function(){
     var btn = document.getElementById('paymentCta');
     btn.textContent = 'Redirecting...';
     btn.style.opacity = '0.7';
     btn.style.pointerEvents = 'none';
-
-    var stripe = Stripe(STRIPE_CONFIG.publishableKey);
-    var checkoutParams = {
-      lineItems: [{ price: STRIPE_CONFIG.prices[selectedPlan], quantity: 1 }],
-      mode: selectedPlan === 'weekly' ? 'subscription' : 'payment',
-      successUrl: window.location.origin + '/portal.html?enrolled=true',
-      cancelUrl: window.location.origin + '/#pricing'
-    };
-
-    stripe.redirectToCheckout(checkoutParams).then(function(result){
-      if(result.error){
-        alert(result.error.message);
-        btn.textContent = 'Continue to Payment';
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-      }
-    });
+    window.location.href = PAYMENT_LINKS[selectedPlan];
   };
 
-  /* Close modal on Escape key */
   document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape'){
-      document.getElementById('paymentModal').classList.remove('active');
-    }
+    if(e.key === 'Escape') document.getElementById('paymentModal').classList.remove('active');
   });
 
-  /* Available slots click: scroll to start journey */
   document.querySelectorAll('.availability-dot.available').forEach(function(dot){
     dot.addEventListener('click', function(){
       document.getElementById('paymentModal').classList.add('active');
