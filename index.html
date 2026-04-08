@@ -1479,7 +1479,12 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
     </div>
     <h3 style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--blue-deep);margin-bottom:0.5rem;">You're In!</h3>
-    <p style="font-size:1rem;color:var(--grey-dark);margin-bottom:1.5rem;line-height:1.6;">Your coaching slot is confirmed. Check your inbox for a confirmation email with all the details.</p>
+    <p style="font-size:1rem;color:var(--grey-dark);margin-bottom:0.75rem;line-height:1.6;">Your coaching slot is confirmed.</p>
+    <div id="successBookingDetails" style="display:none;background:#fff;border:2px solid var(--gold-rich);border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;">
+      <div id="successEmail" style="font-size:1.1rem;font-weight:700;color:var(--blue-deep);margin-bottom:0.5rem;word-break:break-all;"></div>
+      <div id="successSchedule" style="font-size:0.95rem;color:var(--grey-dark);line-height:1.5;"></div>
+    </div>
+    <p style="font-size:0.85rem;color:var(--grey-dark);margin-bottom:1.25rem;">Check your inbox for a confirmation email with all the details.</p>
     <div style="background:linear-gradient(135deg,rgba(0,0,54,0.04),rgba(212,175,55,0.08));border-radius:16px;padding:1.25rem;margin-bottom:1.5rem;">
       <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold-rich);margin-bottom:0.5rem;">What happens next</div>
       <div style="font-size:0.85rem;color:var(--grey-dark);line-height:1.6;">
@@ -3354,6 +3359,19 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           var isAdmin = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email);
           var newData = { email: user.email, createdAt: new Date().toISOString() };
           if (isAdmin) newData.enrolled = true;
+          // Auto-enroll if email matches a booked slot (Stripe payment completed)
+          if (!isAdmin) {
+            try {
+              var enrollRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(user.email));
+              var enrollData = await enrollRes.json();
+              if (enrollData.enrolled) {
+                newData.enrolled = true;
+                if (enrollData.name) newData.displayName = enrollData.name;
+                if (enrollData.plan) newData.plan = enrollData.plan;
+                if (enrollData.slotLabel) newData.slotLabel = enrollData.slotLabel;
+              }
+            } catch(e) { console.warn('Auto-enrollment check failed:', e.message); }
+          }
           try {
             await Promise.race([
               updateUserProfile(user.uid, newData),
@@ -3362,6 +3380,24 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           } catch(e) { console.warn('Profile create timeout:', e.message); }
           try { profile = await getUserProfile(user.uid); } catch(e) {}
           if (!profile) profile = { email: user.email, enrolled: isAdmin };
+        }
+        // Also check enrollment for existing users who aren't yet enrolled
+        if (profile && !profile.enrolled) {
+          var isAdmin2 = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email);
+          if (!isAdmin2) {
+            try {
+              var enrollRes2 = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(user.email));
+              var enrollData2 = await enrollRes2.json();
+              if (enrollData2.enrolled) {
+                var updates = { enrolled: true };
+                if (enrollData2.name && !profile.displayName) updates.displayName = enrollData2.name;
+                if (enrollData2.plan) updates.plan = enrollData2.plan;
+                if (enrollData2.slotLabel) updates.slotLabel = enrollData2.slotLabel;
+                await updateUserProfile(user.uid, updates);
+                profile.enrolled = true;
+              }
+            } catch(e) { console.warn('Auto-enrollment check failed:', e.message); }
+          }
         }
         // Ensure profile always has email (fixes sparse docs from Google sign-in UID mismatch)
         if (profile && !profile.email) {
@@ -3969,7 +4005,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   /* Check for booking success/cancel in URL */
   var params = new URLSearchParams(window.location.search);
   if(params.get('booking') === 'success'){
-    setTimeout(function(){
+    setTimeout(async function(){
       document.getElementById('successModal').classList.add('active');
       var bookedSlot = params.get('slot');
       if(bookedSlot){
@@ -3977,6 +4013,39 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         if(dlBtn) dlBtn.href = API + '/calendar/' + bookedSlot;
         var gcBtn = document.getElementById('gcalBtn');
         if(gcBtn) gcBtn.href = API + '/gcal/' + bookedSlot;
+        // Fetch slot details to show email, schedule, dates
+        try {
+          var slotsRes = await fetch(API + '/slots');
+          var slotsData = await slotsRes.json();
+          var allSlots = Array.isArray(slotsData) ? slotsData : (slotsData.slots || []);
+          var match = allSlots.find(function(s){ return s.id === bookedSlot; });
+          if(match && match.booking){
+            var detailsEl = document.getElementById('successBookingDetails');
+            var emailEl = document.getElementById('successEmail');
+            var schedEl = document.getElementById('successSchedule');
+            if(detailsEl && emailEl && schedEl){
+              emailEl.textContent = match.booking.email;
+              // Build schedule text
+              var dayName = match.day || '';
+              var timeLabel = match.time || '';
+              // Calculate end date (5 weeks after start)
+              var startStr = match.startDate;
+              if(!startStr){
+                var defSlots = [
+                  {id:'wed-1',s:'2026-04-22'},{id:'wed-2',s:'2026-04-22'},{id:'wed-3',s:'2026-04-22'},{id:'wed-4',s:'2026-04-22'},{id:'wed-5',s:'2026-04-22'},{id:'wed-6',s:'2026-04-22'},{id:'wed-7',s:'2026-04-22'},
+                  {id:'thu-1',s:'2026-04-23'},{id:'thu-2',s:'2026-04-23'},{id:'thu-3',s:'2026-04-23'},{id:'thu-4',s:'2026-04-23'},{id:'thu-5',s:'2026-04-23'},{id:'thu-6',s:'2026-04-23'}
+                ];
+                var defMatch = defSlots.find(function(d){ return d.id === bookedSlot; });
+                startStr = defMatch ? defMatch.s : '2026-04-22';
+              }
+              var startD = new Date(startStr + 'T00:00:00');
+              var endD = new Date(startD); endD.setDate(endD.getDate() + 35);
+              var fmt = function(d){ return d.toLocaleDateString('en-IE',{day:'numeric',month:'short'}); };
+              schedEl.innerHTML = 'Every <strong>' + dayName + '</strong> at <strong>' + timeLabel + '</strong>, 20 min each<br>Six weeks: <strong>' + fmt(startD) + '</strong> to <strong>' + fmt(endD) + '</strong>';
+              detailsEl.style.display = 'block';
+            }
+          }
+        } catch(e){ console.warn('Could not load slot details:', e); }
       }
       loadSlots();
     }, 500);

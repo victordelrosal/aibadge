@@ -67,6 +67,10 @@ export default {
       const slotId = path.replace("/api/gcal/", "");
       return handleGoogleCalendarLink(slotId, env);
     }
+    if (path === "/api/check-enrollment" && request.method === "GET") {
+      const email = url.searchParams.get("email");
+      return handleCheckEnrollment(email, env);
+    }
 
     // ── Legacy: report mailer (POST to root) ──
     if (request.method === "POST" && (path === "/" || path === "")) {
@@ -464,6 +468,33 @@ async function handleGoogleCalendarLink(slotId, env) {
 }
 
 // ══════════════════════════════════════════
+// AUTO-ENROLLMENT CHECK
+// ══════════════════════════════════════════
+
+async function handleCheckEnrollment(email, env) {
+  if (!email) return jsonResponse({ error: "Email required" }, 400);
+
+  const normalised = email.trim().toLowerCase();
+  const slots = await getAllSlots(env);
+
+  for (const slot of slots) {
+    if (slot.status === "booked" && slot.booking && slot.booking.email) {
+      if (slot.booking.email.trim().toLowerCase() === normalised) {
+        return jsonResponse({
+          enrolled: true,
+          name: slot.booking.name,
+          plan: slot.booking.plan,
+          slotId: slot.id,
+          slotLabel: slot.label,
+        }, 200);
+      }
+    }
+  }
+
+  return jsonResponse({ enrolled: false }, 200);
+}
+
+// ══════════════════════════════════════════
 // STRIPE WEBHOOK VERIFICATION
 // ══════════════════════════════════════════
 
@@ -626,6 +657,26 @@ async function sendBookingConfirmation(env, slot) {
   const b = slot.booking;
   const planLabel = b.plan === "upfront" ? "Full Programme (6 weeks, €495)" : `Weekly Session (€90)`;
 
+  // Build Google Calendar URL directly (avoids KV read on click)
+  const def = DEFAULT_SLOTS.find(d => d.id === slot.id);
+  const startDate = def?.startDate || START_WED;
+  const [hh, mm] = slot.time.split(":");
+  const dateStr = startDate.replace(/-/g, "");
+  const gcalStart = `${dateStr}T${hh}${mm}00`;
+  const endMins = parseInt(mm) + 20;
+  const endH = parseInt(hh) + Math.floor(endMins / 60);
+  const endM = endMins % 60;
+  const gcalEnd = `${dateStr}T${String(endH).padStart(2, "0")}${String(endM).padStart(2, "0")}00`;
+  const gcalParams = new URLSearchParams({
+    action: "TEMPLATE",
+    text: "AI Badge Coaching",
+    dates: `${gcalStart}/${gcalEnd}`,
+    details: `AI Badge coaching session with Victor del Rosal.\n20 minutes. Meeting link sent before your first session.\n\nhttps://aibadge.fiveinnolabs.com`,
+    recur: "RRULE:FREQ=WEEKLY;COUNT=6",
+    ctz: "Europe/Dublin",
+  });
+  const gcalUrl = `https://calendar.google.com/calendar/render?${gcalParams.toString()}`;
+
   const html = `
 <!DOCTYPE html><html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,sans-serif;">
@@ -636,20 +687,34 @@ async function sendBookingConfirmation(env, slot) {
   </div>
   <div style="background:#fff;border-radius:16px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
     <div style="text-align:center;margin-bottom:24px;">
-      <div style="font-size:48px;">&#x2705;</div>
+      <div style="font-size:28px;font-weight:800;color:#000036;">${b.name}</div>
+      <div style="font-size:18px;font-weight:600;color:#000036;margin-top:6px;">Welcome to the AI Badge!</div>
+      <div style="font-size:48px;margin-top:12px;">&#x2705;</div>
       <div style="font-size:22px;font-weight:700;color:#000036;margin-top:8px;">You're booked!</div>
     </div>
+    <div style="background:#f0f4ff;border-radius:14px;padding:20px;margin-bottom:16px;border-left:4px solid #000036;">
+      <div style="font-size:18px;font-weight:700;color:#000036;margin-bottom:8px;">Your Schedule</div>
+      <div style="font-size:15px;color:#333;line-height:1.8;">
+        Every <strong>${slot.day}</strong> at <strong>${slot.time}</strong>, 20 minutes each<br>
+        Six weeks: <strong>${getWeeklyDates(startDate)[0]}</strong> to <strong>${getWeeklyDates(startDate)[5]}</strong>
+      </div>
+      <div style="font-size:13px;color:#666;margin-top:8px;">
+        ${getWeeklyDates(startDate).join(" &middot; ")}
+      </div>
+    </div>
     <table style="width:100%;font-size:14px;color:#333;">
-      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Slot</td><td style="padding:8px 0;">${slot.label}</td></tr>
       <tr><td style="padding:8px 0;font-weight:600;color:#666;">Plan</td><td style="padding:8px 0;">${planLabel}</td></tr>
-      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Where</td><td style="padding:8px 0;">Online (link sent before your first session)</td></tr>
+      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Where</td><td style="padding:8px 0;">Online (meeting link sent before your first session)</td></tr>
     </table>
-    <p style="font-size:13px;color:#666;margin-top:20px;line-height:1.6;">Your coaching sessions are every ${slot.day} at ${slot.time}, 20 minutes each. You'll receive a meeting link before your first session.</p>
-    <p style="font-size:12px;color:#888;margin-top:8px;">Your dates: ${getWeeklyDates(DEFAULT_SLOTS.find(d => d.id === slot.id)?.startDate || START_WED).join(", ")}</p>
     <div style="text-align:center;margin-top:20px;">
-      <a href="https://aibadge-report-mailer.victordelrosal.workers.dev/api/gcal/${slot.id}" style="display:inline-block;padding:12px 24px;border-radius:12px;background:#4285f4;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:8px;">Add to Google Calendar</a>
+      <a href="${gcalUrl}" style="display:inline-block;padding:12px 24px;border-radius:12px;background:#4285f4;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:8px;">Add to Google Calendar</a>
       <br>
       <a href="https://aibadge-report-mailer.victordelrosal.workers.dev/api/calendar/${slot.id}" style="display:inline-block;padding:10px 20px;border-radius:12px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:13px;font-weight:600;text-decoration:none;margin-top:8px;">Download .ics (Apple/Outlook)</a>
+    </div>
+    <div style="text-align:center;margin-top:20px;padding:16px;background:#f0f7ff;border-radius:12px;">
+      <div style="font-size:14px;font-weight:600;color:#000036;margin-bottom:8px;">Access your learning dashboard:</div>
+      <a href="https://aibadge.fiveinnolabs.com/#/login" style="display:inline-block;padding:12px 28px;border-radius:12px;background:linear-gradient(135deg,#000036,#02066F);color:#fff;font-size:14px;font-weight:700;text-decoration:none;">Sign In to AI Badge</a>
+      <div style="font-size:11px;color:#888;margin-top:8px;">Use Google sign-in or create an account with this email address.</div>
     </div>
     <p style="font-size:12px;color:#888;margin-top:16px;text-align:center;">Please review our <a href="https://aibadge.fiveinnolabs.com/guidelines.html" style="color:#D4AF37;font-weight:600;">Programme Guidelines</a> before your first session.</p>
   </div>
