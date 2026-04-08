@@ -3384,23 +3384,13 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           try { profile = await getUserProfile(user.uid); } catch(e) {}
           if (!profile) profile = { email: user.email, enrolled: isAdmin };
         }
-        // Also check enrollment for existing users who aren't yet enrolled
-        if (profile && !profile.enrolled) {
-          var isAdmin2 = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email);
-          if (!isAdmin2) {
-            try {
-              var enrollRes2 = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(user.email));
-              var enrollData2 = await enrollRes2.json();
-              if (enrollData2.enrolled) {
-                var updates = { enrolled: true };
-                if (enrollData2.name && !profile.displayName) updates.displayName = enrollData2.name;
-                if (enrollData2.plan) updates.plan = enrollData2.plan;
-                if (enrollData2.slotLabel) updates.slotLabel = enrollData2.slotLabel;
-                await updateUserProfile(user.uid, updates);
-                profile.enrolled = true;
-              }
-            } catch(e) { console.warn('Auto-enrollment check failed:', e.message); }
-          }
+        // Auto-enroll existing users who don't have enrolled set yet
+        // (handles race condition where updateLastActive creates sparse doc before profile setup)
+        if (profile && profile.enrolled !== true) {
+          try {
+            await updateUserProfile(user.uid, { enrolled: true });
+            profile.enrolled = true;
+          } catch(e) { console.warn('Auto-enroll update failed:', e.message); }
         }
         // Ensure profile always has email (fixes sparse docs from Google sign-in UID mismatch)
         if (profile && !profile.email) {
