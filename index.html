@@ -3583,6 +3583,27 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.submitting = true;
         const result = await signInWithGoogle();
         if (result.success) {
+          // Check if this Google user has a paid booking
+          var gUser = firebase.auth().currentUser;
+          if (gUser) {
+            var isAdmin = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(gUser.email);
+            if (!isAdmin) {
+              try {
+                var checkRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(gUser.email));
+                var checkData = await checkRes.json();
+                if (!checkData.enrolled) {
+                  // Check if they already have a Firestore profile with enrolled:true (returning user)
+                  var existingProfile = await getUserProfile(gUser.uid);
+                  if (!existingProfile || existingProfile.enrolled !== true) {
+                    await firebase.auth().signOut();
+                    this.error = 'No active booking found for ' + gUser.email + '. Please book a coaching slot first.';
+                    this.submitting = false;
+                    return;
+                  }
+                }
+              } catch(e) { /* allow through on network error */ }
+            }
+          }
           // Wait for onAuthStateChanged to finish loading the profile
           var maxWait = 80;
           while (Alpine.store('auth').loading && maxWait-- > 0) {
@@ -3607,6 +3628,20 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           return;
         }
         this.submitting = true;
+        // Verify this email has a paid booking before allowing account creation
+        try {
+          var checkRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(this.email));
+          var checkData = await checkRes.json();
+          if (!checkData.enrolled) {
+            this.error = 'No active booking found for this email. Please book a coaching slot first.';
+            this.submitting = false;
+            return;
+          }
+        } catch(e) {
+          this.error = 'Could not verify booking. Please try again.';
+          this.submitting = false;
+          return;
+        }
         const result = await createAccount(this.email, this.password);
         if (result.success) {
           Alpine.store('ui').closeModal();
