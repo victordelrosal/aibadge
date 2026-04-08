@@ -1,13 +1,13 @@
 # AI Badge: Handoff Document
 
-**Last updated:** 2026-03-25 (night, post-tutorial pipeline session)
-**Latest commit:** `2c1c128`
+**Last updated:** 2026-04-08 (afternoon session)
+**Latest commit:** `d73a2a0`
 
 ---
 
 ## What This Project Is
 
-AI Badge is a **micro-LMS** (Udemy/Coursera style) for AI competency training. Enrolled users consume sequential tutorials (video-based screen recordings hosted on YouTube, unlisted), complete an AI Competency Explorer assessment, and track progress over time.
+AI Badge is a **micro-LMS** (Udemy/Coursera style) for AI competency training. Enrolled users consume sequential tutorials (video-based screen recordings hosted on YouTube, unlisted), complete an AI Competency Explorer assessment, and track progress over time. It includes a booking system with Stripe payments, automated email reminders, and digital credentialing via Certifier.
 
 **Live at:** https://aibadge.fiveinnolabs.com/
 **Repo:** https://github.com/victordelrosal/aibadge.git
@@ -18,103 +18,170 @@ AI Badge is a **micro-LMS** (Udemy/Coursera style) for AI competency training. E
 
 - **Single `index.html` SPA** with Alpine.js, hash-based routing (`#/`, `#/lesson/{moduleId}/{lessonId}`, `#/admin`)
 - **`explore.html`**: Standalone AI Competency Explorer assessment page (also detects logged-in users)
+- **`portal.html`**: Enrolled student dashboard (tutorials, exercises, profile)
+- **`login.html`**: Dedicated login page (redirects to portal.html)
+- **`guidelines.html`**: Canonical source of truth for programme guidelines (6 items)
+- **`terms.html`** / **`privacy.html`**: Legal pages
 - **`assets/js/firebase-app.js`**: Firebase integration layer (auth, Firestore CRUD, admin queries)
 - **Firebase Hosting** + **Firestore** + **Firebase Auth** (Google popup + email/password)
-- **Cloudflare Worker** for email reports via Resend (public assessment flow only)
+- **Cloudflare Worker** (`worker/index.js`): Slot booking, Stripe webhooks, email reminders, calendar integration, enrollment verification
 - **No build step**: vanilla JS, Alpine.js from CDN, Firebase compat SDK from CDN
 - **Firebase SDK version: 10.8.0** across ALL pages (version alignment is critical; see Lessons Learned)
 
 ---
 
-## Critical Lessons Learned (2026-03-25)
+## Booking & Payment System (added 2026-04-07/08)
 
-These are hard-won. Read before touching anything.
+### Slot System (Cloudflare KV)
+- 13 coaching slots: 7 Wednesday (12:00-19:30), 6 Thursday (12:00-19:30)
+- Start dates: Wed 22 Apr 2026, Thu 23 Apr 2026
+- Each slot: 20 min session, weekly for 6 weeks
+- KV namespace ID: `e11a3cbfa9df4a52b4b41091db6e4250`
+- Slot IDs: `wed-1` through `wed-7`, `thu-1` through `thu-6`
+- `wed-5` (14:00) is pre-booked (Helen, real paying customer)
 
-### 1. Firestore Persistence is DISABLED (on purpose)
+### Stripe Integration
+- Two plans: Weekly (EUR 90/week subscription, 6 payments) or Upfront (EUR 495 one-time)
+- Weekly subscriptions auto-cancel after 6 weeks via scheduled cancellation
+- Hold system: 15-min hold with token, released on expiry or payment
+- Webhook: `POST /api/webhook` handles `checkout.session.completed` and `checkout.session.expired`
 
-`firebase-app.js` no longer calls `db.enablePersistence()`. It was causing IndexedDB hangs that blocked both sign-in (getUserProfile hung) and assessment saves (explorer_history writes hung). Symptoms: buttons stuck at "Saving...", users unable to reach dashboard after Google sign-in, no errors in console (operations queued silently).
+### Booking Flow
+1. User selects slot + plan on landing page
+2. `POST /api/hold` creates 15-min hold, returns Stripe checkout URL
+3. User completes Stripe payment
+4. Webhook confirms booking, creates 6 Google Calendar events, sends confirmation email
+5. User clicks "Sign In" in email or success modal
+6. On login, `/api/check-enrollment` verifies paid booking, auto-enrolls user
 
-**Do NOT re-enable persistence** without thorough multi-tab testing across fresh and returning users.
+### Sign-Up Gating (IMPORTANT)
+- **Only paying users can create accounts.** Sign-up is gated behind Stripe payment verification.
+- Email/password registration checks `/api/check-enrollment` before creating the Firebase Auth account
+- Google sign-in checks enrollment after auth; signs out unpaid users with error message
+- Admins (`victor@fiveinnolabs.com`, `victordelrosal@gmail.com`) bypass the check
+- Existing enrolled users are not affected
 
-### 2. Firebase SDK Version Must Match Across ALL Pages
-
-`explore.html` was on SDK 10.12.0 while `index.html` was on 10.8.0. Different SDK versions sharing IndexedDB with multi-tab persistence caused writes to hang. Currently all pages use **10.8.0**.
-
-If upgrading the SDK, update ALL HTML files in one go:
-- `index.html`
-- `explore.html`
-- `portal.html`
-- `login.html`
-
-### 3. COOP Header Required for Google Sign-In Popup
-
-`firebase.json` includes `Cross-Origin-Opener-Policy: same-origin-allow-popups` on all HTML pages. Without this, the Google Sign-In popup cannot communicate the auth result back to the parent window. Do NOT remove this header.
-
-### 4. Auth Flow Has a 5-Second Timeout
-
-In `index.html`, the `onAuthChange` callback wraps `getUserProfile()` and `updateUserProfile()` in `Promise.race` with 5s timeouts. If Firestore is slow or unreachable, the user still gets signed in with a fallback profile. This prevents the dashboard from being permanently stuck on "loading".
-
-### 5. Assessment Save Has an 8-Second Timeout
-
-In `explore.html`, both `submitLoggedIn()` and `saveAssessment()` have 8s timeouts. If the Firestore write hangs, the report is shown anyway. The save may sync later if the connection recovers.
-
-### 6. `completedAt` Uses ISO Strings, Not serverTimestamp
-
-Assessment saves use `new Date().toISOString()` instead of `firebase.firestore.FieldValue.serverTimestamp()`. Server timestamps require a round-trip and could hang. The `formatDate` helper in explorer history handles both Firestore timestamps and ISO strings.
-
-### 7. JS Cache Header is 1 Year
-
-`firebase.json` sets `max-age=31536000` on `assets/js/**`. After changing `firebase-app.js`, users MUST hard-refresh or clear cache. Consider adding cache-busting query params (e.g., `firebase-app.js?v=2`) or reducing the TTL.
-
-### 8. Deploy Firestore Rules Explicitly
-
-`firebase deploy --only hosting` does NOT deploy Firestore rules. If you change `firestore.rules`, run:
-```
-firebase deploy --only hosting,firestore:rules
-```
-
-### 9. Firestore Rules: Admin Can Write to All Subcollections
-
-As of this session, `isAdmin()` has write access to all subcollections (assessments, explorer_history, weeks, exercises). Previously only `isOwner()` could write, which was technically correct but adding admin as belt-and-suspenders.
+### Auto-Enrollment
+- On login, `onAuthStateChanged` in `index.html` auto-sets `enrolled: true` for any profile that doesn't have it
+- This handles a race condition where `updateLastActive()` creates a sparse Firestore doc before the profile setup code runs
+- `/api/check-enrollment?email=` checks if an email has a booked slot in KV
 
 ---
 
-## What's Built and Working
+## Email System (Cloudflare Worker + Resend)
 
-1. **SPA Shell + Auth**
-   - Sign-in modal (Apple sheet style) with Google sign-in + email/password + create account
-   - Google auth uses `signInWithPopup` (redirect fails across custom domains)
-   - Three auth states: unauthenticated (landing), logged in not enrolled (access required), logged in enrolled (dashboard)
-   - Admin detection for both `victor@fiveinnolabs.com` and `victordelrosal@gmail.com`
-   - Auto-creates Firestore profile for ALL new users
-   - Admin emails auto-enrolled on first sign-in
+### Booking Confirmation Email
+- Sent immediately after Stripe payment via Resend API
+- Shows: participant name (big), "Welcome to the AI Badge!", styled schedule card with dates, plan details
+- Buttons: "Add to Google Calendar" (direct URL, NOT API redirect), "Download .ics", "Sign In to AI Badge"
+- Links to Programme Guidelines
 
-2. **Student Dashboard**
-   - Flat tutorial cards (each tutorial is independent, NOT grouped modules)
-   - Dark/light mode toggle with localStorage persistence
-   - Completion checkmarks on dashboard cards (only place for completion tracking)
-   - "Explorer" link in topbar opens `explore.html` in new tab
-   - "Admin" link visible only to admin emails
-   - Explorer History section at bottom showing past assessment scores
+### Session Reminders (Cron)
+- Cron: `0 * * * *` (every hour)
+- Two reminder types: 24h before (23-25h window) and 3h before (2.5-3.5h window)
+- KV dedup keys: `reminder:24h:{slotId}:w{week}` and `reminder:3h:{slotId}:w{week}` with 48h TTL
+- Dublin timezone offset (UTC+1) applied
+- Empty emails skipped, failed sends don't write dedup key (retry next hour)
+- Links to Programme Guidelines in footer
 
-3. **Lesson View**
-   - Three tutorials live: `what-is-html`, `hello-world-2`, `retro-game`
-   - Two tutorials pending (greyed out): `deploy-github`, `opencode-setup`
-   - Each lesson has: YouTube embed, slides PDF download, quick start, detailed guide, troubleshooting (most), transcript
-   - Retro Game YouTube ID: `QeEE1cOq5Sw` (unlisted, fiveinnolabs account)
+### Email Configuration
+- Resend API key in Worker env vars
+- From: `AI Badge <victor@fiveinnolabs.com>` (fiveinnolabs Resend account, verified domain)
+- Must use fiveinnolabs account, not victordelrosal account
 
-4. **Admin Panel** (`#/admin`)
-   - Shows all registered users with email, signup date, enrollment status
-   - iOS-style toggle switches for enrollment
-   - **Note**: Toggle may have issues; verify in console when clicking
+---
 
-5. **AI Competency Explorer** (`explore.html`)
-   - Logged-in users see "Save & View Report" button (no email needed)
-   - Saves to `users/{uid}/explorer_history/{auto-id}`
-   - Public users get email gate flow with Resend email
-   - 8s save timeout with graceful fallback
+## Calendar Integration
 
-6. **Pricing**: Weekly: EUR 75/week (EUR 450 total), Upfront: EUR 395
+### Google Calendar (Victor's coaching calendar)
+- Service account creates 6 weekly events on Victor's calendar after booking
+- Calendar ID: `fe025ce167a5b...@group.calendar.google.com`
+- Events include client name, email, plan, and instructions
+
+### Google Calendar (Learner)
+- "Add to Google Calendar" button in confirmation email uses direct `calendar.google.com/calendar/render` URL
+- IMPORTANT: Do NOT use `/api/gcal/` endpoint (KV eventual consistency causes "Slot not booked" errors)
+- Success modal also builds gcal URL client-side
+
+### .ics Download (Apple/Outlook)
+- `GET /api/calendar/{slotId}` generates ICS file with 6 weekly VEVENT entries
+- Dublin timezone (Europe/Dublin)
+
+---
+
+## Programme Guidelines
+
+- **Canonical source:** `guidelines.html` (6 items: Google Meet, come prepared, rescheduling, missed sessions, consumer protection, 100% guarantee)
+- **Modal in index.html:** Loads dynamically from `guidelines.html` via `fetch` + `DOMParser`
+- **`openGuidelines()` function:** Exposed to global scope via `window.openGuidelines = openGuidelines;`
+- Consent checkbox links to guidelines modal (T&Cs and Privacy links inside modal footer)
+- Email links point to `aibadge.fiveinnolabs.com/guidelines.html`
+
+---
+
+## Digital Credentialing
+
+- Platform: **Certifier** (free tier, 250 credentials/month)
+- Badge image: `assets/img/ai-badge-credential.png`
+- Credential showcase section on landing page with badge image and skill tags
+- Issued after successful completion of all 6 weeks + learning objectives
+
+---
+
+## Pitch Deck
+
+- `welcome/create_pitch_deck.py`: Python script generating 8-slide pitch deck using python-pptx
+- `welcome/ai-badge-pitch.pptx`: Generated deck
+- 8 slides: Hook, Agitate (stats), Solution, How It Works, What You Earn, Your Coach, Guarantee, CTA
+- Brand colors: Navy (#000036), Gold (#D4AF37), White
+
+---
+
+## Critical Lessons Learned
+
+### From 2026-03-25 (original session)
+
+1. **Firestore Persistence is DISABLED** (on purpose). Was causing IndexedDB hangs. Do NOT re-enable.
+2. **Firebase SDK Version Must Match** across ALL pages (currently 10.8.0)
+3. **COOP Header Required** for Google Sign-In popup (`firebase.json`)
+4. **Auth Flow Has 5s Timeout**, Assessment Save Has 8s Timeout
+5. **`completedAt` Uses ISO Strings**, not `serverTimestamp`
+6. **JS Cache Header is 1 Year** on `assets/js/**`. Consider cache-busting.
+7. **Deploy Firestore Rules Explicitly**: `firebase deploy --only hosting,firestore:rules`
+8. **Admin Can Write to All Subcollections**
+
+### From 2026-04-08 (this session)
+
+9. **KV Eventual Consistency**: Never use API redirects that read KV for user-facing links. Build URLs client-side or embed them in emails directly. The `/api/gcal/` endpoint fails on first click due to KV propagation lag.
+10. **`updateLastActive()` Race Condition**: This function uses `.set({lastActiveAt}, {merge: true})` which creates a sparse Firestore doc. If it runs before `onAuthStateChanged` profile creation, the new-user branch is skipped (profile exists but has no `enrolled` field). Fixed by unconditionally setting `enrolled: true` for any profile without it.
+11. **`openGuidelines` Scoping**: Functions defined inside scoped script blocks in `index.html` are not accessible from inline `onclick` handlers. Must expose via `window.openGuidelines = openGuidelines;`.
+12. **Deleting Firebase Users**: Use REST API from terminal (Firebase CLI has no `auth:delete` command). Get access token via refresh token exchange, then call `identitytoolkit.googleapis.com` and Firestore REST API. UIDs from screenshots can have ambiguous characters (capital O vs zero).
+
+---
+
+## Worker API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/slots` | GET | List all slots with status, booking info, dates |
+| `/api/hold` | POST | Hold a slot for 15 min, return Stripe checkout URL |
+| `/api/webhook` | POST | Stripe webhook (checkout completed/expired) |
+| `/api/init` | POST | Re-initialize all slots from defaults |
+| `/api/calendar/{slotId}` | GET | Download .ics file for booked slot |
+| `/api/gcal/{slotId}` | GET | Redirect to Google Calendar (AVOID: KV consistency issues) |
+| `/api/check-enrollment` | GET | Check if email has a booked slot (`?email=`) |
+
+---
+
+## Success Modal (post-booking)
+
+Shows after Stripe redirect with `?booking=success&slot={slotId}`:
+- Confirmation email address (big bold font)
+- Schedule: day, time, 6-week date range
+- "Add to Google Calendar" (direct URL, built client-side)
+- "Download .ics" 
+- "Sign In to AI Badge" button
+- "Got It" dismiss button
 
 ---
 
@@ -123,12 +190,13 @@ As of this session, `isAdmin()` has write access to all subcollections (assessme
 ```
 users/{uid}
   - email, enrolled (boolean), createdAt, updatedAt, lastActiveAt
+  - displayName, plan, slotLabel (set by auto-enrollment)
   - noteForVictor
   /assessments/{baseline|final}
-    - scores, tier, archetype, flags, score, completedAt
   /explorer_history/{auto-id}
-    - scores, tier, archetype, flags, score, completedAt
   /weeks/{weekNum}/exercises/{exerciseId}
+  /logins/{auto-id}
+  /tutorial_completions/{tutorialId}
 
 programmes/default
 public_assessments/{auto-id}
@@ -140,15 +208,22 @@ public_assessments/{auto-id}
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Main SPA (landing, dashboard, lesson views, admin, sign-in modal) |
+| `index.html` | Main SPA (landing, booking, dashboard, lessons, admin, sign-in modal) |
 | `explore.html` | AI Competency Explorer (standalone assessment) |
+| `portal.html` | Enrolled student dashboard |
+| `login.html` | Dedicated login page |
+| `guidelines.html` | Programme guidelines (canonical source) |
+| `terms.html` | Terms and conditions |
+| `privacy.html` | Privacy policy |
 | `assets/js/firebase-app.js` | Firebase integration layer (auth, Firestore CRUD) |
+| `assets/img/ai-badge-credential.png` | Badge credential image |
 | `firestore.rules` | Firestore security rules |
 | `firebase.json` | Firebase hosting config (headers, caching, COOP) |
+| `worker/index.js` | Cloudflare Worker (booking, Stripe, emails, reminders, calendar) |
+| `worker/wrangler.toml` | Worker config (KV binding, cron, env vars) |
+| `welcome/create_pitch_deck.py` | Pitch deck generator |
 | `docs/HANDOFF.md` | This file |
-| `tutorials/hello-world/` | First tutorial assets (mp4, pdf, pptx) |
-| `tutorials/hello-world-2/` | Second tutorial assets (mp4, pdf, pptx) |
-| `tutorials/retro-game/` | Third tutorial assets (mp4, pdf, pptx) |
+| `tutorials/{id}/` | Tutorial assets (mp4, pdf, pptx) |
 
 ---
 
@@ -158,21 +233,14 @@ public_assessments/{auto-id}
 - **Popup not redirect** for Google Sign-In: redirect loses auth state between `firebaseapp.com` and custom domain
 - **No build step**: everything is vanilla JS, CDN libraries, single HTML files
 - **No Firestore persistence**: disabled due to IndexedDB hangs (see Lessons Learned)
-- **Completion tracking only on dashboard**: removed from lesson views to avoid duplication
+- **Direct calendar URLs**: Never use API redirects for calendar links (KV consistency)
+- **Sign-up gated behind payment**: Only users with confirmed Stripe bookings can create accounts
 
 ---
 
 ## Tutorial Pipeline
 
-A standardised skill exists for adding new tutorials: `aibadge-tutorial` (in `~/.claude/skills/aibadge-tutorial/SKILL.md`).
-
-**Full e2e pipeline:** User provides video file, then:
-1. Copy video to `tutorials/{id}/{id}.mp4`
-2. Convert pptx to PDF via PowerPoint AppleScript
-3. Upload video to YouTube (unlisted) via `~/.youtube-upload-credentials/upload_youtube.py`
-4. Extract transcript from video via faster-whisper (not fabricated)
-5. Add entry to `_lmsTutorials` array (active tutorials before pending ones)
-6. Create lesson HTML template with 4 sections: Quick Start, Detailed Guide, Troubleshooting, Transcript
+Skill: `aibadge-tutorial` (in `~/.claude/skills/aibadge-tutorial/SKILL.md`)
 
 **YouTube IDs:**
 | Tutorial | YouTube ID |
@@ -181,15 +249,19 @@ A standardised skill exists for adding new tutorials: `aibadge-tutorial` (in `~/
 | Hello World 2 | `69KTw0ViJYY` |
 | Retro Game | `QeEE1cOq5Sw` |
 
-**Upload credentials:** `~/.youtube-upload-credentials/` (fiveinnolabs@gmail.com OAuth, cached token).
+---
+
+## Pricing (current)
+
+- Weekly: EUR 90/week (subscription, 6 payments = EUR 540 total)
+- Upfront: EUR 495 (one-time, 6-week programme)
 
 ---
 
 ## TODO / Open Items
 
-1. **JS cache-busting**: Add version query params to script tags or reduce `max-age` on `assets/js/**`
-2. **API key restrictions**: Add HTTP referrer restrictions in Google Cloud Console (Firebase key is public by design, but restrict to `aibadge.fiveinnolabs.com` and `ai-badge-2026.web.app`)
-3. **Admin toggle verification**: Confirm enrollment toggle works end-to-end
-4. **Pending tutorials**: "Deploy to GitHub" and "OpenCode Setup" need content
-5. **Google email warning**: Addressed in API key restrictions above; not a security emergency
-6. **Dark mode card styling**: Cards updated to `rgba(30,30,50,0.85)` for better opacity; monitor if it looks right across different screens
+1. **JS cache-busting**: Add version query params to script tags or reduce `max-age`
+2. **API key restrictions**: Add HTTP referrer restrictions in Google Cloud Console
+3. **Pending tutorials**: "Deploy to GitHub" and "OpenCode Setup" need content
+4. **Stripe live mode**: Currently using test keys; switch to live for production
+5. **Helen's slot**: `wed-5` is pre-booked for Helen (heathermomalley@gmail.com), real paying customer. Do NOT touch.
