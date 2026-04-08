@@ -3774,6 +3774,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
   /* Load guidelines from canonical source (guidelines.html) */
   let guidelinesLoaded = false;
+  window.openGuidelines = openGuidelines;
   function openGuidelines() {
     document.getElementById('guidelinesModal').classList.add('active');
     if (guidelinesLoaded) return;
