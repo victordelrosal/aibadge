@@ -1381,7 +1381,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     </div>
 
     <div style="text-align:center;margin-top:1.2rem;">
-      <a href="#" onclick="event.preventDefault();document.getElementById('guidelinesModal').classList.add('active')" style="font-size:0.85rem;color:var(--gold-rich);text-decoration:underline;text-underline-offset:3px;">Programme Guidelines &amp; Policies</a>
+      <a href="guidelines.html" onclick="event.preventDefault();openGuidelines()" style="font-size:0.85rem;color:var(--gold-rich);text-decoration:underline;text-underline-offset:3px;">Programme Guidelines &amp; Policies</a>
     </div>
 
   </div>
@@ -1459,7 +1459,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
     <label class="payment-consent" id="consentLabel">
       <input type="checkbox" id="consentCheck" onchange="updatePaymentBtn()">
-      <span>I agree to the <a href="#" onclick="event.preventDefault();event.stopPropagation();document.getElementById('guidelinesModal').classList.add('active')">Programme Guidelines &amp; Policies</a></span>
+      <span>I agree to the <a href="guidelines.html" onclick="event.preventDefault();event.stopPropagation();openGuidelines()">Programme Guidelines &amp; Policies</a></span>
     </label>
 
     <button class="btn-cta" id="paymentCta" onclick="handleCheckout()" disabled>Hold Slot &amp; Pay</button>
@@ -1494,42 +1494,14 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   </div>
 </div>
 
-<!-- Programme Guidelines Modal -->
+<!-- Programme Guidelines Modal (content loaded from guidelines.html) -->
 <div class="payment-overlay" id="guidelinesModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="payment-modal" style="max-width:520px;">
     <button class="payment-modal-close" onclick="document.getElementById('guidelinesModal').classList.remove('active')" aria-label="Close">&times;</button>
     <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--blue-deep);margin-bottom:1.2rem;">Programme Guidelines</h3>
 
-    <div style="font-size:0.9rem;color:var(--grey-dark);line-height:1.7;">
-      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
-        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F4F9;</span>
-        <div><strong>Sessions are on Google Meet.</strong> You'll receive a meeting link before your first session. All 6 sessions are 20 minutes each.</div>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
-        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F4DA;</span>
-        <div><strong>Come prepared.</strong> Learners must complete assigned tutorials and check them off in the dashboard before each check-in session. This is how the programme works best.</div>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
-        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F504;</span>
-        <div><strong>Rescheduling.</strong> Need to move a session? Contact Victor at <a href="mailto:victor@fiveinnolabs.com" style="color:var(--gold-rich);">victor@fiveinnolabs.com</a> with at least 24 hours notice.</div>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
-        <span style="font-size:1.1rem;flex-shrink:0;">&#x274C;</span>
-        <div><strong>Missed sessions.</strong> No-shows and sessions missed without prior notice cannot be rescheduled or refunded.</div>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
-        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F6E1;&#xFE0F;</span>
-        <div><strong>Consumer protection.</strong> EU consumer rights apply. You have a 14-day cooling-off period from enrolment. See our <a href="terms.html" target="_blank" style="color:var(--gold-rich);">Terms &amp; Conditions</a> for full refund and cancellation details.</div>
-      </div>
-
-      <div style="display:flex;gap:10px;align-items:flex-start;">
-        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F4B0;</span>
-        <div><strong>100% Guarantee.</strong> If you have completed all sessions and all exercises, and still do not find a single practical use case, we will refund your full tuition. No forms. No friction. Just email Victor for a full refund.</div>
-      </div>
+    <div id="guidelinesContent" style="font-size:0.9rem;color:var(--grey-dark);line-height:1.7;">
+      <div style="text-align:center;padding:2rem 0;color:#999;">Loading guidelines...</div>
     </div>
 
     <div style="text-align:center;margin-top:1rem;font-size:0.8rem;color:#999;">
@@ -3799,6 +3771,27 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   let selectedPlan = 'weekly';
   let selectedSlotId = null;
   let selectedSlotLabel = '';
+
+  /* Load guidelines from canonical source (guidelines.html) */
+  let guidelinesLoaded = false;
+  function openGuidelines() {
+    document.getElementById('guidelinesModal').classList.add('active');
+    if (guidelinesLoaded) return;
+    fetch('guidelines.html')
+      .then(r => r.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const content = doc.getElementById('guidelines-content');
+        if (content) {
+          document.getElementById('guidelinesContent').innerHTML = content.innerHTML;
+          guidelinesLoaded = true;
+        }
+      })
+      .catch(() => {
+        document.getElementById('guidelinesContent').innerHTML = '<p>Could not load guidelines. <a href="guidelines.html" target="_blank" style="color:var(--gold-rich);">View them here.</a></p>';
+      });
+  }
 
   /* Load slots on page load */
   async function loadSlots(){

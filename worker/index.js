@@ -651,6 +651,7 @@ async function sendBookingConfirmation(env, slot) {
       <br>
       <a href="https://aibadge-report-mailer.victordelrosal.workers.dev/api/calendar/${slot.id}" style="display:inline-block;padding:10px 20px;border-radius:12px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:13px;font-weight:600;text-decoration:none;margin-top:8px;">Download .ics (Apple/Outlook)</a>
     </div>
+    <p style="font-size:12px;color:#888;margin-top:16px;text-align:center;">Please review our <a href="https://aibadge.fiveinnolabs.com/guidelines.html" style="color:#D4AF37;font-weight:600;">Programme Guidelines</a> before your first session.</p>
   </div>
   <div style="text-align:center;font-size:11px;color:#999;padding:20px 0;">
     AI Badge by Victor del Rosal &middot; <a href="https://fiveinnolabs.com" style="color:#D4AF37;">fiveinnolabs</a>
@@ -784,7 +785,7 @@ async function sendReminderEmail(env, slot, weekNum, reminderType) {
       <p style="font-size:13px;font-weight:600;color:#000036;margin:0 0 6px;">Before your session:</p>
       <p style="font-size:13px;color:#444;margin:0;line-height:1.6;">Make sure you've completed any assigned tutorials and exercises. Your session will be most valuable when you come prepared with questions.</p>
     </div>
-    <p style="font-size:11px;color:#999;line-height:1.5;">Need to reschedule? Contact Victor at victor@fiveinnolabs.com with at least 24 hours notice. Missed sessions without notice cannot be rescheduled.</p>
+    <p style="font-size:11px;color:#999;line-height:1.5;">Need to reschedule? Contact Victor at victor@fiveinnolabs.com with at least 24 hours notice. Missed sessions without notice cannot be rescheduled. See full <a href="https://aibadge.fiveinnolabs.com/guidelines.html" style="color:#D4AF37;">Programme Guidelines</a>.</p>
   </div>
   <div style="text-align:center;font-size:11px;color:#999;padding:20px 0;">
     <em>This is an automated reminder.</em><br>
