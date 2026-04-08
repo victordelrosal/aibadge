@@ -9,3 +9,6 @@ SITE_URL = "https://aibadge.fiveinnolabs.com"
 [[kv_namespaces]]
 binding = "SLOTS"
 id = "e11a3cbfa9df4a52b4b41091db6e4250"
+
+[triggers]
+crons = ["0 * * * *"]

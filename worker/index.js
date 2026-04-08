@@ -74,6 +74,10 @@ export default {
     }
 
     return jsonResponse({ error: "Not found" }, 404);
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(sendSessionReminders(env));
   }
 };
 
@@ -689,6 +693,130 @@ async function sendHostNotification(env, slot) {
              <p>6 calendar events created on AI Badge calendar. Add a Meet link to the first session.</p>`,
     }),
   });
+}
+
+// ══════════════════════════════════════════
+// SESSION REMINDERS (Cron Trigger)
+// ══════════════════════════════════════════
+
+async function sendSessionReminders(env) {
+  try {
+  const now = new Date();
+  const slots = await getAllSlots(env);
+
+  for (const slot of slots) {
+    if (slot.status !== "booked" || !slot.booking) continue;
+    if (!slot.booking.email) continue;
+
+    const def = DEFAULT_SLOTS.find(d => d.id === slot.id);
+    if (!def) continue;
+    const startDate = def.startDate || START_WED;
+
+    for (let week = 0; week < 6; week++) {
+      const sessionDate = new Date(startDate + "T00:00:00");
+      sessionDate.setDate(sessionDate.getDate() + week * 7);
+
+      const [hours, mins] = slot.time.split(":");
+      sessionDate.setHours(parseInt(hours), parseInt(mins), 0, 0);
+
+      // Dublin is UTC+1 (IST) in April-May 2026
+      const sessionUTC = new Date(sessionDate.getTime() - (1 * 60 * 60 * 1000));
+
+      const diffMs = sessionUTC.getTime() - now.getTime();
+      const diffHours = diffMs / (1000 * 60 * 60);
+
+      if (diffHours > 23 && diffHours <= 25) {
+        const key = `reminder:24h:${slot.id}:w${week + 1}`;
+        const sent = await env.SLOTS.get(key);
+        if (!sent) {
+          const ok = await sendReminderEmail(env, slot, week + 1, "24h");
+          if (ok) await env.SLOTS.put(key, "sent", { expirationTtl: 172800 });
+        }
+      }
+
+      if (diffHours > 2.5 && diffHours <= 3.5) {
+        const key = `reminder:3h:${slot.id}:w${week + 1}`;
+        const sent = await env.SLOTS.get(key);
+        if (!sent) {
+          const ok = await sendReminderEmail(env, slot, week + 1, "3h");
+          if (ok) await env.SLOTS.put(key, "sent", { expirationTtl: 172800 });
+        }
+      }
+    }
+  }
+  } catch (err) {
+    console.error("Session reminders cron error:", err);
+  }
+}
+
+async function sendReminderEmail(env, slot, weekNum, reminderType) {
+  const b = slot.booking;
+  const def = DEFAULT_SLOTS.find(d => d.id === slot.id);
+  const startDate = def?.startDate || START_WED;
+  const dates = getWeeklyDates(startDate);
+
+  const isDay = reminderType === "24h";
+  const timeLabel = isDay ? "tomorrow" : "in about 3 hours";
+  const subjectPrefix = isDay ? "Tomorrow" : "Starting Soon";
+
+  const html = `
+<!DOCTYPE html><html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,sans-serif;">
+<div style="max-width:600px;margin:0 auto;padding:32px 16px;">
+  <div style="text-align:center;margin-bottom:24px;">
+    <div style="font-size:24px;font-weight:800;color:#000036;">AI Badge</div>
+    <div style="font-size:12px;color:#888;margin-top:2px;">Automated Reminder</div>
+  </div>
+  <div style="background:#fff;border-radius:16px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:48px;">&#x23F0;</div>
+      <div style="font-size:22px;font-weight:700;color:#000036;margin-top:8px;">Session ${timeLabel}</div>
+    </div>
+    <p style="font-size:14px;color:#333;line-height:1.6;margin-bottom:16px;">
+      Hi ${b.name}, your <strong>Week ${weekNum}/6</strong> AI Badge coaching session is ${timeLabel}.
+    </p>
+    <table style="width:100%;font-size:14px;color:#333;margin-bottom:16px;">
+      <tr><td style="padding:8px 0;font-weight:600;color:#666;">When</td><td style="padding:8px 0;">${slot.label} (${dates[weekNum - 1]})</td></tr>
+      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Duration</td><td style="padding:8px 0;">20 minutes</td></tr>
+      <tr><td style="padding:8px 0;font-weight:600;color:#666;">Where</td><td style="padding:8px 0;">Google Meet (check your calendar event for the link)</td></tr>
+    </table>
+    <div style="background:linear-gradient(135deg,rgba(0,0,54,0.04),rgba(212,175,55,0.08));border-radius:12px;padding:16px;margin-bottom:16px;">
+      <p style="font-size:13px;font-weight:600;color:#000036;margin:0 0 6px;">Before your session:</p>
+      <p style="font-size:13px;color:#444;margin:0;line-height:1.6;">Make sure you've completed any assigned tutorials and exercises. Your session will be most valuable when you come prepared with questions.</p>
+    </div>
+    <p style="font-size:11px;color:#999;line-height:1.5;">Need to reschedule? Contact Victor at victor@fiveinnolabs.com with at least 24 hours notice. Missed sessions without notice cannot be rescheduled.</p>
+  </div>
+  <div style="text-align:center;font-size:11px;color:#999;padding:20px 0;">
+    <em>This is an automated reminder.</em><br>
+    AI Badge by Victor del Rosal &middot; <a href="https://fiveinnolabs.com" style="color:#D4AF37;">fiveinnolabs</a>
+  </div>
+</div>
+</body></html>`;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: env.FROM_EMAIL,
+        to: b.email,
+        subject: `${subjectPrefix}: AI Badge Session (Week ${weekNum}/6) - ${slot.label}`,
+        html: html,
+      }),
+    });
+    if (!res.ok) {
+      const result = await res.json();
+      console.error(`Reminder email API error (${reminderType}, ${slot.id}, w${weekNum}):`, result);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error(`Reminder email failed (${reminderType}, ${slot.id}, w${weekNum}):`, err);
+    return false;
+  }
 }
 
 // ══════════════════════════════════════════

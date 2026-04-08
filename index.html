@@ -1380,6 +1380,24 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <div class="availability-sublabel">One-to-one coaching, limited by design. Click a green slot to book.</div>
     </div>
 
+    <div style="text-align:center;margin-top:1.2rem;">
+      <a href="#" onclick="event.preventDefault();document.getElementById('guidelinesModal').classList.add('active')" style="font-size:0.85rem;color:var(--gold-rich);text-decoration:underline;text-underline-offset:3px;">Programme Guidelines &amp; Policies</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== GUARANTEE ===================== -->
+<section class="section" style="background:linear-gradient(135deg,#000036 0%,#02066F 100%);padding:3rem 0;">
+  <div class="container" style="text-align:center;max-width:640px;">
+    <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#x1F4B0;</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;color:#D4AF37;margin-bottom:1rem;">100% Guarantee</h2>
+    <p style="font-size:1.05rem;color:#c8c8e0;line-height:1.7;margin-bottom:1rem;">
+      If you have completed all sessions and all exercises, and still do not find a single practical use case, we will refund your full tuition.
+    </p>
+    <p style="font-size:1.1rem;color:#D4AF37;font-weight:600;line-height:1.6;">
+      No forms. No friction. Just email me for a full refund.
+    </p>
   </div>
 </section>
 
@@ -1446,6 +1464,48 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <a id="gcalBtn" href="#" target="_blank" style="display:block;width:100%;padding:14px;border-radius:14px;background:#4285f4;color:#fff;font-size:1rem;font-weight:700;text-align:center;text-decoration:none;margin-bottom:0.5rem;">Add to Google Calendar</a>
     <a id="calendarDownloadBtn" href="#" style="display:block;width:100%;padding:12px;border-radius:14px;background:linear-gradient(135deg,#000036,#02066F);color:#D4AF37;font-size:0.9rem;font-weight:600;text-align:center;text-decoration:none;margin-bottom:0.75rem;">Download .ics (Apple/Outlook)</a>
     <button class="btn-cta" onclick="document.getElementById('successModal').classList.remove('active');window.history.replaceState({},'',window.location.pathname);" style="width:100%;border-radius:14px;font-size:1rem;">Got It</button>
+  </div>
+</div>
+
+<!-- Programme Guidelines Modal -->
+<div class="payment-overlay" id="guidelinesModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="payment-modal" style="max-width:520px;">
+    <button class="payment-modal-close" onclick="document.getElementById('guidelinesModal').classList.remove('active')" aria-label="Close">&times;</button>
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--blue-deep);margin-bottom:1.2rem;">Programme Guidelines</h3>
+
+    <div style="font-size:0.9rem;color:var(--grey-dark);line-height:1.7;">
+      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F4F9;</span>
+        <div><strong>Sessions are on Google Meet.</strong> You'll receive a meeting link before your first session. All 6 sessions are 20 minutes each.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F4DA;</span>
+        <div><strong>Come prepared.</strong> Learners must complete assigned tutorials and check them off in the dashboard before each check-in session. This is how the programme works best.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F504;</span>
+        <div><strong>Rescheduling.</strong> Need to move a session? Contact Victor at <a href="mailto:victor@fiveinnolabs.com" style="color:var(--gold-rich);">victor@fiveinnolabs.com</a> with at least 24 hours notice.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0;">&#x274C;</span>
+        <div><strong>Missed sessions.</strong> No-shows and sessions missed without prior notice cannot be rescheduled or refunded.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F6E1;&#xFE0F;</span>
+        <div><strong>Consumer protection.</strong> EU consumer rights apply. You have a 14-day cooling-off period from enrolment. See our <a href="terms.html" target="_blank" style="color:var(--gold-rich);">Terms &amp; Conditions</a> for full refund and cancellation details.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0;">&#x1F4B0;</span>
+        <div><strong>100% Guarantee.</strong> If you have completed all sessions and all exercises, and still do not find a single practical use case, we will refund your full tuition. No forms. No friction. Just email Victor for a full refund.</div>
+      </div>
+    </div>
+
+    <button class="btn-cta" onclick="document.getElementById('guidelinesModal').classList.remove('active')" style="width:100%;margin-top:1.2rem;border-radius:14px;font-size:0.95rem;">Got It</button>
   </div>
 </div>
 
