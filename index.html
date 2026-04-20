@@ -3701,6 +3701,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 9, type: 'video', lessonPath: 'tutorials/hello-world-2/hello-world-2.html' },
     { id: 'retro-game', moduleId: 'retro-game', title: 'Retro Game', icon: '🎮', iconBg: 'rgba(255,59,48,0.12)', level: 'beginner', durationMinutes: 12, type: 'video', lessonPath: 'tutorials/retro-game/retro-game.html' },
     { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', durationMinutes: 11, type: 'video', lessonPath: 'tutorials/GitHub/GitHub.html' },
+    { id: 'ai-interviews-you', moduleId: 'ai-interviews-you', title: 'AI Interviews You', icon: '🎤', iconBg: 'rgba(175,82,222,0.12)', level: 'beginner', durationMinutes: 15, type: 'video', lessonPath: 'tutorials/ai-interviews-you/ai-interviews-you.html' },
     { id: 'opencode-setup', moduleId: 'opencode-setup', title: 'OpenCode Setup', icon: '⚡', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', durationMinutes: 35, type: 'video', pending: true }
   ];
 
@@ -3809,6 +3810,23 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           content = content.replace(/\shref="(?!https?:\/\/|\/\/|#|mailto:|javascript:)/g, ' href="' + basePath);
 
           this.lessonContent = content;
+
+          // After lesson DOM renders, auto-prefill any exercise submission widgets
+          setTimeout(function(){
+            try {
+              var boxes = document.querySelectorAll('[data-exercise-submission]');
+              for (var i = 0; i < boxes.length; i++) {
+                var b = boxes[i];
+                if (typeof window.prefillExerciseUrl === 'function') {
+                  window.prefillExerciseUrl({
+                    exerciseId: b.getAttribute('data-exercise-submission'),
+                    inputId:    b.getAttribute('data-submission-input'),
+                    statusId:   b.getAttribute('data-submission-status')
+                  });
+                }
+              }
+            } catch(err) { /* silent */ }
+          }, 50);
         } catch(e) {
           console.error('Failed to load lesson:', e);
           this.lessonError = true;
@@ -3825,6 +3843,127 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         if (user && lesson) saveTutorialCompletion(user.uid, lesson.id, this.isComplete);
       }
     };
+  };
+
+  /* --------------------------------------------------------------------------
+     Delegated copy-to-clipboard for any [data-copy-btn] inside a .cg-code-block.
+     Works for lesson content injected via x-html (inline scripts don't run there).
+     -------------------------------------------------------------------------- */
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  /* --------------------------------------------------------------------------
+     Generic exercise URL submission (reusable across lessons)
+     Usage from lesson HTML (inline onclick):
+       submitExerciseUrl({ exerciseId: 'ai-interviews-you',
+                           inputId: 'aiyInput', statusId: 'aiyStatus', btnId: 'aiyBtn',
+                           validate: 'github.io' })
+     -------------------------------------------------------------------------- */
+  window.submitExerciseUrl = async function(opts) {
+    opts = opts || {};
+    var input  = document.getElementById(opts.inputId);
+    var status = document.getElementById(opts.statusId);
+    var btn    = document.getElementById(opts.btnId);
+    var setStatus = function(kind, html) {
+      if (!status) return;
+      status.style.display = 'block';
+      status.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+      status.innerHTML = html;
+    };
+    var openDeployLesson = function(text) {
+      return '<a href="#" onclick="event.preventDefault();var el=document.querySelector(\'[x-data*=lmsDashboard]\'); if(window.Alpine){Alpine.evaluate(el, \'loadLesson(\\\'deploy-github\\\')\');window.scrollTo({top:0,behavior:\'smooth\'});}">' + text + '</a>';
+    };
+
+    var url = (input && input.value || '').trim();
+    if (!url) { setStatus('err', 'Please paste your URL.'); return; }
+
+    if (opts.validate === 'github.io') {
+      if (/^https?:\/\/(www\.)?github\.com\//i.test(url)) {
+        setStatus('err', 'That looks like a <code>github.com</code> repo link, not a live page. Enable GitHub Pages for that repo, then paste the URL that ends in <code>.github.io</code>. Need a refresher? Open ' + openDeployLesson('Deploy to GitHub') + '.');
+        return;
+      }
+      if (!/^https?:\/\//i.test(url)) { setStatus('err', 'URL must start with <code>https://</code>.'); return; }
+      if (!/^https?:\/\/[a-z0-9]([a-z0-9-]*[a-z0-9])?\.github\.io(\/[^\s]*)?$/i.test(url)) {
+        setStatus('err', 'We only accept live <code>.github.io</code> URLs. Revisit ' + openDeployLesson('Deploy to GitHub') + ' if you need to deploy.');
+        return;
+      }
+    }
+
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh and try again.'); return; }
+
+    if (btn) { btn.disabled = true; btn.dataset._label = btn.textContent; btn.textContent = 'Submitting...'; }
+    try {
+      var out = await saveSubmission(user.uid, opts.exerciseId, { type: 'url', value: url, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your page: <a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>');
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, opts.exerciseId, true); } catch (e) {}
+        }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset._label || 'Submit'; }
+    }
+  };
+
+  /* Prefill submission input with any previous submission, once user is signed in. */
+  window.prefillExerciseUrl = async function(opts) {
+    opts = opts || {};
+    try {
+      var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || typeof getSubmission !== 'function') return;
+      var existing = await getSubmission(user.uid, opts.exerciseId);
+      if (existing && existing.value) {
+        var input = document.getElementById(opts.inputId);
+        if (input && !input.value) input.value = existing.value;
+        var status = document.getElementById(opts.statusId);
+        if (status) {
+          status.style.display = 'block';
+          status.className = 'cg-submit-status ok';
+          status.innerHTML = 'Previously submitted: <a href="' + existing.value + '" target="_blank" rel="noopener">' + existing.value + '</a>. Submit again to update.';
+        }
+      }
+    } catch (e) { /* silent */ }
   };
 </script>
 

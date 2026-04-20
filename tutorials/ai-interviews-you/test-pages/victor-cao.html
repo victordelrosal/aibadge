@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Victor del Rosal — AI Educator & Chief AI Officer</title>
+<meta name="description" content="Helping organisations and professionals understand, adopt, and lead in the age of artificial intelligence.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Victor del Rosal — AI Educator & Chief AI Officer">
+<meta property="og:description" content="Helping organisations and professionals understand, adopt, and lead in the age of artificial intelligence.">
+<meta property="og:type" content="profile">
+<meta property="og:url" content="">
+<!-- Add og:image later: 1200x630 PNG matching dark theme -->
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Prevent theme flash -->
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.add('light');})();</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #020a18;
+  --bg-grad: linear-gradient(170deg, #020a18 0%, #041028 40%, #06142e 70%, #020a18 100%);
+  --surface: rgba(8,24,56,0.85);
+  --surface-hover: rgba(12,32,72,0.95);
+  --border: rgba(0,170,255,0.12);
+  --border-glow: rgba(0,170,255,0.3);
+  --text: #d0e0f0;
+  --text-bright: #e8f0ff;
+  --text-dim: #6888aa;
+  --neon: #00aaff;
+  --cyan: #00e5ff;
+  --green: #00ff88;
+  --amber: #ffaa00;
+  --red: #ff4466;
+  --purple: #aa66ff;
+  --header-bg: rgba(4,12,28,0.75);
+}
+html.light {
+  --bg: #f6f8fc;
+  --bg-grad: linear-gradient(170deg, #f6f8fc 0%, #eef3fb 40%, #e6edf8 70%, #f6f8fc 100%);
+  --surface: rgba(255,255,255,0.92);
+  --surface-hover: rgba(255,255,255,1);
+  --border: rgba(0,110,200,0.18);
+  --border-glow: rgba(0,110,200,0.35);
+  --text: #223352;
+  --text-bright: #0d1b33;
+  --text-dim: #5a6a82;
+  --neon: #0070d4;
+  --cyan: #0098b8;
+  --header-bg: rgba(246,248,252,0.85);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* Background layers */
+.bg-gradient {
+  position: fixed; inset: 0; background: var(--bg-grad); z-index: -3;
+}
+.bg-grid {
+  position: fixed; inset: 0; z-index: -2; opacity: 0.35; pointer-events: none;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.orb {
+  position: fixed; width: 600px; height: 600px; border-radius: 50%;
+  filter: blur(100px); opacity: 0.08; z-index: -1; pointer-events: none;
+}
+.orb-1 { background: var(--neon); top: -150px; left: -200px; animation: orbit1 22s ease-in-out infinite alternate; }
+.orb-2 { background: var(--cyan); bottom: -200px; right: -200px; animation: orbit2 28s ease-in-out infinite alternate; }
+.orb-3 { background: var(--purple); top: 40%; right: -300px; width: 500px; height: 500px; animation: orbit3 32s ease-in-out infinite alternate; }
+@keyframes orbit1 { from { transform: translate(0,0); } to { transform: translate(80px, 120px); } }
+@keyframes orbit2 { from { transform: translate(0,0); } to { transform: translate(-100px, -80px); } }
+@keyframes orbit3 { from { transform: translate(0,0); } to { transform: translate(-60px, 100px); } }
+
+/* Header */
+header {
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  max-width: 880px; margin: 0 auto; padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.brand { font-weight: 700; color: var(--text-bright); letter-spacing: -0.01em; font-size: 16px; }
+.tools { display: flex; gap: 6px; }
+.tool-btn {
+  background: transparent; border: 1px solid var(--border);
+  width: 36px; height: 36px; border-radius: 8px;
+  color: var(--text-dim); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+.tool-btn:hover { color: var(--neon); border-color: var(--border-glow); box-shadow: 0 0 12px var(--border-glow); }
+.tool-btn svg { width: 18px; height: 18px; }
+html.light .sun { display: none; } .moon { display: none; } html.light .moon { display: inline-block; }
+.sun { display: inline-block; }
+
+/* Content */
+main {
+  position: relative; z-index: 1;
+  max-width: 880px; margin: 0 auto; padding: 0 20px 80px;
+}
+
+/* Hero */
+.hero { padding: 80px 0 60px; }
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 800;
+  color: var(--text-bright);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 14px;
+}
+.hero-role {
+  font-size: 1.1rem; font-weight: 600;
+  color: var(--neon); margin-bottom: 28px;
+  letter-spacing: 0.01em;
+}
+.hero-line {
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  color: var(--text); line-height: 1.45;
+  max-width: 680px; margin-bottom: 36px;
+}
+.cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--neon); color: #001020;
+  padding: 14px 26px; border-radius: 10px;
+  font-weight: 700; text-decoration: none; font-size: 0.98rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 24px rgba(0,170,255,0.35);
+}
+.cta:hover { background: var(--cyan); box-shadow: 0 0 36px rgba(0,229,255,0.55); transform: translateY(-1px); }
+.cta svg { width: 18px; height: 18px; }
+
+/* Sections */
+.section { margin-bottom: 18px; }
+.section-toggle {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; transition: all 0.2s ease;
+  color: var(--text-bright); font-family: inherit;
+}
+.section-toggle:hover { background: var(--surface-hover); border-color: var(--border-glow); }
+.toggle-left { display: flex; align-items: center; gap: 14px; }
+.section-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(0,170,255,0.12); color: var(--neon);
+  font-weight: 700; font-size: 0.95rem;
+  border: 1px solid var(--border-glow);
+}
+.section-toggle h2 {
+  font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--text-bright);
+}
+.toggle-icon {
+  color: var(--text-dim); font-size: 1.4rem; font-weight: 300;
+  transition: transform 0.3s ease;
+}
+.section-toggle.active .toggle-icon { transform: rotate(45deg); color: var(--neon); }
+.section-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  background: transparent;
+  padding: 0 20px;
+}
+.section-body.open { max-height: 2000px; padding: 20px 20px 8px; }
+.section-body p { margin-bottom: 14px; color: var(--text); }
+.section-body ul { margin: 10px 0 14px 18px; }
+.section-body li { margin-bottom: 8px; color: var(--text); }
+.section-body strong { color: var(--text-bright); }
+
+/* Footer */
+footer {
+  position: relative; z-index: 1;
+  max-width: 880px; margin: 40px auto 0; padding: 24px 20px 32px;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim); font-size: 0.85rem; text-align: center;
+}
+footer a { color: var(--text-dim); }
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">Victor del Rosal</div>
+    <div class="tools">
+      <button class="tool-btn" title="Expand / collapse all sections" onclick="toggleAll()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <button class="tool-btn" title="Toggle light / dark mode" onclick="toggleTheme()">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Victor del Rosal</h1>
+    <div class="hero-role">AI Educator · Lecturer · Chief AI Officer at fiveinnolabs</div>
+    <p class="hero-line">Helping organisations and professionals understand, adopt, and lead in the age of artificial intelligence.</p>
+    <a class="cta" href="#contact">
+      Get in touch
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+    </a>
+  </section>
+
+  <div class="section">
+    <button class="section-toggle active" onclick="toggleSection(this)">
+      <div class="toggle-left"><span class="section-num">1</span><h2>About</h2></div>
+      <span class="toggle-icon">+</span>
+    </button>
+    <div class="section-body open">
+      <p>AI educator, consultant, and author working at the intersection of academia, consulting, and industry. Chief AI Officer at <strong>fiveinnolabs</strong>, where I design and deliver AI strategy, training, and innovation programs for businesses and professionals. Adjunct Assistant Professor at the <strong>National College of Ireland</strong>, teaching at master's level across AI, cloud, and innovation.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <button class="section-toggle active" onclick="toggleSection(this)">
+      <div class="toggle-left"><span class="section-num">2</span><h2>Teaching &amp; Impact</h2></div>
+      <span class="toggle-icon">+</span>
+    </button>
+    <div class="section-body open">
+      <ul>
+        <li>MSc-level modules across AI, cloud, and innovation at the National College of Ireland.</li>
+        <li>Recipient of the NCI President's Award for Distinguished Teaching.</li>
+        <li>Supervision of award-winning student innovation projects, including national student startup victories.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <button class="section-toggle active" onclick="toggleSection(this)">
+      <div class="toggle-left"><span class="section-num">3</span><h2>AI Strategy &amp; Consulting</h2></div>
+      <span class="toggle-icon">+</span>
+    </button>
+    <div class="section-body open">
+      <ul>
+        <li>Founder and Chief AI Officer at <strong>fiveinnolabs</strong>, delivering AI strategy, training, and transformation programs.</li>
+        <li>Prior senior roles at Tata Consultancy Services and CloudStrong.</li>
+        <li>Engagements span boardroom-level strategy, executive education, and applied transformation work.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <button class="section-toggle active" onclick="toggleSection(this)">
+      <div class="toggle-left"><span class="section-num">4</span><h2>Publications &amp; Thought Leadership</h2></div>
+      <span class="toggle-icon">+</span>
+    </button>
+    <div class="section-body open">
+      <ul>
+        <li><strong>Humanlike: the AI Transformation</strong> — on AI's impact on work, organisations, and people.</li>
+        <li><strong>Disruption: Emerging Technologies and the Future of Work</strong> — used as academic text in universities across Ireland, Switzerland, and the US.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="contact">
+    <button class="section-toggle active" onclick="toggleSection(this)">
+      <div class="toggle-left"><span class="section-num">5</span><h2>Contact</h2></div>
+      <span class="toggle-icon">+</span>
+    </button>
+    <div class="section-body open">
+      <p>Open to senior AI leadership roles, advisory work, and keynote invitations.</p>
+      <p>Reach out directly to start a conversation.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Victor del Rosal · <span id="year"></span> · Built with the <a href="https://aibadge.fiveinnolabs.com" target="_blank" rel="noopener">AI Badge</a>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+function toggleSection(btn){
+  btn.classList.toggle('active');
+  btn.nextElementSibling.classList.toggle('open');
+}
+function toggleAll(){
+  var toggles = document.querySelectorAll('.section-toggle');
+  var anyClosed = Array.from(toggles).some(t => !t.classList.contains('active'));
+  toggles.forEach(t => {
+    if (anyClosed) { t.classList.add('active'); t.nextElementSibling.classList.add('open'); }
+    else { t.classList.remove('active'); t.nextElementSibling.classList.remove('open'); }
+  });
+}
+function toggleTheme(){
+  var light = document.documentElement.classList.toggle('light');
+  localStorage.setItem('theme', light ? 'light' : 'dark');
+}
+</script>
+</body>
+</html>

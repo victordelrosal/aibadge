@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interviews You | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none; z-index: 1;
+  }
+  .cg-topbar { position: sticky; top: 0; z-index: 100; height: 56px; background: rgba(0, 0, 54, 0.95); border-bottom: 1px solid rgba(0, 102, 255, 0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-video-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); color: var(--cg-text-muted); font-size: 1.05rem; flex-direction: column; gap: 0.5rem; text-align: center; padding: 1rem; }
+  .cg-video-placeholder svg { opacity: 0.4; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; max-height: 340px; overflow-y: auto; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
+  /* Submission UI */
+  .cg-submit-box { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; margin: 1rem 0; }
+  .cg-submit-row { display: flex; gap: 0.5rem; align-items: stretch; flex-wrap: wrap; }
+  .cg-submit-input { flex: 1; min-width: 220px; padding: 0.7rem 0.9rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 8px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15); }
+  .cg-submit-btn { padding: 0.7rem 1.2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; transition: all 0.2s; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4); }
+  .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .cg-submit-status { margin-top: 0.75rem; font-size: 0.9rem; }
+  .cg-submit-status.ok { color: var(--cg-success); }
+  .cg-submit-status.err { color: var(--cg-error); }
+  .cg-submit-status a { color: var(--cg-cyan); }
+  /* Light mode */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; } .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; }
+  .cg-lesson.light-mode .cg-step-card, .cg-lesson.light-mode .cg-concept-card, .cg-lesson.light-mode .cg-submit-box { background: #f8f9fa; border: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>AI Interviews You</h1>
+      <p class="cg-subtitle">Turn your story into a personal landing page, in one chat</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~18 minutes</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/hp98tK52XVE" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="ai-interviews-you.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: One Prompt, One Page</h2>
+          <span class="cg-session-meta">One prompt. Four questions. One page.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><div class="cg-step-num">1</div><h5>Open an AI chat</h5><p><a href="https://chatgpt.com" target="_blank">ChatGPT</a>, <a href="https://claude.ai" target="_blank">Claude</a>, or <a href="https://gemini.google.com" target="_blank">Gemini</a>.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">2</div><h5>Paste the prompt</h5><p>Answer 4 quick questions. Upload a CV or LinkedIn screenshot to speed it up.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">3</div><h5>Reply <code>build</code></h5><p>In the same chat. It returns one complete <code>index.html</code>.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">4</div><h5>Deploy & submit</h5><p>Push to GitHub Pages (Lesson 4), then submit your URL below.</p></div>
+        </div>
+
+        <h3>The Prompt</h3>
+        <p>Paste this <strong>once</strong> into a fresh chat. The AI will interview you (4 questions), produce a Brief, then wait for you to reply <code>build</code> &mdash; and only then output your complete <code>index.html</code>.</p>
+        <div class="cg-code-block">
+          <pre>You are my interviewer and builder. First you'll run a fast, mostly-MCQ interview, produce a Brief, and WAIT. Only after I reply "build" will you output a complete index.html.
+
+# PART 1 &mdash; The Interview
+
+## Rules
+- Ask exactly 4 questions, one at a time. Wait for my answer before the next.
+- Start your FIRST reply with Question 1. No preamble. No "Sure", no "let's begin", no greeting or commentary.
+- Every question MUST be shown in full, including ALL lettered options. Do not shorten, summarise, or omit options.
+- Questions 1, 2, and 4 are multiple choice. I reply with a letter (or "f: my own answer").
+- Question 3 is open &mdash; and for Q3, I can upload a file or image instead of typing.
+- Never ask follow-up questions. Never ask me to clarify. Take what I give and move on.
+- If I answer with just "f" with no specification, silently pick the closest non-"Other" option.
+- If I reply with a question instead of an answer, answer it in ONE short line, then re-show the same question in full.
+- If I reply in a language other than English, mirror my language for all remaining questions and the Brief. Do not translate my words.
+- "Focus" covers a paid job, business, volunteer role, caregiving, studying, hobby, or personal mission. Do not assume I am employed.
+
+## UPLOAD HANDLING
+At ANY question, if I upload a file, image, PDF, Word doc, screenshot, or multiple files at once:
+- Silently extract the relevant content. Do not ask me what to do with it.
+- Use it to auto-answer the CURRENT question, AND pre-fill later questions wherever you can.
+- For MCQ questions: pick the best-fitting letter based on what you extracted, state it, and move on.
+- For Q3: auto-summarise the upload into one short paragraph (what I do + one concrete thing to be proud of), treat that as my answer, and move on.
+- Still show each later question fully so I can override with a letter.
+- If I paste a URL you cannot open, reply in one line: "I can't open links &mdash; paste the content or upload a file." Then wait.
+
+## The 4 questions
+
+1. What is the focus of this page?
+   (a) My paid job or professional role
+   (b) My own business, practice, or consultancy
+   (c) Volunteer work, caregiving, or a personal mission
+   (d) A serious hobby or creative project
+   (e) My studies or learning journey
+   (f) Other: ___
+
+2. Who is the page for?
+   (a) A prospective client or customer
+   (b) A future employer or recruiter
+   (c) Colleagues, peers, or my professional network
+   (d) A general audience or portfolio visitor
+   (e) Myself &mdash; for reflection and clarity
+   (f) Other: ___
+
+3. In one short paragraph: what do you do, and what is ONE specific thing you're proud of? Name companies, people, or outcomes where you can.
+   Shortcut: drop in your CV, resume, LinkedIn profile screenshot, or a link &mdash; I will extract and summarise it for you. Two or three sentences is plenty.
+
+4. What should a visitor feel or do after reading the page?
+   (a) Trust me / take me seriously
+   (b) Hire me or contact me for work
+   (c) Collaborate with me
+   (d) Understand clearly what I do
+   (e) Remember me
+   (f) Other: ___
+
+## The Brief (produce immediately after Q4)
+
+---
+**BRIEF FOR LANDING PAGE**
+
+**Name &amp; Role:**
+**Audience:**
+**Value proposition (one sentence, sharp):**
+**Signature work (1-3 bullets, specifics only):**
+**Tone &amp; style (3 words):**
+**Primary page goal:**
+**Hero line (one polished sentence for the top of the page):**
+**Suggested sections (3-5 bullets for the page structure):**
+---
+
+Rules for the Brief:
+- Fill every field.
+- Use the exact words I gave you wherever possible. The Brief must sound like me, not like generic marketing. Avoid superlatives I did not use (no "award-winning", "industry-leading", "cutting-edge") unless they appear in my input.
+- Where I didn't give you enough, infer confidently and mark with [inferred]. [inferred] may only flag things you can defend from my inputs or uploads. Do NOT invent specifics (numbers, dates, client names, awards).
+- If my Q3 answer is one sentence or less, infer the rest from Q1 + Q2 context &mdash; never fabricate achievements.
+
+After the Brief, add ONE closing line only:
+Reply "build" when you're ready for your page, or correct any field and I'll update the Brief.
+
+Then STOP and wait. Do NOT produce the HTML until I reply "build".
+
+# PART 2 &mdash; The Build (only after I reply "build")
+
+When I reply "build", output ONE complete, self-contained index.html file I can save and push to GitHub Pages. Nothing else &mdash; no explanation, no commentary, no partial snippets. Just the full file in a single ```html code block.
+
+## File
+- Single HTML file. All CSS and JS inline. No frameworks, no build tools.
+- Google Fonts (Inter) is the ONLY external dependency allowed.
+- Must work when opened locally (file://) and when deployed to GitHub Pages.
+
+## Theme &mdash; dark-first with light toggle
+Default is dark mode. Deep navy gradient background, never pure black. Use these CSS variables:
+- --bg: #020a18
+- --bg-grad: linear-gradient(170deg, #020a18 0%, #041028 40%, #06142e 70%, #020a18 100%)
+- --surface: rgba(8,24,56,0.85)
+- --border: rgba(0,170,255,0.12)
+- --border-glow: rgba(0,170,255,0.3)
+- --text: #d0e0f0
+- --text-bright: #e8f0ff
+- --text-dim: #6888aa
+- Accents: --neon #00aaff, --cyan #00e5ff, --green #00ff88, --amber #ffaa00, --red #ff4466, --purple #aa66ff
+
+Provide a complete `html.light { }` override that remaps every variable for a clean, readable (not washed-out) light mode. Toggle via sun/moon icon in the header. Persist the choice in localStorage. Apply the saved preference BEFORE first paint so there is no flash.
+
+## Layout
+- Sticky frosted-glass header: position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); semi-transparent background.
+  - Left: my name.
+  - Right: icon-only buttons &mdash; theme toggle and collapse/expand-all toggle. No text labels. Use title="" tooltips.
+- Content container: max-width: 880px; margin: 0 auto; padding: 0 20px.
+- Font: Inter (Google Fonts) + system fallback stack. Body 16px, line-height 1.65, -webkit-font-smoothing: antialiased.
+- Links: --neon color, --cyan on hover with subtle glow, no underline.
+
+## Background depth (required, back to front)
+1. Fixed full-page gradient (--bg-grad).
+2. Subtle 60px grid overlay at ~3% opacity.
+3. Two or three large blurred radial orbs (filter: blur(100px)) at ~8% opacity, slowly orbiting via CSS keyframes. Orbs render OUTSIDE the 880px content column &mdash; never behind text.
+4. Content layer: position: relative; z-index: 1.
+
+## Hero (top of page)
+- Big name.
+- Role line in accent color.
+- The Hero line from the Brief as a single large statement.
+- One primary CTA button matching the Brief's Primary page goal (e.g. "Get in touch", "Hire me", "Read my work").
+
+## Sections
+Turn each item from the Brief's "Suggested sections" into its OWN collapsible section. Use a button + body pattern:
+- Circled numbered indicator (1, 2, 3...) on the left.
+- Section title next to the number.
+- +/- toggle icon on the right.
+- All sections open by default. Smooth open/close animation.
+- The collapse/expand-all toggle in the header controls them globally.
+
+Fill each section from the Brief. Use the Signature work bullets verbatim where possible. Keep copy tight.
+
+## Favicon
+Set a favicon in &lt;head&gt; using an emoji SVG data URI. Pick an emoji that fits my work.
+
+## Meta tags
+Include Open Graph + Twitter Card tags for title, description, type, and url. Omit og:image for now; leave an HTML comment: &lt;!-- Add og:image later: 1200x630 PNG matching dark theme --&gt;
+
+## Footer
+Subtle, dimmed footer with: my name, current year, and "Built with the AI Badge". No disclaimer needed.
+
+## Content rules (critical)
+- Use the Brief verbatim wherever possible: Name &amp; Role, Hero line, Signature work bullets, Suggested sections.
+- Anything marked [inferred] in the Brief must either stay [inferred] in the page or be softened &mdash; do NOT fabricate specific achievements, numbers, dates, or names I didn't give you.
+- No lorem ipsum. No marketing fluff I didn't write. No invented client names.
+
+## Output format
+Output ONLY one ```html code block containing the entire file, ready to save as index.html. No text before the block. No text after the block.
+
+---
+
+Begin with Question 1 now &mdash; show the question text and ALL six options exactly as written. Then wait for my answer.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Save and deploy</h4>
+          <p>Copy the <code>index.html</code> from the chat, save it as <code>index.html</code> in a new GitHub repo, then deploy with the workflow from <strong>Deploy to GitHub</strong>. Paste the live URL below to submit.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">From the first question to a live URL</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>This lesson stacks everything you've learned so far: prompting an LLM, saving an <code>index.html</code>, and deploying to GitHub Pages. The output is a small landing page about you that you can share.</p>
+
+        <h3>Part 1: Open the LLM and Paste the Prompt</h3>
+        <h4>Step 1: Open a fresh chat</h4>
+        <p>Go to <a href="https://chatgpt.com" target="_blank">chatgpt.com</a>, <a href="https://claude.ai" target="_blank">claude.ai</a>, or <a href="https://gemini.google.com" target="_blank">gemini.google.com</a>. A brand-new chat window is ideal: the prompt is long and self-contained, and any prior history just adds noise.</p>
+        <h4>Step 2: Paste the Interview + Build prompt</h4>
+        <p>Scroll back up to <strong>The Prompt</strong> in Quick Start and hit <strong>Copy prompt</strong>. Paste it into the chat and send. You'll notice there's only one prompt: it runs the interview <em>and</em> builds the page, but it will <strong>wait</strong> after the Brief until you reply <code>build</code>.</p>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Programming with English</h4>
+          <p>This prompt <em>is</em> a small program. It tells the LLM the order of steps, when to stop, and how to handle uploads. This is prompt engineering: natural language used to script an LLM's behaviour. You'll use more of this in later lessons.</p>
+        </div>
+
+        <h3>Part 2: Answer the 4 Questions</h3>
+        <p>The AI asks them one at a time:</p>
+        <ol>
+          <li><strong>Focus of the page</strong> (MCQ) &mdash; paid job, business, volunteer, hobby, studies, or "other". Reply with a single letter.</li>
+          <li><strong>Audience</strong> (MCQ) &mdash; client, employer, peers, general, yourself, or "other".</li>
+          <li><strong>What you do + one thing you're proud of</strong> (open) &mdash; type two or three sentences, or use the upload shortcut below.</li>
+          <li><strong>What should the visitor feel or do?</strong> (MCQ) &mdash; trust, hire, collaborate, understand, remember, or "other".</li>
+        </ol>
+
+        <h4>The upload shortcut (Q3)</h4>
+        <p>Instead of typing a paragraph, upload your <strong>LinkedIn profile as a PDF</strong>, a CV, or a screenshot of your profile. The prompt is designed to silently extract what it needs, auto-answer Q3, and even pre-fill later questions.</p>
+        <div class="cg-concept-card">
+          <h4>How to save your LinkedIn as a PDF</h4>
+          <ol>
+            <li>Open your LinkedIn profile.</li>
+            <li>Click the <strong>&hellip;</strong> (three-dot) button under your headline.</li>
+            <li>Choose <strong>Save to PDF</strong>. It downloads to your Downloads folder.</li>
+            <li>Drag the PDF into the chat (ChatGPT: use <strong>Add photos &amp; files</strong>).</li>
+          </ol>
+        </div>
+
+        <h3>Part 3: Review the Brief, then Build</h3>
+        <p>After Q4, the AI produces a <strong>Brief</strong>: name &amp; role, audience, value proposition, signature work, tone, goal, hero line, and suggested sections. Read it carefully. Anything tagged <code>[inferred]</code> is the AI's guess, not a fact.</p>
+        <p>You have two options:</p>
+        <ul>
+          <li><strong>Correct it first.</strong> Reply in plain English, e.g. "Replace [inferred] role with 'Marketing Lead at Stripe'" or "Tone should be warm, not formal." The AI updates the Brief and asks again.</li>
+          <li><strong>Build it.</strong> Once the Brief reads like you, reply with a single word: <code>build</code></li>
+        </ul>
+        <p>Only after you reply <code>build</code> will the AI output the full <code>index.html</code> inside a single code block.</p>
+
+        <h3>Part 4: Save and Preview Locally</h3>
+        <h4>Step 1: Copy the code</h4>
+        <p>Click the <strong>Copy code</strong> button on the <code>index.html</code> code block. Make sure it starts with <code>&lt;!DOCTYPE html&gt;</code> and ends with <code>&lt;/html&gt;</code>.</p>
+        <h4>Step 2: Paste into Sublime Text</h4>
+        <p>Open Sublime Text, create a new file (<kbd>Cmd</kbd>+<kbd>N</kbd> / <kbd>Ctrl</kbd>+<kbd>N</kbd>), and paste.</p>
+        <h4>Step 3: Save as <code>index.html</code></h4>
+        <p>Save into a new folder in your <strong>AI Projects</strong> directory, named <code>ai-interviews-you</code>. The filename must be <code>index.html</code> exactly: this matters for GitHub Pages, which looks for <code>index.html</code> at the root by default.</p>
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Important</h4>
+          <p>Use <code>index.html</code>, not <code>ai-interviews-you.html</code>. GitHub Pages serves <code>index.html</code> automatically at the root of your repo.</p>
+        </div>
+        <h4>Step 4: Open it in your browser</h4>
+        <p>Double-click the file, or use <kbd>Cmd</kbd>+<kbd>O</kbd> / <kbd>Ctrl</kbd>+<kbd>O</kbd> from any browser. Your landing page should load with the hero, your name, role, sections, and a theme toggle.</p>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> This is still a local file</h4>
+          <p>The URL in the address bar will start with <code>file://</code>. That means only your laptop can see it. Don't submit this link. The next part puts it online.</p>
+        </div>
+
+        <h3>Part 5: Push to GitHub Pages</h3>
+        <p>This is the same workflow from the <strong>Deploy to GitHub</strong> lesson, applied to this repo. Short version:</p>
+        <ol>
+          <li>Go to <a href="https://github.com/new" target="_blank">github.com/new</a>. Name the repo <code>ai-interviews-you</code> to match your folder. Keep it <strong>Public</strong>, no README, and click <strong>Create repository</strong>.</li>
+          <li>On the empty repo page, click <strong>Create new file</strong>. Name the file <code>index.html</code>.</li>
+          <li>Paste your full HTML code into the file body. Click <strong>Commit changes</strong>, accept the suggested commit message, commit again.</li>
+          <li>Go to <strong>Settings &rarr; Pages</strong>. Under <strong>Branch</strong>, change <code>None</code> to <code>main</code>, then click <strong>Save</strong>.</li>
+          <li>Wait ~60 seconds. Refresh the Pages settings page and copy the live URL. It looks like <code>https://yourname.github.io/ai-interviews-you/</code>.</li>
+        </ol>
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> You're live</h4>
+          <p>That <code>.github.io</code> URL is the one you share. It's public, hosted for free by GitHub, and it's the one you submit below.</p>
+        </div>
+
+        <h3>Part 6: Submit the Right URL</h3>
+        <p>Scroll down to <strong>Submit Your Work</strong> and paste the live <strong>.github.io</strong> URL. The repository URL (<code>github.com/yourname/ai-interviews-you</code>) is <em>not</em> the page: it's the code. Submit the public page, not the code.</p>
+        <div class="cg-filename-compare">
+          <div class="cg-filename-box wrong"><h5>Wrong (repo)</h5><code>github.com/you/ai-interviews-you</code></div>
+          <div class="cg-filename-box right"><h5>Correct (live page)</h5><code>you.github.io/ai-interviews-you/</code></div>
+        </div>
+
+        <h3>Keyboard Shortcuts</h3>
+        <table class="cg-kbd-table">
+          <thead><tr><th>Action</th><th>Mac</th><th>Windows</th></tr></thead>
+          <tbody>
+            <tr><td>Copy</td><td><kbd>Cmd</kbd> + <kbd>C</kbd></td><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td></tr>
+            <tr><td>Paste</td><td><kbd>Cmd</kbd> + <kbd>V</kbd></td><td><kbd>Ctrl</kbd> + <kbd>V</kbd></td></tr>
+            <tr><td>Select All</td><td><kbd>Cmd</kbd> + <kbd>A</kbd></td><td><kbd>Ctrl</kbd> + <kbd>A</kbd></td></tr>
+            <tr><td>Save</td><td><kbd>Cmd</kbd> + <kbd>S</kbd></td><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td></tr>
+            <tr><td>New File</td><td><kbd>Cmd</kbd> + <kbd>N</kbd></td><td><kbd>Ctrl</kbd> + <kbd>N</kbd></td></tr>
+            <tr><td>Open File</td><td><kbd>Cmd</kbd> + <kbd>O</kbd></td><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <style>
+      .cg-filename-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+      .cg-filename-box { padding: 1rem; border-radius: 0.5rem; text-align: center; }
+      .cg-filename-box.wrong { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
+      .cg-filename-box.right { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); }
+      .cg-filename-box h5 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+      .cg-filename-box.wrong h5 { color: var(--cg-error); }
+      .cg-filename-box.right h5 { color: var(--cg-success); }
+      .cg-filename-box code { display: block; margin: 0.25rem 0; }
+      .cg-kbd-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+      .cg-kbd-table th, .cg-kbd-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--cg-border); color: var(--cg-text-secondary); }
+      .cg-kbd-table th { background: rgba(0, 102, 255, 0.15); font-weight: 600; color: var(--cg-cyan); }
+      .cg-session-content kbd { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.2rem 0.5rem; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: #fff; }
+      @media (max-width: 768px) { .cg-filename-compare { grid-template-columns: 1fr; } }
+      .cg-lesson.light-mode .cg-filename-box.wrong { background: #fce8e6; border-color: #d93025; }
+      .cg-lesson.light-mode .cg-filename-box.wrong h5 { color: #d93025; }
+      .cg-lesson.light-mode .cg-filename-box.right { background: #e6f4ea; border-color: #1e8e3e; }
+      .cg-lesson.light-mode .cg-filename-box.right h5 { color: #1e8e3e; }
+      .cg-lesson.light-mode .cg-kbd-table th { background: #f1f3f4; color: #202124; }
+      .cg-lesson.light-mode .cg-session-content kbd { background: #f1f3f4; border: 1px solid #dadce0; color: #202124; }
+    </style>
+
+    <!-- DEPLOY TO GITHUB PAGES (bridge step) -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Deploy Your Page to GitHub</h2>
+          <span class="cg-session-meta">Turn your <code>index.html</code> into a live URL</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>You now have an <code>index.html</code> from the chat. Next, publish it as a live, public page so anyone can visit it and so you can submit it below.</p>
+        <ol>
+          <li>Create a new repository on GitHub (public).</li>
+          <li>Upload or commit your <code>index.html</code> to the repo root.</li>
+          <li>Enable GitHub Pages in the repo settings and grab the <code>https://<em>yourname</em>.github.io/<em>repo</em>/</code> URL.</li>
+        </ol>
+        <p>Full step-by-step walkthrough is in the previous lesson:</p>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Open: Deploy to GitHub</h4>
+          <p><a href="https://aibadge.fiveinnolabs.com/#/lesson/deploy-github/deploy-github" target="_blank" rel="noopener">aibadge.fiveinnolabs.com &rarr; Deploy to GitHub</a> &mdash; the full workflow, with screenshots.</p>
+        </div>
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Heads up</h4>
+          <p>Pages can take 30-60 seconds to go live after you enable it. Refresh the URL a couple of times before panicking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT YOUR WORK -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Submit Your Work</h2>
+          <span class="cg-session-meta">Paste your GitHub Pages URL</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>Paste the <strong>live GitHub Pages URL</strong> for your new landing page. It should look like <code>https://yourname.github.io/your-repo/</code>.</p>
+        <div class="cg-submit-box" data-exercise-submission="ai-interviews-you" data-submission-input="aiyInput" data-submission-status="aiyStatus" data-submission-btn="aiyBtn" data-submission-validate="github.io">
+          <div class="cg-submit-row">
+            <input type="url" class="cg-submit-input" id="aiyInput" placeholder="https://yourname.github.io/your-repo/" autocomplete="off" spellcheck="false">
+            <button class="cg-submit-btn" id="aiyBtn" onclick="(window.submitExerciseUrl||window.__aiyInterviewsSubmit)({exerciseId:'ai-interviews-you',inputId:'aiyInput',statusId:'aiyStatus',btnId:'aiyBtn',validate:'github.io'})">Submit</button>
+          </div>
+          <div class="cg-submit-status" id="aiyStatus" style="display:none;"></div>
+        </div>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Why .github.io only?</h4>
+          <p>We accept live, public URLs on GitHub Pages so your page is reachable by anyone. If you submit a <code>github.com</code> repo link, we'll ask you to enable Pages first.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common snags and fixes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro Tip: The AI is your IT support</h4>
+          <p>Page looks wrong? Paste a screenshot straight back into the same chat and say "fix this". Ask for a different tone, more sections, a specific colour. Iterate.</p>
+        </div>
+        <div class="cg-concept-card"><h4>The AI asked a follow-up question</h4><p>Old prompt version. Copy the prompt above again into a fresh chat &mdash; the v2 prompt forbids follow-ups.</p></div>
+        <div class="cg-concept-card"><h4>My Brief has [inferred] tags I don't like</h4><p>Reply in the same chat with the correction (e.g. "Replace [inferred] role with 'Marketing Lead at Stripe'"), then say <code>build</code>.</p></div>
+        <div class="cg-concept-card"><h4>Submission says "not a github.io URL"</h4><p>You pasted the repo link (<code>github.com/...</code>) instead of the live Pages URL. Open your repo &gt; Settings &gt; Pages and grab the URL that starts with <code>https://</code> and ends in <code>.github.io</code>. If you haven't deployed yet, revisit <strong>Deploy to GitHub</strong>.</p></div>
+        <div class="cg-concept-card"><h4>The AI fabricated an award I never won</h4><p>The prompt bans this. Re-paste it into a fresh chat and be explicit in Q3. Anything the AI invented, ask it to remove by name before you reply <code>build</code>.</p></div>
+        <div class="cg-concept-card"><h4>GitHub Pages shows a 404</h4><p>Enable takes 30-60 seconds. Refresh a couple of times. If it still 404s, open <strong>Settings &rarr; Pages</strong> and confirm the branch is set to <code>main</code> and the source is the repo root.</p></div>
+        <div class="cg-concept-card"><h4>"I uploaded a PDF but the AI asked me to type anyway"</h4><p>Some LLMs need the file to finish uploading before the prompt is sent. Wait for the file thumbnail to appear, then send your message. If it still ignores the upload, say "use the file I uploaded as my answer to Question 3."</p></div>
+        <h3>Common Mistakes to Avoid</h3>
+        <ul>
+          <li>Saving the file as <code>ai-interviews-you.html</code> instead of <code>index.html</code> (GitHub Pages defaults to <code>index.html</code>)</li>
+          <li>Submitting the <code>github.com</code> repo link instead of the <code>.github.io</code> live URL</li>
+          <li>Pasting the prompt into an older chat with conflicting context &mdash; always use a fresh chat</li>
+          <li>Replying <code>build</code> before checking the Brief for <code>[inferred]</code> fields</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>Welcome back to the AI Badge. Today's session combines everything we've done so far into a mini project.</p>
+
+        <h3>Stacking Skills into a Mini Project</h3>
+        <p>You've been building up tools and skills tutorial by tutorial. This lesson is where we integrate them: you'll prompt a large language model, receive an <code>index.html</code>, save it, preview it, and deploy it to GitHub Pages. There's also some prompt engineering in here, because the prompt we use is a little program written in English. Don't worry about the prompt's internals for now: we'll dig into prompt engineering more in later lessons.</p>
+        <p>By the end of this tutorial, you'll submit a live URL to a GitHub Page that you built.</p>
+
+        <h3>The Idea: AI Interviews You</h3>
+        <p>You paste a single prompt into ChatGPT (or Claude, or Gemini), and the AI conducts a short interview. It asks a few multiple-choice questions, then one open question where you can either type a paragraph or upload your CV or a LinkedIn PDF. Once it has enough, it produces a Brief and <strong>waits</strong>. Only after you reply <code>build</code> does it output the full <code>index.html</code>.</p>
+
+        <h3>Opening ChatGPT and Pasting the Prompt</h3>
+        <p>Go to <a href="https://chatgpt.com" target="_blank">chatgpt.com</a> (or <code>chat.com</code> works too). You can use Claude, Gemini, or your LLM of choice. Some of the options like extended thinking may change over time, so ignore any setting you don't recognise.</p>
+        <p>Back on the tutorial page you'll see the video up top and the prompt in the Quick Start section. Copy the prompt and paste it into the chat. The prompt tells the LLM: "you are my interviewer and builder. First you'll run a fast, mostly multiple-choice interview, produce a Brief, and wait. Only after I reply <em>build</em> will you output a complete <code>index.html</code>."</p>
+
+        <h3>Programming with Natural Language</h3>
+        <p>This is what prompt engineering looks like in practice: you use plain English to tell an AI what to do and in what order, and even when to stop. It's a surprisingly powerful way to think. The prompt also handles image uploads, PDFs, Word documents, and screenshots, so you don't have to retype what you already have on LinkedIn.</p>
+
+        <h3>Walking Through the Interview</h3>
+        <p>The four questions: what is the focus of the page, who is the page for, a short paragraph about what you do and one thing you're proud of, and what the visitor should feel or do.</p>
+        <p>For the demo, I picked my paid professional role (a), a prospective client or customer (a), and for Question 3 I showed the upload shortcut.</p>
+
+        <h3>The LinkedIn PDF Shortcut</h3>
+        <p>Instead of typing a paragraph, anyone can go to their LinkedIn profile, click the three-dot button, and choose <strong>Save to PDF</strong>. The PDF lands in your Downloads folder. Back in ChatGPT, click <strong>Add photos &amp; files</strong>, attach the PDF, and send. The prompt is designed to silently extract the relevant content and auto-answer Question 3. You could also take a screenshot of your profile and attach that, whatever you prefer.</p>
+        <p>For Question 4, I picked <strong>collaborate</strong> (option c). That's it: the interview is done.</p>
+
+        <h3>The Brief and "build"</h3>
+        <p>The AI produces a Brief for a landing page: audience, value proposition, signature work pulled from the CV, tone, goal, and hero line. Read it, correct anything you don't like, then reply with a single word: <code>build</code>.</p>
+        <p>At that point the AI starts producing the full <code>index.html</code> in a single code block. While it's building, I'll show you the next step.</p>
+
+        <h3>Saving the index.html</h3>
+        <p>Once the build is done, copy the full code. Open a fresh tab in Sublime Text (<kbd>Cmd</kbd>+<kbd>N</kbd> / <kbd>Ctrl</kbd>+<kbd>N</kbd>), paste it, and check the HTML tags at the very top and very bottom. If the opening <code>&lt;!DOCTYPE html&gt;</code> and closing <code>&lt;/html&gt;</code> are present, the code is complete.</p>
+        <p>Save into your AI Projects folder, in a subfolder called <code>ai-interviews-you</code>. The filename must be <code>index.html</code>. Open it from your browser with <kbd>Cmd</kbd>+<kbd>O</kbd> / <kbd>Ctrl</kbd>+<kbd>O</kbd> and you'll see a short landing page: nav bar, gradient background, collapsible sections, a hero, and a primary call-to-action. It's not fancy, but it has design flair, and every learner's page comes out different because every Brief is different.</p>
+
+        <h3>Pushing to GitHub Pages</h3>
+        <p>This is the workflow from the previous tutorial (<strong>Deploy to GitHub</strong>). Go to <a href="https://github.com/new" target="_blank">github.com/new</a>, set the repository name to <code>ai-interviews-you</code> to match your local folder, keep it public, no description, no README, and click <strong>Create repository</strong>.</p>
+        <p>On the empty repo, click <strong>Create new file</strong>, name it <code>index.html</code>, paste the full code into the contents, and commit. Copilot will suggest a commit message, accept it and commit again.</p>
+        <p>Now the crucial bit: go to <strong>Settings &rarr; Pages</strong>. Under <strong>Branch</strong>, change <code>None</code> to <code>main</code>, and save. Wait about a minute. The live URL will be <code>https://yourname.github.io/ai-interviews-you/</code>.</p>
+
+        <h3>Local vs. Live</h3>
+        <p>If your browser's address bar says <code>file://</code>, that's the local copy. Only your laptop can see it. Do not submit that link. The whole point of GitHub Pages is to get a public <code>.github.io</code> URL that anyone can visit.</p>
+
+        <h3>Submitting the Right URL</h3>
+        <p>There's one mistake that's easy to make: confusing the repository URL (<code>github.com/you/ai-interviews-you</code>) with the live page URL (<code>you.github.io/ai-interviews-you/</code>). If you paste the repo link, the submission form will reject it and remind you to enable GitHub Pages. Paste the <code>.github.io</code> URL and hit submit.</p>
+
+        <h3>What You Achieved</h3>
+        <p>You ran a mini interview in your own LLM, got code tailored to your profile, saved it, and deployed it as a live public page. You stacked Hello World, Deploy to GitHub, and prompt engineering into one deliverable. If you got this far and submitted that page, you're flying. Congratulations and I'll see you in the next tutorial. Take care.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('lesson-theme');
+  if(t==='light') document.querySelector('.cg-lesson').classList.add('light-mode');
+
+  // Delegated copy handler: any button with [data-copy-btn] inside a .cg-code-block
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  var EXERCISE_ID = 'ai-interviews-you';
+  // Accepts scheme-optional github.io URLs: user.github.io, user.github.io/repo, user.github.io/repo/
+  var GHIO_REGEX = /^https?:\/\/[a-z0-9]([a-z0-9-]*[a-z0-9])?\.github\.io(\/[^\s]*)?$/i;
+  var GHCOM_REGEX = /^https?:\/\/(www\.)?github\.com\//i;
+
+  function setStatus(kind, html) {
+    var el = document.getElementById('aiyStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+    el.innerHTML = html;
+  }
+
+  function deployLessonLink(text) {
+    // Request parent Alpine dashboard to open the Deploy to GitHub lesson
+    return '<a href="#" onclick="event.preventDefault();try{var s=window.Alpine&&window.Alpine.store&&window.Alpine.store(\'ui\');if(s){s.activeLessonId=\'deploy-github\';window.scrollTo({top:0,behavior:\'smooth\'});}}catch(e){}">' + text + '</a>';
+  }
+
+  function validate(url) {
+    url = (url || '').trim();
+    if (!url) return { ok: false, msg: 'Please paste your GitHub Pages URL.' };
+    if (GHCOM_REGEX.test(url)) {
+      return { ok: false, msg: 'That looks like a <code>github.com</code> repo link, not a live page. Enable GitHub Pages for that repo, then paste the URL that ends in <code>.github.io</code>. Need a refresher? Open ' + deployLessonLink('Deploy to GitHub') + '.' };
+    }
+    if (!/^https?:\/\//i.test(url)) {
+      return { ok: false, msg: 'URL must start with <code>https://</code>.' };
+    }
+    if (!GHIO_REGEX.test(url)) {
+      return { ok: false, msg: 'We only accept live <code>.github.io</code> URLs for now. Revisit ' + deployLessonLink('Deploy to GitHub') + ' if you need to deploy.' };
+    }
+    return { ok: true, value: url };
+  }
+
+  async function loadExisting() {
+    try {
+      var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || typeof getSubmission !== 'function') return;
+      var existing = await getSubmission(user.uid, EXERCISE_ID);
+      if (existing && existing.value) {
+        var input = document.getElementById('aiyInput');
+        if (input) input.value = existing.value;
+        setStatus('ok', 'Previously submitted: <a href="' + existing.value + '" target="_blank" rel="noopener">' + existing.value + '</a>. Submit again to update.');
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  window.__aiyInterviewsSubmit = async function() {
+    var input = document.getElementById('aiyInput');
+    var btn = document.getElementById('aiyBtn');
+    var res = validate(input.value);
+    if (!res.ok) { setStatus('err', res.msg); return; }
+
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh the page and try again.'); return; }
+
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting...';
+
+    try {
+      var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: res.value, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your page: <a href="' + res.value + '" target="_blank" rel="noopener">' + res.value + '</a>');
+        // Also mark the tutorial as complete
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {}
+        }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  };
+
+  // Try loading existing submission once firebase user is available
+  setTimeout(loadExisting, 400);
+  setTimeout(loadExisting, 1500);
+})();
+</script>
+</body>
+</html>
