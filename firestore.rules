@@ -58,6 +58,18 @@ service cloud.firestore {
         allow read: if isOwner(userId) || isAdmin();
         allow write: if isOwner(userId) || isAdmin();
       }
+
+      // Exercise submissions subcollection (URL/text/file artefacts)
+      match /submissions/{exerciseId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isOwner(userId) || isAdmin();
+
+        // Archive of prior submissions (kept for audit when user edits/deletes)
+        match /archive/{archiveId} {
+          allow read: if isOwner(userId) || isAdmin();
+          allow write: if isOwner(userId) || isAdmin();
+        }
+      }
     }
 
     // ----------------------------------------------------------------

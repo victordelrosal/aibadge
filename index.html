@@ -3282,7 +3282,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="assets/js/firebase-app.js?v=2"></script>
+<script src="assets/js/firebase-app.js?v=3"></script>
 
 <!-- SPA Init -->
 <script>
@@ -3894,6 +3894,104 @@ document.querySelectorAll('#navLinks a').forEach(a => {
                            inputId: 'aiyInput', statusId: 'aiyStatus', btnId: 'aiyBtn',
                            validate: 'github.io' })
      -------------------------------------------------------------------------- */
+  function __findSubmitBox(exerciseId) {
+    return document.querySelector('[data-exercise-submission="' + exerciseId + '"]');
+  }
+  function __fmtDate(ts) {
+    try {
+      var d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+      if (!d || isNaN(d.getTime())) return '';
+      return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return ''; }
+  }
+  function __renderSubmitted(exerciseId, data) {
+    var box = __findSubmitBox(exerciseId);
+    if (!box) return;
+    var cardId = box.getAttribute('data-submission-card');
+    var urlId  = box.getAttribute('data-submission-card-url');
+    var metaId = box.getAttribute('data-submission-card-meta');
+    var formId = box.getAttribute('data-submission-form');
+    var fabId  = box.getAttribute('data-submission-fab');
+    var statusId = box.getAttribute('data-submission-status');
+    var card = cardId && document.getElementById(cardId);
+    var urlA = urlId  && document.getElementById(urlId);
+    var meta = metaId && document.getElementById(metaId);
+    var form = formId && document.getElementById(formId);
+    var fab  = fabId  && document.getElementById(fabId);
+    var status = statusId && document.getElementById(statusId);
+    if (card && urlA) {
+      urlA.textContent = data.value;
+      urlA.href = data.value;
+      if (meta) meta.textContent = data.submittedAt ? ('Submitted ' + __fmtDate(data.submittedAt)) : 'Submitted';
+      card.classList.add('visible');
+    }
+    if (form) form.style.display = 'none';
+    if (fab) fab.classList.remove('visible');
+    if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+  }
+  function __renderEditing(exerciseId) {
+    var box = __findSubmitBox(exerciseId);
+    if (!box) return;
+    var cardId = box.getAttribute('data-submission-card');
+    var formId = box.getAttribute('data-submission-form');
+    var fabId  = box.getAttribute('data-submission-fab');
+    var card = cardId && document.getElementById(cardId);
+    var form = formId && document.getElementById(formId);
+    var fab  = fabId  && document.getElementById(fabId);
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+  }
+  function __updateFab(exerciseId, hasSubmission) {
+    var box = __findSubmitBox(exerciseId);
+    if (!box) return;
+    var fabId = box.getAttribute('data-submission-fab');
+    var fab = fabId && document.getElementById(fabId);
+    if (!fab) return;
+    if (hasSubmission) fab.classList.remove('visible');
+    else fab.classList.add('visible');
+  }
+  window.__aiyScrollToSubmit = function() {
+    var box = __findSubmitBox('ai-interviews-you');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('aiyInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__aiyEditSubmission = function() {
+    __renderEditing('ai-interviews-you');
+    var input = document.getElementById('aiyInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__aiyDeleteSubmission = async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    var btn = document.getElementById('aiyDeleteBtn');
+    if (btn) { btn.disabled = true; btn.dataset._label = btn.textContent; btn.textContent = 'Deleting...'; }
+    try {
+      var out = await deleteSubmission(user.uid, 'ai-interviews-you');
+      if (out && out.success) {
+        var input = document.getElementById('aiyInput');
+        if (input) input.value = '';
+        __renderEditing('ai-interviews-you');
+        var status = document.getElementById('aiyStatus');
+        if (status) { status.style.display = 'block'; status.className = 'cg-submit-status ok'; status.innerHTML = 'Submission deleted. You can submit a new URL any time.'; }
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, 'ai-interviews-you', false); } catch (e) {}
+        }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset._label || 'Delete'; }
+    }
+  };
+
   window.submitExerciseUrl = async function(opts) {
     opts = opts || {};
     var input  = document.getElementById(opts.inputId);
@@ -3933,6 +4031,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       var out = await saveSubmission(user.uid, opts.exerciseId, { type: 'url', value: url, status: 'submitted' });
       if (out && out.success) {
         setStatus('ok', 'Submitted! Your page: <a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>');
+        try { __renderSubmitted(opts.exerciseId, { value: url, submittedAt: new Date() }); } catch(e) {}
         if (typeof saveTutorialCompletion === 'function') {
           try { await saveTutorialCompletion(user.uid, opts.exerciseId, true); } catch (e) {}
         }
@@ -3953,15 +4052,13 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
       if (!user || typeof getSubmission !== 'function') return;
       var existing = await getSubmission(user.uid, opts.exerciseId);
+      var input = document.getElementById(opts.inputId);
       if (existing && existing.value) {
-        var input = document.getElementById(opts.inputId);
-        if (input && !input.value) input.value = existing.value;
-        var status = document.getElementById(opts.statusId);
-        if (status) {
-          status.style.display = 'block';
-          status.className = 'cg-submit-status ok';
-          status.innerHTML = 'Previously submitted: <a href="' + existing.value + '" target="_blank" rel="noopener">' + existing.value + '</a>. Submit again to update.';
-        }
+        if (input) input.value = existing.value;
+        __renderSubmitted(opts.exerciseId, existing);
+        __updateFab(opts.exerciseId, true);
+      } else {
+        __updateFab(opts.exerciseId, false);
       }
     } catch (e) { /* silent */ }
   };

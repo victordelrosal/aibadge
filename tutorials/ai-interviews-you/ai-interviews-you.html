@@ -100,17 +100,41 @@
   .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
   .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
   /* Submission UI */
-  .cg-submit-box { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; margin: 1rem 0; }
-  .cg-submit-row { display: flex; gap: 0.5rem; align-items: stretch; flex-wrap: wrap; }
-  .cg-submit-input { flex: 1; min-width: 220px; padding: 0.7rem 0.9rem; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 8px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; }
-  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15); }
-  .cg-submit-btn { padding: 0.7rem 1.2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; transition: all 0.2s; }
-  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4); }
+  .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+  .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+  .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+  .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+  .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
   .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .cg-submit-status { margin-top: 0.75rem; font-size: 0.9rem; }
-  .cg-submit-status.ok { color: var(--cg-success); }
-  .cg-submit-status.err { color: var(--cg-error); }
+  .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+  .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+  .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+  .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+  .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+  .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
   .cg-submit-status a { color: var(--cg-cyan); }
+  .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+  .cg-submitted-card.visible { display: block; }
+  .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+  .cg-submitted-url:hover { text-decoration: underline; }
+  .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+  .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+  @media (max-width: 540px) {
+    .cg-submit-row { flex-direction: column; }
+    .cg-submit-btn { width: 100%; }
+  }
+  /* Floating reminder */
+  .cg-submit-fab { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 9999; padding: 0.95rem 1.4rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); color: #fff; border: none; border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; box-shadow: 0 10px 30px rgba(0,102,255,0.45), 0 0 0 4px rgba(0,212,255,0.12); display: none; align-items: center; gap: 0.55rem; animation: cgFabPulse 2.6s ease-in-out infinite; }
+  .cg-submit-fab.visible { display: inline-flex; }
+  .cg-submit-fab:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 14px 36px rgba(0,102,255,0.6), 0 0 0 4px rgba(0,212,255,0.2); }
+  .cg-submit-fab svg { width: 18px; height: 18px; }
+  @keyframes cgFabPulse { 0%,100% { box-shadow: 0 10px 30px rgba(0,102,255,0.45), 0 0 0 4px rgba(0,212,255,0.12); } 50% { box-shadow: 0 10px 30px rgba(0,102,255,0.6), 0 0 0 10px rgba(0,212,255,0.02); } }
+  @media (max-width: 540px) { .cg-submit-fab { right: 1rem; bottom: 1rem; padding: 0.8rem 1.1rem; font-size: 0.85rem; } }
   /* Light mode */
   .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
   .cg-lesson.light-mode::before { display: none; }
@@ -531,13 +555,41 @@ Begin with Question 1 now &mdash; show the question text and ALL six options exa
       </div>
       <div class="cg-session-content" onclick="event.stopPropagation()">
         <p>Paste the <strong>live GitHub Pages URL</strong> for your new landing page. It should look like <code>https://yourname.github.io/your-repo/</code>.</p>
-        <div class="cg-submit-box" data-exercise-submission="ai-interviews-you" data-submission-input="aiyInput" data-submission-status="aiyStatus" data-submission-btn="aiyBtn" data-submission-validate="github.io">
-          <div class="cg-submit-row">
-            <input type="url" class="cg-submit-input" id="aiyInput" placeholder="https://yourname.github.io/your-repo/" autocomplete="off" spellcheck="false">
-            <button class="cg-submit-btn" id="aiyBtn" onclick="(window.submitExerciseUrl||window.__aiyInterviewsSubmit)({exerciseId:'ai-interviews-you',inputId:'aiyInput',statusId:'aiyStatus',btnId:'aiyBtn',validate:'github.io'})">Submit</button>
+        <div class="cg-submit-box" data-exercise-submission="ai-interviews-you" data-submission-input="aiyInput" data-submission-status="aiyStatus" data-submission-btn="aiyBtn" data-submission-validate="github.io" data-submission-card="aiySubmittedCard" data-submission-card-url="aiySubmittedUrl" data-submission-card-meta="aiySubmittedMeta" data-submission-form="aiyFormWrap" data-submission-fab="aiySubmitFab" id="aiySubmitBox">
+          <div class="cg-submitted-card" id="aiySubmittedCard">
+            <div class="cg-submitted-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Your submission
+            </div>
+            <a class="cg-submitted-url" id="aiySubmittedUrl" href="#" target="_blank" rel="noopener"></a>
+            <div class="cg-submitted-meta" id="aiySubmittedMeta"></div>
+            <div class="cg-submitted-actions">
+              <button type="button" class="cg-submit-btn secondary" id="aiyEditBtn" onclick="window.__aiyEditSubmission&&window.__aiyEditSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit / Resubmit
+              </button>
+              <button type="button" class="cg-submit-btn danger" id="aiyDeleteBtn" onclick="window.__aiyDeleteSubmission&&window.__aiyDeleteSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Delete
+              </button>
+            </div>
           </div>
-          <div class="cg-submit-status" id="aiyStatus" style="display:none;"></div>
+          <div id="aiyFormWrap">
+            <span class="cg-submit-label">GitHub Pages URL</span>
+            <div class="cg-submit-row">
+              <input type="url" class="cg-submit-input" id="aiyInput" placeholder="https://yourname.github.io/your-repo/" autocomplete="off" spellcheck="false">
+              <button class="cg-submit-btn" id="aiyBtn" onclick="(window.submitExerciseUrl||window.__aiyInterviewsSubmit)({exerciseId:'ai-interviews-you',inputId:'aiyInput',statusId:'aiyStatus',btnId:'aiyBtn',validate:'github.io'})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Submit
+              </button>
+            </div>
+            <div class="cg-submit-status" id="aiyStatus" style="display:none;"></div>
+          </div>
         </div>
+        <button type="button" class="cg-submit-fab" id="aiySubmitFab" onclick="window.__aiyScrollToSubmit&&window.__aiyScrollToSubmit()" aria-label="Jump to submission">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Submit your URL
+        </button>
         <div class="cg-callout info">
           <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Why .github.io only?</h4>
           <p>We accept live, public URLs on GitHub Pages so your page is reachable by anyone. If you submit a <code>github.com</code> repo link, we'll ask you to enable Pages first.</p>
@@ -719,15 +771,85 @@ Begin with Question 1 now &mdash; show the question text and ALL six options exa
     return { ok: true, value: url };
   }
 
+  function fmtDate(ts) {
+    try {
+      var d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+      if (!d || isNaN(d.getTime())) return '';
+      return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return ''; }
+  }
+  function renderSubmitted(value, ts) {
+    var card = document.getElementById('aiySubmittedCard');
+    var urlA = document.getElementById('aiySubmittedUrl');
+    var meta = document.getElementById('aiySubmittedMeta');
+    var form = document.getElementById('aiyFormWrap');
+    var fab  = document.getElementById('aiySubmitFab');
+    var status = document.getElementById('aiyStatus');
+    if (card && urlA) { urlA.textContent = value; urlA.href = value; card.classList.add('visible'); }
+    if (meta) meta.textContent = ts ? ('Submitted ' + fmtDate(ts)) : 'Submitted';
+    if (form) form.style.display = 'none';
+    if (fab) fab.classList.remove('visible');
+    if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+  }
+  function renderEditing() {
+    var card = document.getElementById('aiySubmittedCard');
+    var form = document.getElementById('aiyFormWrap');
+    var fab  = document.getElementById('aiySubmitFab');
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+  }
+
+  window.__aiyScrollToSubmit = window.__aiyScrollToSubmit || function() {
+    var box = document.getElementById('aiySubmitBox');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('aiyInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__aiyEditSubmission = window.__aiyEditSubmission || function() {
+    renderEditing();
+    var input = document.getElementById('aiyInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__aiyDeleteSubmission = window.__aiyDeleteSubmission || async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    try {
+      var out = await deleteSubmission(user.uid, EXERCISE_ID);
+      if (out && out.success) {
+        var input = document.getElementById('aiyInput');
+        if (input) input.value = '';
+        renderEditing();
+        setStatus('ok', 'Submission deleted. You can submit a new URL any time.');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, false); } catch (e) {} }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    }
+  };
+
   async function loadExisting() {
     try {
       var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-      if (!user || typeof getSubmission !== 'function') return;
+      if (!user || typeof getSubmission !== 'function') {
+        var fab = document.getElementById('aiySubmitFab');
+        if (fab) fab.classList.add('visible');
+        return;
+      }
       var existing = await getSubmission(user.uid, EXERCISE_ID);
+      var input = document.getElementById('aiyInput');
       if (existing && existing.value) {
-        var input = document.getElementById('aiyInput');
         if (input) input.value = existing.value;
-        setStatus('ok', 'Previously submitted: <a href="' + existing.value + '" target="_blank" rel="noopener">' + existing.value + '</a>. Submit again to update.');
+        renderSubmitted(existing.value, existing.submittedAt);
+      } else {
+        var fab = document.getElementById('aiySubmitFab');
+        if (fab) fab.classList.add('visible');
       }
     } catch (e) { /* silent */ }
   }
@@ -750,6 +872,7 @@ Begin with Question 1 now &mdash; show the question text and ALL six options exa
       var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: res.value, status: 'submitted' });
       if (out && out.success) {
         setStatus('ok', 'Submitted! Your page: <a href="' + res.value + '" target="_blank" rel="noopener">' + res.value + '</a>');
+        renderSubmitted(res.value, new Date());
         // Also mark the tutorial as complete
         if (typeof saveTutorialCompletion === 'function') {
           try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {}

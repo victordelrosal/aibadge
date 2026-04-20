@@ -344,6 +344,75 @@ async function getTutorialCompletions(userId) {
 }
 
 /* --------------------------------------------------------------------------
+   Exercise Submissions (Firestore: users/{userId}/submissions/{exerciseId})
+   Generic schema reusable across exercises. Types: 'url' | 'text' | 'file'.
+   -------------------------------------------------------------------------- */
+
+async function saveSubmission(userId, exerciseId, data) {
+  initFirebase();
+  try {
+    var payload = {
+      exerciseId: exerciseId,
+      type: data.type || 'url',
+      value: data.value || '',
+      status: data.status || 'submitted',
+      submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (data.meta) payload.meta = data.meta;
+    await db.collection("users").doc(userId).collection("submissions").doc(exerciseId).set(payload, { merge: true });
+    return { success: true };
+  } catch (error) {
+    console.warn("saveSubmission:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+async function getSubmission(userId, exerciseId) {
+  initFirebase();
+  try {
+    var doc = await db.collection("users").doc(userId).collection("submissions").doc(exerciseId).get();
+    return doc.exists ? doc.data() : null;
+  } catch (error) {
+    console.warn("getSubmission:", error);
+    return null;
+  }
+}
+
+async function deleteSubmission(userId, exerciseId) {
+  initFirebase();
+  try {
+    var ref = db.collection("users").doc(userId).collection("submissions").doc(exerciseId);
+    var snap = await ref.get();
+    if (snap.exists) {
+      var prior = snap.data() || {};
+      var archive = {
+        archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        prior: prior
+      };
+      await ref.collection("archive").add(archive);
+    }
+    await ref.delete();
+    return { success: true };
+  } catch (error) {
+    console.warn("deleteSubmission:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+async function getSubmissions(userId) {
+  initFirebase();
+  try {
+    var snapshot = await db.collection("users").doc(userId).collection("submissions").get();
+    var result = {};
+    snapshot.docs.forEach(function(doc) { result[doc.id] = doc.data(); });
+    return result;
+  } catch (error) {
+    console.warn("getSubmissions:", error);
+    return {};
+  }
+}
+
+/* --------------------------------------------------------------------------
    Admin Queries
    -------------------------------------------------------------------------- */
 
