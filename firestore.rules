@@ -73,6 +73,15 @@ service cloud.firestore {
     }
 
     // ----------------------------------------------------------------
+    // Collection-group read for submissions (admin only).
+    // Enables collectionGroup('submissions') queries across all users.
+    // Per-user read/write is still governed by the nested rule above.
+    // ----------------------------------------------------------------
+    match /{path=**}/submissions/{exerciseId} {
+      allow read: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------
     // Programmes: readable by any authenticated user
     // ----------------------------------------------------------------
     match /programmes/{programmeId} {

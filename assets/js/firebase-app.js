@@ -505,6 +505,25 @@ async function getAdminLoginHistory(userId) {
   }
 }
 
+async function getAdminAllSubmissions() {
+  initFirebase();
+  var user = getCurrentUser();
+  if (!user || !ADMIN_EMAILS.includes(user.email)) return [];
+  try {
+    var snapshot = await db.collectionGroup("submissions").get();
+    return snapshot.docs.map(function(doc) {
+      var parent = doc.ref.parent.parent;
+      return Object.assign(
+        { id: doc.id, userId: parent ? parent.id : null },
+        doc.data()
+      );
+    });
+  } catch (error) {
+    console.error("getAdminAllSubmissions:", error);
+    return [];
+  }
+}
+
 /* --------------------------------------------------------------------------
    Helpers
    -------------------------------------------------------------------------- */

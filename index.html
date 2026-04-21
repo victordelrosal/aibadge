@@ -2062,6 +2062,28 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .admin-stat-label { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:rgba(60,60,67,0.5); margin-bottom:2px; }
       .admin-detail-dark .admin-stat-label { color:rgba(235,235,245,0.4); }
       .admin-stat-value { font-size:1.1rem; font-weight:700; }
+
+      /* Submissions admin section */
+      .admin-subs-card { background:rgba(255,255,255,0.7); border:1px solid rgba(0,0,0,0.06); border-radius:14px; padding:20px; margin-bottom:20px; }
+      #view-admin.lms-dark .admin-subs-card { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.08); color:#f5f5f5; }
+      .admin-subs-header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+      .admin-subs-title { font-size:1.05rem; font-weight:700; margin:0; }
+      .admin-subs-controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+      .admin-subs-select { padding:6px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.12); background:#fff; font-size:0.85rem; color:#1c1c1e; min-width:180px; }
+      #view-admin.lms-dark .admin-subs-select { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#f5f5f5; }
+      .admin-subs-count { font-size:0.8rem; opacity:0.6; }
+      .admin-sub-row { display:grid; grid-template-columns: 1.1fr 1.6fr 0.9fr 0.8fr; gap:12px; padding:10px 12px; border-radius:10px; align-items:center; font-size:0.85rem; border:1px solid rgba(0,0,0,0.04); background:rgba(255,255,255,0.5); margin-bottom:6px; }
+      #view-admin.lms-dark .admin-sub-row { background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.06); }
+      .admin-sub-row a { color:#007AFF; text-decoration:none; word-break:break-all; }
+      .admin-sub-row a:hover { text-decoration:underline; }
+      .admin-sub-email { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .admin-sub-exercise { font-family:ui-monospace,Menlo,monospace; font-size:0.78rem; opacity:0.75; }
+      .admin-sub-meta { font-size:0.78rem; opacity:0.6; }
+      .admin-sub-head { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; opacity:0.5; padding:0 12px 6px; display:grid; grid-template-columns: 1.1fr 1.6fr 0.9fr 0.8fr; gap:12px; }
+      @media (max-width:700px) {
+        .admin-sub-row, .admin-sub-head { grid-template-columns: 1fr; }
+        .admin-sub-head { display:none; }
+      }
     </style>
 
     <!-- Enrolled: Tutorial cards (each tutorial = its own card) -->
@@ -2625,6 +2647,47 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <div style="max-width:800px;margin:0 auto;padding:32px 20px;position:relative;z-index:2;">
     <h1 class="lms-heading" style="margin-bottom:4px;">User Management</h1>
     <p class="lms-subheading" style="margin-bottom:24px;" x-text="users.length + ' registered user' + (users.length !== 1 ? 's' : '')"></p>
+
+    <!-- Exercise submissions (all users) -->
+    <div class="admin-subs-card">
+      <div class="admin-subs-header">
+        <h2 class="admin-subs-title">Exercise Submissions</h2>
+        <div class="admin-subs-controls">
+          <select class="admin-subs-select" x-model="submissionFilter">
+            <option value="">All exercises</option>
+            <template x-for="ex in submissionExercises" :key="ex">
+              <option :value="ex" x-text="ex"></option>
+            </template>
+          </select>
+          <button @click="loadSubmissions()" :disabled="submissionsLoading"
+                  style="font-size:0.82rem;padding:6px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.12);background:#fff;cursor:pointer;">
+            <span x-text="submissionsLoading ? 'Loading…' : 'Refresh'"></span>
+          </button>
+        </div>
+      </div>
+      <p class="admin-subs-count" x-show="!submissionsLoading"
+         x-text="filteredSubmissions.length + ' submission' + (filteredSubmissions.length !== 1 ? 's' : '') + (submissionFilter ? ' for ' + submissionFilter : ' across ' + submissionExercises.length + ' exercise' + (submissionExercises.length !== 1 ? 's' : ''))"></p>
+      <p class="admin-subs-count" x-show="submissionsError" style="color:#FF3B30;" x-text="submissionsError"></p>
+
+      <template x-if="!submissionsLoading && filteredSubmissions.length > 0">
+        <div style="margin-top:10px;">
+          <div class="admin-sub-head">
+            <span>User</span><span>URL</span><span>Exercise</span><span>Submitted</span>
+          </div>
+          <template x-for="s in filteredSubmissions" :key="s.userId + '_' + s.id">
+            <div class="admin-sub-row">
+              <span class="admin-sub-email" x-text="s.userEmail || s.userId || '(unknown)'"></span>
+              <a :href="s.value" target="_blank" rel="noopener" x-text="s.value"></a>
+              <span class="admin-sub-exercise" x-text="s.exerciseId || s.id"></span>
+              <span class="admin-sub-meta" x-text="formatDateTime(s.submittedAt)"></span>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <p x-show="!submissionsLoading && !submissionsError && filteredSubmissions.length === 0"
+         style="font-size:0.85rem;opacity:0.6;margin:8px 0 0;">No submissions yet.</p>
+    </div>
 
     <!-- Loading state -->
     <div x-show="loading" style="text-align:center;padding:40px 0;">
@@ -3465,6 +3528,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       expandedUser: null,
       detailLoading: false,
       detailData: { assessments: [], tutorials: {}, logins: [], tutorialsDone: 0 },
+      submissions: [],
+      submissionsLoading: false,
+      submissionsError: null,
+      submissionFilter: '',
       dimensionList: [
         { key: 'aiFoundations', label: 'AI Foundations' },
         { key: 'criticalEvaluation', label: 'Critical Evaluation' },
@@ -3479,9 +3546,53 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         initFirebase();
         var unsub = firebase.auth().onAuthStateChanged(function(user) {
           unsub();
-          if (user) self.loadUsers();
+          if (user) { self.loadUsers(); self.loadSubmissions(); }
           else { self.loading = false; self.error = 'Not signed in.'; }
         });
+      },
+      get submissionExercises() {
+        var ids = {};
+        this.submissions.forEach(function(s) { if (s.exerciseId) ids[s.exerciseId] = true; });
+        return Object.keys(ids).sort();
+      },
+      get filteredSubmissions() {
+        var f = this.submissionFilter;
+        var list = f ? this.submissions.filter(function(s) { return s.exerciseId === f; }) : this.submissions;
+        return list.slice().sort(function(a, b) {
+          var da = a.submittedAt && a.submittedAt.toDate ? a.submittedAt.toDate().getTime() : 0;
+          var db2 = b.submittedAt && b.submittedAt.toDate ? b.submittedAt.toDate().getTime() : 0;
+          return db2 - da;
+        });
+      },
+      async loadSubmissions() {
+        this.submissionsLoading = true;
+        this.submissionsError = null;
+        try {
+          var rows = await getAdminAllSubmissions();
+          // Attach user email from already-loaded users list (fallback to userId)
+          var emailByUid = {};
+          (this.users || []).forEach(function(u) { emailByUid[u.id] = u.email; });
+          // If users not loaded yet, wait briefly and retry map once loadUsers resolves
+          rows.forEach(function(r) { r.userEmail = emailByUid[r.userId] || null; });
+          this.submissions = rows;
+          if (!rows.length) { /* no rows is fine */ }
+          // If users hadn't loaded when we mapped emails, re-map after users finishes
+          var self = this;
+          if (rows.some(function(r) { return !r.userEmail; }) && this.loading) {
+            var waitForUsers = function() {
+              if (self.loading) { setTimeout(waitForUsers, 150); return; }
+              var map = {};
+              (self.users || []).forEach(function(u) { map[u.id] = u.email; });
+              self.submissions = self.submissions.map(function(r) {
+                return Object.assign({}, r, { userEmail: map[r.userId] || r.userEmail });
+              });
+            };
+            waitForUsers();
+          }
+        } catch (e) {
+          this.submissionsError = 'Failed to load submissions: ' + e.message;
+        }
+        this.submissionsLoading = false;
       },
       async loadUsers() {
         this.loading = true;

@@ -552,6 +552,10 @@ Begin with Question 1 now &mdash; show the question text and ALL six options exa
       .cg-submit-fab svg { width: 18px; height: 18px; flex-shrink: 0; }
       @keyframes cgFabPulse { 0%,100% { box-shadow: 0 10px 30px rgba(0,102,255,0.45), 0 0 0 4px rgba(0,212,255,0.12); } 50% { box-shadow: 0 10px 30px rgba(0,102,255,0.6), 0 0 0 10px rgba(0,212,255,0.02); } }
       @media (max-width: 540px) { .cg-submit-fab { right: 1rem; bottom: 1rem; padding: 0.8rem 1.1rem; font-size: 0.85rem; } }
+      /* Light-mode overrides for submission input (SPA-scoped) */
+      .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+      .cg-lesson.light-mode .cg-submit-input:focus { background: #fff; border-color: #1a73e8; box-shadow: 0 0 0 4px rgba(26,115,232,0.18); }
+      .cg-lesson.light-mode .cg-submit-input::placeholder { color: #9aa0a6; }
     </style>
 
     <!-- DEPLOY TO GITHUB PAGES (bridge step) -->
