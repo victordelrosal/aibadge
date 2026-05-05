@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Five Innovators | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none; z-index: 1;
+  }
+  .cg-topbar { position: sticky; top: 0; z-index: 100; height: 56px; background: rgba(0, 0, 54, 0.95); border-bottom: 1px solid rgba(0, 102, 255, 0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-video-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); color: var(--cg-text-muted); font-size: 1.05rem; flex-direction: column; gap: 0.5rem; text-align: center; padding: 1rem; }
+  .cg-video-placeholder svg { opacity: 0.4; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; max-height: 340px; overflow-y: auto; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
+  /* Submission UI */
+  .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+  .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+  .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+  .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+  .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+  .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+  .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+  .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+  .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+  .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+  .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+  .cg-submit-status a { color: var(--cg-cyan); }
+  .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+  .cg-submitted-card.visible { display: block; }
+  .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+  .cg-submitted-url:hover { text-decoration: underline; }
+  .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+  .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+  @media (max-width: 540px) {
+    .cg-submit-row { flex-direction: column; }
+    .cg-submit-btn { width: 100%; }
+  }
+  /* Floating reminder */
+  .cg-submit-fab { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 9999; padding: 0.95rem 1.4rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); color: #fff; border: none; border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; box-shadow: 0 10px 30px rgba(0,102,255,0.45), 0 0 0 4px rgba(0,212,255,0.12); display: none; align-items: center; gap: 0.55rem; animation: cgFabPulse 2.6s ease-in-out infinite; }
+  .cg-submit-fab.visible { display: inline-flex; }
+  .cg-submit-fab:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 14px 36px rgba(0,102,255,0.6), 0 0 0 4px rgba(0,212,255,0.2); }
+  .cg-submit-fab svg { width: 18px; height: 18px; }
+  @keyframes cgFabPulse { 0%,100% { box-shadow: 0 10px 30px rgba(0,102,255,0.45), 0 0 0 4px rgba(0,212,255,0.12); } 50% { box-shadow: 0 10px 30px rgba(0,102,255,0.6), 0 0 0 10px rgba(0,212,255,0.02); } }
+  @media (max-width: 540px) { .cg-submit-fab { right: 1rem; bottom: 1rem; padding: 0.8rem 1.1rem; font-size: 0.85rem; } }
+  /* Light mode */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; } .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; }
+  .cg-lesson.light-mode .cg-step-card, .cg-lesson.light-mode .cg-concept-card, .cg-lesson.light-mode .cg-submit-box { background: #f8f9fa; border: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>The Five Innovators</h1>
+      <p class="cg-subtitle">Run a whole team inside one chat. Octopus, browser edition.</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~20 minutes</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <div class="cg-video-placeholder">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <span>Video coming soon</span>
+      </div>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="five-innovators.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: The Chain</h2>
+          <span class="cg-session-meta">Four agents. One project. One landing page.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><div class="cg-step-num">1</div><h5>Pick a project</h5><p>The demo, or one of three options. Each is just enough info to start.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">2</div><h5>Open an AI chat</h5><p><a href="https://claude.ai" target="_blank">Claude.ai</a> or <a href="https://chatgpt.com" target="_blank">ChatGPT</a>. Turn on Deep Research mode for the first prompt.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">3</div><h5>Run the chain</h5><p>Four prompts in order: Researcher, Designer, Maker, Marketer. Each builds on the last.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">4</div><h5>Deploy &amp; submit</h5><p>Save the Maker&apos;s <code>index.html</code>, push to GitHub Pages, submit the URL below.</p></div>
+        </div>
+
+        <h3>The Five Innovators</h3>
+        <p>You are the <strong style="color:#BF5AF2">Manager (Purple)</strong>. Four AI agents work for you. The agent personas are generic and world-class. Your job is to point them at <em>your</em> project.</p>
+
+        <div class="cg-step-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cg-step-card" style="border-left:4px solid #FFD60A;"><h5 style="color:#FFD60A">&#x1F7E1; Researcher &amp; Analyst</h5><p>Intelligence and evaluation. Runs Deep Research, returns a structured market-research brief with cited sources.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #FF9500;"><h5 style="color:#FF9500">&#x1F7E0; Designer</h5><p>Solutions. Reads the brief, designs a landing page + interactive qualifier as one spec.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #0A84FF;"><h5 style="color:#0A84FF">&#x1F535; Maker</h5><p>Building. Reads the spec, ships one complete <code>index.html</code> file ready for GitHub Pages.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #34C759;"><h5 style="color:#34C759">&#x1F7E2; Marketer</h5><p>Distribution. Reads the brief and the page, writes the launch posts and outreach plan.</p></div>
+        </div>
+
+        <h3>Pick Your Project</h3>
+        <p>One demo plus three student options. Each brief is intentionally light. The Researcher prompt is where you personalise it.</p>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Demo (built live in the video): Trade Academy</h4>
+          <p>A trade academy or ETB launches a paid series of 90-minute evening introductions to specific vocational and trade skills. Each session is a hands-on taster led by a working tradesperson. The catch: which skills should be in the lineup? You will research what trade and vocational skills will be in highest demand in Ireland over the next 24-36 months, driven by housing targets, retrofit obligations, energy transition, automation displacement, and demographic shifts. The deliverable is a single-page launch site with a &quot;Find your next skill&quot; qualifier that recommends three taster sessions per visitor based on their answers. Audience: career-curious adults, mid-career switchers, returning emigrants, parents going back to work, school-leavers between Leaving Cert and CAO. Pricing benchmark: &euro;25-&euro;60 per session.</p>
+        </div>
+
+        <div class="cg-concept-card" style="border-left:4px solid #34C759;">
+          <h4>Option 1: Local Library Book Club</h4>
+          <p>A local public library launches a paid book-club programme as a new revenue and engagement service. Six weeks per cohort, in-person Wednesday evenings, with a librarian-curated reading list and a post-meeting drink in the foyer. The question: which genres and which audiences? Research what is underserved by existing book clubs in Ireland and the UK, looking at BookTok demographics, library footfall data, the &quot;lapsed reader&quot; segment, and paid book-club benchmarks (Faber Members, Penguin Live, Books Are My Bag). Deliverable: a single-page launch site with a &quot;Find your cohort&quot; qualifier recommending one of three streams per visitor. Audience: adults 25-65 who read regularly but do not currently belong to a book club. Pricing benchmark: &euro;60-&euro;120 per six-week cohort.</p>
+        </div>
+
+        <div class="cg-concept-card" style="border-left:4px solid #FF9500;">
+          <h4>Option 2: Strength After 50</h4>
+          <p>A regional gym chain launches a longevity-focused strength programme for adults aged 50 and over: an 8-week beginner barbell course, baseline DEXA scan, monthly progress check, small-group sessions, evidence-based programming. The question: who exactly is this for and why now? Research the longevity boom (Peter Attia, Andrew Huberman, sarcopenia and &quot;healthspan&quot; research), Irish and UK demographics of adults 50+, current gym attendance and drop-off patterns, the Pvolve / Hampton Hidden Gym / F45 Lift Off competitive landscape, and willingness-to-pay. Deliverable: a single-page launch site with a &quot;Find your starting block&quot; qualifier recommending one of three programme entry points per visitor. Audience: active adults 50+, plus their adult children deciding for them. Pricing benchmark: &euro;299-&euro;599 per 8 weeks.</p>
+        </div>
+
+        <div class="cg-concept-card" style="border-left:4px solid #0A84FF;">
+          <h4>Option 3: Greenlight Ireland</h4>
+          <p>A major Irish bank (AIB or Bank of Ireland) launches a kids&apos; debit card and financial-literacy app for ages 6-17, with parent controls, a gamified savings dashboard, and chore-linked allowances. The question: how do you launch this in a market that already has Revolut &lt;18, in a country where Bank of Ireland&apos;s Money Smarts dominates the schools? Research the cross-jurisdictional comparators (Greenlight US, GoHenry UK, Revolut &lt;18), Irish parents&apos; attitudes to money education (Junior Achievement Ireland, BoI Money Smarts), the EU regulatory frame for child financial products, and pricing benchmarks (&euro;2.99 to &pound;5.99 per month). Deliverable: a single-page launch site with a &quot;Find your family fit&quot; qualifier recommending one of three plan tiers based on family size and child age. Audience: parents of 6-17 year olds.</p>
+        </div>
+
+        <h3>The Four Master Prompts</h3>
+        <p>Copy each prompt into a fresh chat in order. Replace the <code>YOUR PROJECT</code> block at the top with your chosen project brief above. Feed the previous agent&apos;s output into the next agent&apos;s chat.</p>
+
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Turn on Deep Research for the Researcher prompt</h4>
+          <p>In Claude.ai, toggle Research before sending. In ChatGPT, choose Deep Research from the tools menu. Expect a 5-15 minute report with citations. The other three prompts run as normal chats.</p>
+        </div>
+
+        <h4 style="color:#FFD60A; margin-top:1.5rem;">&#x1F7E1; 1. The Researcher &amp; Analyst</h4>
+        <div class="cg-code-block">
+          <pre>You are the Researcher &amp; Analyst. The Yellow agent on a four-person product launch team. Your domain is intelligence and evaluation. You do not design, build, or market.
+
+YOUR PROJECT
+[paste the project brief here]
+
+YOUR JOB
+Use Deep Research. Deliver one structured market-research brief that the Designer can use as input.
+
+OUTPUT CONTRACT (mandatory structure, in this order)
+
+1. Audience profile (2-3 paragraphs)
+   Who is this really for? Demographics, psychographics, current behaviour, what they currently do instead. Cite at least 3 named sources.
+
+2. Top 5 verbatim pain points (with sources)
+   Direct quotes from forums, reviews, articles, surveys, podcasts. Each bullet: the quote + a source link.
+
+3. Top 3 competitors or analogues (with strengths and gaps)
+   Real organisations. Real prices. What they do well. What they do not.
+
+4. Pricing benchmarks
+   A range with at least 3 reference points. Each benchmark sourced.
+
+5. Positioning angle
+   Two or three viable positioning angles. One recommendation: which is still un-owned and why.
+
+6. Sources
+   Numbered list of every source cited. Minimum 8 sources. Prefer primary research, named experts, and data from the last 24 months.
+
+RULES
+- Date the brief at the top: &quot;Compiled YYYY-MM-DD&quot;.
+- Cite inline. Do not paraphrase numbers without a source.
+- If something is uncertain, say so. Do not fabricate.
+- No preamble, no commentary. Brief only.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+        <h4 style="color:#FF9500; margin-top:1.5rem;">&#x1F7E0; 2. The Designer</h4>
+        <div class="cg-code-block">
+          <pre>You are the Designer. The Orange agent on a four-person product launch team. Your domain is solutions: UX, information design, page architecture. You do not research, build, or market.
+
+YOUR PROJECT
+[paste the project brief here]
+
+YOUR INPUT
+Below is the Researcher&apos;s brief. Read it carefully. Everything you specify must be traceable to it.
+
+[paste the Researcher&apos;s brief here]
+
+OUTPUT CONTRACT (one design spec, in this order)
+
+1. The page in one sentence
+   What this page promises a visitor in 12 words or fewer.
+
+2. Page architecture (two halves in one index.html)
+   TOP HALF: landing page
+   - Hero (headline, sub-line, primary CTA)
+   - Three reasons this is for you (one sentence each)
+   - One sample-experience block (what attending or using this actually looks like)
+   - One social-proof block (use the Researcher&apos;s sourced quotes)
+   - One objection-handling FAQ (3-5 questions)
+   BOTTOM HALF: working prototype, &quot;Is this for you?&quot; qualifier
+   - 5 questions, each multiple choice
+   - Scoring rubric: how answers map to a tier
+   - 3 result tiers, each with personalised copy and a tier-specific CTA
+
+3. Voice and tone
+   Three adjectives. Three phrases the page would use. Three phrases it would never use.
+
+4. Visual direction
+   Colour mood. Typography pairing (one display + one body). One signature visual element.
+
+5. Content blocks (verbatim where possible)
+   Pull from the Researcher&apos;s brief. Use real quotes, the recommended positioning angle, the named pain points.
+
+RULES
+- Do not invent statistics, names, or quotes. If the brief does not have it, do not use it.
+- The qualifier must produce meaningful differences between tiers, not just &quot;great fit / okay fit / not a fit&quot;.
+- No preamble. Spec only.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+        <h4 style="color:#0A84FF; margin-top:1.5rem;">&#x1F535; 3. The Maker</h4>
+        <div class="cg-code-block">
+          <pre>You are the Maker. The Blue agent on a four-person product launch team. Your domain is building. You ship working code from a spec. You do not research, design, or market.
+
+YOUR PROJECT
+[paste the project brief here]
+
+YOUR INPUT
+Below is the Designer&apos;s spec. Build to it. Do not invent content not in the spec.
+
+[paste the Designer&apos;s spec here]
+
+OUTPUT
+One complete index.html. Single file. All CSS and JS inline. No frameworks, no build tools. Google Fonts (Inter) is the only allowed external dependency. Must work locally (file://) and on GitHub Pages.
+
+THEME (dark-first, with light toggle)
+Use these CSS variables:
+- --bg: #020a18
+- --bg-grad: linear-gradient(170deg, #020a18, #041028 40%, #06142e 70%, #020a18)
+- --surface: rgba(8,24,56,0.85)
+- --border: rgba(0,170,255,0.12)
+- --text: #d0e0f0; --text-bright: #e8f0ff; --text-dim: #6888aa
+- Accents: --neon #00aaff, --cyan #00e5ff, --green #00ff88, --amber #ffaa00
+
+Provide a complete html.light { } override. Toggle via sun/moon button in the header. Persist in localStorage. Apply saved preference before first paint.
+
+LAYOUT
+- Sticky frosted-glass header (backdrop-filter: blur(20px))
+- Content container max-width 880px, centered
+- Inter font + system fallback. 16px body, 1.65 line-height, antialiased
+- Background: gradient + subtle 60px grid at ~3% opacity + 2 blurred radial orbs (orbiting via CSS keyframes), orbs render OUTSIDE the 880px content column
+
+PAGE STRUCTURE (render the spec exactly)
+1. Hero
+2. Three reasons
+3. Sample-experience block
+4. Social-proof block
+5. FAQ
+6. &quot;Is this for you?&quot; qualifier (interactive: question flow + scoring + tier result + CTA)
+7. Footer
+
+The qualifier MUST work in the browser. JavaScript handles flow, scoring, and result rendering.
+
+FAVICON
+SVG data URI emoji that fits the project.
+
+META
+OG and Twitter Card tags. Comment placeholder for og:image (1200x630).
+
+OUTPUT FORMAT
+ONE ```html code block, the complete file, ready to save as index.html. Nothing before or after the block.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+        <h4 style="color:#34C759; margin-top:1.5rem;">&#x1F7E2; 4. The Marketer</h4>
+        <div class="cg-code-block">
+          <pre>You are the Marketer. The Green agent on a four-person product launch team. Your domain is distribution: copywriting, social, outreach, growth. You do not research, design, or build.
+
+YOUR PROJECT
+[paste the project brief here]
+
+YOUR INPUT
+The Researcher&apos;s brief and the Designer&apos;s spec. Your launch must be consistent with both.
+
+[paste the Researcher&apos;s brief here]
+
+[paste the Designer&apos;s spec here]
+
+OUTPUT CONTRACT (one launch kit, in this order)
+
+1. The launch post (LinkedIn, 200-300 words)
+   First-person, written for the launch lead. One hook line. One specific stat from the Researcher&apos;s brief, cited. One sample-of-experience moment. One soft CTA.
+
+2. The follow-up post (LinkedIn, 100-150 words, day +3)
+   A second-act post: a small story or detail from the build that reinforces the recommended positioning angle.
+
+3. Three short-form variants (under 280 characters each)
+   For X / Threads / BlueSky. Same campaign, different angles.
+
+4. Three subject lines for an email announcement
+   Targeting the audience the Researcher identified.
+
+5. Three &quot;places this should land&quot; outreach targets
+   Specific newsletters, podcasts, journalists, communities. Real names. Sourced from the Researcher&apos;s brief.
+
+RULES
+- Use the positioning angle the Researcher recommended. Do not invent a new one.
+- Use real, sourced stats. No &quot;studies show&quot; without a citation.
+- Tone aligned with the Designer&apos;s voice spec.
+- No preamble. Launch kit only.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Run the chain end-to-end</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <p>This tutorial is adapted from <a href="https://victordelrosal.com/octopus" target="_blank" rel="noopener">Octopus</a>, a multi-agent system originally built for the terminal. Here you will run four of the five agents inside a single browser chat. The fifth, the Manager, is you.</p>
+
+        <h3>Part 1: Pick Your Project</h3>
+        <p>Scroll back to <strong>Pick Your Project</strong> in Quick Start. Read the four briefs. Choose one. The brief is intentionally light: roughly 150 words. The chain&apos;s job is to fill in the rest.</p>
+        <p>If you want the highest-quality run, choose the project closest to a real problem you have. The agents only get to be as useful as the project is real to you.</p>
+
+        <h3>Part 2: Run the Researcher (Yellow)</h3>
+        <h4>Step 1: Open Claude or ChatGPT and turn on Deep Research</h4>
+        <p>In Claude, toggle the Research button before sending. In ChatGPT, select Deep Research from the tools menu. Deep Research is what makes this prompt different from a normal chat: it browses many sources, follows citations, and returns a longer, sourced report.</p>
+        <h4>Step 2: Paste the Researcher prompt</h4>
+        <p>Scroll up to <strong>The Researcher &amp; Analyst</strong> in Quick Start. Hit Copy prompt. Open a fresh chat. Paste.</p>
+        <h4>Step 3: Paste your project brief into the YOUR PROJECT block</h4>
+        <p>Replace <code>[paste the project brief here]</code> with the project brief you chose. Press send.</p>
+        <h4>Step 4: Wait for the report</h4>
+        <p>Deep Research takes 5-15 minutes. It will return a structured brief with audience, pain points, competitors, pricing, positioning, and sources. Read it. Save it. You will paste it into the next three prompts.</p>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Personalising the prompt</h4>
+          <p>The prompt is generic. Your only job is to swap the project brief in. If you want, you can also bias the research scope (e.g. &quot;focus on Ireland and the UK&quot; or &quot;include sources from the last 12 months only&quot;). Keep edits minimal.</p>
+        </div>
+
+        <h3>Part 3: Run the Designer (Orange)</h3>
+        <p>Open a fresh chat. Paste the Designer prompt. Replace YOUR PROJECT with your project brief. Replace the bracketed input block with the Researcher&apos;s full brief from Part 2. Press send.</p>
+        <p>The Designer returns one design spec: page architecture (landing page + qualifier), voice and tone, visual direction, and content blocks pulled from the Researcher. Read it. Save it.</p>
+
+        <h3>Part 4: Run the Maker (Blue)</h3>
+        <p>Open a fresh chat. Paste the Maker prompt. Replace YOUR PROJECT with your project brief. Replace the bracketed input block with the Designer&apos;s full spec. Press send.</p>
+        <p>The Maker returns one complete <code>index.html</code> in a single code block. Copy the whole code block (including <code>&lt;!DOCTYPE html&gt;</code> at the top and <code>&lt;/html&gt;</code> at the bottom). Save it as <code>index.html</code> in a new folder named after your project.</p>
+
+        <h3>Part 5: Run the Marketer (Green)</h3>
+        <p>Open a fresh chat. Paste the Marketer prompt. Replace YOUR PROJECT with your project brief. Replace the bracketed inputs with the Researcher&apos;s brief and the Designer&apos;s spec. Press send.</p>
+        <p>The Marketer returns one launch kit: a LinkedIn launch post, a follow-up post, three short-form variants, three email subject lines, three outreach targets. Save it. You will use it once your page is live.</p>
+
+        <h3>Part 6: Manager (You)</h3>
+        <p>You are the Purple agent. Your job is not to execute. Your job is to decide. Read what came back. Cut what does not fit. Tighten what is loose. Push back where the agents got lazy. Ask any of them to redo a section. Keep ownership of the output: it goes out under your name.</p>
+        <p>Then ship: deploy the page to GitHub Pages (next section), submit the live URL below, and post the launch with the Marketer&apos;s copy.</p>
+
+      </div>
+    </div>
+    <!-- DEPLOY TO GITHUB PAGES (bridge step) -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 22l-6-4-6 4 1.5-8.5L2 9h7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Deploy Your Page to GitHub</h2>
+          <span class="cg-session-meta">Turn your <code>index.html</code> into a live URL</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>You now have an <code>index.html</code> from the chat. Next, publish it as a live, public page so anyone can visit it and so you can submit it below.</p>
+        <ol>
+          <li>Create a new repository on GitHub (public).</li>
+          <li>Upload or commit your <code>index.html</code> to the repo root.</li>
+          <li>Enable GitHub Pages in the repo settings and grab the <code>https://<em>yourname</em>.github.io/<em>repo</em>/</code> URL.</li>
+        </ol>
+        <p>Full step-by-step walkthrough is in the previous lesson:</p>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Open: Deploy to GitHub</h4>
+          <p><a href="https://aibadge.fiveinnolabs.com/#/lesson/deploy-github/deploy-github" target="_blank" rel="noopener">aibadge.fiveinnolabs.com &rarr; Deploy to GitHub</a>: the full workflow, with screenshots.</p>
+        </div>
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Heads up</h4>
+          <p>Pages can take 30-60 seconds to go live after you enable it. Refresh the URL a couple of times before panicking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT YOUR WORK -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Submit Your Work</h2>
+          <span class="cg-session-meta">Paste your GitHub Pages URL</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>Paste the <strong>live GitHub Pages URL</strong> for your new landing page. It should look like <code>https://yourname.github.io/your-repo/</code>.</p>
+        <div class="cg-submit-box" data-exercise-submission="ai-interviews-you" data-submission-input="fivInput" data-submission-status="fivStatus" data-submission-btn="fivBtn" data-submission-validate="github.io" data-submission-card="fivSubmittedCard" data-submission-card-url="fivSubmittedUrl" data-submission-card-meta="fivSubmittedMeta" data-submission-form="fivFormWrap" data-submission-fab="fivSubmitFab" id="fivSubmitBox">
+          <div class="cg-submitted-card" id="fivSubmittedCard">
+            <div class="cg-submitted-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Your submission
+            </div>
+            <a class="cg-submitted-url" id="fivSubmittedUrl" href="#" target="_blank" rel="noopener"></a>
+            <div class="cg-submitted-meta" id="fivSubmittedMeta"></div>
+            <div class="cg-submitted-actions">
+              <button type="button" class="cg-submit-btn secondary" id="fivEditBtn" onclick="window.__fivEditSubmission&&window.__fivEditSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit / Resubmit
+              </button>
+              <button type="button" class="cg-submit-btn danger" id="fivDeleteBtn" onclick="window.__fivDeleteSubmission&&window.__fivDeleteSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>
+          <div id="fivFormWrap">
+            <span class="cg-submit-label">GitHub Pages URL</span>
+            <div class="cg-submit-row">
+              <input type="url" class="cg-submit-input" id="fivInput" placeholder="https://yourname.github.io/your-repo/" autocomplete="off" spellcheck="false">
+              <button class="cg-submit-btn" id="fivBtn" onclick="(window.submitExerciseUrl||window.__fivSubmit)({exerciseId:'five-innovators',inputId:'fivInput',statusId:'fivStatus',btnId:'fivBtn',validate:'github.io'})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Submit
+              </button>
+            </div>
+            <div class="cg-submit-status" id="fivStatus" style="display:none;"></div>
+          </div>
+        </div>
+        <button type="button" class="cg-submit-fab" id="fivSubmitFab" onclick="window.__fivScrollToSubmit&&window.__fivScrollToSubmit()" aria-label="Jump to submission">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Submit your URL
+        </button>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Why .github.io only?</h4>
+          <p>We accept live, public URLs on GitHub Pages so your page is reachable by anyone. If you submit a <code>github.com</code> repo link, we'll ask you to enable Pages first.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common snags and fixes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro tip: one fresh chat per agent</h4>
+          <p>Each agent runs in its own chat. Do not mix them. Pasting the Designer prompt into the Researcher&apos;s chat confuses the model and breaks the role separation.</p>
+        </div>
+        <div class="cg-concept-card"><h4>The Researcher returned an essay, not a brief</h4><p>The output contract was ignored. Reply in the same chat: &quot;Re-do this following the OUTPUT CONTRACT exactly. Use the six numbered sections in order.&quot;</p></div>
+        <div class="cg-concept-card"><h4>Deep Research isn&apos;t available in my account</h4><p>Use a normal chat with the Researcher prompt. The output will be shallower and have fewer citations, but the chain still works. Or sign in to <a href="https://claude.ai" target="_blank">Claude.ai</a>, which offers Research on most plans.</p></div>
+        <div class="cg-concept-card"><h4>The Designer invented stats not in the brief</h4><p>The Designer is supposed to be traceable to the Researcher. Reply: &quot;Remove anything not in the Researcher&apos;s brief. If a section is empty, leave it empty and flag it as [missing].&quot;</p></div>
+        <div class="cg-concept-card"><h4>The Maker&apos;s index.html is incomplete</h4><p>Hit length limits. Reply: &quot;Continue from where you stopped. Output only the missing portion.&quot; Then concatenate. Or ask for a leaner version: &quot;Reduce CSS to essentials. Strip non-critical animations.&quot;</p></div>
+        <div class="cg-concept-card"><h4>The qualifier doesn&apos;t actually work in the browser</h4><p>The Maker shipped the form without the JavaScript flow. Reply: &quot;The qualifier must be interactive: clicking an answer advances to the next question, and the final tier renders with the Designer&apos;s tier copy. Re-output the full file.&quot;</p></div>
+        <div class="cg-concept-card"><h4>The Marketer wrote a generic LinkedIn post</h4><p>It ignored the brief. Reply: &quot;Re-write using the recommended positioning angle from the Researcher&apos;s brief, with one specific stat cited inline. No generic claims.&quot;</p></div>
+        <h3>Common Mistakes to Avoid</h3>
+        <ul>
+          <li>Skipping the personalisation: leaving <code>[paste the project brief here]</code> in the prompt</li>
+          <li>Running all four agents in one chat (role separation collapses)</li>
+          <li>Submitting the GitHub repo URL instead of the live <code>.github.io</code> page</li>
+          <li>Forgetting to turn on Deep Research before the Researcher prompt</li>
+          <li>Skipping the Manager step: shipping whatever the agents returned without editing</li>
+        </ul>
+      </div>
+    </div>
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Transcript coming soon</h4>
+          <p>Full transcript will be added once the tutorial video is recorded.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('lesson-theme');
+  if(t==='light') document.querySelector('.cg-lesson').classList.add('light-mode');
+
+  // Delegated copy handler: any button with [data-copy-btn] inside a .cg-code-block
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  var EXERCISE_ID = 'five-innovators';
+  // Accepts scheme-optional github.io URLs: user.github.io, user.github.io/repo, user.github.io/repo/
+  var GHIO_REGEX = /^https?:\/\/[a-z0-9]([a-z0-9-]*[a-z0-9])?\.github\.io(\/[^\s]*)?$/i;
+  var GHCOM_REGEX = /^https?:\/\/(www\.)?github\.com\//i;
+
+  function setStatus(kind, html) {
+    var el = document.getElementById('fivStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+    el.innerHTML = html;
+  }
+
+  function deployLessonLink(text) {
+    // Request parent Alpine dashboard to open the Deploy to GitHub lesson
+    return '<a href="#" onclick="event.preventDefault();try{var s=window.Alpine&&window.Alpine.store&&window.Alpine.store(\'ui\');if(s){s.activeLessonId=\'deploy-github\';window.scrollTo({top:0,behavior:\'smooth\'});}}catch(e){}">' + text + '</a>';
+  }
+
+  function validate(url) {
+    url = (url || '').trim();
+    if (!url) return { ok: false, msg: 'Please paste your GitHub Pages URL.' };
+    if (GHCOM_REGEX.test(url)) {
+      return { ok: false, msg: 'That looks like a <code>github.com</code> repo link, not a live page. Enable GitHub Pages for that repo, then paste the URL that ends in <code>.github.io</code>. Need a refresher? Open ' + deployLessonLink('Deploy to GitHub') + '.' };
+    }
+    if (!/^https?:\/\//i.test(url)) {
+      return { ok: false, msg: 'URL must start with <code>https://</code>.' };
+    }
+    if (!GHIO_REGEX.test(url)) {
+      return { ok: false, msg: 'We only accept live <code>.github.io</code> URLs for now. Revisit ' + deployLessonLink('Deploy to GitHub') + ' if you need to deploy.' };
+    }
+    return { ok: true, value: url };
+  }
+
+  function fmtDate(ts) {
+    try {
+      var d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+      if (!d || isNaN(d.getTime())) return '';
+      return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return ''; }
+  }
+  function renderSubmitted(value, ts) {
+    var card = document.getElementById('fivSubmittedCard');
+    var urlA = document.getElementById('fivSubmittedUrl');
+    var meta = document.getElementById('fivSubmittedMeta');
+    var form = document.getElementById('fivFormWrap');
+    var fab  = document.getElementById('fivSubmitFab');
+    var status = document.getElementById('fivStatus');
+    if (card && urlA) { urlA.textContent = value; urlA.href = value; card.classList.add('visible'); }
+    if (meta) meta.textContent = ts ? ('Submitted ' + fmtDate(ts)) : 'Submitted';
+    if (form) form.style.display = 'none';
+    if (fab) fab.classList.remove('visible');
+    if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+  }
+  function renderEditing() {
+    var card = document.getElementById('fivSubmittedCard');
+    var form = document.getElementById('fivFormWrap');
+    var fab  = document.getElementById('fivSubmitFab');
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+  }
+
+  window.__fivScrollToSubmit = window.__fivScrollToSubmit || function() {
+    var box = document.getElementById('fivSubmitBox');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('fivInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__fivEditSubmission = window.__fivEditSubmission || function() {
+    renderEditing();
+    var input = document.getElementById('fivInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__fivDeleteSubmission = window.__fivDeleteSubmission || async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    try {
+      var out = await deleteSubmission(user.uid, EXERCISE_ID);
+      if (out && out.success) {
+        var input = document.getElementById('fivInput');
+        if (input) input.value = '';
+        renderEditing();
+        setStatus('ok', 'Submission deleted. You can submit a new URL any time.');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, false); } catch (e) {} }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    }
+  };
+
+  async function loadExisting() {
+    try {
+      var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || typeof getSubmission !== 'function') {
+        var fab = document.getElementById('fivSubmitFab');
+        if (fab) fab.classList.add('visible');
+        return;
+      }
+      var existing = await getSubmission(user.uid, EXERCISE_ID);
+      var input = document.getElementById('fivInput');
+      if (existing && existing.value) {
+        if (input) input.value = existing.value;
+        renderSubmitted(existing.value, existing.submittedAt);
+      } else {
+        var fab = document.getElementById('fivSubmitFab');
+        if (fab) fab.classList.add('visible');
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  window.__fivSubmit = async function() {
+    var input = document.getElementById('fivInput');
+    var btn = document.getElementById('fivBtn');
+    var res = validate(input.value);
+    if (!res.ok) { setStatus('err', res.msg); return; }
+
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh the page and try again.'); return; }
+
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting...';
+
+    try {
+      var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: res.value, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your page: <a href="' + res.value + '" target="_blank" rel="noopener">' + res.value + '</a>');
+        renderSubmitted(res.value, new Date());
+        // Also mark the tutorial as complete
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {}
+        }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  };
+
+  // Try loading existing submission once firebase user is available
+  setTimeout(loadExisting, 400);
+  setTimeout(loadExisting, 1500);
+})();
+</script>
+</body>
+</html>
