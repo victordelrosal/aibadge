@@ -4104,6 +4104,48 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     }
   };
 
+  // Five Innovators submission handlers (mirrors aiy* pattern; SPA-loaded lessons need globals)
+  window.__fivScrollToSubmit = function() {
+    var box = __findSubmitBox('five-innovators');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('fivInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__fivEditSubmission = function() {
+    __renderEditing('five-innovators');
+    var input = document.getElementById('fivInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__fivDeleteSubmission = async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    var btn = document.getElementById('fivDeleteBtn');
+    if (btn) { btn.disabled = true; btn.dataset._label = btn.textContent; btn.textContent = 'Deleting...'; }
+    try {
+      var out = await deleteSubmission(user.uid, 'five-innovators');
+      if (out && out.success) {
+        var input = document.getElementById('fivInput');
+        if (input) input.value = '';
+        __renderEditing('five-innovators');
+        var status = document.getElementById('fivStatus');
+        if (status) { status.style.display = 'block'; status.className = 'cg-submit-status ok'; status.innerHTML = 'Submission deleted. You can submit a new URL any time.'; }
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, 'five-innovators', false); } catch (e) {}
+        }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset._label || 'Delete'; }
+    }
+  };
+
   window.submitExerciseUrl = async function(opts) {
     opts = opts || {};
     var input  = document.getElementById(opts.inputId);
