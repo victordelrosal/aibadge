@@ -3975,10 +3975,11 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       var restore = function(ok){
         if (label) {
           label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
-          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
         }
+        if (ok) { btn.classList.add('copied'); }
         setTimeout(function(){
-          if (label) { label.textContent = 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+          if (label) { label.textContent = 'Copy prompt'; }
+          btn.classList.remove('copied');
         }, 2000);
       };
       var fallback = function(){
