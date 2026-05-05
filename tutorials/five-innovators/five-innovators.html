@@ -191,10 +191,7 @@
 
     <!-- Tutorial Video -->
     <div class="cg-video-wrapper">
-      <div class="cg-video-placeholder">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-        <span>Video coming soon</span>
-      </div>
+      <iframe src="https://www.youtube.com/embed/0KOhhSAIvgE" allowfullscreen></iframe>
     </div>
 
     <!-- Slides -->
@@ -676,10 +673,49 @@ Begin now in Researcher mode with Deep Research. Output the brief, then stop and
         <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
       </div>
       <div class="cg-session-content" onclick="event.stopPropagation()">
-        <div class="cg-callout info">
-          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Transcript coming soon</h4>
-          <p>Full transcript will be added once the tutorial video is recorded.</p>
-        </div>
+
+        <h3>Welcome and What&apos;s Coming</h3>
+        <p>Hello and welcome back to the AI Badge. Today&apos;s session is a new one: The Five Innovators. We&apos;re exploring different archetypes and how you can start thinking in terms of agents, where each AI agent has a specific persona and a specific job to do for you. In your tutorial section you&apos;ll find the detailed instructions and the walkthrough. The page includes a single master prompt that contains all four agents: the Researcher, the Designer, the Maker, and the Marketer. We&apos;ll start a chat with that prompt, chain the agents together in sequence, and produce real outputs you can publish. You&apos;ll also lean on what you&apos;ve learned in previous sessions about creating GitHub repositories and publishing to GitHub Pages.</p>
+
+        <h3>The Demo: A Trade Academy Launch</h3>
+        <p>There&apos;s a project we&apos;ll do together, and you&apos;ll have a choice of three other projects to try for yourself afterwards. For this exercise, you are the Manager. You&apos;re the human directing the team; the four AI agents work for you. The demo: imagine we&apos;re a trade academy launching a paid series of 90-minute evening introductions to specific vocational and trade skills. We need to identify which skills should be in the lineup, so the central question is: what trade and vocational skills will be in highest demand in Ireland over the next 24 to 36 months?</p>
+
+        <h3>The Master Prompt: Generic by Design</h3>
+        <p>The master prompt includes all four agents stitched together. Picture an octopus with different arms working in coordination. The prompt is unbranded on purpose: it works for any organisation, any entrepreneur, any company. It can be applied to a vocational academy like our demo, or to a corporate launch, or to a nonprofit. It&apos;s the personalisation step that makes it sing.</p>
+
+        <h3>Personalising the Prompt</h3>
+        <p>Copy the master prompt and open ChatGPT (Claude, Gemini, or Perplexity work too). Before you paste, add a short framing line at the top. Open your reply with something like <em>&quot;We are the following organisation looking to do this:&quot;</em> then in quotes paste the project brief from the tutorial page, close the quotes, and end with: <em>&quot;please customise the following four agents specifically to assist us.&quot;</em> Below that, paste the full master prompt with <kbd>Cmd</kbd>+<kbd>V</kbd> or <kbd>Ctrl</kbd>+<kbd>V</kbd>. That single tweak is the prompt-engineering move: you turn a generic prompt into a tailored team of specialist agents for your specific organisation.</p>
+
+        <h3>Running the Chain and Watching the Researcher Work</h3>
+        <p>Send the prompt. You can leave the model on Instant; you don&apos;t need extended thinking. The model starts working through the sequence. The Researcher hits first: it browses websites, government pages, agency reports, looking for relevant data on demand for trade skills. That&apos;s the preliminary research happening live. Sometimes the model produces a prompt for you to run separately, but because our master prompt has the sequence baked in, it just keeps going.</p>
+
+        <h3>Introducing Deep Research</h3>
+        <p>While that&apos;s running, let&apos;s bring in Deep Research. Inside ChatGPT, Claude, Gemini and Perplexity there&apos;s a Deep Research toggle. If you send a research question without it, you get a normal answer with a few sources. With Deep Research on, the model browses for ten to twenty minutes, sometimes half an hour or more, pulling from many more sources and producing a structured, cited report. Plug in the brief&apos;s central question, turn on Deep Research, and click start. Imagine spinning up a research assistant that does in under an hour what would take a human days.</p>
+
+        <h3>The Deep Research Report</h3>
+        <p>I ran this earlier so we don&apos;t have to wait live. The output is roughly thirteen pages, downloadable as PDF, Word, or Markdown. Here&apos;s the PDF: a trade and vocational skills outlook for Ireland. It comes with an executive summary, demand drivers, a shortlist of skills, regional patterns, a heat map, constraints and risks, and recommendations. Every claim is sourced inline. In this run, Deep Research went through 319 separate sources. Doing that as a human in one hour is essentially impossible.</p>
+
+        <h3>Feeding the Report Back to the Chain</h3>
+        <p>Return to the original chat. The Researcher has paused with its preliminary summary. Attach the Deep Research PDF and reply: <em>&quot;Research agent, please analyse the attached report and select the top three vocational skills with highest demand. Prepare your output for the next agent.&quot;</em> The Researcher reads the PDF and surfaces the top three: electricians, plumbers and heat-pump technicians, and retrofit and insulation specialists. Then it hands those to the Designer.</p>
+
+        <h3>Designer to Maker</h3>
+        <p>Tell the Designer: design the offering for the academy based on these top three trades, create compelling 90-minute pitch slots. The Designer drafts the offering. Pass that to the Maker, with a reminder that we want a single-page HTML, JavaScript and CSS file (the same shape as earlier tutorials). The Maker builds the page.</p>
+
+        <h3>The Marketer&apos;s Twist</h3>
+        <p>The Marketer in this run took an interesting angle: rather than polishing the landing-page copy, it produced a set of LinkedIn posts to promote the launch. That&apos;s still genuinely useful. The Maker has built the landing page; the Marketer is now telling us how to share it. As the Manager, you decide whether to keep what you got or push back and ask for landing-page polish instead.</p>
+
+        <h3>Publishing to GitHub Pages</h3>
+        <p>Same workflow as previous sessions. Go to GitHub, create a new repository (this one is <code>trade-skills-invitation</code>), keep it public, no README, click create. On the empty repo, click <strong>Create new file</strong>, name it <code>index.html</code>, paste the Maker&apos;s full code, commit. Then go to <strong>Settings &rarr; Pages</strong> and switch the branch from <code>None</code> to <code>main</code>. Save and wait about a minute.</p>
+
+        <h3>The Live Page</h3>
+        <p>Refresh and visit the URL. There&apos;s the page: <em>&quot;Before you retrain, try a trade. Hands-on 90-minute evening sessions led by real tradespeople, in Ireland&apos;s most in-demand skills.&quot;</em> Below that, three 90-minute tasters: electrical, heating and retrofit. We went from a research question to a published page that anyone can visit, in a single chat with the four agents working in sequence. Keep practising the GitHub Pages deploy until it becomes second nature.</p>
+
+        <h3>A Word of Caution on Deep Research Limits</h3>
+        <p>You&apos;re capped on Deep Research queries per day and per month, and the cap depends on your subscription tier. Typical paid tiers give you ten to fifteen searches in a window. Plan your runs and don&apos;t burn them on questions a normal chat could handle.</p>
+
+        <h3>Your Turn</h3>
+        <p>Choose one of the three options on the tutorial page: a local library book club, a regional gym launching a Strength After 50 programme, or a major Irish bank launching a kids&apos; debit card. Run the same chain end to end. When you&apos;ve published your page, paste the live <code>.github.io</code> URL into the submission box at the bottom of the lesson. Good luck and well done. See you next time.</p>
+
       </div>
     </div>
   </div>
