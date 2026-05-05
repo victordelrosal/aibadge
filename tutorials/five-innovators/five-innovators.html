@@ -570,6 +570,11 @@ Begin now in Researcher mode with Deep Research. Output the brief, then stop and
       .cg-lesson.light-mode .cg-submit-btn.danger:hover { background: #f9d4d0; }
       .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
       .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+      /* Submission status messages need readable colours in light mode */
+      .cg-lesson.light-mode .cg-submit-status.ok { color: #137333; background: #e6f4ea; }
+      .cg-lesson.light-mode .cg-submit-status.err { color: #b3261e; background: #fce8e6; }
+      .cg-lesson.light-mode .cg-submit-status a { color: #1a73e8; }
+
       /* Agent label contrast in light mode (yellow needs darkening for WCAG) */
       .cg-lesson.light-mode .cg-step-card h5[style*="#FFD60A"] { color: #B8860B !important; }
 
