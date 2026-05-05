@@ -128,13 +128,14 @@
     .cg-submit-row { flex-direction: column; }
     .cg-submit-btn { width: 100%; }
   }
-  /* Floating reminder */
-  .cg-submit-fab { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 9999; padding: 0.95rem 1.4rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); color: #fff; border: none; border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; box-shadow: 0 10px 30px rgba(0,102,255,0.45), 0 0 0 4px rgba(0,212,255,0.12); display: none; align-items: center; gap: 0.55rem; animation: cgFabPulse 2.6s ease-in-out infinite; }
+  /* Floating reminder (Tally-style: minimal, frosted, no pulse) */
+  .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
   .cg-submit-fab.visible { display: inline-flex; }
-  .cg-submit-fab:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 14px 36px rgba(0,102,255,0.6), 0 0 0 4px rgba(0,212,255,0.2); }
-  .cg-submit-fab svg { width: 18px; height: 18px; }
-  @keyframes cgFabPulse { 0%,100% { box-shadow: 0 10px 30px rgba(0,102,255,0.45), 0 0 0 4px rgba(0,212,255,0.12); } 50% { box-shadow: 0 10px 30px rgba(0,102,255,0.6), 0 0 0 10px rgba(0,212,255,0.02); } }
-  @media (max-width: 540px) { .cg-submit-fab { right: 1rem; bottom: 1rem; padding: 0.8rem 1.1rem; font-size: 0.85rem; } }
+  .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+  .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+  .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+  @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
   /* Light mode */
   .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
   .cg-lesson.light-mode::before { display: none; }
@@ -251,22 +252,33 @@
           <p>A major Irish bank (AIB or Bank of Ireland) launches a kids&apos; debit card and financial-literacy app for ages 6-17, with parent controls, a gamified savings dashboard, and chore-linked allowances. The question: how do you launch this in a market that already has Revolut &lt;18, in a country where Bank of Ireland&apos;s Money Smarts dominates the schools? Research the cross-jurisdictional comparators (Greenlight US, GoHenry UK, Revolut &lt;18), Irish parents&apos; attitudes to money education (Junior Achievement Ireland, BoI Money Smarts), the EU regulatory frame for child financial products, and pricing benchmarks (&euro;2.99 to &pound;5.99 per month). Deliverable: a single-page launch site with a &quot;Find your family fit&quot; qualifier recommending one of three plan tiers based on family size and child age. Audience: parents of 6-17 year olds.</p>
         </div>
 
-        <h3>The Four Master Prompts</h3>
-        <p>Copy each prompt into a fresh chat in order. Replace the <code>YOUR PROJECT</code> block at the top with your chosen project brief above. Feed the previous agent&apos;s output into the next agent&apos;s chat.</p>
+        <h3>The Master Prompt</h3>
+        <p>One copy-paste. The model plays all four agents in sequence in the same chat. After each agent, it stops and waits for you to reply <code>next</code>.</p>
 
         <div class="cg-callout warning">
-          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Turn on Deep Research for the Researcher prompt</h4>
-          <p>In Claude.ai, toggle Research before sending. In ChatGPT, choose Deep Research from the tools menu. Expect a 5-15 minute report with citations. The other three prompts run as normal chats.</p>
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Turn on Deep Research before you send</h4>
+          <p>In Claude.ai, toggle Research before sending. In ChatGPT, choose Deep Research from the tools menu. The Researcher will use it. The other three agents run as normal chat in the same conversation.</p>
         </div>
 
-        <h4 style="color:#FFD60A; margin-top:1.5rem;">&#x1F7E1; 1. The Researcher &amp; Analyst</h4>
         <div class="cg-code-block">
-          <pre>You are the Researcher &amp; Analyst. The Yellow agent on a four-person product launch team. Your domain is intelligence and evaluation. You do not design, build, or market.
+          <pre>You are an Octopus team of four AI agents working on a single product launch. You will play each role in sequence: Researcher &amp; Analyst (Yellow), Designer (Orange), Maker (Blue), Marketer (Green). I am the Manager (Purple). I decide what ships.
 
 YOUR PROJECT
 [paste the project brief here]
 
-YOUR JOB
+SEQUENCING RULES
+- Start in Researcher mode and run Deep Research. Output ONLY the Researcher&apos;s brief.
+- After each agent&apos;s output, STOP and write one line: &quot;Reply &apos;next&apos; to continue with [next agent].&quot; Then wait.
+- When I reply &quot;next&quot;, switch role and run the next agent. Each agent must declare itself at the top of its output: &quot;&#x1F7E1; RESEARCHER&quot; / &quot;&#x1F7E0; DESIGNER&quot; / &quot;&#x1F535; MAKER&quot; / &quot;&#x1F7E2; MARKETER&quot;.
+- Each agent reads everything that came before in this chat. Do not ask me to re-paste prior outputs.
+- If I reply with corrections instead of &quot;next&quot;, apply them and re-output the current agent&apos;s section. Wait for &quot;next&quot; before moving on.
+
+==============================================================
+&#x1F7E1; AGENT 1: RESEARCHER &amp; ANALYST (Yellow)
+==============================================================
+Your domain is intelligence and evaluation. You do not design, build, or market.
+
+JOB
 Use Deep Research. Deliver one structured market-research brief that the Designer can use as input.
 
 OUTPUT CONTRACT (mandatory structure, in this order)
@@ -293,23 +305,12 @@ RULES
 - Date the brief at the top: &quot;Compiled YYYY-MM-DD&quot;.
 - Cite inline. Do not paraphrase numbers without a source.
 - If something is uncertain, say so. Do not fabricate.
-- No preamble, no commentary. Brief only.</pre>
-          <div class="cg-code-footer">
-            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
-          </div>
-        </div>
+- No preamble, no commentary. Brief only.
 
-        <h4 style="color:#FF9500; margin-top:1.5rem;">&#x1F7E0; 2. The Designer</h4>
-        <div class="cg-code-block">
-          <pre>You are the Designer. The Orange agent on a four-person product launch team. Your domain is solutions: UX, information design, page architecture. You do not research, build, or market.
-
-YOUR PROJECT
-[paste the project brief here]
-
-YOUR INPUT
-Below is the Researcher&apos;s brief. Read it carefully. Everything you specify must be traceable to it.
-
-[paste the Researcher&apos;s brief here]
+==============================================================
+&#x1F7E0; AGENT 2: DESIGNER (Orange)
+==============================================================
+Your domain is solutions: UX, information design, page architecture. You do not research, build, or market. Read the Researcher&apos;s brief above. Everything you specify must be traceable to it.
 
 OUTPUT CONTRACT (one design spec, in this order)
 
@@ -340,23 +341,12 @@ OUTPUT CONTRACT (one design spec, in this order)
 RULES
 - Do not invent statistics, names, or quotes. If the brief does not have it, do not use it.
 - The qualifier must produce meaningful differences between tiers, not just &quot;great fit / okay fit / not a fit&quot;.
-- No preamble. Spec only.</pre>
-          <div class="cg-code-footer">
-            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
-          </div>
-        </div>
+- No preamble. Spec only.
 
-        <h4 style="color:#0A84FF; margin-top:1.5rem;">&#x1F535; 3. The Maker</h4>
-        <div class="cg-code-block">
-          <pre>You are the Maker. The Blue agent on a four-person product launch team. Your domain is building. You ship working code from a spec. You do not research, design, or market.
-
-YOUR PROJECT
-[paste the project brief here]
-
-YOUR INPUT
-Below is the Designer&apos;s spec. Build to it. Do not invent content not in the spec.
-
-[paste the Designer&apos;s spec here]
+==============================================================
+&#x1F535; AGENT 3: MAKER (Blue)
+==============================================================
+Your domain is building. You ship working code from a spec. You do not research, design, or market. Read the Designer&apos;s spec above. Build to it exactly. Do not invent content not in the spec.
 
 OUTPUT
 One complete index.html. Single file. All CSS and JS inline. No frameworks, no build tools. Google Fonts (Inter) is the only allowed external dependency. Must work locally (file://) and on GitHub Pages.
@@ -396,25 +386,12 @@ META
 OG and Twitter Card tags. Comment placeholder for og:image (1200x630).
 
 OUTPUT FORMAT
-ONE ```html code block, the complete file, ready to save as index.html. Nothing before or after the block.</pre>
-          <div class="cg-code-footer">
-            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
-          </div>
-        </div>
+ONE ```html code block, the complete file, ready to save as index.html. Nothing before or after the block.
 
-        <h4 style="color:#34C759; margin-top:1.5rem;">&#x1F7E2; 4. The Marketer</h4>
-        <div class="cg-code-block">
-          <pre>You are the Marketer. The Green agent on a four-person product launch team. Your domain is distribution: copywriting, social, outreach, growth. You do not research, design, or build.
-
-YOUR PROJECT
-[paste the project brief here]
-
-YOUR INPUT
-The Researcher&apos;s brief and the Designer&apos;s spec. Your launch must be consistent with both.
-
-[paste the Researcher&apos;s brief here]
-
-[paste the Designer&apos;s spec here]
+==============================================================
+&#x1F7E2; AGENT 4: MARKETER (Green)
+==============================================================
+Your domain is distribution: copywriting, social, outreach, growth. You do not research, design, or build. Read the Researcher&apos;s brief and the Designer&apos;s spec above. Your launch must be consistent with both.
 
 OUTPUT CONTRACT (one launch kit, in this order)
 
@@ -437,12 +414,15 @@ RULES
 - Use the positioning angle the Researcher recommended. Do not invent a new one.
 - Use real, sourced stats. No &quot;studies show&quot; without a citation.
 - Tone aligned with the Designer&apos;s voice spec.
-- No preamble. Launch kit only.</pre>
+- No preamble. Launch kit only.
+
+==============================================================
+
+Begin now in Researcher mode with Deep Research. Output the brief, then stop and wait for &quot;next&quot;.</pre>
           <div class="cg-code-footer">
             <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
           </div>
         </div>
-
       </div>
     </div>
     <!-- DETAILED GUIDE -->
@@ -451,46 +431,45 @@ RULES
         <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
         <div class="cg-session-info">
           <h2>Detailed Step-by-Step Guide</h2>
-          <span class="cg-session-meta">Run the chain end-to-end</span>
+          <span class="cg-session-meta">Run the chain end-to-end in a single chat</span>
         </div>
         <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
       </div>
       <div class="cg-session-content" onclick="event.stopPropagation()">
 
-        <p>This tutorial is adapted from <a href="https://victordelrosal.com/octopus" target="_blank" rel="noopener">Octopus</a>, a multi-agent system originally built for the terminal. Here you will run four of the five agents inside a single browser chat. The fifth, the Manager, is you.</p>
+        <p>This tutorial is adapted from <a href="https://victordelrosal.com/octopus" target="_blank" rel="noopener">Octopus</a>, a multi-agent system originally built for the terminal. Here you run four of the five agents inside a single browser chat. The fifth, the Manager, is you.</p>
 
         <h3>Part 1: Pick Your Project</h3>
-        <p>Scroll back to <strong>Pick Your Project</strong> in Quick Start. Read the four briefs. Choose one. The brief is intentionally light: roughly 150 words. The chain&apos;s job is to fill in the rest.</p>
+        <p>Scroll back to <strong>Pick Your Project</strong> in Quick Start. Read the four briefs. Choose one. Each brief is intentionally light: roughly 150 words. The chain&apos;s job is to fill in the rest.</p>
         <p>If you want the highest-quality run, choose the project closest to a real problem you have. The agents only get to be as useful as the project is real to you.</p>
 
-        <h3>Part 2: Run the Researcher (Yellow)</h3>
-        <h4>Step 1: Open Claude or ChatGPT and turn on Deep Research</h4>
-        <p>In Claude, toggle the Research button before sending. In ChatGPT, select Deep Research from the tools menu. Deep Research is what makes this prompt different from a normal chat: it browses many sources, follows citations, and returns a longer, sourced report.</p>
-        <h4>Step 2: Paste the Researcher prompt</h4>
-        <p>Scroll up to <strong>The Researcher &amp; Analyst</strong> in Quick Start. Hit Copy prompt. Open a fresh chat. Paste.</p>
-        <h4>Step 3: Paste your project brief into the YOUR PROJECT block</h4>
-        <p>Replace <code>[paste the project brief here]</code> with the project brief you chose. Press send.</p>
-        <h4>Step 4: Wait for the report</h4>
-        <p>Deep Research takes 5-15 minutes. It will return a structured brief with audience, pain points, competitors, pricing, positioning, and sources. Read it. Save it. You will paste it into the next three prompts.</p>
+        <h3>Part 2: Open Claude or ChatGPT and Turn On Deep Research</h3>
+        <p>In Claude.ai, toggle the Research button before sending. In ChatGPT, select Deep Research from the tools menu. Deep Research is what makes the Researcher different from a normal chat: it browses many sources, follows citations, and returns a longer, sourced report.</p>
+
+        <h3>Part 3: Personalise and Paste the Master Prompt</h3>
+        <p>Scroll up to <strong>The Master Prompt</strong> in Quick Start. Hit Copy prompt. Open a fresh chat. Paste.</p>
+        <p>Find the <code>YOUR PROJECT</code> block at the top. Replace <code>[paste the project brief here]</code> with the project brief you chose. Press send.</p>
         <div class="cg-callout info">
-          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Personalising the prompt</h4>
-          <p>The prompt is generic. Your only job is to swap the project brief in. If you want, you can also bias the research scope (e.g. &quot;focus on Ireland and the UK&quot; or &quot;include sources from the last 12 months only&quot;). Keep edits minimal.</p>
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> One chat for the whole chain</h4>
+          <p>The merged prompt runs all four agents sequentially in the same conversation. Each agent reads everything that came before. Do not open a new chat between agents.</p>
         </div>
 
-        <h3>Part 3: Run the Designer (Orange)</h3>
-        <p>Open a fresh chat. Paste the Designer prompt. Replace YOUR PROJECT with your project brief. Replace the bracketed input block with the Researcher&apos;s full brief from Part 2. Press send.</p>
-        <p>The Designer returns one design spec: page architecture (landing page + qualifier), voice and tone, visual direction, and content blocks pulled from the Researcher. Read it. Save it.</p>
+        <h3>Part 4: The Researcher Returns the Brief (5-15 minutes)</h3>
+        <p>Deep Research takes time. The Researcher returns a structured brief: audience, pain points, competitors, pricing, positioning, sources. Read it. If anything is missing or wrong, reply with corrections in plain English. The Researcher will redo the section.</p>
+        <p>When you are happy, reply with one word: <code>next</code></p>
 
-        <h3>Part 4: Run the Maker (Blue)</h3>
-        <p>Open a fresh chat. Paste the Maker prompt. Replace YOUR PROJECT with your project brief. Replace the bracketed input block with the Designer&apos;s full spec. Press send.</p>
-        <p>The Maker returns one complete <code>index.html</code> in a single code block. Copy the whole code block (including <code>&lt;!DOCTYPE html&gt;</code> at the top and <code>&lt;/html&gt;</code> at the bottom). Save it as <code>index.html</code> in a new folder named after your project.</p>
+        <h3>Part 5: The Designer Returns the Spec</h3>
+        <p>The Designer reads the brief above and returns one design spec: page architecture (landing page + qualifier), voice and tone, visual direction, content blocks. Read it. Push back where it is loose. When ready, reply <code>next</code>.</p>
 
-        <h3>Part 5: Run the Marketer (Green)</h3>
-        <p>Open a fresh chat. Paste the Marketer prompt. Replace YOUR PROJECT with your project brief. Replace the bracketed inputs with the Researcher&apos;s brief and the Designer&apos;s spec. Press send.</p>
-        <p>The Marketer returns one launch kit: a LinkedIn launch post, a follow-up post, three short-form variants, three email subject lines, three outreach targets. Save it. You will use it once your page is live.</p>
+        <h3>Part 6: The Maker Returns the index.html</h3>
+        <p>The Maker reads the spec and returns one complete <code>index.html</code> in a single code block. Copy the whole code block (from <code>&lt;!DOCTYPE html&gt;</code> to <code>&lt;/html&gt;</code>). Save it as <code>index.html</code> in a new folder named after your project.</p>
+        <p>Open the file in your browser to preview locally. If something is broken or missing, reply with the issue. The Maker will re-output the file. When ready, reply <code>next</code>.</p>
 
-        <h3>Part 6: Manager (You)</h3>
-        <p>You are the Purple agent. Your job is not to execute. Your job is to decide. Read what came back. Cut what does not fit. Tighten what is loose. Push back where the agents got lazy. Ask any of them to redo a section. Keep ownership of the output: it goes out under your name.</p>
+        <h3>Part 7: The Marketer Returns the Launch Kit</h3>
+        <p>The Marketer reads the brief and the spec and returns the launch kit: LinkedIn launch post, follow-up post, three short-form variants, three email subject lines, three outreach targets.</p>
+
+        <h3>Part 8: Manager (You)</h3>
+        <p>You are the Purple agent. Your job is not to execute. Your job is to decide. Read what came back. Cut what does not fit. Tighten what is loose. Push back where the agents got lazy. The output goes out under your name.</p>
         <p>Then ship: deploy the page to GitHub Pages (next section), submit the live URL below, and post the launch with the Marketer&apos;s copy.</p>
 
       </div>
@@ -568,7 +547,7 @@ RULES
           </div>
         </div>
         <button type="button" class="cg-submit-fab" id="fivSubmitFab" onclick="window.__fivScrollToSubmit&&window.__fivScrollToSubmit()" aria-label="Jump to submission">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           Submit your URL
         </button>
         <div class="cg-callout info">
@@ -590,8 +569,8 @@ RULES
       </div>
       <div class="cg-session-content" onclick="event.stopPropagation()">
         <div class="cg-callout info" style="margin-bottom: 1.5rem;">
-          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro tip: one fresh chat per agent</h4>
-          <p>Each agent runs in its own chat. Do not mix them. Pasting the Designer prompt into the Researcher&apos;s chat confuses the model and breaks the role separation.</p>
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro tip: one chat for the whole chain</h4>
+          <p>The merged prompt runs all four agents in one conversation. Reply <code>next</code> between agents. Each agent reads everything that came before. Do not open a new chat between agents.</p>
         </div>
         <div class="cg-concept-card"><h4>The Researcher returned an essay, not a brief</h4><p>The output contract was ignored. Reply in the same chat: &quot;Re-do this following the OUTPUT CONTRACT exactly. Use the six numbered sections in order.&quot;</p></div>
         <div class="cg-concept-card"><h4>Deep Research isn&apos;t available in my account</h4><p>Use a normal chat with the Researcher prompt. The output will be shallower and have fewer citations, but the chain still works. Or sign in to <a href="https://claude.ai" target="_blank">Claude.ai</a>, which offers Research on most plans.</p></div>
@@ -601,8 +580,8 @@ RULES
         <div class="cg-concept-card"><h4>The Marketer wrote a generic LinkedIn post</h4><p>It ignored the brief. Reply: &quot;Re-write using the recommended positioning angle from the Researcher&apos;s brief, with one specific stat cited inline. No generic claims.&quot;</p></div>
         <h3>Common Mistakes to Avoid</h3>
         <ul>
-          <li>Skipping the personalisation: leaving <code>[paste the project brief here]</code> in the prompt</li>
-          <li>Running all four agents in one chat (role separation collapses)</li>
+          <li>Leaving <code>[paste the project brief here]</code> unedited in the merged prompt</li>
+          <li>Opening a new chat between agents (the next agent loses context from the prior brief or spec)</li>
           <li>Submitting the GitHub repo URL instead of the live <code>.github.io</code> page</li>
           <li>Forgetting to turn on Deep Research before the Researcher prompt</li>
           <li>Skipping the Manager step: shipping whatever the agents returned without editing</li>
