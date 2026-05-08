@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your AI Workspace | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none; z-index: 1;
+  }
+  .cg-topbar { position: sticky; top: 0; z-index: 100; height: 56px; background: rgba(0, 0, 54, 0.95); border-bottom: 1px solid rgba(0, 102, 255, 0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; max-height: 360px; overflow-y: auto; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-tree { font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; line-height: 1.65; color: var(--cg-text-secondary); background: rgba(0,0,0,0.45); border: 1px solid var(--cg-border); border-radius: 0.6rem; padding: 1rem 1.25rem; margin: 1rem 0; white-space: pre; overflow-x: auto; }
+  .cg-tree b { color: var(--cg-cyan); font-weight: 600; }
+  .cg-md-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+  .cg-md-compare > div { background: rgba(0,0,0,0.4); border: 1px solid var(--cg-border); border-radius: 0.6rem; padding: 0.85rem 1rem; }
+  .cg-md-compare h5 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--cg-cyan); }
+  @media (max-width: 640px) { .cg-md-compare { grid-template-columns: 1fr; } }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
+  /* Submission UI */
+  .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+  .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+  .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+  .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+  .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+  .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+  .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+  .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+  .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+  .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+  .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+  .cg-submit-status a { color: var(--cg-cyan); }
+  .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+  .cg-submitted-card.visible { display: block; }
+  .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+  .cg-submitted-url:hover { text-decoration: underline; }
+  .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+  .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+  @media (max-width: 540px) {
+    .cg-submit-row { flex-direction: column; }
+    .cg-submit-btn { width: 100%; }
+  }
+  .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+  .cg-submit-fab.visible { display: inline-flex; }
+  .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+  .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+  /* Light mode */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; } .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-tree { background: #f8f9fa; color: #3c4043; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-md-compare > div { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; }
+  .cg-lesson.light-mode .cg-step-card, .cg-lesson.light-mode .cg-concept-card, .cg-lesson.light-mode .cg-submit-box { background: #f8f9fa; border: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>Your AI Workspace</h1>
+      <p class="cg-subtitle">Folders and markdown: the boring eight minutes that triple the value of every AI prompt you will ever write.</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~7 minutes</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/4THQxOhbIBo" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="your-ai-workspace.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: The 5-Minute Setup</h2>
+          <span class="cg-session-meta">One folder, three subfolders, three files.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><div class="cg-step-num">1</div><h5>Create the workspace folder</h5><p>Open Finder (Mac) or File Explorer (Windows). Make a new folder called <code>my-ai-workspace</code> in your Documents or home folder.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">2</div><h5>Add three subfolders</h5><p>Inside, create <code>personas/</code>, <code>skills/</code>, and <code>notes/</code>. Empty for now: you fill them in Lessons 8 and 9.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">3</div><h5>Add three markdown files</h5><p><code>README.md</code> at the root, <code>CLAUDE.md</code> at the root, and <code>notes.md</code> inside <code>notes/</code>. Use TextEdit, Notepad, or any plain editor.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">4</div><h5>Save as <code>.md</code></h5><p>On Mac TextEdit: Format &rarr; Make Plain Text first, then save with the <code>.md</code> extension. On Windows Notepad: Save As &rarr; All Files, name it <code>README.md</code>.</p></div>
+        </div>
+
+        <h3>What the finished workspace looks like</h3>
+        <div class="cg-tree"><b>my-ai-workspace/</b>
+├── README.md            &larr; what this folder is, in five lines
+├── CLAUDE.md            &larr; always-on instructions for any AI
+├── personas/            &larr; (filled in Lesson 8)
+├── skills/              &larr; (filled in Lesson 9)
+└── notes/
+    └── notes.md         &larr; scratchpad for ideas, links, half-thoughts</div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> That is the whole lesson</h4>
+          <p>Five files and folders. Empty today. Furnished over the next two lessons. The folder is where every later lesson deposits its work.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Guide</h2>
+          <span class="cg-session-meta">Why folders, why markdown, and what to put in each file</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>Why folders matter (the folder is, in part, the agent)</h3>
+        <p>Modern AI tools that read your machine (Claude Code, ChatGPT Desktop, Cursor, Gemini for Workspace) infer what you are working on from your folder names and structure. When you drag a file into a chat, the assistant uses where it lives in your tree to make sense of it. Tidy tree, tidy answers. And future you finds things in seconds. The cheapest productivity upgrade in your life is a folder you can name out loud.</p>
+
+        <h3>Why markdown (AI's native tongue)</h3>
+        <p>By 2026, markdown is the lingua franca for agents. Three reasons:</p>
+        <ul>
+          <li><strong>Parsed better, fewer tokens.</strong> LLMs read clean markdown more accurately than <code>.docx</code>, <code>.pdf</code>, or rich text, and burn fewer tokens doing it.</li>
+          <li><strong>Native output of every modern AI.</strong> ChatGPT, Claude, Gemini, Copilot all produce markdown by default. Meeting it in its own format compounds.</li>
+          <li><strong>Plain text. Forever.</strong> It is just <code># heading</code>, <code>- bullet</code>, <code>**bold**</code>. Opens anywhere, breaks nowhere, survives every tool change.</li>
+        </ul>
+
+        <h3>Markdown vs plain text files</h3>
+        <div class="cg-md-compare">
+          <div>
+            <h5>.txt</h5>
+            <p style="font-size:0.85rem;color:var(--cg-text-secondary);"><strong style="color:var(--cg-ice)">Best for:</strong> raw notes, logs, transcripts, simple dumps. Universal, minimal.</p>
+            <p style="font-size:0.85rem;color:var(--cg-text-secondary);"><strong style="color:var(--cg-warning)">Cons:</strong> harder to scan, weak hierarchy, code and instructions blur together.</p>
+          </div>
+          <div>
+            <h5>.md</h5>
+            <p style="font-size:0.85rem;color:var(--cg-text-secondary);"><strong style="color:var(--cg-ice)">Best for:</strong> agent instructions, specs, READMEs, plans, architecture notes. Human + machine readable.</p>
+            <p style="font-size:0.85rem;color:var(--cg-text-secondary);"><strong style="color:var(--cg-warning)">Cons:</strong> a tiny bit of formatting discipline; markdown flavours can differ slightly.</p>
+          </div>
+        </div>
+
+        <h3>The three files that earn their keep</h3>
+        <p>Every project starts with these. They are short on purpose. Five lines beats five hundred.</p>
+
+        <h4>README.md &mdash; what this folder is</h4>
+        <div class="cg-code-block">
+          <div class="cg-code-header">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy</span>
+            </button>
+          </div>
+          <pre># My AI Workspace
+
+A small home for the AI tools, personas, and notes I am building.
+
+Owner: [your name]
+Started: [today's date]
+
+## What lives here
+- personas/ &mdash; my AI teammates (filled in Lesson 8)
+- skills/   &mdash; reusable recipes my teammates can run (Lesson 9)
+- notes/    &mdash; scratchpad for ideas, links, half-thoughts</pre>
+        </div>
+
+        <h4>CLAUDE.md &mdash; always-on context for any AI</h4>
+        <p>Named <code>CLAUDE.md</code> by convention (Claude Code reads it automatically). If you use Gemini, Cursor, or ChatGPT desktop, name it whatever that tool reads (e.g. <code>INSTRUCTIONS.md</code>) or just keep <code>CLAUDE.md</code> and paste its contents into a custom GPT or Gem. Same idea either way: a short note any AI can read about how to work with you.</p>
+        <div class="cg-code-block">
+          <div class="cg-code-header">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy</span>
+            </button>
+          </div>
+          <pre># Working with me
+
+- Be direct, be warm.
+- I run [a small literacy non-profit / a one-person consultancy / a classroom of 30 students].
+- Default tone: encouraging, plain language. No jargon unless I ask.
+- No em dashes. Use commas, semicolons, or full stops.
+- When you propose options, give me your top recommendation first.
+- If you are uncertain, say so. Don't fabricate.</pre>
+        </div>
+
+        <h4>notes/notes.md &mdash; the scratchpad</h4>
+        <div class="cg-code-block">
+          <div class="cg-code-header">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy</span>
+            </button>
+          </div>
+          <pre># Notes
+
+## 2026-05-08
+- Read the AI Badge Lesson 6 transcript
+- Try the Designer agent on the spring fundraising letter
+- Idea: turn last week's Zoom transcript into a one-page brief</pre>
+        </div>
+
+        <h3>Markdown cheat-sheet (everything you actually need)</h3>
+        <div class="cg-code-block">
+          <div class="cg-code-header">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy</span>
+            </button>
+          </div>
+          <pre># Heading 1
+## Heading 2
+### Heading 3
+
+**bold**   *italic*
+
+- bullet item
+- another bullet
+  - nested bullet
+
+1. numbered item
+2. second item
+
+[link text](https://example.com)
+
+`inline code`
+
+```
+code block
+```
+
+&gt; quoted line</pre>
+        </div>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Why this matters for Lessons 8 and 9</h4>
+          <p>The personas you build in Lesson 8 land in <code>personas/</code>. The skills you build in Lesson 9 land in <code>skills/</code>. The workspace is the home you furnish over the next two lessons. Anything you save here can be pasted into any AI chat as instant context, so the assistant never starts from scratch.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SUBMIT YOUR WORK -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Submit Your Work</h2>
+          <span class="cg-session-meta">Share a public link to your README.md or your workspace</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>Paste a <strong>public URL</strong> that shows your workspace exists. The simplest options:</p>
+        <ul>
+          <li>A <a href="https://gist.github.com/" target="_blank">GitHub Gist</a> with your <code>README.md</code> contents pasted in (takes 30 seconds).</li>
+          <li>A GitHub repo with your <code>README.md</code> committed (e.g. <code>https://github.com/yourname/my-ai-workspace</code>).</li>
+          <li>A Dropbox or Google Drive share link to a screenshot of your workspace open in Finder/Explorer.</li>
+        </ul>
+        <div class="cg-submit-box" data-exercise-submission="your-ai-workspace" data-submission-input="ywkInput" data-submission-status="ywkStatus" data-submission-btn="ywkBtn" data-submission-card="ywkSubmittedCard" data-submission-card-url="ywkSubmittedUrl" data-submission-card-meta="ywkSubmittedMeta" data-submission-form="ywkFormWrap" data-submission-fab="ywkSubmitFab" id="ywkSubmitBox">
+          <div class="cg-submitted-card" id="ywkSubmittedCard">
+            <div class="cg-submitted-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Your submission
+            </div>
+            <a class="cg-submitted-url" id="ywkSubmittedUrl" href="#" target="_blank" rel="noopener"></a>
+            <div class="cg-submitted-meta" id="ywkSubmittedMeta"></div>
+            <div class="cg-submitted-actions">
+              <button type="button" class="cg-submit-btn secondary" id="ywkEditBtn" onclick="window.__ywkEditSubmission&&window.__ywkEditSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit / Resubmit
+              </button>
+              <button type="button" class="cg-submit-btn danger" id="ywkDeleteBtn" onclick="window.__ywkDeleteSubmission&&window.__ywkDeleteSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>
+          <div id="ywkFormWrap">
+            <span class="cg-submit-label">Public URL (gist, repo, or share link)</span>
+            <div class="cg-submit-row">
+              <input type="url" class="cg-submit-input" id="ywkInput" placeholder="https://gist.github.com/yourname/..." autocomplete="off" spellcheck="false">
+              <button class="cg-submit-btn" id="ywkBtn" onclick="(window.submitExerciseUrl||window.__ywkSubmit)({exerciseId:'your-ai-workspace',inputId:'ywkInput',statusId:'ywkStatus',btnId:'ywkBtn'})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Submit
+              </button>
+            </div>
+            <div class="cg-submit-status" id="ywkStatus" style="display:none;"></div>
+          </div>
+        </div>
+        <button type="button" class="cg-submit-fab" id="ywkSubmitFab" onclick="window.__ywkScrollToSubmit&&window.__ywkScrollToSubmit()" aria-label="Jump to submission">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit your URL
+        </button>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Easiest path: a GitHub Gist</h4>
+          <p>Go to <a href="https://gist.github.com/" target="_blank">gist.github.com</a>, sign in, paste your <code>README.md</code> content, name the file <code>README.md</code>, click <strong>Create public gist</strong>, copy the URL, and paste it above. Done in under a minute.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common snags and fixes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro tip: AI as your IT support</h4>
+          <p>Stuck on any of the steps below? Paste the exact error or the screen you are looking at into ChatGPT or Claude with: <em>&quot;I am on macOS [version] / Windows 11. I am trying to create a markdown file. Here is what I see: [paste]. Walk me through the next click.&quot;</em> The assistant will guide you through.</p>
+        </div>
+
+        <div class="cg-concept-card"><h4>My file saved as <code>README.md.txt</code></h4><p>Windows Notepad and Mac TextEdit sometimes append <code>.txt</code> automatically. On Mac TextEdit, do <strong>Format &rarr; Make Plain Text</strong> first, then save. On Windows Notepad, in the Save dialog change <strong>Save as type</strong> from <em>Text Documents (*.txt)</em> to <em>All Files</em>, then type the full name <code>README.md</code>.</p></div>
+
+        <div class="cg-concept-card"><h4>I cannot see file extensions in Finder/Explorer</h4><p>On Mac: Finder &rarr; Settings &rarr; Advanced &rarr; tick <strong>Show all filename extensions</strong>. On Windows 11: open File Explorer, click the View menu &rarr; Show &rarr; tick <strong>File name extensions</strong>. Without this, you cannot tell <code>README.md</code> from <code>README.md.txt</code>.</p></div>
+
+        <div class="cg-concept-card"><h4>What editor should I use to edit markdown?</h4><p>Any plain text editor works. Free options worth a look: <a href="https://obsidian.md/" target="_blank">Obsidian</a>, <a href="https://typora.io/" target="_blank">Typora</a>, <a href="https://code.visualstudio.com/" target="_blank">VS Code</a>. But honestly: TextEdit (Mac) or Notepad (Windows) is fine. Markdown is just text.</p></div>
+
+        <div class="cg-concept-card"><h4>Should the file be <code>CLAUDE.md</code> or something else?</h4><p>If you use Claude or Claude Code, keep <code>CLAUDE.md</code>: it is the convention Claude reads automatically. If you use Gemini, Cursor, or a ChatGPT custom GPT, the name does not matter for the AI; it matters for you. Pick one name and stick with it. The contents are what counts.</p></div>
+
+        <div class="cg-concept-card"><h4>Where should I put the workspace folder?</h4><p>Anywhere you can find it again. Documents folder is fine. Desktop is fine. iCloud Drive or Dropbox is fine if you want it on multiple machines. Avoid putting it inside a system folder (Applications, Library) where it will get lost.</p></div>
+
+        <h3>Common Mistakes to Avoid</h3>
+        <ul>
+          <li>Saving as <code>.docx</code>, <code>.pages</code>, or <code>.notes</code> &mdash; AI parses these poorly. Markdown only.</li>
+          <li>Writing 500-line README files &mdash; the point is short and scannable. Five lines beats fifty.</li>
+          <li>Filling <code>personas/</code> and <code>skills/</code> with random files now &mdash; they fill themselves in Lessons 8 and 9.</li>
+          <li>Treating this as one-and-done &mdash; the workspace grows. Edit your <code>CLAUDE.md</code> as you learn what works.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">Full tutorial walkthrough</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>Why this lesson, and where it fits</h3>
+        <p>One of the more exciting use cases of AI in 2026 is AI personas that remember who you are: the context, the type of work you do, the specific functions, tasks, and roles you perform day to day, whether for your job, a hobby, or another interest. Previously we looked at creating archetypes, the five innovator archetypes. We went through all four in the last exercise and reserved the Manager role for you, the human driving these agents. Now we want to move on to the more agentic use of AI, where you create personas customised for you. But before we do that, we need to set up the structure and understand how it works.</p>
+
+        <h3>Why folders: the AI feels forgetful, but it is not the AI</h3>
+        <p>Sometimes we feel like we are repeating ourselves to AI. It feels forgetful. Some providers have solved part of this with persistent memory, but I find that is more useful at a project level. The way to solve it is a folder structure: scattered ideas become organised ideas, one home per project or per goal. The folder is, in part, the agent, because it gives it context. We are going to see how AI tools read what you have stored on your local machine, and how you can paste and carry that context across different sessions. It also makes finding things in the future a matter of seconds.</p>
+
+        <h3>Markdown: the native tongue of AI</h3>
+        <p>The native file type AI uses is called markdown. It looks like a text document. The difference is the <code>.md</code> extension and a few small formatting conventions we will see. Plain text files are great for raw notes, logs, transcripts: universal, but harder for AI to scan, less hierarchy. Markdown files are useful for agent instructions, README files in repositories, and similar. They are human-readable too: headings, lists, code, all in plain text. That is the formatting AI prefers to read.</p>
+
+        <h3>The structure we are going to build</h3>
+        <p>We will replicate this structure on your own local computer. Earlier in the AI Badge we worked on a folder of mini-projects: Hello World, the games, AI Interviews You, and so on. What we want now is an outer <code>my-ai-workspace</code> folder where you create that structure first, and then drop in your project folders alongside it.</p>
+        <p>Inside that workspace, two key things to start with: a <code>personas/</code> folder and a <code>skills/</code> folder. We populate those in the next two tutorials. Then a <code>README.md</code> document and a <code>CLAUDE.md</code> document at the root. The <code>CLAUDE</code> name will vary if you are using Gemini or ChatGPT instead, but the idea is the same.</p>
+
+        <h3>What goes in the README and CLAUDE files</h3>
+        <p>The <code>README.md</code> is your workspace's front door: it gives context about who you are, what you do, who owns it, and what lives in each subfolder. It will vary for each person. <code>CLAUDE.md</code> is similar: it gives the wider context of who you are, what you do, your preferences. Think of the two as going hand in hand. The <code>notes/</code> folder is for half-formed thoughts: ideas, observations, links, anything relevant to your working life or your projects.</p>
+
+        <h3>The principle: context plus memory</h3>
+        <p>The main principle to take away is that you are giving AI two things: context for the work you want to do, and memory. It keeps track of what has been said, what you have written. This is a powerful combination, because any time you start a new conversation, whether at the project-folder level, in a sub-project subfolder, or at the general level, the AI does not start from scratch. You do not have to re-explain who you are or what you do. It already knows. This is part of the scaffolding we are creating so AI can do its most powerful work. Think of it as a home for AI, for your AI team. We will see how to furnish it.</p>
+
+        <h3>Wrap-up</h3>
+        <p>This is an introduction to the next few tutorials. You can start very simply by creating that folder structure, and we take it from there. Thanks very much. See you in the next one.</p>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('lesson-theme');
+  if(t==='light') document.querySelector('.cg-lesson').classList.add('light-mode');
+
+  // Delegated copy handler: any button with [data-copy-btn] inside a .cg-code-block
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = 'Copy'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  /* Local fallbacks if standardized submitExerciseUrl is not loaded (standalone open) */
+  var EXERCISE_ID = 'your-ai-workspace';
+  function setStatus(kind, html) {
+    var el = document.getElementById('ywkStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+    el.innerHTML = html;
+  }
+  window.__ywkSubmit = window.__ywkSubmit || async function() {
+    var input = document.getElementById('ywkInput');
+    var url = (input && input.value || '').trim();
+    if (!url) { setStatus('err', 'Please paste a URL.'); return; }
+    if (!/^https?:\/\//i.test(url)) { setStatus('err', 'URL must start with <code>https://</code>.'); return; }
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Open this lesson from the AI Badge dashboard to submit.'); return; }
+    try {
+      var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: url, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your link: <a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {} }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    }
+  };
+  window.__ywkScrollToSubmit = window.__ywkScrollToSubmit || function() {
+    var box = document.getElementById('ywkSubmitBox');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('ywkInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__ywkEditSubmission = window.__ywkEditSubmission || function() {
+    var card = document.getElementById('ywkSubmittedCard');
+    var form = document.getElementById('ywkFormWrap');
+    var fab  = document.getElementById('ywkSubmitFab');
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+    var input = document.getElementById('ywkInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__ywkDeleteSubmission = window.__ywkDeleteSubmission || async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    try {
+      var out = await deleteSubmission(user.uid, EXERCISE_ID);
+      if (out && out.success) {
+        var input = document.getElementById('ywkInput');
+        if (input) input.value = '';
+        window.__ywkEditSubmission();
+        setStatus('ok', 'Submission deleted. You can submit a new URL any time.');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, false); } catch (e) {} }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    }
+  };
+})();
+</script>
+</body>
+</html>
