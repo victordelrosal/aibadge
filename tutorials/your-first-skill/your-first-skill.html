@@ -189,17 +189,13 @@
       <p class="cg-subtitle">Give one of your AI personas a reusable recipe they can run on demand.</p>
       <div class="cg-meta">
         <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
-        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~12 minutes</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~17 minutes</span>
       </div>
     </div>
 
-    <!-- Tutorial Video (placeholder, recording pending) -->
+    <!-- Tutorial Video -->
     <div class="cg-video-wrapper">
-      <div class="cg-video-placeholder">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-        <strong>Video coming soon</strong>
-        <span>Recording pending. The slides, master prompt, and submission below are ready to use right now.</span>
-      </div>
+      <iframe src="https://www.youtube.com/embed/Gn1_-52VqDw" title="Your First Skill" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
     <!-- Slides -->
@@ -504,6 +500,54 @@ START NOW WITH Q1. NOTHING ELSE.</pre>
         </ul>
       </div>
     </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">The full walkthrough in text form</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>Why Skills</h3>
+        <p>Now that we have created AI personas, agents that can help you on a day to day basis, it is time to give them <strong>skills</strong>: small repeatable recipes. Personas have personalities, voice, and context. Skills are the markdown files the agent runs in the same repeatable manner every time.</p>
+        <p>For example, if you have a persona like <strong>Aria</strong> the scientist, you have already defined how she thinks and her voice. A skill could be a <em>weekly funder scan</em>: how to perform the scan on a weekly basis, which sources to access, how to pull and format the information. Is the output a CSV file? What are the steps? That is what a skill is. It tells the agent when to run, what inputs to ask for, and the steps in order.</p>
+        <p>Think of it the same way you would teach a colleague or an intern. Anyone in the team would have these repeatable protocols. The important thing is you do not have to micromanage every last step. Modern AI is smart enough to figure out a lot. You just give a general idea of what you want, the inputs, the outputs, and the process. Input, process, output is a good way to think about it.</p>
+
+        <h3>The Skill Maker Prompt</h3>
+        <p>The base prompt for this lesson is the <strong>Skill Maker</strong>. Its job is to help you write one SKILL.md file. A skill, like a persona, is a markdown file: a small reusable procedure that one or more of your AI personas can run on demand.</p>
+        <p>If you copy the prompt and run it in a fresh instance, the first thing to do is reference the personas you already have. In ChatGPT's web interface, drop in the persona files, then paste the prompt. In this walkthrough I tweaked it slightly: instead of the prompt interviewing me, I told it to apply the prompt to one of the five agents, let the AI decide which, and then assume it interviews that agent. The output is a SKILL.md.</p>
+
+        <h3>Iterating on the Skill</h3>
+        <p>ChatGPT picked <strong>Attica</strong> the manager and produced a first draft. After reading it I thought, maybe there is something more interesting here. So I asked: actually, create a more unique and particular skill. It moved to <strong>Milo</strong> the designer and produced a skill about <em>turning big taster ideas into vivid 90 minute learner experiences</em>. Interesting, that fit Milo's role.</p>
+        <p>Notice the beauty: all the context the model needed came from the persona descriptions. I did not even include the description of the organisation. There was enough context in the role descriptions that the model could figure out what the team does and where they work.</p>
+        <p>Then I pushed once more: assume the five agents have been hard at work over the past six months. One of them keeps getting asked to do something repetitive and time consuming. Guess what that might be. Explain the pain points, then explain how a skill could solve it, then create that skill as a markdown file. The model treated it as <em>six month operational archaeology</em>: <strong>Nora</strong> kept being asked to turn academy claims into evidence backed, legally safer, commercially credible claims. The skill it produced: <code>harden-public-claims</code>. That one was a keeper.</p>
+
+        <h3>Saving to the Workspace</h3>
+        <p>If you recall the workspace structure from the previous lesson, you already have a <code>skills/</code> folder. Save the skill there using the kebab case name the model gave it: <code>harden-public-claims.md</code>. Now if you open the skills folder, there it is, the same file you were just looking at in the chat.</p>
+        <p>This is where it can get tricky if you are not using the terminal. In a web chat, you copy and paste files in and out by hand. In the terminal, all of this is automatic. There is no copy paste. That is why the terminal interface is worth installing.</p>
+
+        <h3>Running the Skill (Terminal)</h3>
+        <p>From here on, the workspace folder is the root: in a real organisation it would be renamed from <code>my-workspace-generic</code> to the name of the organisation, in this example <code>traders-academy</code>. Open a new terminal at that folder. This time we will use <strong>Claude Code</strong>, just to show that skills work the same across Claude, Codex (ChatGPT), and Gemini. They are interoperable.</p>
+        <p>First prompt: <code>scan all the agents and available skills in this folder</code>. The agent walks the tree, lists the five personas and the one new skill, and reports there are no products defined. Good.</p>
+        <p>Then: <code>create a hypothetical scenario where the skill would be used. Define the specific problem being faced.</code> The model returns a Tuesday morning landing page launch, with a hero section that needs hardening: three reviewers will read the same paragraph within 48 hours, and each can block the project for a different reason. Concrete enough to test on.</p>
+        <p>Final step: <code>apply the skill</code>. The model is smart enough that you do not have to spell out the procedure. It runs the skill, produces an <em>assumed claims</em> table with risks and safer rewrites, and you have a usable output.</p>
+
+        <h3>Comparing Web Chat and Terminal</h3>
+        <p>For comparison, I ran the same scenario in the ChatGPT web interface, dropping in the same files. It still works: it detects the skill, recognises the other agents, produces a similar result. The point is not that the terminal is the only way. The point is the terminal makes this fast, organised, and findable. In the web interface you repeat yourself uploading files for every fresh session.</p>
+
+        <h3>Skills Are the Unlock</h3>
+        <p>Notice the arc: from a generic organisation, to a named one (Traders Academy), to a set of personas with voices and roles, to skills the personas can replicate on an ongoing basis. Recipes you can run over and over. This is a far more powerful way to work than re prompting from scratch every time.</p>
+        <p>And there are not dozens, not hundreds, but probably thousands of skills already published for Claude that also work for ChatGPT and Gemini. Skills are interoperable across systems, and skills are where a lot of the focus is right now in making AI agents work better, faster, and more efficiently on repetitive processes.</p>
+        <p>That is it for today. Send a link to your work in the submission box: examples of the SKILL.md you built and proof it fired. You can publish them on a GitHub Pages site or a Gist to showcase how you are using your skills. Looking forward to your submissions.</p>
+
+      </div>
+    </div>
+
   </div>
   <div class="cg-footer">
     <span>AI Badge</span>
