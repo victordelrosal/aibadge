@@ -355,6 +355,88 @@ START NOW WITH Q1. NOTHING ELSE.</pre>
       </div>
     </div>
 
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">From persona on a desk to a skill that fires on demand</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>Part 1. Persona is identity, skill is procedure</h3>
+        <p>A persona is <strong>who</strong>: voice, archetype, defaults, how they push back. Built once, mostly stable. A skill is <strong>how</strong>: when to fire, the steps in order, what good output looks like. They sit on the same desk: one persona file plus many skill files, all plain markdown, all in the same workspace.</p>
+        <p>Think of a skill as the protocol you would hand a new colleague or intern. You do not need to micromanage every step. Modern AI is smart enough to fill the gaps. What it needs from you is the spine: <em>input, process, output</em>. Inputs: what does the skill need from me. Process: the steps in the order I want them. Output: the shape of the result, with one example so the model knows what good looks like.</p>
+
+        <h3>Part 2. The anatomy of a SKILL.md</h3>
+        <p>Every skill the master prompt produces has the same five sections. Knowing the anatomy makes editing fast: when something drifts, you know exactly which section to sharpen.</p>
+        <ul>
+          <li><strong>Front matter</strong> (<code>name</code>, <code>description</code>, <code>owner</code>, <code>created</code>). The <code>description</code> field is the trigger surface. This is where your real words live.</li>
+          <li><strong>When to use</strong>. Three to five concrete situations, plus a "do not use when" line if a false trigger is likely.</li>
+          <li><strong>Inputs needed</strong>. List what the skill needs and which inputs to ask for if you forget.</li>
+          <li><strong>Steps</strong>. A numbered procedure, no more than seven. If it runs longer, split into setup and execution.</li>
+          <li><strong>Output contract + worked example + test line</strong>. Length, format, what must and must not be in it. The worked example teaches the skill more than the steps do. The test line is one phrase you can paste into a fresh chat to verify it fires.</li>
+        </ul>
+
+        <h3>Part 3. Triggers in your real words</h3>
+        <p>Triggers are the single most important field. A skill that never fires is worthless. The most common mistake is writing the trigger like a description instead of like the words you would actually say.</p>
+        <p>Bad: <code>"a skill for funders"</code>. The model has nothing concrete to match. Good: <code>"scan funders"</code> &middot; <code>"any new grants?"</code> &middot; <code>"Monday research"</code>. Three real phrases. The model recognises one and runs the skill.</p>
+        <p>Trigger on the <em>work</em>, not the <em>worker</em>. <code>"scientist things"</code> is too abstract; <code>"any new grants?"</code> is the actual sentence you would say to Aria.</p>
+
+        <h3>Part 4. Iterate to a skill worth keeping</h3>
+        <p>The first skill the model produces is rarely the right one. That is fine. Push back. In the recorded walkthrough I asked the model three times before landing on a skill worth saving:</p>
+        <ol>
+          <li><strong>First pass</strong>: the model picked Attica the manager and produced a generic management skill. Functional, forgettable.</li>
+          <li><strong>Second pass</strong>: I said "create something more unique and particular." It moved to Milo the designer and built a skill about turning big taster ideas into 90 minute learner experiences. Better.</li>
+          <li><strong>Third pass</strong>: I said "assume the five agents have been hard at work over the past six months. One keeps getting asked to do something repetitive. Guess what." The model treated it as <em>six month operational archaeology</em> and produced <code>harden-public-claims</code> for Nora: turn copy full of unsupported claims into legally safer, evidence backed copy. That one was the keeper.</li>
+        </ol>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> The "operational archaeology" prompt</h4>
+          <p>If the model gives you a bland first draft, ask it to imagine the team has been running for six months. What task keeps recurring and creating drag? Solve <em>that</em> with a skill. Adds context the model needs to write something specific.</p>
+        </div>
+
+        <h3>Part 5. Save it next to the persona</h3>
+        <p>Open the workspace you built in Lesson 7. Inside, you already have a <code>skills/</code> folder. Save the SKILL.md there using the kebab case name the model gave it. Examples: <code>skills/harden-public-claims.md</code>, <code>skills/weekly-funder-scan.md</code>, <code>skills/dinner-from-fridge.md</code>.</p>
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Save as .md, not .txt</h4>
+          <p>The structure (front matter, headings, fenced examples) is what makes any AI tool read the file correctly. Saving as <code>.txt</code> defeats the format.</p>
+        </div>
+
+        <h3>Part 6. Run it the slow way (web chat) and the fast way (terminal)</h3>
+        <p>Both work. The difference is friction.</p>
+        <h4>Web chat (ChatGPT, Claude.ai, Gemini)</h4>
+        <ol>
+          <li>Open a fresh chat.</li>
+          <li>Drop in (or paste) the persona file <em>plus</em> the SKILL.md.</li>
+          <li>Tell the model: <em>"Read the attached SKILL.md. When I say one of its trigger phrases, run that skill."</em></li>
+          <li>Say a trigger phrase verbatim: <em>"Aria, any new grants?"</em></li>
+        </ol>
+        <p>Works every time, but you repeat the upload step in every new session.</p>
+
+        <h4>Terminal (Claude Code, Codex, Gemini CLI)</h4>
+        <ol>
+          <li>Open a terminal at your workspace root (the folder named after your team or organisation).</li>
+          <li>Start the CLI tool of your choice: <code>claude</code>, <code>codex</code>, or <code>gemini</code>. They all read the folder.</li>
+          <li>Ask it to <code>scan all the agents and available skills in this folder</code>. It walks the tree and reports back.</li>
+          <li>Ask for a hypothetical scenario where the skill would fire, then say <code>apply the skill</code>.</li>
+        </ol>
+        <p>No copy-paste. The persona and skill are already on the same desk; the AI tool just reads them. This is why a tidy workspace from Lesson 7 pays off here.</p>
+
+        <h3>Part 7. Build a small library, not one giant skill</h3>
+        <p>The temptation is to write one huge skill that handles everything. Resist it. Skills should be small, single purpose, and specific. One repeatable task per file.</p>
+        <p>Good starting backlog: pick the three or four tasks you do most often each week. One SKILL.md each. After a month you have a small library that compounds: any persona on your team can borrow a skill another persona uses. Skills travel across Claude, ChatGPT, and Gemini, so the library is portable too.</p>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> The shape of a working skill</h4>
+          <p>Five answers in. One fenced markdown block out, well formed. Save next to the persona. Trigger phrase fires it. Output matches the contract. If any of those four steps wobbles, sharpen the section that owns it (description for triggers, output contract for shape, worked example for tone).</p>
+        </div>
+
+      </div>
+    </div>
+
     <style>
       /* SPA-survivable submission styles (must live inside .cg-main so x-html keeps them) */
       .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
