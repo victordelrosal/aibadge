@@ -3968,7 +3968,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.lessonContent = '';
 
         try {
-          var resp = await fetch(tut.lessonPath, { cache: 'no-cache' });
+          var _bust = (tut.lessonPath.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
+          var resp = await fetch(tut.lessonPath + _bust, { cache: 'no-cache' });
           if (!resp.ok) throw new Error('HTTP ' + resp.status);
           var html = await resp.text();
 
