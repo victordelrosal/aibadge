@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your First Skill | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none; z-index: 1;
+  }
+  .cg-topbar { position: sticky; top: 0; z-index: 100; height: 56px; background: rgba(0, 0, 54, 0.95); border-bottom: 1px solid rgba(0, 102, 255, 0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-video-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(0, 102, 255, 0.18), rgba(0, 212, 255, 0.10)); color: var(--cg-text-secondary); font-size: 1.05rem; flex-direction: column; gap: 0.6rem; text-align: center; padding: 1.5rem; }
+  .cg-video-placeholder svg { opacity: 0.7; color: var(--cg-cyan); }
+  .cg-video-placeholder strong { color: var(--cg-text-primary); font-size: 1.2rem; font-weight: 600; }
+  .cg-video-placeholder span { color: var(--cg-text-tertiary); font-size: 0.92rem; max-width: 38ch; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; max-height: 340px; overflow-y: auto; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+  .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
+  /* Submission UI */
+  .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+  .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+  .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+  .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+  .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+  .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+  .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+  .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+  .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+  .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+  .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+  .cg-submit-status a { color: var(--cg-cyan); }
+  .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+  .cg-submitted-card.visible { display: block; }
+  .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+  .cg-submitted-url:hover { text-decoration: underline; }
+  .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+  .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+  @media (max-width: 540px) {
+    .cg-submit-row { flex-direction: column; }
+    .cg-submit-btn { width: 100%; }
+  }
+  /* Floating reminder */
+  .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+  .cg-submit-fab.visible { display: inline-flex; }
+  .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+  .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+  .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+  @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+  /* Light mode */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; } .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; }
+  .cg-lesson.light-mode .cg-step-card, .cg-lesson.light-mode .cg-concept-card, .cg-lesson.light-mode .cg-submit-box { background: #f8f9fa; border: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-video-placeholder { background: linear-gradient(135deg, rgba(26,115,232,0.10), rgba(26,115,232,0.04)); color: #5f6368; }
+  .cg-lesson.light-mode .cg-video-placeholder strong { color: #202124; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>Your First Skill</h1>
+      <p class="cg-subtitle">Give one of your AI personas a reusable recipe they can run on demand.</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~12 minutes</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video (placeholder, recording pending) -->
+    <div class="cg-video-wrapper">
+      <div class="cg-video-placeholder">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <strong>Video coming soon</strong>
+        <span>Recording pending. The slides, master prompt, and submission below are ready to use right now.</span>
+      </div>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="your-first-skill.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: Build One Skill</h2>
+          <span class="cg-session-meta">One master prompt, five answers, one SKILL.md.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Prerequisite</h4>
+          <p>Complete <strong>Your AI Team</strong> first, so you have at least one persona file. A skill needs an owner.</p>
+        </div>
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><div class="cg-step-num">1</div><h5>Open an AI chat</h5><p><a href="https://chatgpt.com" target="_blank">ChatGPT</a>, <a href="https://claude.ai" target="_blank">Claude</a>, or <a href="https://gemini.google.com" target="_blank">Gemini</a>. Any capable model works.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">2</div><h5>Paste the master prompt</h5><p>One copy-paste below. The model becomes the Skill Maker and runs a short five-question interview.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">3</div><h5>Answer five questions</h5><p>Owner persona. The task. When it should fire. What good output looks like. What inputs it needs.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">4</div><h5>Save, then test</h5><p>Save the SKILL.md next to the persona. New chat: paste persona + skill, say a trigger phrase, watch it fire.</p></div>
+        </div>
+
+        <h3>Persona vs Skill</h3>
+        <p>A persona is <strong>who</strong>. A skill is <strong>how</strong>. They sit on the same desk: one persona file + many skill files, all plain markdown.</p>
+
+        <div class="cg-step-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cg-step-card" style="border-left:4px solid #003399;"><h5 style="color:#003399">&#x1F464; Persona &mdash; identity</h5><p>How they think. How they push back. Their voice. Built once, mostly stable. Example: <code>aria.md</code>.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #c18a1c;"><h5 style="color:#c18a1c">&#x1F4DD; Skill &mdash; procedure</h5><p>When to fire. Steps in order. Output contract. One per repeatable task. Example: <code>weekly-funder-scan.md</code>.</p></div>
+        </div>
+
+        <h3>The Master Prompt</h3>
+        <p>One copy-paste. The model interviews you with five short questions and then produces one well-formed SKILL.md inside a fenced code block.</p>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Tested on GPT-5, Claude 4 Opus, and Gemini 2.5 Pro</h4>
+          <p>Works on any capable chat model. The interview is deliberately context-free, so it fits any persona and any task.</p>
+        </div>
+
+        <div class="cg-code-block">
+          <div class="cg-code-header">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+          <pre>You are the Skill Maker. Your job is to help me write one SKILL.md file: a small reusable procedure that one of my AI personas (or any AI assistant) can run on demand. A skill is not an identity. A skill is a recipe. We will build exactly one skill in this session, and we will build it well.
+
+GROUND RULES
+
+1. Ask the fewest questions possible. Five at most. One at a time. Wait for my answer before the next.
+2. Do not lecture. Do not preview. Just ask.
+3. The single most important thing in a skill is its trigger description: the line that tells an AI when to use this skill. We will spend extra care on it.
+4. Output is a single markdown file inside one fenced code block, ready for me to save as a .md file.
+5. No em dashes. Use commas, colons, semicolons, full stops, or parentheses.
+
+THE INTERVIEW
+
+Q1. Which persona on your team will own this skill? Give me the name and the archetype, or paste the persona file. If you do not have personas yet, just describe the kind of assistant you want to run this skill.
+
+Q2. In one sentence, what is the task this skill should perform? Start with a verb. For example: &quot;Draft a weekly funder scan&quot;, &quot;Turn lecture notes into exam flashcards&quot;, &quot;Plan dinners for the week from what is in the fridge&quot;, &quot;Prepare me for a 1-to-1 with my report&quot;.
+
+Q3. When should this skill fire? Give me three to five trigger phrases or situations you would actually use. The closer to your real words, the better. For example: &quot;scan funders&quot;, &quot;any new grants?&quot;, &quot;Monday research&quot;, or &quot;I have a 1-to-1 in an hour&quot;.
+
+Q4. What does a great output of this skill look like? One short paragraph. Length, format (table, bullets, paragraphs), what is in it, what is left out. If a previous output exists that you liked, paste a sample.
+
+Q5. What inputs does the skill need from me to do its job, and which of those should it ask me for if I forget to provide them? Three to five items maximum.
+
+Once you have those five answers, do not ask anything else. Proceed to draft.
+
+THE SKILL FILE FORMAT
+
+Produce a single fenced markdown block in exactly this shape, populated with my answers. Be concrete. Every line should reflect my real task, not a generic placeholder.
+
+```markdown
+---
+name: {short-kebab-case-id, e.g. weekly-funder-scan}
+description: Use when {situation in my own words}. Triggers on {three to five real trigger phrases the user would say}.
+owner: {persona name and archetype, or &quot;any assistant&quot; if no persona}
+created: {today's date as YYYY-MM-DD}
+---
+
+# {Human-readable title}
+
+## When to use
+- Three to five concrete situations where this skill should fire.
+- One line each.
+- Include a &quot;do not use when&quot; line if there is a clear false-trigger to avoid.
+
+## Inputs needed
+- List the inputs the skill needs to do its job.
+- For each, state whether it is required or optional, and what to ask the user if it is missing.
+
+## Steps
+A numbered list of the actual procedure, written so an AI assistant could follow it without further clarification. Each step is one short instruction. No more than seven steps. If the procedure is longer than seven steps, split it into a setup phase and an execution phase, each capped at seven.
+
+## Output contract
+- Length, format, and shape of the result.
+- What must be in the output.
+- What must not be in the output.
+- One example skeleton (table headers, bullet shape, etc.) so the model knows what &quot;good&quot; looks like.
+
+## One worked example
+A short, real example of the skill in action. Inputs at the top. Output at the bottom. Five to ten lines total. This is the most important section: the example teaches the skill more than the steps do.
+
+## Test it
+A copy-pasteable line the user can say to a chat assistant (with the matching persona loaded) to verify the skill fires and runs correctly the first time.
+```
+
+NAMING
+
+Choose the `name:` field as a short, lowercase, kebab-case identifier (verbs first when possible: weekly-funder-scan, draft-1to1-prep, flashcards-from-notes, dinner-from-fridge). Keep it short enough to remember, descriptive enough to find later.
+
+CLOSING
+
+After the fenced block, add a closing paragraph (no more than four sentences) telling me how to use this skill in practice: save it as `{name}.md` next to my persona file, paste the persona file plus this skill file into a new chat, then say one of the trigger phrases to test it. End by suggesting one related skill I might want to build next, based on what I described.
+
+START NOW WITH Q1. NOTHING ELSE.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+        <h3>Triggers Are Everything</h3>
+        <p>The single most important field in a SKILL.md is the trigger description. A skill that never fires is worthless. Write triggers in your <em>real</em> words, the phrases you would actually say, not abstract descriptions.</p>
+
+        <div class="cg-step-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="cg-step-card" style="border-left:4px solid #d93025;"><h5 style="color:#d93025">&#x274C; Too generic</h5><p><code>"a skill for funders"</code> &mdash; the model has nothing concrete to match against, so it never fires on its own.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #1e8e3e;"><h5 style="color:#1e8e3e">&#x2705; Ready to fire</h5><p><code>"scan funders"</code> &middot; <code>"any new grants?"</code> &middot; <code>"Monday research"</code> &mdash; three real phrases. The model recognises one and runs the skill.</p></div>
+        </div>
+
+        <h3>Test It</h3>
+        <p>Save it. Load it. Say the words. Four moves.</p>
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><h5>1. Save</h5><p>Save the SKILL.md next to the persona file: <code>your-ai-workspace/skills/weekly-funder-scan.md</code>.</p></div>
+          <div class="cg-step-card"><h5>2. Load</h5><p>New chat. Paste (or attach) the persona file plus the skill file together.</p></div>
+          <div class="cg-step-card"><h5>3. Trigger</h5><p>Say one of your trigger phrases verbatim: <code>"Aria, any new grants?"</code></p></div>
+          <div class="cg-step-card"><h5>4. Iterate</h5><p>If output drifts, edit the steps or sharpen a trigger phrase. Skills are living documents.</p></div>
+        </div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> One persona, many skills</h4>
+          <p>Build a small backlog over time: the three or four tasks you do most often each week. One SKILL.md each. That is your library.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <style>
+      /* SPA-survivable submission styles (must live inside .cg-main so x-html keeps them) */
+      .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+      .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+      .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+      .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+      .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+      .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+      .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+      .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+      .cg-submit-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+      .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+      .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+      .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+      .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+      .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+      .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+      .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+      .cg-submit-status a { color: var(--cg-cyan); }
+      .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+      .cg-submitted-card.visible { display: block; }
+      .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+      .cg-submitted-label svg { width: 16px; height: 16px; flex-shrink: 0; }
+      .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+      .cg-submitted-url:hover { text-decoration: underline; }
+      .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+      .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+      .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+      .cg-submitted-actions .cg-submit-btn svg { width: 14px; height: 14px; }
+      @media (max-width: 540px) {
+        .cg-submit-row { flex-direction: column; }
+        .cg-submit-btn { width: 100%; }
+      }
+      .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+      .cg-submit-fab.visible { display: inline-flex; }
+      .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+      .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+      @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+      .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+      .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+      .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+      .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+      .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+      .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+      .cg-lesson.light-mode .cg-submit-input:focus { background: #fff; border-color: #1a73e8; box-shadow: 0 0 0 4px rgba(26,115,232,0.18); }
+      .cg-lesson.light-mode .cg-submit-input::placeholder { color: #9aa0a6; }
+      .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+      .cg-lesson.light-mode .cg-submit-btn.secondary { background: #f1f3f4; color: #202124; border: 1px solid #dadce0; }
+      .cg-lesson.light-mode .cg-submit-btn.secondary:hover { background: #e8eaed; }
+      .cg-lesson.light-mode .cg-submit-btn.danger { background: #fce8e6; color: #d93025; border: 1px solid #f6c5c1; }
+      .cg-lesson.light-mode .cg-submit-btn.danger:hover { background: #f9d4d0; }
+      .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+      .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+      .cg-lesson.light-mode .cg-submit-status.ok { color: #137333; background: #e6f4ea; }
+      .cg-lesson.light-mode .cg-submit-status.err { color: #b3261e; background: #fce8e6; }
+      .cg-lesson.light-mode .cg-submit-status a { color: #1a73e8; }
+    </style>
+
+    <!-- SUBMIT YOUR WORK -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Submit Your Work</h2>
+          <span class="cg-session-meta">Paste a public link to your SKILL.md</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>Paste a <strong>public link</strong> to your SKILL.md plus a screenshot or transcript showing it firing successfully when you said one of your trigger phrases. A Gist, GitHub Pages page, Notion page, Google Doc, or any URL that anyone can open will do.</p>
+        <div class="cg-submit-box" data-exercise-submission="your-first-skill" data-submission-input="yfsInput" data-submission-status="yfsStatus" data-submission-btn="yfsBtn" data-submission-validate="url" data-submission-card="yfsSubmittedCard" data-submission-card-url="yfsSubmittedUrl" data-submission-card-meta="yfsSubmittedMeta" data-submission-form="yfsFormWrap" data-submission-fab="yfsSubmitFab" id="yfsSubmitBox">
+          <div class="cg-submitted-card" id="yfsSubmittedCard">
+            <div class="cg-submitted-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Your submission
+            </div>
+            <a class="cg-submitted-url" id="yfsSubmittedUrl" href="#" target="_blank" rel="noopener"></a>
+            <div class="cg-submitted-meta" id="yfsSubmittedMeta"></div>
+            <div class="cg-submitted-actions">
+              <button type="button" class="cg-submit-btn secondary" id="yfsEditBtn" onclick="window.__yfsEditSubmission&&window.__yfsEditSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit / Resubmit
+              </button>
+              <button type="button" class="cg-submit-btn danger" id="yfsDeleteBtn" onclick="window.__yfsDeleteSubmission&&window.__yfsDeleteSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>
+          <div id="yfsFormWrap">
+            <span class="cg-submit-label">Public URL</span>
+            <div class="cg-submit-row">
+              <input type="url" class="cg-submit-input" id="yfsInput" placeholder="https://gist.github.com/yourname/... or any public link" autocomplete="off" spellcheck="false">
+              <button class="cg-submit-btn" id="yfsBtn" onclick="(window.submitExerciseUrl||window.__yfsSubmit)({exerciseId:'your-first-skill',inputId:'yfsInput',statusId:'yfsStatus',btnId:'yfsBtn',validate:'url'})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Submit
+              </button>
+            </div>
+            <div class="cg-submit-status" id="yfsStatus" style="display:none;"></div>
+          </div>
+        </div>
+        <button type="button" class="cg-submit-fab" id="yfsSubmitFab" onclick="window.__yfsScrollToSubmit&&window.__yfsScrollToSubmit()" aria-label="Jump to submission">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit your URL
+        </button>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> What to submit</h4>
+          <p>One public link containing your SKILL.md (<code>.md</code>) and a short proof it fired (a screenshot of the chat output, or a paste of the transcript). Easiest options: a public GitHub <a href="https://gist.github.com" target="_blank" rel="noopener">Gist</a>, a public Notion page, a published Google Doc, or a GitHub Pages site.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common snags and fixes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> The shape of a good run</h4>
+          <p>Five short answers in. One fenced markdown block out, well-formed, ready to save. If you are getting anything else, the prompt was probably truncated when pasted. Re-copy from the button at the top of the code block, paste, and try again.</p>
+        </div>
+        <div class="cg-concept-card"><h4>The model lectured me before asking Q1</h4><p>It ignored Ground Rule #1. Reply: &quot;Skip the preview. Ask Q1 only.&quot;</p></div>
+        <div class="cg-concept-card"><h4>It asked more than five questions</h4><p>Reply: &quot;Stop. Re-read your ground rules. Five answers, then draft. No more questions.&quot;</p></div>
+        <div class="cg-concept-card"><h4>The skill never fires when I say my trigger phrase</h4><p>The trigger description is too generic, or your phrase does not match. Edit the <code>description:</code> line so it includes the exact words you would say. Three to five real phrases beats one abstract one.</p></div>
+        <div class="cg-concept-card"><h4>The skill fires when I do not want it to (false trigger)</h4><p>Add a &quot;do not use when&quot; line under <code>## When to use</code>. Be specific about the lookalike situation that should NOT fire it.</p></div>
+        <div class="cg-concept-card"><h4>The output drifts from one run to the next</h4><p>Sharpen the <code>## Output contract</code>. Add length limits, a required structure, and one example skeleton (table headers, bullet shape, etc.).</p></div>
+        <div class="cg-concept-card"><h4>I got prose, not a fenced markdown block</h4><p>Reply: &quot;Re-output as a single fenced markdown code block in the SKILL.md format you were given.&quot;</p></div>
+        <div class="cg-concept-card"><h4>The persona ignores the skill file when I paste both</h4><p>Tell the model directly: &quot;Read the attached SKILL.md. From now on, when I say one of its trigger phrases, run that skill.&quot; Some chat tools need an explicit instruction.</p></div>
+
+        <h3>Common Mistakes to Avoid</h3>
+        <ul>
+          <li>Writing one giant skill that tries to do everything. Skills should be small. One task per file.</li>
+          <li>Using the archetype name as the trigger (&quot;scientist things&quot;). Triggers are about the work, not the worker.</li>
+          <li>Skipping the worked example. The example teaches the skill more than the steps do.</li>
+          <li>Saving as <code>.txt</code>. Save as <code>.md</code> so any AI tool reads the structure correctly.</li>
+          <li>Building skills before personas. The <code>owner:</code> field is what binds skills to who runs them.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('lesson-theme');
+  if(t==='light') document.querySelector('.cg-lesson').classList.add('light-mode');
+
+  // Delegated copy handler: any button with [data-copy-btn] inside a .cg-code-block
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  var EXERCISE_ID = 'your-first-skill';
+  var URL_REGEX = /^https?:\/\/[^\s]{6,}$/i;
+
+  function setStatus(kind, html) {
+    var el = document.getElementById('yfsStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+    el.innerHTML = html;
+  }
+
+  function validate(url) {
+    url = (url || '').trim();
+    if (!url) return { ok: false, msg: 'Please paste a public URL with your SKILL.md and proof it fired.' };
+    if (!/^https?:\/\//i.test(url)) {
+      return { ok: false, msg: 'URL must start with <code>https://</code>.' };
+    }
+    if (!URL_REGEX.test(url)) {
+      return { ok: false, msg: 'That does not look like a valid URL. Try a Gist, GitHub Pages, Notion, or published Google Doc link.' };
+    }
+    return { ok: true, value: url };
+  }
+
+  function fmtDate(ts) {
+    try {
+      var d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+      if (!d || isNaN(d.getTime())) return '';
+      return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return ''; }
+  }
+  function renderSubmitted(value, ts) {
+    var card = document.getElementById('yfsSubmittedCard');
+    var urlA = document.getElementById('yfsSubmittedUrl');
+    var meta = document.getElementById('yfsSubmittedMeta');
+    var form = document.getElementById('yfsFormWrap');
+    var fab  = document.getElementById('yfsSubmitFab');
+    var status = document.getElementById('yfsStatus');
+    if (card && urlA) { urlA.textContent = value; urlA.href = value; card.classList.add('visible'); }
+    if (meta) meta.textContent = ts ? ('Submitted ' + fmtDate(ts)) : 'Submitted';
+    if (form) form.style.display = 'none';
+    if (fab) fab.classList.remove('visible');
+    if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+  }
+  function renderEditing() {
+    var card = document.getElementById('yfsSubmittedCard');
+    var form = document.getElementById('yfsFormWrap');
+    var fab  = document.getElementById('yfsSubmitFab');
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+  }
+
+  window.__yfsScrollToSubmit = window.__yfsScrollToSubmit || function() {
+    var box = document.getElementById('yfsSubmitBox');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('yfsInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__yfsEditSubmission = window.__yfsEditSubmission || function() {
+    renderEditing();
+    var input = document.getElementById('yfsInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__yfsDeleteSubmission = window.__yfsDeleteSubmission || async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    try {
+      var out = await deleteSubmission(user.uid, EXERCISE_ID);
+      if (out && out.success) {
+        var input = document.getElementById('yfsInput');
+        if (input) input.value = '';
+        renderEditing();
+        setStatus('ok', 'Submission deleted. You can submit a new URL any time.');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, false); } catch (e) {} }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    }
+  };
+
+  async function loadExisting() {
+    try {
+      var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || typeof getSubmission !== 'function') {
+        var fab = document.getElementById('yfsSubmitFab');
+        if (fab) fab.classList.add('visible');
+        return;
+      }
+      var existing = await getSubmission(user.uid, EXERCISE_ID);
+      var input = document.getElementById('yfsInput');
+      if (existing && existing.value) {
+        if (input) input.value = existing.value;
+        renderSubmitted(existing.value, existing.submittedAt);
+      } else {
+        var fab = document.getElementById('yfsSubmitFab');
+        if (fab) fab.classList.add('visible');
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  window.__yfsSubmit = async function() {
+    var input = document.getElementById('yfsInput');
+    var btn = document.getElementById('yfsBtn');
+    var res = validate(input.value);
+    if (!res.ok) { setStatus('err', res.msg); return; }
+
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh the page and try again.'); return; }
+
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting...';
+
+    try {
+      var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: res.value, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your page: <a href="' + res.value + '" target="_blank" rel="noopener">' + res.value + '</a>');
+        renderSubmitted(res.value, new Date());
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {}
+        }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  };
+
+  setTimeout(loadExisting, 400);
+  setTimeout(loadExisting, 1500);
+})();
+</script>
+</body>
+</html>
