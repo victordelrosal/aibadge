@@ -99,6 +99,28 @@ async function createAccount(email, password) {
   }
 }
 
+async function sendVerificationEmail(user) {
+  if (!user) return { success: false, error: "No user signed in" };
+  try {
+    await user.sendEmailVerification();
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: _friendlyAuthError(error) };
+  }
+}
+
+async function reloadCurrentUser() {
+  initFirebase();
+  if (!auth.currentUser) return null;
+  try {
+    await auth.currentUser.reload();
+    return auth.currentUser;
+  } catch (error) {
+    console.warn("reloadCurrentUser:", error);
+    return auth.currentUser;
+  }
+}
+
 async function signOut() {
   initFirebase();
   try {
@@ -129,6 +151,74 @@ async function sendPasswordReset(email) {
   try {
     await auth.sendPasswordResetEmail(email);
     return { success: true };
+  } catch (error) {
+    return { success: false, error: _friendlyAuthError(error) };
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Email-link (passwordless) sign-in for NCI
+   Flow: user enters @ncirl.ie email → we send a one-time link → user clicks
+   it in their NCI inbox → /verify.html completes sign-in and grants free
+   access. No password ever required.
+   -------------------------------------------------------------------------- */
+
+const NCI_SIGNIN_RETURN_URL = "https://aibadge.fiveinnolabs.com/verify.html";
+const NCI_EMAIL_STORAGE_KEY = "aibadge.nciSignInEmail";
+
+async function sendNciSignInLink(email) {
+  initFirebase();
+  const target = String(email || "").trim().toLowerCase();
+  if (!isNciEmail(target)) {
+    return { success: false, error: "NCI email-link sign-in is only available for @ncirl.ie addresses." };
+  }
+  const actionCodeSettings = {
+    url: NCI_SIGNIN_RETURN_URL,
+    handleCodeInApp: true
+  };
+  try {
+    await auth.sendSignInLinkToEmail(target, actionCodeSettings);
+    try { window.localStorage.setItem(NCI_EMAIL_STORAGE_KEY, target); } catch (e) { /* private mode */ }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: _friendlyAuthError(error) };
+  }
+}
+
+function isNciSignInLink(url) {
+  initFirebase();
+  return auth.isSignInWithEmailLink(url || window.location.href);
+}
+
+async function completeEmailLinkSignIn(emailOverride) {
+  initFirebase();
+  const href = window.location.href;
+  if (!auth.isSignInWithEmailLink(href)) {
+    return { success: false, error: "This page was not opened from a valid sign-in link." };
+  }
+  let email = emailOverride && String(emailOverride).trim().toLowerCase();
+  if (!email) {
+    try { email = window.localStorage.getItem(NCI_EMAIL_STORAGE_KEY); } catch (e) { /* private mode */ }
+  }
+  if (!email) {
+    return { success: false, error: "needEmail" };
+  }
+  try {
+    const credential = await auth.signInWithEmailLink(email, href);
+    try { window.localStorage.removeItem(NCI_EMAIL_STORAGE_KEY); } catch (e) { /* ignore */ }
+    await updateLastActive(credential.user.uid);
+    logLogin(credential.user.uid);
+    if (isNciEmail(credential.user.email)) {
+      try {
+        await updateUserProfile(credential.user.uid, {
+          email: credential.user.email,
+          enrolled: true,
+          enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+          enrolmentSource: "nci-magic-link"
+        });
+      } catch (e) { console.warn("NCI auto-enrol write failed:", e); }
+    }
+    return { success: true, user: credential.user };
   } catch (error) {
     return { success: false, error: _friendlyAuthError(error) };
   }
@@ -561,7 +651,12 @@ function _friendlyAuthError(error) {
     "auth/invalid-email": "Please enter a valid email address.",
     "auth/user-disabled": "This account has been disabled. Please contact support.",
     "auth/too-many-requests": "Too many attempts. Please wait a moment and try again.",
-    "auth/invalid-credential": "Invalid email or password. Please try again."
+    "auth/invalid-credential": "Invalid email or password. Please try again.",
+    "auth/invalid-action-code": "This sign-in link has already been used or has expired. Request a new one.",
+    "auth/expired-action-code": "This sign-in link has expired. Request a new one.",
+    "auth/missing-email": "Please enter your NCI email address.",
+    "auth/unauthorized-continue-uri": "Sign-in link domain is not authorised. Contact victor@fiveinnolabs.com.",
+    "auth/operation-not-allowed": "Email-link sign-in is not enabled yet. Contact victor@fiveinnolabs.com."
   };
   return map[error.code] || error.message;
 }

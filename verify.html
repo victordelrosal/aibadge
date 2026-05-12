@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verifying sign-in | AI Badge</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .verify-card { max-width:440px; }
+    .verify-status { font:500 15px/1.5 -apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif; color:rgba(60,60,67,0.7); margin:0 0 18px; }
+    .verify-spinner { width:32px; height:32px; border-radius:50%; border:3px solid rgba(0,122,255,0.18); border-top-color:#007AFF; animation:vspin 0.8s linear infinite; margin:0 auto 16px; }
+    @keyframes vspin { to { transform:rotate(360deg); } }
+    .verify-ok { color:#1d6e36; background:rgba(52,199,89,0.08); border:1px solid rgba(52,199,89,0.25); border-radius:10px; padding:12px 14px; margin-bottom:14px; font:500 14px/1.5 -apple-system,sans-serif; }
+    .verify-err { color:#FF3B30; background:rgba(255,59,48,0.08); border:1px solid rgba(255,59,48,0.2); border-radius:10px; padding:12px 14px; margin-bottom:14px; font:500 14px/1.5 -apple-system,sans-serif; }
+    .verify-actions { display:flex; gap:10px; justify-content:center; margin-top:12px; }
+    .verify-actions .btn { font:600 15px/1.3 -apple-system,sans-serif; padding:10px 18px; border-radius:10px; cursor:pointer; min-height:44px; }
+    .verify-btn-primary { background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%); color:#0A0E27; border:none; }
+    .verify-btn-ghost { background:#fff; color:#000; border:1px solid rgba(60,60,67,0.18); }
+    .verify-email-input { width:100%; padding:12px 14px; border:1px solid rgba(60,60,67,0.18); border-radius:10px; font:400 16px/1.4 -apple-system,sans-serif; outline:none; margin-bottom:12px; }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="auth-card verify-card">
+      <div class="logo-mark">
+        <h1 class="serif">AI Badge</h1>
+        <p>Verifying your NCI sign-in</p>
+      </div>
+
+      <!-- Initial: spinner while we try the link -->
+      <div id="verify-loading">
+        <div class="verify-spinner"></div>
+        <p class="verify-status">Signing you in...</p>
+      </div>
+
+      <!-- Cross-device fallback: ask for email -->
+      <div id="verify-needs-email" style="display:none;">
+        <p class="verify-status">For security, please re-enter the NCI email this link was sent to:</p>
+        <input id="verify-email" type="email" class="verify-email-input" placeholder="you@ncirl.ie" autocomplete="email">
+        <div class="verify-actions">
+          <button id="verify-confirm" class="btn verify-btn-primary">Confirm and sign in</button>
+        </div>
+      </div>
+
+      <!-- Success state -->
+      <div id="verify-success" style="display:none;">
+        <div class="verify-ok">You're in. Taking you to your AI Badge portal...</div>
+      </div>
+
+      <!-- Error state -->
+      <div id="verify-error" style="display:none;">
+        <div class="verify-err" id="verify-error-message"></div>
+        <div class="verify-actions">
+          <a class="btn verify-btn-ghost" href="/">Back to sign in</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-branding">
+      fiveinnolabs
+    </div>
+  </div>
+
+  <!-- Firebase SDK (v10 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="assets/js/firebase-app.js"></script>
+
+  <script>
+    initFirebase();
+
+    const elLoading = document.getElementById("verify-loading");
+    const elNeedsEmail = document.getElementById("verify-needs-email");
+    const elSuccess = document.getElementById("verify-success");
+    const elError = document.getElementById("verify-error");
+    const elErrorMsg = document.getElementById("verify-error-message");
+    const inputEmail = document.getElementById("verify-email");
+    const btnConfirm = document.getElementById("verify-confirm");
+
+    function show(el) {
+      [elLoading, elNeedsEmail, elSuccess, elError].forEach(e => e.style.display = "none");
+      el.style.display = "";
+    }
+
+    function showError(msg) {
+      elErrorMsg.textContent = msg;
+      show(elError);
+    }
+
+    async function tryComplete(emailOverride) {
+      const result = await completeEmailLinkSignIn(emailOverride);
+      if (result.success) {
+        show(elSuccess);
+        setTimeout(() => { window.location.href = "portal.html"; }, 900);
+        return;
+      }
+      if (result.error === "needEmail") {
+        show(elNeedsEmail);
+        return;
+      }
+      showError(result.error || "We could not complete sign-in. Please try again.");
+    }
+
+    if (!isNciSignInLink(window.location.href)) {
+      showError("This page must be opened from a sign-in link in your NCI email.");
+    } else {
+      tryComplete();
+    }
+
+    btnConfirm.addEventListener("click", () => {
+      const email = (inputEmail.value || "").trim().toLowerCase();
+      if (!email) { return; }
+      show(elLoading);
+      tryComplete(email);
+    });
+
+    inputEmail.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { btnConfirm.click(); }
+    });
+  </script>
+
+</body>
+</html>
