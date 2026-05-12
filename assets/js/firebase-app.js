@@ -157,10 +157,68 @@ async function sendPasswordReset(email) {
 }
 
 /* --------------------------------------------------------------------------
-   Email-link (passwordless) sign-in for NCI
-   Flow: user enters @ncirl.ie email → we send a one-time link → user clicks
-   it in their NCI inbox → /verify.html completes sign-in and grants free
-   access. No password ever required.
+   NCI class-code free access (simpler gate, 2026-05-12)
+   NCI students/staff enter their @ncirl.ie email plus a class code Victor
+   shares verbally in lectures. If the code matches, we sign them into
+   Firebase Auth using a fixed shared password so the same email resolves
+   to the same UID across devices. No email verification loop required.
+
+   Rotate the code by editing NCI_CLASS_CODES below and redeploying.
+   Case-insensitive match.
+   -------------------------------------------------------------------------- */
+
+const NCI_FREE_ACCESS_PASSWORD = "nci-domain-claim-2026-fiveinnolabs";
+const NCI_CLASS_CODES = ["NCI2026", "H9CEAI"]; // case-insensitive
+
+function isValidNciClassCode(code) {
+  const c = String(code || "").trim().toUpperCase();
+  if (!c) return false;
+  return NCI_CLASS_CODES.some(v => v.toUpperCase() === c);
+}
+
+async function signInOrCreateNciFreeAccount(email, classCode) {
+  initFirebase();
+  const target = String(email || "").trim().toLowerCase();
+  if (!isNciEmail(target)) {
+    return { success: false, error: "Free access is only available for @ncirl.ie addresses." };
+  }
+  if (!isValidNciClassCode(classCode)) {
+    return { success: false, error: "That class code isn't right. Ask Victor for the current code." };
+  }
+  let credential;
+  try {
+    credential = await auth.signInWithEmailAndPassword(target, NCI_FREE_ACCESS_PASSWORD);
+  } catch (signInErr) {
+    if (signInErr.code === "auth/user-not-found"
+        || signInErr.code === "auth/invalid-credential"
+        || signInErr.code === "auth/wrong-password") {
+      try {
+        credential = await auth.createUserWithEmailAndPassword(target, NCI_FREE_ACCESS_PASSWORD);
+      } catch (createErr) {
+        return { success: false, error: _friendlyAuthError(createErr) };
+      }
+    } else {
+      return { success: false, error: _friendlyAuthError(signInErr) };
+    }
+  }
+  await updateLastActive(credential.user.uid);
+  logLogin(credential.user.uid);
+  try {
+    await updateUserProfile(credential.user.uid, {
+      email: credential.user.email,
+      enrolled: true,
+      enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+      enrolmentSource: "nci-class-code",
+      classCode: String(classCode || "").trim().toUpperCase()
+    });
+  } catch (e) { console.warn("NCI auto-enrol write failed:", e); }
+  return { success: true, user: credential.user };
+}
+
+/* --------------------------------------------------------------------------
+   Email-link (passwordless) sign-in for NCI (DEPRECATED 2026-05-12)
+   Replaced by signInOrCreateNciFreeAccount above because NCI's M365 filter
+   quarantined the verification emails. Kept in code in case we revive it.
    -------------------------------------------------------------------------- */
 
 const NCI_SIGNIN_RETURN_URL = "https://aibadge.fiveinnolabs.com/verify.html";

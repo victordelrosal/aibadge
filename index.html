@@ -2925,9 +2925,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
     <!-- Title -->
     <h2 style="font:700 22px/1.25 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;text-align:center;margin-bottom:4px;"
-        x-text="linkSent ? 'Check your inbox' : (isNciEmailLive ? 'NCI free access' : (isRegister ? 'Create Account' : 'Sign In'))"></h2>
+        x-text="isNciEmailLive ? 'NCI free access' : (isRegister ? 'Create Account' : 'Sign In')"></h2>
     <p style="font:400 15px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);text-align:center;margin-bottom:24px;"
-       x-text="linkSent ? ('We sent a sign-in link to ' + email) : (isNciEmailLive ? 'No password needed. We\u2019ll email you a one-click sign-in link.' : (isRegister ? 'Create your AI Badge account' : 'Sign in to your AI Badge account'))"></p>
+       x-text="isNciEmailLive ? 'Enter the class code Victor shared in lecture.' : (isRegister ? 'Create your AI Badge account' : 'Sign in to your AI Badge account')"></p>
 
     <!-- Error -->
     <div x-show="error" x-text="error"
@@ -2939,26 +2939,14 @@ input[type="range"].explorer-slider::-moz-range-thumb{
          style="background:rgba(52,199,89,0.08);color:#34C759;padding:10px 14px;border-radius:10px;font-size:0.875rem;font-weight:500;margin-bottom:16px;display:none;"
          x-transition></div>
 
-    <!-- Post-send confirmation block (NCI magic link) -->
-    <div x-show="linkSent"
-         style="display:none;background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.25);border-radius:12px;padding:18px;margin-bottom:16px;font:400 14px/1.55 -apple-system,sans-serif;color:#1d6e36;">
-      <p style="margin:0 0 10px;"><strong>Open your NCI inbox.</strong> Click the link in the email we just sent. It signs you in instantly: no password needed.</p>
-      <p style="margin:0;color:rgba(60,60,67,0.7);">Link expires in 1 hour. Didn't get it? Check spam, then
-        <button @click.prevent="linkSent = false; error = '';" style="background:none;border:none;color:#007AFF;cursor:pointer;padding:0;font:inherit;text-decoration:underline;">try a different email</button>.
-      </p>
-    </div>
+    <!-- Form -->
+    <div>
 
-    <!-- Form (hidden once link is sent) -->
-    <div x-show="!linkSent">
-
-      <!-- Microsoft (NCI) Sign-In removed 2026-05-12: no usable Azure tenant.
-           NCI users now sign in via the email-link flow below (@ncirl.ie → magic link).
-           The signInWithMicrosoft() helper is kept in assets/js/firebase-app.js in case
-           a tenant becomes available and we want to revive this path. -->
+      <!-- Microsoft (NCI) Sign-In removed 2026-05-12: no usable Azure tenant. -->
 
       <!-- NCI free-access hint -->
       <div style="background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.25);border-radius:10px;padding:10px 14px;margin-bottom:16px;font:500 13px/1.5 -apple-system,sans-serif;color:#1d6e36;">
-        <strong>NCI staff &amp; students:</strong> sign in with your <code style="background:rgba(52,199,89,0.15);padding:1px 6px;border-radius:4px;">@ncirl.ie</code> email for free instant access. We'll email you a one-click verification link: no password needed.
+        <strong>NCI staff &amp; students:</strong> sign in with your <code style="background:rgba(52,199,89,0.15);padding:1px 6px;border-radius:4px;">@ncirl.ie</code> email plus the class code Victor shares in lecture. Free instant access, no email verification needed.
       </div>
 
       <!-- Google Sign-In (hidden once an NCI email is typed: keep flows distinct) -->
@@ -2975,11 +2963,18 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <div style="flex:1;height:1px;background:rgba(60,60,67,0.18);"></div>
       </div>
 
-      <form @submit.prevent="isNciEmailLive ? handleSendNciLink() : (isRegister ? handleRegister() : handleSignIn())">
+      <form @submit.prevent="isNciEmailLive ? handleNciClassCode() : (isRegister ? handleRegister() : handleSignIn())">
         <div style="margin-bottom:16px;">
           <label style="display:block;font:600 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Email</label>
           <input type="email" x-model="email" required autocomplete="email" placeholder="you@ncirl.ie"
                  style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:400 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;"
+                 @focus="$el.style.borderColor='#007AFF';$el.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
+                 @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
+        </div>
+        <div x-show="isNciEmailLive" style="margin-bottom:20px;">
+          <label style="display:block;font:600 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Class code</label>
+          <input type="text" x-model="classCode" :required="isNciEmailLive" autocomplete="off" autocapitalize="characters" placeholder="From your lecture"
+                 style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:600 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;letter-spacing:0.05em;text-transform:uppercase;"
                  @focus="$el.style.borderColor='#007AFF';$el.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
                  @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
         </div>
@@ -2992,7 +2987,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </div>
         <button type="submit" :disabled="submitting"
                 style="width:100%;padding:14px;border:none;border-radius:12px;font:600 17px/1.3 -apple-system,sans-serif;cursor:pointer;min-height:50px;background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%);color:#0A0E27;box-shadow:0 4px 20px rgba(212,175,55,0.4);"
-                x-text="submitting ? (isNciEmailLive ? 'Sending link...' : (isRegister ? 'Creating...' : 'Signing in...')) : (isNciEmailLive ? 'Send verification link' : (isRegister ? 'Create Account' : 'Sign In'))"></button>
+                x-text="submitting ? (isNciEmailLive ? 'Checking...' : (isRegister ? 'Creating...' : 'Signing in...')) : (isNciEmailLive ? 'Get free access' : (isRegister ? 'Create Account' : 'Sign In'))"></button>
       </form>
 
       <div x-show="!isNciEmailLive" style="text-align:center;margin-top:16px;">
@@ -3772,28 +3767,39 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     return {
       email: '',
       password: '',
+      classCode: '',
       error: '',
       success: '',
       submitting: false,
       isRegister: false,
-      linkSent: false,
 
       get isNciEmailLive() {
         return typeof isNciEmail === 'function' && isNciEmail(this.email);
       },
 
-      async handleSendNciLink() {
+      async handleNciClassCode() {
         this.error = '';
         this.success = '';
         if (!this.isNciEmailLive) {
           this.error = 'Use your @ncirl.ie email for free access.';
           return;
         }
+        if (!this.classCode || !this.classCode.trim()) {
+          this.error = 'Enter the class code Victor shared in lecture.';
+          return;
+        }
         this.submitting = true;
-        const result = await sendNciSignInLink(this.email);
+        const result = await signInOrCreateNciFreeAccount(this.email, this.classCode);
         this.submitting = false;
         if (result.success) {
-          this.linkSent = true;
+          var maxWait = 80;
+          while (Alpine.store('auth').loading && maxWait-- > 0) {
+            await new Promise(r => setTimeout(r, 100));
+          }
+          Alpine.store('ui').closeModal();
+          this.email = '';
+          this.password = '';
+          this.classCode = '';
         } else {
           this.error = result.error;
         }
