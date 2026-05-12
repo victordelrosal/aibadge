@@ -63,6 +63,32 @@ async function signInWithGoogle() {
   }
 }
 
+// NCI auto-enrol: any email ending in .ncirl.ie (staff, student, root tenant).
+const NCI_DOMAIN_SUFFIX = ".ncirl.ie";
+function isNciEmail(email) {
+  if (!email) return false;
+  const e = String(email).toLowerCase().trim();
+  return e.endsWith(NCI_DOMAIN_SUFFIX) || e.endsWith("@ncirl.ie");
+}
+
+async function signInWithMicrosoft() {
+  initFirebase();
+  try {
+    const provider = new firebase.auth.OAuthProvider("microsoft.com");
+    // Prompt account picker so users on shared devices can choose.
+    provider.setCustomParameters({ prompt: "select_account" });
+    provider.addScope("openid");
+    provider.addScope("email");
+    provider.addScope("profile");
+    const credential = await auth.signInWithPopup(provider);
+    await updateLastActive(credential.user.uid);
+    logLogin(credential.user.uid);
+    return { success: true, user: credential.user };
+  } catch (error) {
+    return { success: false, error: _friendlyAuthError(error) };
+  }
+}
+
 async function createAccount(email, password) {
   initFirebase();
   try {
