@@ -3884,7 +3884,22 @@ document.querySelectorAll('#navLinks a').forEach(a => {
             this.error = 'No users found (or not authorised).';
             this.users = [];
           } else {
-            allUsers.forEach(function(u) { u.toggling = false; });
+            allUsers.forEach(function(u) {
+              u.toggling = false;
+              // Enrich older accounts (pre-roster nci-class-code sign-ups) that
+              // never stored a name/ID: match their email against the roster.
+              var entry = (typeof getNciRosterEntry === 'function') ? getNciRosterEntry(u.email) : null;
+              if (entry) {
+                if (!u.fullName) u.fullName = entry.fullName;
+                if (!u.firstName) u.firstName = entry.firstName;
+                if (!u.studentId) u.studentId = entry.studentId;
+                if (!u.cohort) u.cohort = entry.cohort;
+              }
+              if (!u.studentId && typeof deriveStudentIdFromEmail === 'function') {
+                var sid = deriveStudentIdFromEmail(u.email);
+                if (sid) u.studentId = sid;
+              }
+            });
             this.users = allUsers.sort(function(a, b) {
               var da = a.createdAt ? (a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt)) : new Date(0);
               var db2 = b.createdAt ? (b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt)) : new Date(0);
