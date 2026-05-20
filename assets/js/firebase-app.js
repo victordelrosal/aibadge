@@ -640,6 +640,77 @@ async function logLogin(userId) {
   } catch (error) {
     console.warn("logLogin:", error);
   }
+  // Denormalised counters on the user doc for fast admin analytics.
+  recordLoginMetrics(userId);
+}
+
+/* --------------------------------------------------------------------------
+   Engagement tracking (login frequency + foreground engaged time)
+   All written to the users/{uid} doc, so the existing owner/admin rules
+   already cover it (no firestore.rules change). Accrues from deploy forward.
+   -------------------------------------------------------------------------- */
+
+async function recordLoginMetrics(userId) {
+  initFirebase();
+  if (!userId) return;
+  try {
+    await db.collection("users").doc(userId).set({
+      loginCount: firebase.firestore.FieldValue.increment(1),
+      lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastSeenAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch (error) { console.warn("recordLoginMetrics:", error); }
+}
+
+var _aibHeartbeat = { interval: null, last: 0, uid: null, bound: false };
+
+// Counts only foreground time, in ~60s ticks, capped 1s-5min per tick so an
+// idle/asleep tab does not inflate engaged time. Approximate but honest.
+function startEngagementHeartbeat(userId) {
+  initFirebase();
+  if (!userId) return;
+  if (_aibHeartbeat.uid === userId && _aibHeartbeat.interval) return;
+  stopEngagementHeartbeat();
+  _aibHeartbeat.uid = userId;
+  _aibHeartbeat.last = Date.now();
+  try {
+    db.collection("users").doc(userId).set(
+      { lastSeenAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  } catch (e) { /* ignore */ }
+  _aibHeartbeat.interval = setInterval(function () {
+    if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+    var now = Date.now();
+    var delta = now - _aibHeartbeat.last;
+    _aibHeartbeat.last = now;
+    var patch = { lastSeenAt: firebase.firestore.FieldValue.serverTimestamp() };
+    if (delta > 1000 && delta < 5 * 60 * 1000) {
+      patch.totalEngagedMs = firebase.firestore.FieldValue.increment(delta);
+    }
+    try { db.collection("users").doc(_aibHeartbeat.uid).set(patch, { merge: true }); } catch (e) { /* ignore */ }
+  }, 60000);
+  if (!_aibHeartbeat.bound && typeof document !== "undefined") {
+    document.addEventListener("visibilitychange", function () { _aibHeartbeat.last = Date.now(); });
+    _aibHeartbeat.bound = true;
+  }
+}
+
+function stopEngagementHeartbeat() {
+  if (_aibHeartbeat.interval) { clearInterval(_aibHeartbeat.interval); _aibHeartbeat.interval = null; }
+  _aibHeartbeat.uid = null;
+}
+
+// Admin: batch-load tutorial completions for many users (per-user reads, which
+// the existing nested rule already permits for admins). Returns { uid: {tutId:{...}} }.
+async function getAdminAllTutorialCompletions(userIds) {
+  initFirebase();
+  var user = getCurrentUser();
+  if (!user || !ADMIN_EMAILS.includes(user.email)) return {};
+  var out = {};
+  await Promise.all((userIds || []).map(async function (uid) {
+    try { out[uid] = await getAdminTutorialCompletions(uid); }
+    catch (e) { out[uid] = {}; }
+  }));
+  return out;
 }
 
 /* --------------------------------------------------------------------------

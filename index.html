@@ -2096,6 +2096,69 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         .admin-sub-row, .admin-sub-head { grid-template-columns: 1fr; }
         .admin-sub-head { display:none; }
       }
+
+      /* ===== Analytics dashboard (matrix) ===== */
+      .amx-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:16px; }
+      .amx-kpi { background:rgba(255,255,255,0.85); border:1px solid rgba(0,0,0,0.06); border-radius:12px; padding:12px 14px; text-align:center; }
+      .amx-kpi-val { font:700 1.5rem/1.1 -apple-system,sans-serif; color:#000036; }
+      .amx-kpi-lab { font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; opacity:0.55; margin-top:4px; }
+      .amx-controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+      .amx-search { flex:1; min-width:200px; padding:9px 12px; border:1px solid rgba(0,0,0,0.14); border-radius:10px; font-size:0.9rem; background:#fff; outline:none; }
+      .amx-search:focus { border-color:#007AFF; box-shadow:0 0 0 3px rgba(0,122,255,0.12); }
+      .amx-select { padding:9px 12px; border:1px solid rgba(0,0,0,0.14); border-radius:10px; font-size:0.85rem; background:#fff; cursor:pointer; }
+      .amx-count { font-size:0.8rem; opacity:0.6; }
+      .amx-btn { font-size:0.82rem; font-weight:600; padding:9px 14px; border-radius:10px; border:1px solid rgba(0,0,0,0.14); background:#fff; cursor:pointer; white-space:nowrap; }
+      .amx-btn:hover { background:#F2F2F7; }
+      .amx-card { background:rgba(255,255,255,0.85); border:1px solid rgba(0,0,0,0.06); border-radius:14px; padding:16px; margin-bottom:16px; }
+      .amx-card-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+      .amx-card-title { font:700 1.05rem/1.2 -apple-system,sans-serif; margin:0; color:#000036; }
+      .amx-card-sub { font-size:0.78rem; opacity:0.55; }
+      .amx-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px; }
+      .amx-table { border-collapse:separate; border-spacing:0; width:100%; font-size:0.84rem; }
+      .amx-table th, .amx-table td { padding:8px 8px; text-align:center; white-space:nowrap; border-bottom:1px solid rgba(0,0,0,0.05); }
+      .amx-table thead th { position:sticky; top:0; background:#f3f4f8; z-index:2; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.02em; opacity:0.85; cursor:pointer; user-select:none; }
+      .amx-table thead th.amx-th-tut { font-size:1rem; padding:8px 6px; }
+      .amx-sticky { position:sticky; left:0; z-index:3; }
+      .amx-th-name { text-align:left; background:#f3f4f8 !important; min-width:170px; }
+      .amx-td-name { text-align:left; background:#fff; font-weight:600; min-width:170px; }
+      .amx-name { overflow:hidden; text-overflow:ellipsis; max-width:150px; display:inline-block; vertical-align:middle; }
+      .amx-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:7px; vertical-align:middle; }
+      .amx-td-id, .amx-th-id { font-family:ui-monospace,Menlo,monospace; font-size:0.78rem; opacity:0.75; }
+      .amx-row { cursor:pointer; transition:background 0.12s; }
+      .amx-row:hover td { background:#eef2ff; }
+      .amx-row:hover .amx-td-name { background:#eef2ff; }
+      .amx-row-open td, .amx-row-open .amx-td-name { background:#e7edff !important; }
+      .amx-cell { font-size:0.8rem; }
+      .amx-tick { color:#34C759; font-weight:800; }
+      .amx-blank { opacity:0.22; }
+      .amx-td-num { font-variant-numeric:tabular-nums; }
+      .amx-foot td { font-weight:700; font-size:0.75rem; opacity:0.7; background:#f7f8fc; border-top:2px solid rgba(0,0,0,0.08); }
+      .amx-foot .amx-td-name { background:#f7f8fc; }
+      .amx-detail-row td { background:#fbfbfe; padding:0; }
+      .amx-detail { padding:16px 18px; border-top:2px solid rgba(0,122,255,0.18); }
+      .amx-detail-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+      .amx-detail-name { font:700 1.1rem/1.2 -apple-system,sans-serif; color:#000036; }
+      .amx-detail-meta { font-size:0.82rem; opacity:0.7; margin-top:3px; }
+      .amx-sub-item { display:flex; align-items:center; gap:10px; padding:8px 10px; border:1px solid rgba(0,0,0,0.05); background:rgba(255,255,255,0.6); border-radius:9px; margin-bottom:6px; font-size:0.84rem; }
+      .amx-sub-item a { color:#007AFF; text-decoration:none; }
+      .amx-sub-item a:hover { text-decoration:underline; }
+      .amx-sub-ex { font-family:ui-monospace,Menlo,monospace; font-size:0.74rem; opacity:0.7; flex-shrink:0; }
+
+      /* dark mode */
+      #view-admin.lms-dark .amx-kpi { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.08); }
+      #view-admin.lms-dark .amx-kpi-val { color:#fff; }
+      #view-admin.lms-dark .amx-search, #view-admin.lms-dark .amx-select, #view-admin.lms-dark .amx-btn { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#f5f5f5; }
+      #view-admin.lms-dark .amx-btn:hover { background:rgba(255,255,255,0.14); }
+      #view-admin.lms-dark .amx-card { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.08); }
+      #view-admin.lms-dark .amx-card-title, #view-admin.lms-dark .amx-detail-name { color:#fff; }
+      #view-admin.lms-dark .amx-table th, #view-admin.lms-dark .amx-table td { border-bottom-color:rgba(255,255,255,0.07); }
+      #view-admin.lms-dark .amx-table thead th, #view-admin.lms-dark .amx-th-name { background:#0a1230 !important; color:#dfe4ff; }
+      #view-admin.lms-dark .amx-td-name { background:#0c1330; color:#f5f5f5; }
+      #view-admin.lms-dark .amx-row:hover td, #view-admin.lms-dark .amx-row:hover .amx-td-name { background:#16204d; }
+      #view-admin.lms-dark .amx-row-open td, #view-admin.lms-dark .amx-row-open .amx-td-name { background:#1b2657 !important; }
+      #view-admin.lms-dark .amx-foot td, #view-admin.lms-dark .amx-foot .amx-td-name { background:#0a1230; }
+      #view-admin.lms-dark .amx-detail-row td { background:#070c22; }
+      #view-admin.lms-dark .amx-sub-item { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.07); }
     </style>
 
     <!-- Enrolled: Tutorial cards (each tutorial = its own card) -->
@@ -2715,9 +2778,184 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   </header>
 
   <!-- Admin content -->
-  <div style="max-width:800px;margin:0 auto;padding:32px 20px;position:relative;z-index:2;">
-    <h1 class="lms-heading" style="margin-bottom:4px;">User Management</h1>
-    <p class="lms-subheading" style="margin-bottom:24px;" x-text="users.length + ' registered user' + (users.length !== 1 ? 's' : '')"></p>
+  <div style="max-width:1240px;margin:0 auto;padding:32px 20px;position:relative;z-index:2;">
+    <h1 class="lms-heading" style="margin-bottom:4px;">Activity &amp; Analytics</h1>
+    <p class="lms-subheading" style="margin-bottom:20px;" x-text="users.length + ' learner' + (users.length !== 1 ? 's' : '') + (matrixLoading ? ' · loading progress…' : '')"></p>
+
+    <!-- KPI cards -->
+    <div class="amx-kpis" x-show="!loading">
+      <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.total"></div><div class="amx-kpi-lab">Learners</div></div>
+      <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.enrolled"></div><div class="amx-kpi-lab">Enrolled</div></div>
+      <div class="amx-kpi"><div class="amx-kpi-val" style="color:#34C759;" x-text="kpis.active7"></div><div class="amx-kpi-lab">Active 7d</div></div>
+      <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.totalLogins"></div><div class="amx-kpi-lab">Total logins</div></div>
+      <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.avgCompletion + '%'"></div><div class="amx-kpi-lab">Avg completion</div></div>
+      <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.submissions"></div><div class="amx-kpi-lab">Submissions</div></div>
+      <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.engaged"></div><div class="amx-kpi-lab">Engaged time</div></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="amx-controls" x-show="!loading">
+      <input type="search" x-model="search" placeholder="Search name, student ID, email…" class="amx-search">
+      <select class="amx-select" x-model="cohortFilter">
+        <option value="">All cohorts</option>
+        <template x-for="c in cohorts" :key="c"><option :value="c" x-text="c"></option></template>
+      </select>
+      <span class="amx-count" x-text="processedUsers.length + ' shown'"></span>
+      <span style="flex:1;"></span>
+      <button class="amx-btn" @click="exportCsv()">⬇ Export CSV</button>
+      <button class="amx-btn" @click="loadUsers()">↻ Refresh</button>
+    </div>
+
+    <!-- Completion matrix -->
+    <div class="amx-card" x-show="!loading && users.length > 0">
+      <div class="amx-card-head">
+        <h2 class="amx-card-title">Completion matrix</h2>
+        <span class="amx-card-sub" x-text="allTutorials.length + ' tutorials · click a row for full detail'"></span>
+      </div>
+      <div class="amx-scroll">
+        <table class="amx-table">
+          <thead>
+            <tr>
+              <th class="amx-sticky amx-th-name" @click="setSort('name')">Learner <span x-show="sortKey==='name'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
+              <th class="amx-th-id" @click="setSort('studentId')">ID</th>
+              <template x-for="t in allTutorials" :key="t.id">
+                <th class="amx-th-tut" :title="t.title"><span x-text="t.icon || '•'"></span></th>
+              </template>
+              <th class="amx-th-num" @click="setSort('completion')">% <span x-show="sortKey==='completion'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
+              <th class="amx-th-num" @click="setSort('logins')">Logins <span x-show="sortKey==='logins'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
+              <th class="amx-th-num" @click="setSort('engaged')">Engaged <span x-show="sortKey==='engaged'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
+              <th class="amx-th-num" @click="setSort('lastSeen')">Last active <span x-show="sortKey==='lastSeen'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
+              <th class="amx-th-num" @click="setSort('submissions')">Subs <span x-show="sortKey==='submissions'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
+            </tr>
+          </thead>
+            <template x-for="u in processedUsers" :key="u.id">
+            <tbody class="amx-ubody">
+              <tr class="amx-row" :class="expandedUser === u.id ? 'amx-row-open' : ''" @click="toggleDetail(u)">
+                <td class="amx-sticky amx-td-name">
+                  <span class="amx-dot" :style="'background:' + (u.enrolled ? '#34C759' : 'rgba(142,142,147,0.5)')"></span>
+                  <span class="amx-name" x-text="displayName(u)"></span>
+                </td>
+                <td class="amx-td-id" x-text="u.studentId || '—'"></td>
+                <template x-for="t in allTutorials" :key="t.id">
+                  <td class="amx-cell">
+                    <span x-show="completionInfo(u.id, t.id)" class="amx-tick" :title="formatDateTime(completionInfo(u.id, t.id) && completionInfo(u.id, t.id).completedAt)">✓</span>
+                    <span x-show="!completionInfo(u.id, t.id)" class="amx-blank">·</span>
+                  </td>
+                </template>
+                <td class="amx-td-num"><strong x-text="userCompletionPct(u) + '%'"></strong></td>
+                <td class="amx-td-num" x-text="u.loginCount || 0"></td>
+                <td class="amx-td-num" x-text="engagedLabel(u.totalEngagedMs)"></td>
+                <td class="amx-td-num" x-text="relativeLast(u)"></td>
+                <td class="amx-td-num" x-text="userSubmissionCount(u)"></td>
+              </tr>
+              <tr x-show="expandedUser === u.id" class="amx-detail-row">
+                <td colspan="99" style="padding:0;">
+                  <div class="amx-detail" :class="darkMode ? 'admin-detail-dark' : ''">
+                    <div x-show="detailLoading" style="padding:16px 0;text-align:center;"><p style="font-size:0.85rem;opacity:0.5;">Loading user data…</p></div>
+                    <div x-show="!detailLoading">
+
+                      <!-- Identity + enrolment -->
+                      <div class="amx-detail-head">
+                        <div>
+                          <div class="amx-detail-name" x-text="displayName(u)"></div>
+                          <div class="amx-detail-meta">
+                            <span x-show="u.studentId" x-text="'NCI ' + u.studentId"></span>
+                            <span x-show="u.cohort" x-text="' · ' + u.cohort"></span>
+                            <span x-show="u.programme" x-text="' · ' + u.programme"></span>
+                            <span x-show="u.email" x-text="' · ' + u.email"></span>
+                          </div>
+                          <div class="amx-detail-meta" style="opacity:0.55;" x-show="u.enrolmentSource" x-text="'Source: ' + u.enrolmentSource + (u.accessRequested ? ' (self-registered)' : '')"></div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                          <span style="font-size:0.78rem;font-weight:600;" :style="'color:' + (u.enrolled ? '#34C759' : 'rgba(142,142,147,0.9)')" x-text="u.enrolled ? 'Enrolled' : 'Pending'"></span>
+                          <button class="admin-toggle" :class="u.enrolled ? 'admin-toggle-on' : ''" @click.stop="toggleEnrolled(u)" :disabled="u.toggling"><span class="admin-toggle-knob"></span></button>
+                        </div>
+                      </div>
+
+                      <!-- Quick stats -->
+                      <div class="admin-stat-row" style="margin-top:12px;">
+                        <div class="admin-stat"><div class="admin-stat-label">Completion</div><div class="admin-stat-value" x-text="userCompletionPct(u) + '%'"></div></div>
+                        <div class="admin-stat"><div class="admin-stat-label">Tutorials</div><div class="admin-stat-value" x-text="userDoneCount(u) + '/' + allTutorials.length"></div></div>
+                        <div class="admin-stat"><div class="admin-stat-label">Logins</div><div class="admin-stat-value" x-text="u.loginCount || (detailData.logins ? detailData.logins.length : 0)"></div></div>
+                        <div class="admin-stat"><div class="admin-stat-label">Engaged</div><div class="admin-stat-value" style="font-size:0.95rem;" x-text="engagedLabel(u.totalEngagedMs)"></div></div>
+                        <div class="admin-stat"><div class="admin-stat-label">Last active</div><div class="admin-stat-value" style="font-size:0.85rem;" x-text="relativeLast(u)"></div></div>
+                        <div class="admin-stat"><div class="admin-stat-label">Submissions</div><div class="admin-stat-value" x-text="userSubmissionCount(u)"></div></div>
+                      </div>
+
+                      <!-- Submissions -->
+                      <div class="admin-detail-section">
+                        <div class="admin-detail-title">Submissions</div>
+                        <template x-if="userSubmissions(u).length === 0"><p class="admin-detail-empty">No submissions yet.</p></template>
+                        <template x-for="s in userSubmissions(u)" :key="s.id">
+                          <div class="amx-sub-item">
+                            <span class="amx-sub-ex" x-text="s.exerciseId || s.id"></span>
+                            <a :href="s.value" target="_blank" rel="noopener" x-text="s.value" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;"></a>
+                            <span class="admin-assessment-meta" x-text="formatDateTime(s.submittedAt)"></span>
+                          </div>
+                        </template>
+                      </div>
+
+                      <!-- Tutorial progress -->
+                      <div class="admin-detail-section">
+                        <div class="admin-detail-title">Tutorial Progress</div>
+                        <template x-for="tut in allTutorials" :key="tut.id">
+                          <div class="admin-tut-row">
+                            <div class="admin-tut-check" :class="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completed ? 'done' : ''">
+                              <template x-if="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completed">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                              </template>
+                            </div>
+                            <span x-text="tut.title" style="flex:1;"></span>
+                            <span class="admin-assessment-meta" x-text="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completedAt ? formatDateTime(detailData.tutorials[tut.id].completedAt) : ''"></span>
+                          </div>
+                        </template>
+                      </div>
+
+                      <!-- Login history -->
+                      <div class="admin-detail-section">
+                        <div class="admin-detail-title">Login History</div>
+                        <template x-if="!detailData.logins || detailData.logins.length === 0"><p class="admin-detail-empty">No login records yet.</p></template>
+                        <template x-for="login in (detailData.logins || [])" :key="login.id">
+                          <div class="admin-login-row" x-text="formatDateTime(login.timestamp)"></div>
+                        </template>
+                      </div>
+
+                      <!-- Explorer / assessment history -->
+                      <div class="admin-detail-section">
+                        <div class="admin-detail-title">Explorer &amp; Assessment History</div>
+                        <template x-if="!detailData.assessments || detailData.assessments.length === 0"><p class="admin-detail-empty">No assessments taken yet.</p></template>
+                        <template x-for="a in (detailData.assessments || [])" :key="a.id">
+                          <div class="admin-assessment">
+                            <div class="admin-assessment-header">
+                              <div>
+                                <span class="admin-assessment-score" :style="'color:' + tierColor(a.score)" x-text="a.score + '%'"></span>
+                                <span style="font-size:0.82rem;font-weight:500;margin-left:6px;" x-text="a.tier || ''"></span>
+                              </div>
+                              <span class="admin-assessment-meta" x-text="formatDateTime(a.completedAt)"></span>
+                            </div>
+                          </div>
+                        </template>
+                      </div>
+
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            </template>
+          <tbody>
+            <tr class="amx-foot">
+              <td class="amx-sticky amx-td-name">Completed</td>
+              <td></td>
+              <template x-for="t in allTutorials" :key="t.id">
+                <td class="amx-cell" x-text="tutorialDoneCount(t.id)"></td>
+              </template>
+              <td colspan="5"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- Exercise submissions (all users) -->
     <div class="admin-subs-card">
@@ -2770,128 +3008,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <p style="color:#FF3B30;font-weight:500;" x-text="error"></p>
     </div>
 
-    <!-- User list -->
-    <div x-show="!loading && users.length > 0" style="display:flex;flex-direction:column;gap:1px;border-radius:14px;overflow:hidden;">
-      <template x-for="u in users" :key="u.id">
-        <div>
-          <div class="admin-user-row" :class="darkMode ? 'admin-user-row-dark' : ''" @click="toggleDetail(u)">
-            <div style="flex:1;min-width:0;">
-              <p style="font-weight:600;font-size:0.95rem;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="u.email"></p>
-              <p style="font-size:0.8rem;margin:4px 0 0;opacity:0.5;" x-text="'Signed up: ' + formatDate(u.createdAt)"></p>
-            <p style="font-size:0.7rem;margin:2px 0 0;opacity:0.3;font-family:monospace;" x-text="'UID: ' + u.id"></p>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-              <span style="font-size:0.8rem;font-weight:500;"
-                    :style="'color:' + (u.enrolled ? '#34C759' : 'rgba(142,142,147,0.8)')"
-                    x-text="u.enrolled ? 'Enrolled' : 'Pending'"></span>
-              <button class="admin-toggle" :class="u.enrolled ? 'admin-toggle-on' : ''"
-                      @click.stop="toggleEnrolled(u)"
-                      :disabled="u.toggling">
-                <span class="admin-toggle-knob"></span>
-              </button>
-              <svg :style="'transform:rotate(' + (expandedUser === u.id ? '90' : '0') + 'deg);transition:transform 0.2s'" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
-            </div>
-          </div>
-
-          <!-- Expandable detail panel -->
-          <div x-show="expandedUser === u.id" x-collapse class="admin-detail" :class="darkMode ? 'admin-detail-dark' : ''">
-
-            <!-- Loading -->
-            <div x-show="detailLoading" style="padding:16px 0;text-align:center;">
-              <p style="font-size:0.85rem;opacity:0.5;">Loading user data...</p>
-            </div>
-
-            <div x-show="!detailLoading">
-
-              <!-- Quick stats -->
-              <div class="admin-stat-row" style="margin-top:12px;">
-                <div class="admin-stat">
-                  <div class="admin-stat-label">Assessments</div>
-                  <div class="admin-stat-value" x-text="detailData.assessments ? detailData.assessments.length : 0"></div>
-                </div>
-                <div class="admin-stat">
-                  <div class="admin-stat-label">Tutorials Done</div>
-                  <div class="admin-stat-value" x-text="detailData.tutorialsDone || 0"></div>
-                </div>
-                <div class="admin-stat">
-                  <div class="admin-stat-label">Total Logins</div>
-                  <div class="admin-stat-value" x-text="detailData.logins ? detailData.logins.length : 0"></div>
-                </div>
-                <div class="admin-stat">
-                  <div class="admin-stat-label">Last Active</div>
-                  <div class="admin-stat-value" style="font-size:0.85rem;" x-text="formatDate(u.lastActiveAt)"></div>
-                </div>
-              </div>
-
-              <!-- Assessment History -->
-              <div class="admin-detail-section">
-                <div class="admin-detail-title">Assessment History</div>
-                <template x-if="!detailData.assessments || detailData.assessments.length === 0">
-                  <p class="admin-detail-empty">No assessments taken yet.</p>
-                </template>
-                <template x-for="a in (detailData.assessments || [])" :key="a.id">
-                  <div class="admin-assessment">
-                    <div class="admin-assessment-header">
-                      <div>
-                        <span class="admin-assessment-score" :style="'color:' + tierColor(a.score)" x-text="a.score + '%'"></span>
-                        <span style="font-size:0.82rem;font-weight:500;margin-left:6px;" x-text="a.tier || ''"></span>
-                      </div>
-                      <span class="admin-assessment-meta" x-text="formatDateTime(a.completedAt)"></span>
-                    </div>
-                    <div class="admin-dim-grid">
-                      <template x-for="dim in dimensionList" :key="dim.key">
-                        <div class="admin-dim-row">
-                          <span class="admin-dim-label" x-text="dim.label"></span>
-                          <div class="admin-dim-bar">
-                            <div class="admin-dim-fill" :style="'width:' + ((a.scores && a.scores[dim.key]) || 0) + '%;background:' + tierColor((a.scores && a.scores[dim.key]) || 0)"></div>
-                          </div>
-                          <span class="admin-dim-val" x-text="(a.scores && a.scores[dim.key]) || 0"></span>
-                        </div>
-                      </template>
-                    </div>
-                  </div>
-                </template>
-              </div>
-
-              <!-- Tutorial Completions -->
-              <div class="admin-detail-section">
-                <div class="admin-detail-title">Tutorial Progress</div>
-                <template x-if="!detailData.tutorials || Object.keys(detailData.tutorials).length === 0">
-                  <p class="admin-detail-empty">No tutorials completed yet.</p>
-                </template>
-                <template x-for="tut in allTutorials" :key="tut.id">
-                  <div class="admin-tut-row">
-                    <div class="admin-tut-check" :class="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completed ? 'done' : ''">
-                      <template x-if="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completed">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                      </template>
-                    </div>
-                    <span x-text="tut.title" style="flex:1;"></span>
-                    <span class="admin-assessment-meta" x-text="detailData.tutorials && detailData.tutorials[tut.id] && detailData.tutorials[tut.id].completedAt ? formatDateTime(detailData.tutorials[tut.id].completedAt) : ''"></span>
-                  </div>
-                </template>
-              </div>
-
-              <!-- Login History -->
-              <div class="admin-detail-section">
-                <div class="admin-detail-title">Login History</div>
-                <template x-if="!detailData.logins || detailData.logins.length === 0">
-                  <p class="admin-detail-empty">No login records yet.</p>
-                </template>
-                <template x-if="detailData.logins && detailData.logins.length > 0">
-                  <div>
-                    <template x-for="login in detailData.logins" :key="login.id">
-                      <div class="admin-login-row" x-text="formatDateTime(login.timestamp)"></div>
-                    </template>
-                  </div>
-                </template>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </template>
-    </div>
+    <!-- (Per-learner detail now lives inline inside the completion matrix above.) -->
 
     <!-- Empty state -->
     <div x-show="!loading && users.length === 0 && !error" style="text-align:center;padding:60px 0;">
@@ -2899,10 +3016,6 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <p class="lms-subheading">No users have signed up yet.</p>
     </div>
 
-    <!-- Refresh button -->
-    <div x-show="!loading" style="text-align:center;margin-top:24px;">
-      <button @click="loadUsers()" style="font-size:0.85rem;font-weight:500;color:#007AFF;background:none;border:none;cursor:pointer;padding:8px 16px;">Refresh</button>
-    </div>
   </div>
 </div>
 
@@ -3622,9 +3735,11 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         }
         auth.setProfile(profile || {});
         Alpine.store('ui').closeModal();
+        try { if (typeof startEngagementHeartbeat === 'function') startEngagementHeartbeat(user.uid); } catch (e) {}
       } else {
         auth.setUser(null);
         auth.setProfile(null);
+        try { if (typeof stopEngagementHeartbeat === 'function') stopEngagementHeartbeat(); } catch (e) {}
       }
       auth.setLoading(false);
       route();
@@ -3692,6 +3807,12 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       submissionsLoading: false,
       submissionsError: null,
       submissionFilter: '',
+      completionsByUid: {},
+      matrixLoading: false,
+      search: '',
+      cohortFilter: '',
+      sortKey: 'lastSeen',
+      sortDir: 'desc',
       dimensionList: [
         { key: 'aiFoundations', label: 'AI Foundations' },
         { key: 'criticalEvaluation', label: 'Critical Evaluation' },
@@ -3774,6 +3895,17 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           this.error = 'Failed to load users: ' + e.message;
         }
         this.loading = false;
+        if (this.users.length) this.loadMatrix();
+      },
+      async loadMatrix() {
+        this.matrixLoading = true;
+        try {
+          var ids = this.users.map(function(u) { return u.id; });
+          this.completionsByUid = await getAdminAllTutorialCompletions(ids);
+        } catch (e) {
+          console.warn('loadMatrix:', e.message);
+        }
+        this.matrixLoading = false;
       },
       async toggleDetail(u) {
         if (this.expandedUser === u.id) {
@@ -3818,6 +3950,160 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           console.error('Toggle failed:', e);
           this.error = 'Failed: ' + e.message;
         }
+      },
+
+      // ---------- Analytics helpers ----------
+      _toDate(ts) { if (!ts) return null; try { return ts.toDate ? ts.toDate() : new Date(ts); } catch (e) { return null; } },
+      lastSeenDate(u) { return this._toDate(u.lastSeenAt) || this._toDate(u.lastActiveAt) || this._toDate(u.lastLoginAt); },
+      isActive7d(u) {
+        var d = this.lastSeenDate(u);
+        return d ? (Date.now() - d.getTime()) < 7 * 24 * 3600 * 1000 : false;
+      },
+      completionInfo(uid, tutId) {
+        var c = this.completionsByUid[uid];
+        return c && c[tutId] && c[tutId].completed ? c[tutId] : null;
+      },
+      userDoneCount(u) {
+        var c = this.completionsByUid[u.id] || {};
+        var n = 0; var self = this;
+        this.allTutorials.forEach(function(t) { if (c[t.id] && c[t.id].completed) n++; });
+        return n;
+      },
+      userCompletionPct(u) {
+        var total = this.allTutorials.length || 1;
+        return Math.round(this.userDoneCount(u) / total * 100);
+      },
+      userSubmissions(u) {
+        var list = this.submissions.filter(function(s) { return s.userId === u.id; });
+        return list.slice().sort(function(a, b) {
+          var da = a.submittedAt && a.submittedAt.toDate ? a.submittedAt.toDate().getTime() : 0;
+          var db2 = b.submittedAt && b.submittedAt.toDate ? b.submittedAt.toDate().getTime() : 0;
+          return db2 - da;
+        });
+      },
+      userSubmissionCount(u) {
+        var id = u.id;
+        return this.submissions.filter(function(s) { return s.userId === id; }).length;
+      },
+      engagedLabel(ms) {
+        ms = ms || 0;
+        if (ms < 60000) return ms > 0 ? '<1m' : '—';
+        var mins = Math.round(ms / 60000);
+        if (mins < 60) return mins + 'm';
+        var h = Math.floor(mins / 60); var m = mins % 60;
+        return h + 'h' + (m ? ' ' + m + 'm' : '');
+      },
+      relativeLast(u) {
+        var d = this.lastSeenDate(u);
+        if (!d) return '—';
+        var diff = Date.now() - d.getTime();
+        var mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'now';
+        if (mins < 60) return mins + 'm ago';
+        var h = Math.floor(mins / 60);
+        if (h < 24) return h + 'h ago';
+        var days = Math.floor(h / 24);
+        if (days < 30) return days + 'd ago';
+        return this.formatDate(u.lastSeenAt || u.lastActiveAt || u.lastLoginAt);
+      },
+      displayName(u) { return u.fullName || u.displayName || (u.firstName ? u.firstName : '') || u.email || '(unknown)'; },
+      get cohorts() {
+        var set = {};
+        this.users.forEach(function(u) { if (u.cohort) set[u.cohort] = true; });
+        return Object.keys(set).sort();
+      },
+      setSort(key) {
+        if (this.sortKey === key) { this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc'; }
+        else { this.sortKey = key; this.sortDir = (key === 'name' || key === 'studentId' || key === 'cohort') ? 'asc' : 'desc'; }
+      },
+      get processedUsers() {
+        var self = this;
+        var q = (this.search || '').trim().toLowerCase();
+        var cf = this.cohortFilter;
+        var rows = this.users.filter(function(u) {
+          if (cf && u.cohort !== cf) return false;
+          if (!q) return true;
+          var hay = ((self.displayName(u)) + ' ' + (u.studentId || '') + ' ' + (u.email || '') + ' ' + (u.cohort || '')).toLowerCase();
+          return hay.indexOf(q) !== -1;
+        });
+        var dir = this.sortDir === 'asc' ? 1 : -1;
+        var key = this.sortKey;
+        rows = rows.slice().sort(function(a, b) {
+          var va, vb;
+          switch (key) {
+            case 'name': va = self.displayName(a).toLowerCase(); vb = self.displayName(b).toLowerCase(); break;
+            case 'studentId': va = a.studentId || ''; vb = b.studentId || ''; break;
+            case 'cohort': va = a.cohort || ''; vb = b.cohort || ''; break;
+            case 'completion': va = self.userCompletionPct(a); vb = self.userCompletionPct(b); break;
+            case 'logins': va = a.loginCount || 0; vb = b.loginCount || 0; break;
+            case 'engaged': va = a.totalEngagedMs || 0; vb = b.totalEngagedMs || 0; break;
+            case 'submissions': va = self.userSubmissionCount(a); vb = self.userSubmissionCount(b); break;
+            case 'lastSeen': default:
+              va = self.lastSeenDate(a) ? self.lastSeenDate(a).getTime() : 0;
+              vb = self.lastSeenDate(b) ? self.lastSeenDate(b).getTime() : 0;
+              break;
+          }
+          if (va < vb) return -1 * dir;
+          if (va > vb) return 1 * dir;
+          return 0;
+        });
+        return rows;
+      },
+      get kpis() {
+        var self = this;
+        var us = this.users;
+        var enrolled = us.filter(function(u) { return u.enrolled === true; }).length;
+        var active7 = us.filter(function(u) { return self.isActive7d(u); }).length;
+        var totalLogins = us.reduce(function(s, u) { return s + (u.loginCount || 0); }, 0);
+        var totalEngaged = us.reduce(function(s, u) { return s + (u.totalEngagedMs || 0); }, 0);
+        var pctSum = us.reduce(function(s, u) { return s + self.userCompletionPct(u); }, 0);
+        var avgPct = us.length ? Math.round(pctSum / us.length) : 0;
+        return {
+          total: us.length,
+          enrolled: enrolled,
+          active7: active7,
+          totalLogins: totalLogins,
+          avgCompletion: avgPct,
+          submissions: this.submissions.length,
+          engaged: this.engagedLabel(totalEngaged)
+        };
+      },
+      tutorialDoneCount(tutId) {
+        var self = this;
+        return this.users.reduce(function(n, u) {
+          var c = self.completionsByUid[u.id];
+          return n + (c && c[tutId] && c[tutId].completed ? 1 : 0);
+        }, 0);
+      },
+      exportCsv() {
+        var self = this;
+        var headers = ['Name', 'Student ID', 'Email', 'Cohort', 'Programme', 'Enrolled', 'Logins', 'Engaged (min)', 'Last active', 'Completion %', 'Tutorials done', 'Submissions'];
+        var tutTitles = this.allTutorials.map(function(t) { return t.title; });
+        headers = headers.concat(tutTitles);
+        var esc = function(v) { v = (v === null || v === undefined) ? '' : String(v); return '"' + v.replace(/"/g, '""') + '"'; };
+        var lines = [headers.map(esc).join(',')];
+        this.processedUsers.forEach(function(u) {
+          var d = self.lastSeenDate(u);
+          var row = [
+            self.displayName(u), u.studentId || '', u.email || '', u.cohort || '', u.programme || '',
+            u.enrolled ? 'yes' : 'no', u.loginCount || 0,
+            Math.round((u.totalEngagedMs || 0) / 60000),
+            d ? d.toISOString() : '', self.userCompletionPct(u), self.userDoneCount(u), self.userSubmissionCount(u)
+          ];
+          self.allTutorials.forEach(function(t) {
+            var info = self.completionInfo(u.id, t.id);
+            var when = info && info.completedAt && info.completedAt.toDate ? info.completedAt.toDate().toISOString().slice(0, 10) : (info ? 'done' : '');
+            row.push(when);
+          });
+          lines.push(row.map(esc).join(','));
+        });
+        var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'aibadge-analytics-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
       },
       tierColor(score) {
         if (score >= 80) return '#34C759';
