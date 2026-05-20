@@ -30,8 +30,14 @@ function initFirebase() {
   auth = firebase.auth();
   db = firebase.firestore();
 
-  // Persistence disabled: was causing IndexedDB hangs that blocked
-  // both sign-in and assessment saves for users with multiple tabs.
+  // Keep users signed in across visits. LOCAL persistence survives a full
+  // browser restart, so a returning NCI student only re-enters email + code
+  // if they explicitly signed out. (Default is already LOCAL; set explicitly
+  // so a future SDK default change can't silently log everyone out.)
+  try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { /* ignore */ }
+
+  // Firestore offline persistence stays disabled: it was causing IndexedDB
+  // hangs that blocked both sign-in and assessment saves for multi-tab users.
 }
 
 /* --------------------------------------------------------------------------
@@ -176,6 +182,103 @@ function isValidNciClassCode(code) {
   return NCI_CLASS_CODES.some(v => v.toUpperCase() === c);
 }
 
+/* --------------------------------------------------------------------------
+   NCI cohort allow-list (the official class roster).
+   Only emails on this list get instant access via the class-code path.
+   Everyone else with a valid @ncirl.ie / @student.ncirl.ie address must
+   self-register through the request-access flow (registerNciAccessRequest).
+   To add/remove a student, edit this object and redeploy (git push).
+   -------------------------------------------------------------------------- */
+const NCI_ROSTER = {
+  "x25115880@student.ncirl.ie": { firstName: "Obafemi", fullName: "Obafemi Akin-Laguda", studentId: "25115880", cohort: "PGDAIBUS_SEP" },
+  "x24137561@student.ncirl.ie": { firstName: "Luan", fullName: "Luan Carlos Amaral Sandes", studentId: "24137561", cohort: "PGDAIBUS_SEP" },
+  "x25130757@student.ncirl.ie": { firstName: "Andres", fullName: "Andres Arguello Pitt", studentId: "25130757", cohort: "PGDAIBUS_SEP" },
+  "x25123238@student.ncirl.ie": { firstName: "Fuat", fullName: "Fuat Aygin", studentId: "25123238", cohort: "PGDAIBUS_SEP" },
+  "x25115774@student.ncirl.ie": { firstName: "Namir", fullName: "Namir Ben", studentId: "25115774", cohort: "PGDAIBUS_SEP" },
+  "x25120085@student.ncirl.ie": { firstName: "Tom", fullName: "Tom Crotty", studentId: "25120085", cohort: "PGDAIBUS_SEP" },
+  "x20216114@student.ncirl.ie": { firstName: "Frank", fullName: "Frank Devins", studentId: "20216114", cohort: "PGDAIBUS_SEP" },
+  "x25134621@student.ncirl.ie": { firstName: "Ross", fullName: "Ross Doherty", studentId: "25134621", cohort: "PGDAIBUS_SEP" },
+  "x25130749@student.ncirl.ie": { firstName: "Brendan", fullName: "Brendan Dolan", studentId: "25130749", cohort: "PGDAIBUS_SEP" },
+  "x17166080@student.ncirl.ie": { firstName: "Paula", fullName: "Paula Dowling", studentId: "17166080", cohort: "PGDAIBUS_SEP" },
+  "x25134680@student.ncirl.ie": { firstName: "Sara", fullName: "Sara Eltayeb", studentId: "25134680", cohort: "PGDAIBUS_SEP" },
+  "x20180861@student.ncirl.ie": { firstName: "Laura", fullName: "Laura Ferreira Motta", studentId: "20180861", cohort: "PGDAIBUS_SEP" },
+  "x24132292@student.ncirl.ie": { firstName: "Mark", fullName: "Mark Galvin", studentId: "24132292", cohort: "PGDAIBUS_SEP" },
+  "x15001725@student.ncirl.ie": { firstName: "William", fullName: "William Ho", studentId: "15001725", cohort: "PGDAIBUS_SEP" },
+  "x25125133@student.ncirl.ie": { firstName: "Jasson", fullName: "Jasson Ji", studentId: "25125133", cohort: "PGDAIBUS_SEP" },
+  "x25123114@student.ncirl.ie": { firstName: "Ganesh", fullName: "Ganesh Karnambakkam Babu", studentId: "25123114", cohort: "PGDAIBUS_SEP" },
+  "x25155237@student.ncirl.ie": { firstName: "Daniel", fullName: "Daniel Kelly", studentId: "25155237", cohort: "PGDAIBUS_SEP" },
+  "x25132644@student.ncirl.ie": { firstName: "Ozgul", fullName: "Ozgul Kilinc", studentId: "25132644", cohort: "PGDAIBUS_SEP" },
+  "x25118447@student.ncirl.ie": { firstName: "Amay", fullName: "Amay Kumar", studentId: "25118447", cohort: "PGDAIBUS_SEP" },
+  "x25159704@student.ncirl.ie": { firstName: "Vinod", fullName: "Vinod Madan", studentId: "25159704", cohort: "PGDAIBUS_SEP" },
+  "x17115949@student.ncirl.ie": { firstName: "Kevin", fullName: "Kevin Mccarthy", studentId: "17115949", cohort: "PGDAIBUS_SEP" },
+  "x25146041@student.ncirl.ie": { firstName: "John", fullName: "John O Callaghan", studentId: "25146041", cohort: "PGDAIBUS_SEP" },
+  "x25140094@student.ncirl.ie": { firstName: "Manus", fullName: "Manus Ó Dálaigh", studentId: "25140094", cohort: "PGDAIBUS_SEP" },
+  "x25126466@student.ncirl.ie": { firstName: "Elizabeth", fullName: "Elizabeth Oladipo", studentId: "25126466", cohort: "PGDAIBUS_SEP" },
+  "x25115839@student.ncirl.ie": { firstName: "Diana", fullName: "Diana Parau", studentId: "25115839", cohort: "PGDAIBUS_SEP" },
+  "x25113160@student.ncirl.ie": { firstName: "Fabio", fullName: "Fabio Poli", studentId: "25113160", cohort: "PGDAIBUS_SEP" },
+  "x25113046@student.ncirl.ie": { firstName: "Pedro", fullName: "Pedro Queiroga", studentId: "25113046", cohort: "PGDAIBUS_SEP" },
+  "x25115871@student.ncirl.ie": { firstName: "Syamalarao", fullName: "Syamalarao Rakoti", studentId: "25115871", cohort: "PGDAIBUS_SEP" },
+  "x25119371@student.ncirl.ie": { firstName: "Nagarajan", fullName: "Nagarajan Ramu", studentId: "25119371", cohort: "PGDAIBUS_SEP" },
+  "x25134655@student.ncirl.ie": { firstName: "Rohith", fullName: "Rohith Ray", studentId: "25134655", cohort: "PGDAIBUS_SEP" },
+  "x25111485@student.ncirl.ie": { firstName: "Naomi", fullName: "Naomi Del Carmen Santana Sosa", studentId: "25111485", cohort: "PGDAIBUS_SEP" },
+  "x25128442@student.ncirl.ie": { firstName: "Nadiya", fullName: "Nadiya Sydorenko", studentId: "25128442", cohort: "PGDAIBUS_SEP" },
+  "x25137972@student.ncirl.ie": { firstName: "Sebastian", fullName: "Sebastian Thim", studentId: "25137972", cohort: "PGDAIBUS_SEP" },
+  "x24323870@student.ncirl.ie": { firstName: "Rashmi", fullName: "Rashmi Belimagga Shetty Manjunath", studentId: "24323870", cohort: "MSCAIBUSJAN26I" },
+  "x25104403@student.ncirl.ie": { firstName: "Aleyna", fullName: "Aleyna Eski", studentId: "25104403", cohort: "MSCAIBUSJAN26I" },
+  "x25155717@student.ncirl.ie": { firstName: "Chris", fullName: "Chris Crasto Gomes", studentId: "25155717", cohort: "MSCAIBUSJAN26I" },
+  "x24160873@student.ncirl.ie": { firstName: "Axel", fullName: "Axel Adewale Ilenre", studentId: "24160873", cohort: "MSCAIBUSJAN26I" },
+  "x25211013@student.ncirl.ie": { firstName: "Navera", fullName: "Navera Fatima Kurnool", studentId: "25211013", cohort: "MSCAIBUSJAN26I" },
+  "x24266213@student.ncirl.ie": { firstName: "Dnyanesh", fullName: "Dnyanesh Kailas Mali", studentId: "24266213", cohort: "MSCAIBUSJAN26I" },
+  "x25161474@student.ncirl.ie": { firstName: "Onyinyechi", fullName: "Onyinyechi Miracle Obodoeze", studentId: "25161474", cohort: "MSCAIBUSJAN26I" },
+  "x25128558@student.ncirl.ie": { firstName: "Darshankumar", fullName: "Darshankumar Sureshbhai Savaj", studentId: "25128558", cohort: "MSCAIBUSJAN26I" },
+  "x25236482@student.ncirl.ie": { firstName: "Giovanni", fullName: "Giovanni Sottana", studentId: "25236482", cohort: "MSCAIBUSJAN26I" },
+  "x25145924@student.ncirl.ie": { firstName: "Cathal", fullName: "Cathal Wall", studentId: "25145924", cohort: "MSCAIBUSJAN26I" },
+  "x25200992@student.ncirl.ie": { firstName: "Puneet", fullName: "Puneet Warathe", studentId: "25200992", cohort: "MSCAIBUSJAN26I" },
+  "x25205048@student.ncirl.ie": { firstName: "Saw", fullName: "Saw Yamin Thwe", studentId: "25205048", cohort: "MSCAIBUSJAN26I" },
+  "x00341506@student.ncirl.ie": { firstName: "Manuel", fullName: "Manuel Ahumada", studentId: "00341506", cohort: "MSCAIBUSJAN26I" }
+};
+
+function getNciRosterEntry(email) {
+  const e = String(email || "").trim().toLowerCase();
+  return NCI_ROSTER[e] || null;
+}
+
+// NCI student emails look like x25115880@student.ncirl.ie. Pull the digits so
+// self-registered students (not on the roster) still get an ID in the navbar.
+function deriveStudentIdFromEmail(email) {
+  const local = String(email || "").trim().toLowerCase().split("@")[0];
+  const m = local.match(/^x?(\d{5,})$/);
+  return m ? m[1] : "";
+}
+
+// Per-device "have we greeted this email before" flag. Drives Welcome vs
+// Welcome back without depending on a Firestore read race at sign-in.
+function nciMarkSeenReturnFirstTime(email) {
+  try {
+    const k = "aibadge.nci.seen." + String(email || "").trim().toLowerCase();
+    const seen = window.localStorage.getItem(k);
+    window.localStorage.setItem(k, "1");
+    return !seen;
+  } catch (e) { return false; }
+}
+
+// Sign in (or create) the shared NCI account for an email. Throws on real errors.
+async function _nciAuthenticate(target) {
+  try {
+    return await auth.signInWithEmailAndPassword(target, NCI_FREE_ACCESS_PASSWORD);
+  } catch (signInErr) {
+    if (signInErr.code === "auth/user-not-found"
+        || signInErr.code === "auth/invalid-credential"
+        || signInErr.code === "auth/wrong-password") {
+      return await auth.createUserWithEmailAndPassword(target, NCI_FREE_ACCESS_PASSWORD);
+    }
+    throw signInErr;
+  }
+}
+
+// Class-code path: ONLY roster students get in here. Non-roster NCI emails
+// are bounced back with { notOnRoster: true } so the UI can offer the
+// request-access registration flow.
 async function signInOrCreateNciFreeAccount(email, classCode) {
   initFirebase();
   const target = String(email || "").trim().toLowerCase();
@@ -185,21 +288,19 @@ async function signInOrCreateNciFreeAccount(email, classCode) {
   if (!isValidNciClassCode(classCode)) {
     return { success: false, error: "That class code isn't right. Ask Victor for the current code." };
   }
+  const entry = getNciRosterEntry(target);
+  if (!entry) {
+    return {
+      success: false,
+      notOnRoster: true,
+      error: "We couldn't find your student email on the class list."
+    };
+  }
   let credential;
   try {
-    credential = await auth.signInWithEmailAndPassword(target, NCI_FREE_ACCESS_PASSWORD);
-  } catch (signInErr) {
-    if (signInErr.code === "auth/user-not-found"
-        || signInErr.code === "auth/invalid-credential"
-        || signInErr.code === "auth/wrong-password") {
-      try {
-        credential = await auth.createUserWithEmailAndPassword(target, NCI_FREE_ACCESS_PASSWORD);
-      } catch (createErr) {
-        return { success: false, error: _friendlyAuthError(createErr) };
-      }
-    } else {
-      return { success: false, error: _friendlyAuthError(signInErr) };
-    }
+    credential = await _nciAuthenticate(target);
+  } catch (err) {
+    return { success: false, error: _friendlyAuthError(err) };
   }
   await updateLastActive(credential.user.uid);
   logLogin(credential.user.uid);
@@ -208,10 +309,67 @@ async function signInOrCreateNciFreeAccount(email, classCode) {
       email: credential.user.email,
       enrolled: true,
       enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
-      enrolmentSource: "nci-class-code",
-      classCode: String(classCode || "").trim().toUpperCase()
+      enrolmentSource: "nci-roster",
+      classCode: String(classCode || "").trim().toUpperCase(),
+      firstName: entry.firstName,
+      fullName: entry.fullName,
+      displayName: entry.fullName,
+      studentId: entry.studentId,
+      cohort: entry.cohort,
+      onRoster: true
     });
-  } catch (e) { console.warn("NCI auto-enrol write failed:", e); }
+  } catch (e) { console.warn("NCI roster enrol write failed:", e); }
+  return { success: true, user: credential.user };
+}
+
+// Request-access path: a valid NCI email NOT on the roster self-registers
+// (first name, surname, class, programme, email confirmation) with the class
+// code in lieu of a password. Saved to the users database and granted access
+// immediately. Flagged onRoster:false / accessRequested:true so Victor can see
+// who self-enrolled in /#/admin.
+async function registerNciAccessRequest(opts) {
+  initFirebase();
+  opts = opts || {};
+  const target = String(opts.email || "").trim().toLowerCase();
+  if (!isNciEmail(target)) {
+    return { success: false, error: "Access requests are only for @ncirl.ie or @student.ncirl.ie addresses." };
+  }
+  if (!isValidNciClassCode(opts.classCode)) {
+    return { success: false, error: "That class code isn't right. Ask Victor for the current code." };
+  }
+  const firstName = String(opts.firstName || "").trim();
+  const surname = String(opts.surname || "").trim();
+  if (!firstName || !surname) {
+    return { success: false, error: "Please enter your first name and surname." };
+  }
+  const fullName = (firstName + " " + surname).replace(/\s+/g, " ").trim();
+  let credential;
+  try {
+    credential = await _nciAuthenticate(target);
+  } catch (err) {
+    return { success: false, error: _friendlyAuthError(err) };
+  }
+  await updateLastActive(credential.user.uid);
+  logLogin(credential.user.uid);
+  try {
+    await updateUserProfile(credential.user.uid, {
+      email: credential.user.email,
+      enrolled: true,
+      enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+      enrolmentSource: "nci-access-request",
+      classCode: String(opts.classCode || "").trim().toUpperCase(),
+      firstName: firstName,
+      surname: surname,
+      fullName: fullName,
+      displayName: fullName,
+      studentId: deriveStudentIdFromEmail(target),
+      className: String(opts.className || "").trim(),
+      programme: String(opts.programme || "").trim(),
+      onRoster: false,
+      accessRequested: true,
+      accessRequestedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) { console.warn("NCI access-request write failed:", e); }
   return { success: true, user: credential.user };
 }
 
