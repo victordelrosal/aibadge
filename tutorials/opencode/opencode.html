@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install OpenCode | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cg-lesson::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .cg-topbar {
+    position: sticky; top: 0; z-index: 100;
+    height: 56px;
+    background: rgba(0, 0, 54, 0.95);
+    border-bottom: 1px solid rgba(0, 102, 255, 0.2);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.5rem;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar a:hover { color: #fff; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-topbar .cg-breadcrumb { font-size: 0.85rem; color: var(--cg-text-tertiary); display: flex; align-items: center; gap: 0.5rem; }
+  .cg-topbar .cg-breadcrumb span { color: var(--cg-text-muted); }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-no-video-note { margin: 0 0 2rem; padding: 1rem 1.25rem; border: 1px dashed var(--cg-border); border-radius: 0.75rem; background: rgba(0, 102, 255, 0.06); color: var(--cg-text-secondary); font-size: 0.9rem; text-align: center; }
+  .cg-no-video-note strong { color: var(--cg-cyan); }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.1) 20%, rgba(0, 212, 255, 0.2) 50%, rgba(0, 212, 255, 0.1) 80%, transparent 100%); }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session-header:hover .cg-session-toggle { color: var(--cg-cyan); }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; color: var(--cg-cyan); }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 1.25rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; backdrop-filter: blur(20px); }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; transition: all 0.2s ease; }
+  .cg-step-card:hover { border-color: var(--cg-cyan); background: rgba(0, 102, 255, 0.1); transform: translateY(-2px); }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-kbd-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  .cg-kbd-table th, .cg-kbd-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--cg-border); color: var(--cg-text-secondary); }
+  .cg-kbd-table th { background: rgba(0, 102, 255, 0.15); font-weight: 600; color: var(--cg-cyan); }
+  .cg-session-content kbd { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.2rem 0.5rem; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: #fff; }
+  .cg-model-list { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.5rem 0 1rem; }
+  .cg-model-tag { padding: 0.4rem 0.85rem; border-radius: 999px; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.35); color: var(--cg-success); font-size: 0.85rem; font-weight: 500; font-family: 'IBM Plex Mono', monospace; }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; }
+  .cg-theme-toggle .cg-moon { display: block; }
+  /* ===== LIGHT MODE ===== */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; --cg-card-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15); background: #f8f9fa; }
+  .cg-lesson.light-mode::after { opacity: 0; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.1); }
+  .cg-lesson.light-mode .cg-topbar a { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-topbar a:hover { color: #174ea6; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle { border-color: #dadce0; color: #5f6368; }
+  .cg-lesson.light-mode .cg-theme-toggle:hover { background: #f1f3f4; border-color: #1a73e8; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-course-header .cg-meta svg { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-no-video-note { background: #f1f3f4; border-color: #dadce0; color: #5f6368; }
+  .cg-lesson.light-mode .cg-no-video-note strong { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-header::before { display: none; }
+  .cg-lesson.light-mode .cg-session.open .cg-session-header { border-radius: 12px 12px 0 0; }
+  .cg-lesson.light-mode .cg-session-header:hover { border-color: #1a73e8; background: #fff; transform: translateY(-2px); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 12px 12px; }
+  .cg-lesson.light-mode .cg-session-content h3 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content strong { color: var(--cg-text-primary); font-weight: 600; }
+  .cg-lesson.light-mode .cg-session-content kbd { background: #f1f3f4; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-code-footer { background: #f1f3f4; }
+  .cg-lesson.light-mode .cg-copy-btn:hover { background: rgba(26, 115, 232, 0.1); color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; border-color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.info h4 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; border-color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-callout.success h4 { color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; border-color: #f9ab00; }
+  .cg-lesson.light-mode .cg-callout.warning h4 { color: #f9ab00; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; border-color: #d93025; }
+  .cg-lesson.light-mode .cg-callout.error h4 { color: #d93025; }
+  .cg-lesson.light-mode .cg-step-card { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-step-card:hover { border-color: #1a73e8; background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-step-num { background: #1a73e8; color: #fff; }
+  .cg-lesson.light-mode .cg-concept-card { background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; }
+  .cg-lesson.light-mode .cg-concept-card h4 { color: #1a73e8; }
+  .cg-lesson.light-mode .cg-kbd-table th { background: #f1f3f4; color: #202124; }
+  .cg-lesson.light-mode .cg-model-tag { background: #e6f4ea; border-color: #1e8e3e; color: #1e8e3e; }
+  .cg-lesson.light-mode .cg-footer { background: #fff; border-top: 1px solid #dadce0; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>Install OpenCode</h1>
+      <p class="cg-subtitle">Free AI Coding, Right in Your Terminal</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>8-Minute Setup</span>
+      </div>
+    </div>
+
+    <!-- No-video note (instructions-only tutorial) -->
+    <div class="cg-no-video-note">
+      <strong>Written walkthrough.</strong> No video for this one yet, just the steps. Follow them top-to-bottom and you'll be coding with a free AI model in under ten minutes.
+    </div>
+
+    <!-- Slides / PDF -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="opencode.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Install Guide (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: Install OpenCode</h2>
+          <span class="cg-session-meta">4 steps to your first free AI coding session</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> What is OpenCode?</h4>
+          <p style="margin-bottom: 0;">OpenCode is a <strong>free, open-source AI coding assistant</strong> that runs inside your terminal. It can write code, explain code, fix errors, and help you learn, all from the command line, with several free models available through <a href="https://opencode.ai/" target="_blank">opencode.ai</a>.</p>
+        </div>
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card">
+            <div class="cg-step-num">1</div>
+            <h5>Open Your Terminal</h5>
+            <p>Mac: open <strong>Terminal</strong> (<kbd>Cmd</kbd>+<kbd>Space</kbd> &rarr; type Terminal). Windows: open <strong>PowerShell</strong> (Start menu &rarr; type PowerShell).</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">2</div>
+            <h5>Install OpenCode</h5>
+            <p>Mac/Linux: paste the curl install line. Windows: install Node.js, then run <code>npm i -g opencode-ai</code>.</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">3</div>
+            <h5>Launch It</h5>
+            <p>Type <code>opencode</code> in the terminal and press <kbd>Enter</kbd>.</p>
+          </div>
+          <div class="cg-step-card">
+            <div class="cg-step-num">4</div>
+            <h5>Connect a Free Model</h5>
+            <p>Run <code>/connect</code> inside OpenCode, sign in via your browser, paste the key back, then <code>/models</code> &rarr; pick a free one.</p>
+          </div>
+        </div>
+
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> One Terminal, Two Systems</h4>
+          <p style="margin-bottom: 0;">Pick the section below that matches your machine: <strong>Mac</strong> uses a one-line curl install, <strong>Windows</strong> needs Node.js first then npm. The rest of the tutorial is identical for both.</p>
+        </div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Zero Cost</h4>
+          <p>No credit card. No subscription. OpenCode is open source, and several capable models are free to use through OpenCode Zen.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAC INSTALL -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><path d="M12 2v2"/><path d="M9 4l-1-2"/><path d="M15 4l1-2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Mac: Install OpenCode</h2>
+          <span class="cg-session-meta">One line, no Node.js required</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Step 1: Open Terminal</h3>
+        <p>Press <kbd>Cmd</kbd>+<kbd>Space</kbd> to open Spotlight, type <strong>Terminal</strong>, and press <kbd>Enter</kbd>.</p>
+
+        <h3>Step 2: Run the Install Command</h3>
+        <p>Copy and paste this line, then press <kbd>Enter</kbd>:</p>
+        <div class="cg-code-block">
+          <pre>curl -fsSL https://opencode.ai/install | bash</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy command</span>
+            </button>
+          </div>
+        </div>
+        <p>The script downloads OpenCode and puts it on your <code>PATH</code> automatically. It usually finishes in under a minute.</p>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Prefer Homebrew?</h4>
+          <p style="margin-bottom: 0;">If you already use Homebrew, you can install via <code>brew install anomalyco/tap/opencode</code> instead. Either way works.</p>
+        </div>
+
+        <h3>Step 3: Launch OpenCode</h3>
+        <div class="cg-code-block">
+          <pre>opencode</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy command</span>
+            </button>
+          </div>
+        </div>
+        <p>If you see the OpenCode prompt, you're in. Jump down to <strong>Connect to a Free AI Model</strong> below.</p>
+
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> "command not found: opencode"</h4>
+          <p style="margin-bottom: 0;">Close Terminal completely (<kbd>Cmd</kbd>+<kbd>Q</kbd>), reopen it, and try <code>opencode</code> again. Your shell needs a fresh window to pick up the new <code>PATH</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- WINDOWS INSTALL -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Windows: Install OpenCode</h2>
+          <span class="cg-session-meta">Node.js + one npm command</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <h3>Step 1: Open PowerShell</h3>
+        <p>Press the <strong>Windows</strong> key, type <strong>PowerShell</strong>, and click it. A blue window opens.</p>
+
+        <h3>Step 2: Check if Node.js is Already Installed</h3>
+        <p>Type this and press <kbd>Enter</kbd>:</p>
+        <div class="cg-code-block">
+          <pre>node --version</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy command</span>
+            </button>
+          </div>
+        </div>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> What did you see?</h4>
+          <p style="margin-bottom: 0;"><strong>A version number</strong> (like <code>v20.11.0</code>)? Skip to Step 4. <strong>"not recognized"</strong>? Do Step 3 first.</p>
+        </div>
+
+        <h3>Step 3: Install Node.js (only if Step 2 failed)</h3>
+        <ol>
+          <li>Go to <a href="https://nodejs.org" target="_blank">nodejs.org</a></li>
+          <li>Click the big green <strong>LTS</strong> button</li>
+          <li>Run the installer (Next &rarr; Next &rarr; Finish)</li>
+          <li><strong>Close PowerShell completely</strong></li>
+          <li>Reopen PowerShell (this step matters: the window needs to be new)</li>
+          <li>Run <code>node --version</code> again to confirm a version prints</li>
+        </ol>
+
+        <h3>Step 4: Install OpenCode</h3>
+        <div class="cg-code-block">
+          <pre>npm i -g opencode-ai</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy command</span>
+            </button>
+          </div>
+        </div>
+        <p>The <code>-g</code> flag installs OpenCode globally, so you can run it from any folder.</p>
+
+        <h3>Step 5: Launch OpenCode</h3>
+        <div class="cg-code-block">
+          <pre>opencode</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy command</span>
+            </button>
+          </div>
+        </div>
+        <p>You should see the OpenCode interface. Continue to <strong>Connect to a Free AI Model</strong> below.</p>
+      </div>
+    </div>
+
+    <!-- CONNECT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Connect to a Free AI Model</h2>
+          <span class="cg-session-meta">Sign in once, then start coding</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <p>Once OpenCode is running, you'll see a prompt at the bottom of the terminal. The commands below are typed inside OpenCode itself (not the regular shell).</p>
+
+        <h3>Step 1: Start the Connection Flow</h3>
+        <div class="cg-code-block">
+          <pre>/connect</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy command</span>
+            </button>
+          </div>
+        </div>
+
+        <h3>Step 2: Pick a Provider</h3>
+        <p>From the list, choose <strong>OpenCode Zen</strong>. This is the curated set of free models that just work.</p>
+
+        <h3>Step 3: Sign In via Browser</h3>
+        <p>OpenCode opens a browser tab. Sign in with <strong>Google</strong> or <strong>GitHub</strong>. After you authenticate, your API key is shown on the page.</p>
+
+        <h3>Step 4: Paste the Key Back</h3>
+        <p>Copy the API key from the browser and paste it back into the terminal where OpenCode is waiting. Press <kbd>Enter</kbd>.</p>
+
+        <h3>Step 5: Choose a Model</h3>
+        <div class="cg-code-block">
+          <pre>/models</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy command</span>
+            </button>
+          </div>
+        </div>
+        <p>Pick a free model from the list. <strong>Grok Code Fast 1</strong> is a great default. Press <kbd>Enter</kbd> and you're ready.</p>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> You're In</h4>
+          <p>Type any coding question or instruction at the prompt and OpenCode will answer. Try: <em>"Write a Python script that prints hello world."</em></p>
+        </div>
+
+        <h3>Optional: Let OpenCode Read Your Project</h3>
+        <p>If you've opened OpenCode inside an existing code folder, run this once to let it scan and remember the project structure:</p>
+        <div class="cg-code-block">
+          <pre>/init</pre>
+          <div class="cg-code-footer">
+            <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy command</span>
+            </button>
+          </div>
+        </div>
+        <p>It creates an <code>AGENTS.md</code> file so OpenCode has context for future sessions.</p>
+      </div>
+    </div>
+
+    <!-- FREE MODELS -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Free Models Worth Trying</h2>
+          <span class="cg-session-meta">Pick one in <code>/models</code></span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <p>OpenCode Zen rotates the free model line-up over time. These have been reliable picks:</p>
+        <div class="cg-model-list">
+          <span class="cg-model-tag">Grok Code Fast 1</span>
+          <span class="cg-model-tag">GLM 4.7</span>
+          <span class="cg-model-tag">MiniMax M2.1</span>
+        </div>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Switch Anytime</h4>
+          <p style="margin-bottom: 0;">Type <code>/models</code> again at any time to swap. Different models are stronger at different things, so it's worth trying a few.</p>
+        </div>
+
+        <h3>Why OpenCode Matters</h3>
+        <div class="cg-step-grid">
+          <div class="cg-concept-card">
+            <h4>Open Source</h4>
+            <p style="font-size: 0.9rem; margin-bottom: 0;">The whole tool is open source. You can inspect what it does, fork it, and run it offline if you bring your own model.</p>
+          </div>
+          <div class="cg-concept-card">
+            <h4>No Lock-In</h4>
+            <p style="font-size: 0.9rem; margin-bottom: 0;">It speaks to many providers (Anthropic, OpenAI, Google, free Zen models). Switch with one command.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common problems and fixes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pro Tip: Use AI for Help</h4>
+          <p style="margin-bottom: 0;">Stuck? Paste the exact error into ChatGPT, Claude, or Gemini and describe what you were doing. You can even screenshot the terminal: AI can read images.</p>
+        </div>
+
+        <h3>Common Issues</h3>
+
+        <div class="cg-concept-card">
+          <h4><code>'npm' is not recognized</code> (Windows)</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0;">Node.js isn't installed yet, or PowerShell hasn't picked it up. Go back to Windows Step 3, install Node.js, then <strong>close and reopen PowerShell</strong>.</p>
+        </div>
+
+        <div class="cg-concept-card">
+          <h4><code>'node' is not recognized</code> (Windows)</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0;">Same fix: close PowerShell completely and reopen it. New windows pick up the updated PATH.</p>
+        </div>
+
+        <div class="cg-concept-card">
+          <h4><code>'opencode' is not recognized / command not found</code></h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0;">Close the terminal completely, reopen, and try <code>opencode</code> again. If that still fails, re-run the install command from the section that matched your OS.</p>
+        </div>
+
+        <div class="cg-concept-card">
+          <h4>Execution policy error (Windows)</h4>
+          <p style="font-size: 0.9rem;">PowerShell sometimes blocks scripts. Run this once, then retry:</p>
+          <div class="cg-code-block">
+            <pre>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</pre>
+            <div class="cg-code-footer">
+              <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                <span class="cg-btn-text">Copy command</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cg-concept-card">
+          <h4><code>EACCES: permission denied</code> (Mac)</h4>
+          <p style="font-size: 0.9rem;">npm can't write to a system folder. Run the install with <code>sudo</code>:</p>
+          <div class="cg-code-block">
+            <pre>sudo npm i -g opencode-ai</pre>
+            <div class="cg-code-footer">
+              <button class="cg-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.cg-code-block').querySelector('pre').textContent);this.querySelector('.cg-btn-text').textContent='Copied!';setTimeout(()=>this.querySelector('.cg-btn-text').textContent='Copy command',2000)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                <span class="cg-btn-text">Copy command</span>
+              </button>
+            </div>
+          </div>
+          <p style="font-size: 0.85rem; margin-bottom: 0;">It'll ask for your Mac login password. Type it and press <kbd>Enter</kbd>; the password won't show as you type, that's normal.</p>
+        </div>
+
+        <div class="cg-concept-card">
+          <h4><code>/connect</code> isn't doing anything</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0;">Check your internet connection, then try again. If a browser tab didn't open, copy the URL OpenCode prints into a browser manually.</p>
+        </div>
+
+        <div class="cg-concept-card">
+          <h4>Browser opens but no API key appears</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0;">Make sure you completed the sign-in (Google or GitHub) all the way through. Reload the page if the screen looks stuck, then re-run <code>/connect</code>.</p>
+        </div>
+
+        <div class="cg-concept-card">
+          <h4>"Model not available" or rate-limit message</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0;">Free models are popular and occasionally throttle. Run <code>/models</code> and pick a different one from the list, then try again.</p>
+        </div>
+
+        <h3>Where to Get More Help</h3>
+        <p>The official docs at <a href="https://opencode.ai/docs/" target="_blank">opencode.ai/docs</a> have the latest install options and command reference. The community on GitHub is active and responsive.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+var t=localStorage.getItem('lesson-theme');if(t==='light')document.querySelector('.cg-lesson').classList.add('light-mode');
+</script>
+</body>
+</html>
