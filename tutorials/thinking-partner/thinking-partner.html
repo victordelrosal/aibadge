@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thinking Partner | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none; z-index: 1;
+  }
+  .cg-topbar { position: sticky; top: 0; z-index: 100; height: 56px; background: rgba(0, 0, 54, 0.95); border-bottom: 1px solid rgba(0, 102, 255, 0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; max-height: 360px; overflow-y: auto; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+  .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-move { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 1.25rem; border-radius: 0.75rem; margin: 0.6rem 0; border: 1px solid var(--cg-border); background: rgba(0,0,0,0.25); }
+  .cg-move.key { border-color: rgba(0,212,255,0.4); background: rgba(0,102,255,0.10); }
+  .cg-move-num { width: 34px; height: 34px; min-width: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); color: #000; }
+  .cg-move.key .cg-move-num { background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); color: #fff; }
+  .cg-move h5 { margin: 0 0 0.2rem; font-size: 0.98rem; color: var(--cg-text-primary); }
+  .cg-move .cg-key-tag { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--cg-cyan); border: 1px solid rgba(0,212,255,0.4); border-radius: 4px; padding: 0.05rem 0.35rem; margin-left: 0.4rem; vertical-align: middle; }
+  .cg-move p { margin: 0; font-size: 0.88rem; color: var(--cg-text-secondary); }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
+  /* Submission UI */
+  .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+  .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+  .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+  .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+  .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+  .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+  .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+  .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+  .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+  .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+  .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+  .cg-submit-status a { color: var(--cg-cyan); }
+  .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+  .cg-submitted-card.visible { display: block; }
+  .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+  .cg-submitted-url:hover { text-decoration: underline; }
+  .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+  .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+  @media (max-width: 540px) {
+    .cg-submit-row { flex-direction: column; }
+    .cg-submit-btn { width: 100%; }
+  }
+  /* Floating reminder */
+  .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+  .cg-submit-fab.visible { display: inline-flex; }
+  .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+  .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+  .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+  @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+  /* Light mode */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; } .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; }
+  .cg-lesson.light-mode .cg-step-card, .cg-lesson.light-mode .cg-concept-card, .cg-lesson.light-mode .cg-submit-box, .cg-lesson.light-mode .cg-move { background: #f8f9fa; border: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-move.key { background: #e8f0fe; border-color: #1a73e8; }
+  .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>Thinking Partner</h1>
+      <p class="cg-subtitle">Stop using AI as a search box. Seven moves that turn any vague question into a calibrated, evidence-based view.</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~12 minutes</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/nPbbPsDDnu0" title="Thinking Partner" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="thinking-partner.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: The Seven Moves</h2>
+          <span class="cg-session-meta">One topic, seven moves, a view you can act on.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Search box vs thinking partner</h4>
+          <p>Most people ask AI one question and take the one answer. A practitioner runs a short conversation that builds a calibrated, evidence-based view they could not have reached alone. These seven moves are how.</p>
+        </div>
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><div class="cg-step-num">1</div><h5>Open a real chat</h5><p>Pick one real question you are actually sitting with. Real stakes pull better answers than toy prompts.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">2</div><h5>Run the seven moves</h5><p>Paste the card below and work down it as the conversation unfolds. Three moves marked KEY do the heavy lifting.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">3</div><h5>End with the retrospective</h5><p>Ask what you should have asked from the start. Save the master question it hands back.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">4</div><h5>Share your conversation</h5><p>Publish the multi-turn chat to a public link and submit it below, with a 3-line note on which move surprised you.</p></div>
+        </div>
+
+        <h3>The seven-moves card</h3>
+        <p>Keep this beside you. Paste a move into the chat whenever the conversation is ready for it. You do not need to use them in strict order, but the retrospective always comes last.</p>
+
+        <div class="cg-code-block">
+          <div class="cg-code-header">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+          <pre>THE SEVEN MOVES — paste a move into your AI chat as the conversation unfolds. Replace {topic} with your real question.
+
+MOVE 1 — Ask a real question (real stakes pull better answers)
+"Set the record straight about {topic}. There is a lot of talk about it one way and the other. What is a genuinely useful way to think about it?"
+
+MOVE 2 — Drill deeper (push for evidence, then the time horizon)
+"What does the latest research actually say about this?"
+then: "What does this look like over the next five to ten years, not just today?"
+
+MOVE 3 — KEY — Ask the AI for the questions
+"If you could ask any questions and explore every angle of this, what would you be most curious to ask?"
+
+MOVE 4 — KEY — Surface the hypotheses
+"What working theories or hypotheses are we entertaining here? List them so I can test each one on its own."
+
+MOVE 5 — KEY — Force calibration
+"State your confidence on each claim as high, medium, or low, and name the assumptions behind each one."
+
+MOVE 6 — Compress to a reusable prompt, then cross-validate
+"Give me a single deep-research prompt that encompasses everything we covered."
+then run that prompt in another tool or model, and feed the result back: "Does this update your thinking? Anything unexpected?"
+
+MOVE 7 — The retrospective (do this last, every time)
+"What prompt should I have used from the very start, and what would have been the most useful questions to ask?"</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+        <h3>The three moves that change everything</h3>
+        <p>If you remember nothing else, remember these. Almost no one thinks to make them.</p>
+        <div class="cg-move key"><div class="cg-move-num">3</div><div><h5>Ask the AI for the questions<span class="cg-key-tag">KEY</span></h5><p>Turn the model from answerer to question-designer. The questions you did not know to ask are usually the valuable ones.</p></div></div>
+        <div class="cg-move key"><div class="cg-move-num">4</div><div><h5>Surface the hypotheses<span class="cg-key-tag">KEY</span></h5><p>Make the model's reasoning explicit, so you can test each theory on its own instead of swallowing one blended answer.</p></div></div>
+        <div class="cg-move key"><div class="cg-move-num">5</div><div><h5>Force calibration<span class="cg-key-tag">KEY</span></h5><p>This is <code>bet-weights</code> in chat form: the model splits what it is sure of from what it is guessing, and names the assumptions.</p></div></div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> The shift</h4>
+          <p>When the AI designs the questions, surfaces its hypotheses, and calibrates its own claims, you stop being a user and become a collaborator. That is the whole lesson.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Each move, why it works, with a worked example</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>The worked example</h3>
+        <p>The video runs these moves on one real, multi-turn conversation about the future of software-engineering jobs in the AI era: a topic with genuine stakes and a lot of conflicting headlines. Watch the moves on that topic first, then run the same pattern on a question of your own.</p>
+
+        <h3>Move 1: Ask a real question</h3>
+        <p>Real stakes pull a better answer out of the model than a toy prompt does.</p>
+        <div class="cg-step-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="cg-step-card" style="border-left:4px solid #d93025;"><h5 style="color:#d93025">&#x274C; Forgettable</h5><p><code>"Tell me about software jobs."</code> The model gives you its first, blandest thought.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #1e8e3e;"><h5 style="color:#1e8e3e">&#x2705; Real stakes</h5><p><code>"Set the record straight about software jobs. There's talk of redundancies and of more work than ever. What's a genuinely useful way to think about it?"</code></p></div>
+        </div>
+
+        <h3>Move 2: Drill deeper</h3>
+        <p>Two pushes. First for evidence: <em>"What does the latest research actually say?"</em> This moves the model from opinion to data. Then for the time horizon: <em>"What does this look like over the next five to ten years?"</em> This forces it to project, not just describe today.</p>
+
+        <h3>Move 3 (KEY): Ask the AI for the questions</h3>
+        <p>The single biggest unlock. Instead of limiting the conversation to your own framing, ask the model to map the territory you cannot see yet.</p>
+        <div class="cg-code-block">
+          <div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div>
+          <pre>If you could ask any questions and explore every angle of this, what would you be most curious to ask?</pre>
+          <div class="cg-code-footer"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div>
+        </div>
+        <p>In the worked example the model came back with questions most people would never have asked: which roles actually shrink versus just change shape, what the data says versus the headlines, how fast the shift is in years not decades, which skills compound and which become commodities, and where judgement still beats automation.</p>
+
+        <h3>Move 4 (KEY): Surface the hypotheses</h3>
+        <p><em>"What working theories or hypotheses are we entertaining here?"</em> Now you see the structure of the answer, not just the answer, and you can test each theory on its own. In the example, two surfaced clearly: demand for software tends to rise as it gets cheaper to build, and routine coding commoditises while system-level judgement does not.</p>
+
+        <h3>Move 5 (KEY): Force calibration</h3>
+        <p><em>"State your confidence on each claim, and name the assumptions behind it."</em> This is the <code>bet-weights</code> discipline in chat form. The model splits high-confidence claims from low ones and exposes its assumptions, so you never trust an uncalibrated answer.</p>
+        <div class="cg-step-grid">
+          <div class="cg-step-card" style="border-left:4px solid #1e8e3e;"><h5 style="color:#1e8e3e">HIGH</h5><p>Software demand grows long-term.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #f9ab00;"><h5 style="color:#f9ab00">MEDIUM</h5><p>Mid-level roles compress first.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #d93025;"><h5 style="color:#d93025">LOW</h5><p>The exact timing of the shift.</p></div>
+          <div class="cg-step-card"><h5>The point</h5><p>You now act on the high-confidence claims and watch the low ones, instead of treating every sentence as equally true.</p></div>
+        </div>
+
+        <h3>Move 6: Compress, then cross-validate</h3>
+        <p><em>"Give me a single deep-research prompt that encompasses all of this."</em> The conversation becomes a reusable tool: save it and run it again next time. Then cross-validate by running that prompt in another tool or model and feeding the result back: <em>"Does this update your thinking? Anything unexpected?"</em> This guards against confirmation drift.</p>
+
+        <h3>Move 7: The retrospective</h3>
+        <p>The most underrated prompt in AI, and the punchline of this lesson.</p>
+        <div class="cg-code-block">
+          <div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div>
+          <pre>What prompt should I have used from the very start, and what would have been the most useful questions to ask?</pre>
+          <div class="cg-code-footer"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div>
+        </div>
+        <p>It compresses the whole conversation into the single master question that would have unlocked it in one move. It teaches you, not just answers you: run it after any hard chat and your next opening prompt gets sharper. Save the master question; it becomes your opening move next time you face the topic.</p>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Pairs with two other lessons</h4>
+          <p>The calibration move reuses the rubric mindset from <strong>The Evaluator's Mindset</strong>, and the hallucination awareness from <strong>AI Foundations</strong> sits underneath it. If you have done those, this move lands harder.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <style>
+      /* SPA-survivable submission styles (must live inside .cg-main so x-html keeps them) */
+      .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+      .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+      .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+      .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+      .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+      .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+      .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+      .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+      .cg-submit-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+      .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+      .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+      .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+      .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+      .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+      .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+      .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+      .cg-submit-status a { color: var(--cg-cyan); }
+      .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+      .cg-submitted-card.visible { display: block; }
+      .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+      .cg-submitted-label svg { width: 16px; height: 16px; flex-shrink: 0; }
+      .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+      .cg-submitted-url:hover { text-decoration: underline; }
+      .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+      .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+      .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+      .cg-submitted-actions .cg-submit-btn svg { width: 14px; height: 14px; }
+      @media (max-width: 540px) {
+        .cg-submit-row { flex-direction: column; }
+        .cg-submit-btn { width: 100%; }
+      }
+      .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+      .cg-submit-fab.visible { display: inline-flex; }
+      .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+      .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+      @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+      .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+      .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+      .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+      .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+      .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+      .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+      .cg-lesson.light-mode .cg-submit-input:focus { background: #fff; border-color: #1a73e8; box-shadow: 0 0 0 4px rgba(26,115,232,0.18); }
+      .cg-lesson.light-mode .cg-submit-input::placeholder { color: #9aa0a6; }
+      .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+      .cg-lesson.light-mode .cg-submit-btn.secondary { background: #f1f3f4; color: #202124; border: 1px solid #dadce0; }
+      .cg-lesson.light-mode .cg-submit-btn.secondary:hover { background: #e8eaed; }
+      .cg-lesson.light-mode .cg-submit-btn.danger { background: #fce8e6; color: #d93025; border: 1px solid #f6c5c1; }
+      .cg-lesson.light-mode .cg-submit-btn.danger:hover { background: #f9d4d0; }
+      .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+      .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+      .cg-lesson.light-mode .cg-submit-status.ok { color: #137333; background: #e6f4ea; }
+      .cg-lesson.light-mode .cg-submit-status.err { color: #b3261e; background: #fce8e6; }
+      .cg-lesson.light-mode .cg-submit-status a { color: #1a73e8; }
+    </style>
+
+    <!-- SUBMIT YOUR WORK -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Submit Your Work</h2>
+          <span class="cg-session-meta">Paste a public link to your own seven-move conversation</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>Run all seven moves on <strong>one real topic that matters to you</strong>, then publish the conversation to a public link. At minimum it should show: the opening real question, two drill-deeper turns, the ask-for-questions turn, the hypotheses turn, the calibration turn, the deep-research prompt, and the retrospective. Add a 3-line reflection on which move surprised you most. A Gist, GitHub Pages page, Notion page, published Google Doc, or any public URL will do.</p>
+        <div class="cg-submit-box" data-exercise-submission="thinking-partner" data-submission-input="tpInput" data-submission-status="tpStatus" data-submission-btn="tpBtn" data-submission-validate="url" data-submission-card="tpSubmittedCard" data-submission-card-url="tpSubmittedUrl" data-submission-card-meta="tpSubmittedMeta" data-submission-form="tpFormWrap" data-submission-fab="tpSubmitFab" id="tpSubmitBox">
+          <div class="cg-submitted-card" id="tpSubmittedCard">
+            <div class="cg-submitted-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Your submission
+            </div>
+            <a class="cg-submitted-url" id="tpSubmittedUrl" href="#" target="_blank" rel="noopener"></a>
+            <div class="cg-submitted-meta" id="tpSubmittedMeta"></div>
+            <div class="cg-submitted-actions">
+              <button type="button" class="cg-submit-btn secondary" id="tpEditBtn" onclick="window.__tpEditSubmission&&window.__tpEditSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit / Resubmit
+              </button>
+              <button type="button" class="cg-submit-btn danger" id="tpDeleteBtn" onclick="window.__tpDeleteSubmission&&window.__tpDeleteSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>
+          <div id="tpFormWrap">
+            <span class="cg-submit-label">Public URL</span>
+            <div class="cg-submit-row">
+              <input type="url" class="cg-submit-input" id="tpInput" placeholder="https://chatgpt.com/share/... or any public link" autocomplete="off" spellcheck="false">
+              <button class="cg-submit-btn" id="tpBtn" onclick="(window.submitExerciseUrl||window.__tpSubmit)({exerciseId:'thinking-partner',inputId:'tpInput',statusId:'tpStatus',btnId:'tpBtn',validate:'url'})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Submit
+              </button>
+            </div>
+            <div class="cg-submit-status" id="tpStatus" style="display:none;"></div>
+          </div>
+        </div>
+        <button type="button" class="cg-submit-fab" id="tpSubmitFab" onclick="window.__tpScrollToSubmit&&window.__tpScrollToSubmit()" aria-label="Jump to submission">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit your URL
+        </button>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Easiest way to share a chat</h4>
+          <p>In ChatGPT use <strong>Share</strong> to get a public <code>chatgpt.com/share/...</code> link. Claude and Gemini have similar share options. Or paste the conversation into a public <a href="https://gist.github.com" target="_blank" rel="noopener">Gist</a>, Notion page, or Google Doc. Do not include private or confidential information in what you publish.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">Common snags and fixes</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> One conversation, not one prompt</h4>
+          <p>The power is in the multi-turn conversation, not any single prompt. Stay in one chat and keep building on the model's previous answers.</p>
+        </div>
+        <div class="cg-concept-card"><h4>The answers stay shallow</h4><p>Your opening question was probably a toy prompt. Give it real stakes and a real framing (Move 1), then drill for evidence and a time horizon (Move 2).</p></div>
+        <div class="cg-concept-card"><h4>The "ask for questions" move returns generic questions</h4><p>Give it more context first. Run Moves 1 and 2 so the model has a real topic and some evidence to work from before you ask it what it is curious about.</p></div>
+        <div class="cg-concept-card"><h4>The model sounds equally confident about everything</h4><p>That is exactly what Move 5 fixes. Explicitly ask it to mark each claim high, medium, or low confidence and to name its assumptions. Never trust an uncalibrated answer.</p></div>
+        <div class="cg-concept-card"><h4>I cannot get a public share link</h4><p>ChatGPT: use the <strong>Share</strong> button for a <code>chatgpt.com/share/...</code> link. If your account or workspace disables sharing, paste the conversation into a public Gist, Notion page, or Google Doc instead.</p></div>
+        <div class="cg-concept-card"><h4>It feels slow compared to a single question</h4><p>It is slower, and that is the point. A search-box answer is fast and forgettable. A thinking-partner conversation is the one you can actually act on.</p></div>
+        <h3>Common mistakes to avoid</h3>
+        <ul>
+          <li>Starting fresh chats for each move instead of building one conversation.</li>
+          <li>Skipping the three KEY moves (ask-for-questions, hypotheses, calibration). They are the whole point.</li>
+          <li>Trusting confident-sounding claims without forcing calibration.</li>
+          <li>Forgetting the retrospective. It is the move that makes you better next time.</li>
+          <li>Publishing private or confidential content in your shared conversation.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">The full walkthrough in text form</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>AI as a thinking partner</h3>
+        <p>A few years ago it would have been hard to imagine that AI systems could become thinking partners. But here we are in 2026, and the way large language models are built makes it possible for them not only to handle language but to formulate fairly complex ideas that are genuinely useful for thinking. So let's explore how to go beyond a search box, typing one question and taking one answer, and instead build conversations that follow an evidence-based approach and help us think better.</p>
+
+        <h3>Beyond the search box</h3>
+        <p>If you say to a model "tell me about software jobs," it probably will not surface anything interesting. But if you come in with a real question, or even a voice command (I encourage you to use the microphone and talk to it naturally in ChatGPT or any other model), something like: "Let's set the record straight about software jobs. There's a lot of talk about redundancies and about more work than ever." Now you are having an actual conversation, framed in a way that is natural to you, with real stakes.</p>
+
+        <h3>The seven moves</h3>
+        <p>From there you drill deeper, pushing for evidence and for the time horizon. You ask the AI for the questions: what angles might you be missing, what are the blind spots in your own thinking? You make the model's reasoning explicit: what are your hypotheses, how did you reach this conclusion, what is the evidence? And you force calibration, pushing it to state its confidence and the assumptions behind each claim. You do not need the same prompt or format every time, and you can cross-validate the responses elsewhere, especially when the stakes are high.</p>
+
+        <h3>The retrospective: what should I have asked?</h3>
+        <p>At the end of a long, productive conversation, if you did not quite get the output you needed and then finally do, ask: "What should I have asked from the start? What prompt should I have tried at the very beginning to get here?" Try it next time you are stuck with ChatGPT, Claude, or Gemini and only got there after a while. The AI itself can teach you how to talk to it better. This is meta-prompting: prompting about prompting.</p>
+
+        <h3>Bonus: improve this prompt</h3>
+        <p>A related move: say your starting prompt is a little vague, but it is the best you can come up with. Type <code>improve this prompt</code> and then your prompt (in quotation marks or brackets, or nothing at all). It will take your prompt and improve it, and you can run the improved version. You will be surprised how well it works.</p>
+
+        <h3>Ask the AI for the questions</h3>
+        <p>Asking the AI for the questions turns the answerer into a question-designer, and this can be an important unlock. These are the questions you did not know to ask. Say something like: "If you could ask any questions and explore every angle of this, what would you be most curious to ask?" You stop limiting the conversation to your own framing, and the model helps you map the territory and explore adjacent, relevant ideas. On the software-jobs question, for instance: which roles actually shrink and which just change shape? What does the data say versus the headlines? How fast is the shift? What skills compound and what becomes a commodity? Where does judgement still beat automation?</p>
+        <p>In my experience it stimulates my thinking. It may not give the exact answer I was looking for, but it makes me curious to learn more, to go looking for different angles and discover information myself. It is a discovery process, and it works for anything: a hobby, a sport, a personal or professional project, a career move, a trip, learning a new skill you have always wanted to learn or were afraid to ask about.</p>
+
+        <h3>Make the reasoning visible, then calibrate</h3>
+        <p>Think about it this way: if our brains somehow got a 10, 15, or 20 percent IQ boost, what would we do with it, for life in general, not just work? That is the kind of augmentation an LLM offers when you use it to think deeper and ask more meaningful questions, ones you could not easily ask other people or simply Google.</p>
+        <p>Make the reasoning visible by asking what working theories or hypotheses are being entertained, so you can see the underlying frameworks behind an answer. Then ask the model to state its confidence on each claim and name the assumptions behind it. In my own setup I created something called <code>bet-weights</code>. A neural network is made of weights: the strengths of the connections, the parallel to the connections between neurons in our brains that let us learn. When you ask a model to bet its weights on an answer, you are asking it to wager everything it has that the output is correct. I find it works: sometimes it replies that it would not actually bet its weights on the previous answer. It is a bit playful, but it gives you transparency on how confident it really is, rather than a uniformly confident tone.</p>
+
+        <h3>Play with it</h3>
+        <p>So today, try it. Take a real question you are weighing, a decision you are trying to make, or something you are genuinely curious about, and have a chat. Not for work: try it on something you actually care about, where there is some enthusiasm. I always encourage you to tinker with this technology. Use it for fun, to create fun things with and for your children and family. Keep asking those hard questions; it makes you better at talking to these systems, and the skill transfers nicely to work. Keep these moves in mind to improve your AI literacy and proficiency. I hope this helps. Thank you very much. Well done.</p>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('lesson-theme');
+  if(t==='light') document.querySelector('.cg-lesson').classList.add('light-mode');
+
+  // Delegated copy handler: any button with [data-copy-btn] inside a .cg-code-block
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  var EXERCISE_ID = 'thinking-partner';
+  var URL_REGEX = /^https?:\/\/[^\s]{6,}$/i;
+
+  function setStatus(kind, html) {
+    var el = document.getElementById('tpStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+    el.innerHTML = html;
+  }
+
+  function validate(url) {
+    url = (url || '').trim();
+    if (!url) return { ok: false, msg: 'Please paste a public URL to your seven-move conversation.' };
+    if (!/^https?:\/\//i.test(url)) {
+      return { ok: false, msg: 'URL must start with <code>https://</code>.' };
+    }
+    if (!URL_REGEX.test(url)) {
+      return { ok: false, msg: 'That does not look like a valid URL. Try a ChatGPT share link, Gist, Notion, or published Google Doc.' };
+    }
+    return { ok: true, value: url };
+  }
+
+  function fmtDate(ts) {
+    try {
+      var d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+      if (!d || isNaN(d.getTime())) return '';
+      return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return ''; }
+  }
+  function renderSubmitted(value, ts) {
+    var card = document.getElementById('tpSubmittedCard');
+    var urlA = document.getElementById('tpSubmittedUrl');
+    var meta = document.getElementById('tpSubmittedMeta');
+    var form = document.getElementById('tpFormWrap');
+    var fab  = document.getElementById('tpSubmitFab');
+    var status = document.getElementById('tpStatus');
+    if (card && urlA) { urlA.textContent = value; urlA.href = value; card.classList.add('visible'); }
+    if (meta) meta.textContent = ts ? ('Submitted ' + fmtDate(ts)) : 'Submitted';
+    if (form) form.style.display = 'none';
+    if (fab) fab.classList.remove('visible');
+    if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+  }
+  function renderEditing() {
+    var card = document.getElementById('tpSubmittedCard');
+    var form = document.getElementById('tpFormWrap');
+    var fab  = document.getElementById('tpSubmitFab');
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+  }
+
+  window.__tpScrollToSubmit = window.__tpScrollToSubmit || function() {
+    var box = document.getElementById('tpSubmitBox');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('tpInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__tpEditSubmission = window.__tpEditSubmission || function() {
+    renderEditing();
+    var input = document.getElementById('tpInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__tpDeleteSubmission = window.__tpDeleteSubmission || async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    try {
+      var out = await deleteSubmission(user.uid, EXERCISE_ID);
+      if (out && out.success) {
+        var input = document.getElementById('tpInput');
+        if (input) input.value = '';
+        renderEditing();
+        setStatus('ok', 'Submission deleted. You can submit a new URL any time.');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, false); } catch (e) {} }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    }
+  };
+
+  async function loadExisting() {
+    try {
+      var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || typeof getSubmission !== 'function') {
+        var fab = document.getElementById('tpSubmitFab');
+        if (fab) fab.classList.add('visible');
+        return;
+      }
+      var existing = await getSubmission(user.uid, EXERCISE_ID);
+      var input = document.getElementById('tpInput');
+      if (existing && existing.value) {
+        if (input) input.value = existing.value;
+        renderSubmitted(existing.value, existing.submittedAt);
+      } else {
+        var fab = document.getElementById('tpSubmitFab');
+        if (fab) fab.classList.add('visible');
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  window.__tpSubmit = async function() {
+    var input = document.getElementById('tpInput');
+    var btn = document.getElementById('tpBtn');
+    var res = validate(input.value);
+    if (!res.ok) { setStatus('err', res.msg); return; }
+
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh the page and try again.'); return; }
+
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting...';
+
+    try {
+      var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: res.value, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your conversation: <a href="' + res.value + '" target="_blank" rel="noopener">' + res.value + '</a>');
+        renderSubmitted(res.value, new Date());
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {}
+        }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  };
+
+  setTimeout(loadExisting, 400);
+  setTimeout(loadExisting, 1500);
+})();
+</script>
+</body>
+</html>
