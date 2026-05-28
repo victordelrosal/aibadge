@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Foundations 101 | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none; z-index: 1;
+  }
+  .cg-topbar { position: sticky; top: 0; z-index: 100; height: 56px; background: rgba(0, 0, 54, 0.95); border-bottom: 1px solid rgba(0, 102, 255, 0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; max-height: 360px; overflow-y: auto; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+  .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-prob { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0; }
+  .cg-prob span { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 0.3rem 0.6rem; border-radius: 6px; background: rgba(0,102,255,0.12); border: 1px solid var(--cg-border); color: var(--cg-text-secondary); }
+  .cg-prob span b { color: var(--cg-cyan); }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
+  /* Submission UI */
+  .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+  .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+  .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+  .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+  .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+  .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+  .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+  .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+  .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+  .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+  .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+  .cg-submit-status a { color: var(--cg-cyan); }
+  .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+  .cg-submitted-card.visible { display: block; }
+  .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+  .cg-submitted-url:hover { text-decoration: underline; }
+  .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+  .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+  @media (max-width: 540px) {
+    .cg-submit-row { flex-direction: column; }
+    .cg-submit-btn { width: 100%; }
+  }
+  /* Floating reminder */
+  .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+  .cg-submit-fab.visible { display: inline-flex; }
+  .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+  .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+  .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+  @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+  /* Light mode */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; } .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; }
+  .cg-lesson.light-mode .cg-step-card, .cg-lesson.light-mode .cg-concept-card, .cg-lesson.light-mode .cg-submit-box { background: #f8f9fa; border: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-prob span { background: #e8f0fe; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>AI Foundations 101</h1>
+      <p class="cg-subtitle">How a large language model actually works, in plain English: six ideas, no maths, no jargon.</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~10 minutes</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/mRQyxMLIy2c" title="AI Foundations 101" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="ai-foundations.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: Six Ideas</h2>
+          <span class="cg-session-meta">The mental model in one screen, then a quick self-test.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Why this lesson</h4>
+          <p>Ever wondered why AI confidently makes things up? Six ideas explain almost every surprising thing an AI does. Learn them once and you will never be caught off guard by an AI mistake again.</p>
+        </div>
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><div class="cg-step-num">1</div><h5>Pattern matching</h5><p>It predicts the next word, one token at a time. Fluent, not factual.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">2</div><h5>Training data &amp; cutoff</h5><p>It learned the world up to a date. After that, it knows nothing unless you tell it or it can search.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">3</div><h5>Tokens</h5><p>It reads text in chunks, not words. About 750 words is roughly 1,000 tokens. Tokens drive cost and length.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">4</div><h5>Context window</h5><p>It only sees what fits. In long chats, the earliest text falls out of view.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">5</div><h5>Temperature</h5><p>One dial: low stays predictable, high gets creative. Same prompt, different answers.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">6</div><h5>Hallucinations</h5><p>Confident, plausible falsehoods. The natural by-product of next-word prediction.</p></div>
+        </div>
+
+        <h3>Self-test: name the mechanic</h3>
+        <p>Paste this into any AI chat (or just answer it yourself) to check you have the model in your head. Each scenario has one main mechanic behind it.</p>
+
+        <div class="cg-code-block">
+          <div class="cg-code-header">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+          <pre>I just learned the six AI foundations: pattern matching, training data and the cutoff, tokens, context window, temperature, and hallucinations. Quiz me.
+
+For each scenario below, ask me which ONE mechanic is mainly at play, wait for my answer, tell me if I am right, and explain in one line. Then go to the next.
+
+1. I ask a model for today's headlines and it gives me old news with total confidence.
+2. Halfway through a very long chat, the model forgets a key detail I gave it at the start.
+3. I ask the same prompt twice and get two quite different answers.
+4. The model cites a specific paper, author, and journal volume that turn out not to exist.
+5. A very long document gets cut off and the model only answers about the first half.
+6. The model finishes my sentence in a fluent, natural way, but one fact in it is wrong.
+
+Keep it short and friendly. At the end, tell me which ones I got right.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Answer key</h4>
+          <p>1: training cutoff &nbsp;&middot;&nbsp; 2: context window (lost from view) &nbsp;&middot;&nbsp; 3: temperature &nbsp;&middot;&nbsp; 4: hallucination &nbsp;&middot;&nbsp; 5: context window / token limit &nbsp;&middot;&nbsp; 6: pattern matching (fluent, not factual).</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Each of the six ideas, in plain English</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>1. Pattern matching, not thinking</h3>
+        <p>At its core a model predicts the next word. Give it <code>The cat sat on the ___</code> and, from everything it was trained on (the internet, books, billions or trillions of words), it scores every possible next token and picks from the top:</p>
+        <div class="cg-prob"><span><b>mat</b> 62%</span><span>floor 21%</span><span>roof 9%</span><span>keyboard 1%</span></div>
+        <p>Then it does it again, one token at a time. Three consequences follow:</p>
+        <ul>
+          <li><strong>It is fluent, not factual.</strong> Fluency comes from patterns in text; truth has to be checked separately.</li>
+          <li><strong>It has no memory of you.</strong> Each turn it only sees what is in front of it. Nothing is recalled by default.</li>
+          <li><strong>It is confident either way.</strong> A right answer and a wrong one are produced the same way, so confidence is not a signal of correctness.</li>
+        </ul>
+
+        <h3>2. Training data and the cutoff</h3>
+        <p>A model learned the world up to a <strong>training cutoff</strong> date. Inside that data: how language, code, and concepts work, public facts up to the cutoff, and patterns across billions of documents. After the cutoff: last week's news, this morning's price, your private files, anything that happened since. Ask a model what day it is and it often guesses. The fix is to give it the context, or use a tool that can look things up (internet access complements the training data but is not part of the main "brain").</p>
+
+        <h3>3. Tokens</h3>
+        <p>AI reads text in chunks called <strong>tokens</strong>, not whole words. A token is roughly four characters; about 750 words is about 1,000 tokens. <code>"Tokenisation"</code> splits into several tokens, while common words are one each, and spaces and punctuation count too. Why it matters:</p>
+        <ul>
+          <li><strong>Cost:</strong> most tools bill per token, in and out, so longer prompts cost more.</li>
+          <li><strong>Length:</strong> every model has a token budget; very long inputs get truncated.</li>
+          <li><strong>Languages:</strong> some languages use more tokens per word, so they cost more.</li>
+        </ul>
+
+        <h3>4. Context window</h3>
+        <p>The model only sees what fits in its <strong>context window</strong>: your prompt, your files, and every reply share that one window. Past the limit, the earliest text falls out of view, as if it never existed.</p>
+        <ul>
+          <li><strong>Long chats forget the start.</strong> If a conversation runs long, restate the key facts near the end. (Newer tools re-inject or summarise the start to soften this, but it still pays to remember.)</li>
+          <li><strong>Big files can overflow.</strong> A model with a small window cannot reason over a whole long document at once.</li>
+          <li><strong>Put what matters last.</strong> Recent context carries the most weight, so lead with the ask, not the backstory.</li>
+        </ul>
+
+        <h3>5. Temperature</h3>
+        <p><strong>Temperature</strong> is one dial: predictable or surprising. At temperature 0 the model sticks to the most likely word (the 62% one); raise it and the model is freer to pick the second or third option, so it gets more creative.</p>
+        <div class="cg-step-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="cg-step-card" style="border-left:4px solid #1a73e8;"><h5 style="color:#1a73e8">Temperature 0 &middot; predictable</h5><p>"Give me a name for a coffee shop." → The Daily Grind, The Daily Grind, The Daily Grind. Repeatable and on-task. Use for facts, code, extraction.</p></div>
+          <div class="cg-step-card" style="border-left:4px solid #c18a1c;"><h5 style="color:#c18a1c">Temperature 1.2 &middot; creative</h5><p>"Give me a name for a coffee shop." → Cloud &amp; Cardamom, The Velvet Bean, Loiter House Coffee. Varied but less reliable. Use for brainstorms and first drafts.</p></div>
+        </div>
+        <p>Most chat apps hide this dial; it is mainly a developer setting in APIs. But knowing it exists explains why the same prompt can answer differently each time, and in a normal chat you can simply ask the model to "be more creative" to a similar effect.</p>
+
+        <h3>6. Hallucinations</h3>
+        <p>Made-up answers are a <strong>feature, not a glitch</strong>. A model that always predicts the next likely word will sometimes predict a confident, plausible falsehood. Ask for the title of a paper that does not exist and it may invent a specific, confident citation, complete with journal and volume. Three signatures to watch for:</p>
+        <div class="cg-concept-card"><h4>Too specific</h4><p>Exact figures, names, dates, or citations that would be hard to actually know.</p></div>
+        <div class="cg-concept-card"><h4>Too confident</h4><p>No hedging at all on something genuinely uncertain or obscure.</p></div>
+        <div class="cg-concept-card"><h4>Unverifiable</h4><p>You cannot find an independent source that confirms it.</p></div>
+        <p>The fix is your own fact-checking: confirm the link, the paper, the book, the source actually exists, especially for high-stakes work. The model generates answers from its neural network; it is not Google looking information up.</p>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Putting it together</h4>
+          <p>These six ideas explain your everyday choices: you phrase prompts tightly because of <strong>tokens</strong>, you upload the file because of the <strong>context window</strong>, and you check the output because of <strong>hallucination</strong> risk. Mechanics first, then craft.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <style>
+      /* SPA-survivable submission styles (must live inside .cg-main so x-html keeps them) */
+      .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+      .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+      .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+      .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+      .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+      .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+      .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+      .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+      .cg-submit-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+      .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+      .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+      .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+      .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+      .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+      .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+      .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+      .cg-submit-status a { color: var(--cg-cyan); }
+      .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+      .cg-submitted-card.visible { display: block; }
+      .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+      .cg-submitted-label svg { width: 16px; height: 16px; flex-shrink: 0; }
+      .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+      .cg-submitted-url:hover { text-decoration: underline; }
+      .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+      .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+      .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+      .cg-submitted-actions .cg-submit-btn svg { width: 14px; height: 14px; }
+      @media (max-width: 540px) {
+        .cg-submit-row { flex-direction: column; }
+        .cg-submit-btn { width: 100%; }
+      }
+      .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+      .cg-submit-fab.visible { display: inline-flex; }
+      .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+      .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+      @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+      .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+      .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+      .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+      .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+      .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+      .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+      .cg-lesson.light-mode .cg-submit-input:focus { background: #fff; border-color: #1a73e8; box-shadow: 0 0 0 4px rgba(26,115,232,0.18); }
+      .cg-lesson.light-mode .cg-submit-input::placeholder { color: #9aa0a6; }
+      .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+      .cg-lesson.light-mode .cg-submit-btn.secondary { background: #f1f3f4; color: #202124; border: 1px solid #dadce0; }
+      .cg-lesson.light-mode .cg-submit-btn.secondary:hover { background: #e8eaed; }
+      .cg-lesson.light-mode .cg-submit-btn.danger { background: #fce8e6; color: #d93025; border: 1px solid #f6c5c1; }
+      .cg-lesson.light-mode .cg-submit-btn.danger:hover { background: #f9d4d0; }
+      .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+      .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+      .cg-lesson.light-mode .cg-submit-status.ok { color: #137333; background: #e6f4ea; }
+      .cg-lesson.light-mode .cg-submit-status.err { color: #b3261e; background: #fce8e6; }
+      .cg-lesson.light-mode .cg-submit-status a { color: #1a73e8; }
+    </style>
+
+    <!-- SUBMIT YOUR WORK -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Submit Your Work</h2>
+          <span class="cg-session-meta">Spot the four mechanics in the wild</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>Document <strong>one real example of each</strong>, with a one-sentence explanation, and publish it to a public link:</p>
+        <ul>
+          <li>A <strong>token count</strong>: paste a sentence into a tokeniser (try the <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener">OpenAI tokeniser</a>) and note the count.</li>
+          <li>A <strong>context overflow</strong> you caused: a long chat or document where the model lost the start.</li>
+          <li>A <strong>temperature comparison</strong>: the same prompt giving different answers (or one run "be more creative").</li>
+          <li>A <strong>hallucination</strong> you spotted in the wild, and which of the three signatures gave it away.</li>
+        </ul>
+        <p>A Gist, GitHub Pages page, Notion page, published Google Doc, or any public URL will do.</p>
+        <div class="cg-submit-box" data-exercise-submission="ai-foundations" data-submission-input="afInput" data-submission-status="afStatus" data-submission-btn="afBtn" data-submission-validate="url" data-submission-card="afSubmittedCard" data-submission-card-url="afSubmittedUrl" data-submission-card-meta="afSubmittedMeta" data-submission-form="afFormWrap" data-submission-fab="afSubmitFab" id="afSubmitBox">
+          <div class="cg-submitted-card" id="afSubmittedCard">
+            <div class="cg-submitted-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Your submission
+            </div>
+            <a class="cg-submitted-url" id="afSubmittedUrl" href="#" target="_blank" rel="noopener"></a>
+            <div class="cg-submitted-meta" id="afSubmittedMeta"></div>
+            <div class="cg-submitted-actions">
+              <button type="button" class="cg-submit-btn secondary" id="afEditBtn" onclick="window.__afEditSubmission&&window.__afEditSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit / Resubmit
+              </button>
+              <button type="button" class="cg-submit-btn danger" id="afDeleteBtn" onclick="window.__afDeleteSubmission&&window.__afDeleteSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>
+          <div id="afFormWrap">
+            <span class="cg-submit-label">Public URL</span>
+            <div class="cg-submit-row">
+              <input type="url" class="cg-submit-input" id="afInput" placeholder="https://gist.github.com/yourname/... or any public link" autocomplete="off" spellcheck="false">
+              <button class="cg-submit-btn" id="afBtn" onclick="(window.submitExerciseUrl||window.__afSubmit)({exerciseId:'ai-foundations',inputId:'afInput',statusId:'afStatus',btnId:'afBtn',validate:'url'})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Submit
+              </button>
+            </div>
+            <div class="cg-submit-status" id="afStatus" style="display:none;"></div>
+          </div>
+        </div>
+        <button type="button" class="cg-submit-fab" id="afSubmitFab" onclick="window.__afScrollToSubmit&&window.__afScrollToSubmit()" aria-label="Jump to submission">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit your URL
+        </button>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Tip</h4>
+          <p>You do not need anything fancy. Four short notes with screenshots in a public Google Doc is a perfect submission. Do not include private or confidential content.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Common Questions</h2>
+          <span class="cg-session-meta">Quick answers to the usual confusions</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> The one-line takeaway</h4>
+          <p>An LLM predicts the next token from patterns it has seen. Everything surprising it does follows from that one fact.</p>
+        </div>
+        <div class="cg-concept-card"><h4>If it is just predicting words, how is it so good?</h4><p>Because the patterns in trillions of words encode a huge amount of structure about language, code, and concepts. Fluency and usefulness are real; factual accuracy is the part you still have to check.</p></div>
+        <div class="cg-concept-card"><h4>Why does it sound so confident when it is wrong?</h4><p>Confidence is not a signal. A correct answer and a made-up one are produced by the same next-word process, so tone tells you nothing about truth.</p></div>
+        <div class="cg-concept-card"><h4>It does not know today's date or recent news</h4><p>That is the training cutoff. Either give it the information directly, or use a tool with internet access so it can look things up.</p></div>
+        <div class="cg-concept-card"><h4>It forgot something I said earlier in a long chat</h4><p>Context window. The earliest text fell out of view. Restate the key facts near the end, or start a fresh chat with just what matters.</p></div>
+        <div class="cg-concept-card"><h4>Same prompt, different answers every time</h4><p>Temperature. Higher temperature lets it pick less-likely words. For repeatable results, ask for precise output; for ideas, let it roam.</p></div>
+        <div class="cg-concept-card"><h4>It invented a citation that does not exist</h4><p>A hallucination. Watch for the three signatures (too specific, too confident, unverifiable) and verify any fact that matters against an independent source.</p></div>
+        <h3>Key terms</h3>
+        <ul>
+          <li><strong>Token</strong>: a chunk of text (~4 characters) the model reads and bills by.</li>
+          <li><strong>Context window</strong>: the total text the model can see at once.</li>
+          <li><strong>Training cutoff</strong>: the date after which the model knows nothing on its own.</li>
+          <li><strong>Temperature</strong>: the randomness dial, predictable (low) to creative (high).</li>
+          <li><strong>Hallucination</strong>: a confident, plausible, but false output.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">The full walkthrough in text form</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>What is under the hood</h3>
+        <p>Over the last few weeks we have been using AI and pushing it to its limits, but we have not really discussed what is under the hood, what makes AI work. So let's talk about some of the foundations: why large language models work and how. No maths, no jargon, just the principles. If you have ever wondered what makes AI so confident about its outputs, the key is to understand pattern matching, how it is trained, and the ideas of tokens, context windows, temperature, and hallucinations (also called confabulations).</p>
+
+        <h3>Pattern matching</h3>
+        <p>In short, the model predicts the next word. When you ask it to complete a sentence, such as "the cat sat on the," it looks at all its training. Remember it has ingested the internet, books, everything companies could gather for training: billions, perhaps trillions, of words and the way they are constructed. So with a high degree of confidence it can say the next word is most likely, say, 62% probable, with other words at lower percentages. It scores every possible next token, picks from the top, and does that over and over. It has no specific memory of you, so you have to remind it of the context. Either way it is confident in what it produced, because that confidence comes from the statistics of the patterns it has seen.</p>
+
+        <h3>Training data and the cutoff</h3>
+        <p>It has learned the world up to a certain date. There is a training cutoff: whatever is before it is inside the training data, whatever is after is not. So for recent news or any recent knowledge, it simply is not there. It will not know what day it is unless you tell it. This is solved by giving the model internet access, so in addition to its training data it can fetch information in real time, but that is a complement; it is not part of the main brain.</p>
+
+        <h3>Tokens</h3>
+        <p>AI reads text in chunks, not whole words, and these are called tokens. A token is roughly four characters; about 750 words is about 1,000 tokens. Tokenisation is surprisingly important. Common words are one token; spaces and punctuation count too. Most tools bill per token in and out, so longer prompts cost more, and length impacts the token budget: very long input gets truncated if it exceeds what the model can ingest. Some languages use more tokens per word, so they can cost more. These are practical considerations.</p>
+
+        <h3>Context window</h3>
+        <p>The model only sees what fits. Your prompt, your files, and every reply share one window. Beyond that limit, whatever is out of scope is not seen. So in a very long conversation, if your model has a small context window, what you said at the beginning is forgotten; it does not exist for the model. The newest message is seen, but not the very start. Companies have softened this by re-injecting or summarising the beginning, but it is good to keep in mind that there is a context window and a long chat can lose its start. Big files can overflow too, so it is a good idea to put what matters most at the end, where the recent context carries the most weight.</p>
+
+        <h3>Temperature</h3>
+        <p>The other important idea is temperature, which has to do with creativity. A low temperature means it sticks to the most likely word, the 62% one. If you increase the temperature, the model can also choose the next most likely options, so it gets more creative. This is more of a developer setting you tweak in APIs; it is not something you necessarily do chatting with AI directly, but you can tell it to be more creative and in theory that works as well.</p>
+
+        <h3>Hallucinations</h3>
+        <p>The other issue, which we still see though not as much as at the beginning, is hallucinations: made-up answers that are problematic, also called confabulations. A model predicting the next likely word will sometimes make up a confident yet totally false answer. It might give you the title of a paper that does not exist. So it is always a good idea to keep an eye out and do your own fact-checking: make sure the link exists, the paper exists, the book or source exists. If something looks too specific or too confident but is unverifiable, do your own homework, especially for highly sensitive projects.</p>
+
+        <h3>What to do next</h3>
+        <p>Now you understand the mechanics, so you can spot hallucinations and remember this is a probabilistic machine, not Google looking information up: it generates answers from its neural network. Notice tokens, and remember context windows, so answers at the very start of a long chat can be forgotten. Try the idea of temperature: see if you can ask for more creative answers as opposed to strictly probabilistic ones. Carry this as an explorer, and keep looking at more technical explanations and diving deeper. Ironically, the LLM itself can explain how it works, so by all means follow your curiosity in the process of your own exploration. Thanks for your time, and see you in the next video.</p>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('lesson-theme');
+  if(t==='light') document.querySelector('.cg-lesson').classList.add('light-mode');
+
+  // Delegated copy handler: any button with [data-copy-btn] inside a .cg-code-block
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  var EXERCISE_ID = 'ai-foundations';
+  var URL_REGEX = /^https?:\/\/[^\s]{6,}$/i;
+
+  function setStatus(kind, html) {
+    var el = document.getElementById('afStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+    el.innerHTML = html;
+  }
+
+  function validate(url) {
+    url = (url || '').trim();
+    if (!url) return { ok: false, msg: 'Please paste a public URL documenting the four mechanics.' };
+    if (!/^https?:\/\//i.test(url)) {
+      return { ok: false, msg: 'URL must start with <code>https://</code>.' };
+    }
+    if (!URL_REGEX.test(url)) {
+      return { ok: false, msg: 'That does not look like a valid URL. Try a Gist, GitHub Pages, Notion, or published Google Doc link.' };
+    }
+    return { ok: true, value: url };
+  }
+
+  function fmtDate(ts) {
+    try {
+      var d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+      if (!d || isNaN(d.getTime())) return '';
+      return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return ''; }
+  }
+  function renderSubmitted(value, ts) {
+    var card = document.getElementById('afSubmittedCard');
+    var urlA = document.getElementById('afSubmittedUrl');
+    var meta = document.getElementById('afSubmittedMeta');
+    var form = document.getElementById('afFormWrap');
+    var fab  = document.getElementById('afSubmitFab');
+    var status = document.getElementById('afStatus');
+    if (card && urlA) { urlA.textContent = value; urlA.href = value; card.classList.add('visible'); }
+    if (meta) meta.textContent = ts ? ('Submitted ' + fmtDate(ts)) : 'Submitted';
+    if (form) form.style.display = 'none';
+    if (fab) fab.classList.remove('visible');
+    if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+  }
+  function renderEditing() {
+    var card = document.getElementById('afSubmittedCard');
+    var form = document.getElementById('afFormWrap');
+    var fab  = document.getElementById('afSubmitFab');
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+  }
+
+  window.__afScrollToSubmit = window.__afScrollToSubmit || function() {
+    var box = document.getElementById('afSubmitBox');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('afInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__afEditSubmission = window.__afEditSubmission || function() {
+    renderEditing();
+    var input = document.getElementById('afInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__afDeleteSubmission = window.__afDeleteSubmission || async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    try {
+      var out = await deleteSubmission(user.uid, EXERCISE_ID);
+      if (out && out.success) {
+        var input = document.getElementById('afInput');
+        if (input) input.value = '';
+        renderEditing();
+        setStatus('ok', 'Submission deleted. You can submit a new URL any time.');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, false); } catch (e) {} }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    }
+  };
+
+  async function loadExisting() {
+    try {
+      var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || typeof getSubmission !== 'function') {
+        var fab = document.getElementById('afSubmitFab');
+        if (fab) fab.classList.add('visible');
+        return;
+      }
+      var existing = await getSubmission(user.uid, EXERCISE_ID);
+      var input = document.getElementById('afInput');
+      if (existing && existing.value) {
+        if (input) input.value = existing.value;
+        renderSubmitted(existing.value, existing.submittedAt);
+      } else {
+        var fab = document.getElementById('afSubmitFab');
+        if (fab) fab.classList.add('visible');
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  window.__afSubmit = async function() {
+    var input = document.getElementById('afInput');
+    var btn = document.getElementById('afBtn');
+    var res = validate(input.value);
+    if (!res.ok) { setStatus('err', res.msg); return; }
+
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh the page and try again.'); return; }
+
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting...';
+
+    try {
+      var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: res.value, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your work: <a href="' + res.value + '" target="_blank" rel="noopener">' + res.value + '</a>');
+        renderSubmitted(res.value, new Date());
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {}
+        }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  };
+
+  setTimeout(loadExisting, 400);
+  setTimeout(loadExisting, 1500);
+})();
+</script>
+</body>
+</html>
