@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The EU AI Act | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none; z-index: 1;
+  }
+  .cg-topbar { position: sticky; top: 0; z-index: 100; height: 56px; background: rgba(0, 0, 54, 0.95); border-bottom: 1px solid rgba(0, 102, 255, 0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-video-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(0, 102, 255, 0.18), rgba(0, 212, 255, 0.10)); color: var(--cg-text-secondary); font-size: 1.05rem; flex-direction: column; gap: 0.6rem; text-align: center; padding: 1.5rem; }
+  .cg-video-placeholder svg { opacity: 0.7; color: var(--cg-cyan); }
+  .cg-video-placeholder strong { color: var(--cg-text-primary); font-size: 1.2rem; font-weight: 600; }
+  .cg-video-placeholder span { color: var(--cg-text-tertiary); font-size: 0.92rem; max-width: 38ch; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; max-height: 340px; overflow-y: auto; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+  .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
+  /* Risk pyramid */
+  .cg-tier { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.25rem; border-radius: 0.75rem; margin: 0.6rem 0; border: 1px solid var(--cg-border); border-left-width: 4px; background: rgba(0,0,0,0.25); }
+  .cg-tier h5 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.25rem; letter-spacing: 0.02em; }
+  .cg-tier p { margin: 0; font-size: 0.9rem; color: var(--cg-text-secondary); }
+  .cg-tier .cg-tier-tag { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; opacity: 0.85; display: block; margin-top: 0.3rem; }
+  .cg-tier.t-unacceptable { border-left-color: #ef4444; } .cg-tier.t-unacceptable h5 { color: #ff6b5e; }
+  .cg-tier.t-high { border-left-color: #f59e0b; } .cg-tier.t-high h5 { color: #f5b342; }
+  .cg-tier.t-limited { border-left-color: #00D4FF; } .cg-tier.t-limited h5 { color: #57c8e6; }
+  .cg-tier.t-minimal { border-left-color: #22c55e; } .cg-tier.t-minimal h5 { color: #4ade80; }
+  /* Submission UI */
+  .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+  .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+  .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+  .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+  .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+  .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+  .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+  .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+  .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+  .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+  .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+  .cg-submit-status a { color: var(--cg-cyan); }
+  .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+  .cg-submitted-card.visible { display: block; }
+  .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+  .cg-submitted-url:hover { text-decoration: underline; }
+  .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+  .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+  @media (max-width: 540px) {
+    .cg-submit-row { flex-direction: column; }
+    .cg-submit-btn { width: 100%; }
+  }
+  /* Floating reminder */
+  .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+  .cg-submit-fab.visible { display: inline-flex; }
+  .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+  .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+  .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+  @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+  /* Light mode */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; } .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; }
+  .cg-lesson.light-mode .cg-step-card, .cg-lesson.light-mode .cg-concept-card, .cg-lesson.light-mode .cg-submit-box, .cg-lesson.light-mode .cg-tier { background: #f8f9fa; border: 1px solid #dadce0; border-left-width: 4px; }
+  .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-video-placeholder { background: linear-gradient(135deg, rgba(26,115,232,0.10), rgba(26,115,232,0.04)); color: #5f6368; }
+  .cg-lesson.light-mode .cg-video-placeholder strong { color: #202124; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>The EU AI Act</h1>
+      <p class="cg-subtitle">Four risk tiers, one literacy clause, and a five-point hygiene check you can run on any AI workflow.</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>Beginner Friendly</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~8 minutes</span>
+      </div>
+    </div>
+
+    <!-- Tutorial Video -->
+    <div class="cg-video-wrapper">
+      <iframe src="https://www.youtube.com/embed/fS09BIUimv4" title="The EU AI Act" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <!-- Slides -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0 1.5rem;flex-wrap:wrap;">
+      <a href="eu-ai-act.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cg-text-secondary);text-decoration:none;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
+        Download Slides (PDF)
+      </a>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start: Audit One Workflow</h2>
+          <span class="cg-session-meta">Classify the risk tier, run the five-point check, fix one thing.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Not legal advice</h4>
+          <p>This lesson teaches the practical frame of the EU AI Act so you can act sensibly. It is general education, not legal advice. For a binding view on your specific situation, consult a qualified lawyer.</p>
+        </div>
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><div class="cg-step-num">1</div><h5>Pick one AI workflow</h5><p>Something you actually do: drafting emails with ChatGPT, screening CVs, a support chatbot, a model in a spreadsheet.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">2</div><h5>Classify the risk tier</h5><p>Unacceptable, high-risk, limited, or minimal. The tier sets the obligations.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">3</div><h5>Run the five-point check</h5><p>Bias, privacy, consent, attribution, transparency. Pass or fail per item, no fudging.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">4</div><h5>Fix one thing</h5><p>Pick the most important fail. Write down the remediation. Submit your audit below.</p></div>
+        </div>
+
+        <h3>The four risk tiers, at a glance</h3>
+        <p>The Act regulates the <strong>use</strong>, not the model. Same technology, different use, different obligations.</p>
+        <div class="cg-tier t-unacceptable"><div><h5>Unacceptable</h5><p>Banned outright. Social-scoring of citizens by behaviour, real-time biometric ID in public spaces, manipulation of vulnerable groups.</p><span class="cg-tier-tag">Prohibited &middot; you cannot deploy this</span></div></div>
+        <div class="cg-tier t-high"><div><h5>High-risk</h5><p>Heavy obligations. CV screeners and hiring tools, medical triage, education admissions, critical infrastructure (energy, water).</p><span class="cg-tier-tag">Allowed with strict controls</span></div></div>
+        <div class="cg-tier t-limited"><div><h5>Limited-risk</h5><p>Transparency duties. Chatbots and generative tools where people must be told they are dealing with AI.</p><span class="cg-tier-tag">Tell people it is AI</span></div></div>
+        <div class="cg-tier t-minimal"><div><h5>Minimal-risk</h5><p>Most everyday uses. Spam filters, AI in games, drafting assistants. Few or no specific obligations.</p><span class="cg-tier-tag">Light touch</span></div></div>
+
+        <h3>The self-audit prompt</h3>
+        <p>Paste this into any capable AI chat, answer its questions about one of your own workflows, and it returns a tidy <code>audit.md</code> with a pass/fail per check and one remediation to make first. That is what you submit.</p>
+
+        <div class="cg-code-block">
+          <div class="cg-code-header">
+            <button type="button" class="cg-copy-btn" data-copy-btn>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              <span class="cg-btn-text">Copy prompt</span>
+            </button>
+          </div>
+          <pre>You are my EU AI Act readiness auditor. I want to audit ONE of my real AI workflows against the EU AI Act. This is practical education, not legal advice, and you should say so once at the end.
+
+GROUND RULES
+1. Ask the fewest questions possible. Five at most. One at a time. Wait for my answer before the next.
+2. Do not lecture. Just ask, then produce the audit.
+3. Be honest. If something is a FAIL, mark it FAIL. Do not soften it.
+4. No em dashes. Use commas, colons, semicolons, full stops, or parentheses.
+
+THE INTERVIEW
+Q1. Describe the workflow in one or two sentences. What AI tool, doing what, on whose behalf?
+Q2. Whose data goes into the prompts or the system? Any personal, customer, employee, or confidential data?
+Q3. Who sees or is affected by the output, and do they know AI was involved?
+Q4. Does this decision affect people's rights, money, health, jobs, or access to a service? (This drives the risk tier.)
+Q5. Who owns this workflow, and how often does it run?
+
+After five answers, stop asking and produce the audit.
+
+THE AUDIT (output as one fenced markdown block, ready to save as audit.md)
+```markdown
+---
+workflow: {short-kebab-name}
+risk_tier: {unacceptable | high-risk | limited | minimal, with one line of reasoning}
+owner: {who}
+last_audit: {today's date as YYYY-MM-DD}
+---
+
+# {Workflow name}
+
+## Risk classification
+One short paragraph: which tier and why. If high-risk, note that a fundamental rights impact assessment is likely required.
+
+## Five-point hygiene check
+bias:         PASS or FAIL  - one line of evidence
+privacy:      PASS or FAIL  - one line of evidence
+consent:      PASS or FAIL  - one line of evidence
+attribution:  PASS or FAIL  - one line of evidence
+transparency: PASS or FAIL  - one line of evidence
+
+## Remediation (do these in order)
+1. The single most important fix, stated as a concrete action.
+2. The next one.
+
+## Note
+This is general education on the EU AI Act, not legal advice.
+```
+Begin with Q1 now. Nothing else.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+        <h3>What a finished audit looks like</h3>
+        <p>Real workflow in, real pass and fail out. Here is a marketing team using ChatGPT to draft emails.</p>
+        <div class="cg-code-block">
+          <pre>---
+workflow: marketing-emails-with-chatgpt
+risk_tier: minimal
+owner: marketing-lead
+last_audit: 2026-05-28
+---
+
+# Marketing emails with ChatGPT
+
+## Five-point hygiene check
+bias:         PASS  - a human reviews tone before sending
+privacy:      FAIL  - customer data is pasted into the prompt
+consent:      PASS  - opt-in lists only
+attribution:  PASS  - a human author signs the email
+transparency: FAIL  - subscribers are not told AI helped write it
+
+## Remediation
+1. Strip personal data before prompting.
+2. Add an "AI-assisted" line to the footer.</pre>
+          <div class="cg-code-footer">
+            <button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button>
+          </div>
+        </div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> That is the whole exercise</h4>
+          <p>Classify, check, fix one thing, document. Save your audit to a public link (a Gist, Notion page, or Google Doc) and submit it below.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">The risk pyramid, Article 4, the five checks, two real cases</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>Part 1. Why this matters</h3>
+        <p>The EU AI Act is one of the most important regulations of your career, and most professionals cannot name a single risk category. By the end of this lesson, you can. The stakes are real: breaches of the prohibited-practice rules can carry fines of up to <strong>7% of global annual turnover</strong>. The aim here is not to make you a lawyer. It is to give you a frame you can act on.</p>
+
+        <h3>Part 2. The risk pyramid (the part you need cold)</h3>
+        <p>The Act sorts AI uses into four tiers. Two you need to know cold, two you should recognise. The crucial idea: <strong>the Act regulates the use, not the model</strong>. The same technology in a different use can land in a different tier with different obligations.</p>
+        <ul>
+          <li><strong>Unacceptable</strong>: banned outright. Government social-scoring that ranks citizens by behaviour, real-time biometric identification in public spaces, and systems that manipulate vulnerable groups.</li>
+          <li><strong>High-risk</strong>: allowed, but with heavy obligations. CV screeners and hiring tools, medical triage, education admissions, and critical infrastructure such as energy and water.</li>
+          <li><strong>Limited-risk</strong>: transparency duties. If people interact with a chatbot or see generative output, they must be told it is AI.</li>
+          <li><strong>Minimal-risk</strong>: most everyday uses, such as spam filters and drafting assistants. Few or no specific obligations.</li>
+        </ul>
+
+        <h3>Part 3. Article 4: the AI literacy clause</h3>
+        <p>Article 4 is the reason this badge exists. It has been in force since <strong>2 February 2025</strong>. The text, verbatim:</p>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Article 4, EU AI Act (Regulation (EU) 2024/1689)</h4>
+          <p>"Providers and deployers of AI systems shall take measures to ensure, to their best extent, a sufficient level of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in."</p>
+        </div>
+        <p>In plain English, five questions answer most of it:</p>
+        <ol>
+          <li><strong>Who is covered?</strong> Both providers (who build AI systems) and deployers (who use them). If your organisation uses AI, you are a deployer.</li>
+          <li><strong>What is the obligation?</strong> Ensure the people operating AI on your behalf have a sufficient level of AI literacy.</li>
+          <li><strong>What does "sufficient" mean?</strong> It is proportionate to the role, the context, and the risk. A team using a chatbot needs less than a team running a high-risk system.</li>
+          <li><strong>When does it apply to me?</strong> Now. It has applied since 2 February 2025.</li>
+          <li><strong>What if I do nothing?</strong> You carry an unmet obligation, and weak AI literacy is what causes the bias and data-leak incidents the Act is designed to prevent.</li>
+        </ol>
+
+        <h3>Part 4. The five-point hygiene check</h3>
+        <p>This is the portable tool. Run it on any AI workflow you own. Pass or fail per item.</p>
+        <div class="cg-concept-card"><h4>Bias</h4><p>Could the model produce systematically worse output for one group? How would you spot it?</p></div>
+        <div class="cg-concept-card"><h4>Privacy</h4><p>What personal or confidential data is in your prompts? Is the tool's data policy compatible with that?</p></div>
+        <div class="cg-concept-card"><h4>Consent</h4><p>Did the people whose data you use, or who receive AI output, agree to that use?</p></div>
+        <div class="cg-concept-card"><h4>Attribution</h4><p>Are you crediting AI honestly to readers, clients, and regulators? No quiet pass-offs.</p></div>
+        <div class="cg-concept-card"><h4>Transparency</h4><p>Do end users know AI is involved? Do they have a way to flag a bad output?</p></div>
+        <p>One worked audit teaches the discipline more than the five principles do. That is why the Quick Start exercise has you run it on a real workflow.</p>
+
+        <h3>Part 5. Two real cases, where the obligations bite</h3>
+        <h4>Bias: the silent screener</h4>
+        <p>A CV screener is trained on a company's historical hires. Because past hires skewed male, the model learns to downrank women. It looks fair on paper, because nobody wrote a rule about gender, but it discriminates in practice. Hiring tools are <strong>high-risk</strong> under the Act, so audit obligations apply. You catch this by testing outcomes across groups, not by trusting that the inputs looked neutral.</p>
+        <h4>Data leak: the helpful paste</h4>
+        <p>An employee pastes a customer's full data into ChatGPT to draft a reply. No malice, just a Tuesday-morning shortcut. But that data may now sit in logs you do not control, or become training material. That is a GDPR breach. Article 4 is the prevention: train staff <em>before</em> this happens, so the shortcut never feels normal.</p>
+
+        <h3>Part 6. The audit loop: classify, check, apply, document</h3>
+        <p>AI literacy is a practice, not a one-off training. The loop you repeat for every AI workflow your team owns:</p>
+        <ol>
+          <li><strong>Classify.</strong> What risk tier is this use? The tier sets the obligations.</li>
+          <li><strong>Check.</strong> Does the use case need a fundamental rights impact assessment? If it is high-risk, the answer is yes.</li>
+          <li><strong>Apply.</strong> Run the five-point hygiene check. Pass or fail per item.</li>
+          <li><strong>Document.</strong> Keep evidence. Date the audit. Note remediations. Audits and procurement questions will come, and dated evidence is what answers them.</li>
+        </ol>
+
+        <h3>Part 7. What you do next</h3>
+        <p>You now have the regulatory frame. From here it is practice, not theory.</p>
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><h5>Today</h5><p>Audit one workflow with the five-point check (the Quick Start exercise).</p></div>
+          <div class="cg-step-card"><h5>This week</h5><p>Map every AI use in your team to a risk tier.</p></div>
+          <div class="cg-step-card"><h5>Next month</h5><p>Build an AI literacy log. Date your evidence.</p></div>
+          <div class="cg-step-card"><h5>Beyond</h5><p>Write a usage policy. Train others. Repeat annually.</p></div>
+        </div>
+
+      </div>
+    </div>
+
+    <style>
+      /* SPA-survivable submission styles (must live inside .cg-main so x-html keeps them) */
+      .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+      .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+      .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+      .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+      .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+      .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+      .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+      .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+      .cg-submit-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+      .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+      .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+      .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+      .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+      .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+      .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+      .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+      .cg-submit-status a { color: var(--cg-cyan); }
+      .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+      .cg-submitted-card.visible { display: block; }
+      .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+      .cg-submitted-label svg { width: 16px; height: 16px; flex-shrink: 0; }
+      .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+      .cg-submitted-url:hover { text-decoration: underline; }
+      .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+      .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+      .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+      .cg-submitted-actions .cg-submit-btn svg { width: 14px; height: 14px; }
+      @media (max-width: 540px) {
+        .cg-submit-row { flex-direction: column; }
+        .cg-submit-btn { width: 100%; }
+      }
+      .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+      .cg-submit-fab.visible { display: inline-flex; }
+      .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+      .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+      @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+      .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+      .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+      .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+      .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+      .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+      .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+      .cg-lesson.light-mode .cg-submit-input:focus { background: #fff; border-color: #1a73e8; box-shadow: 0 0 0 4px rgba(26,115,232,0.18); }
+      .cg-lesson.light-mode .cg-submit-input::placeholder { color: #9aa0a6; }
+      .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+      .cg-lesson.light-mode .cg-submit-btn.secondary { background: #f1f3f4; color: #202124; border: 1px solid #dadce0; }
+      .cg-lesson.light-mode .cg-submit-btn.secondary:hover { background: #e8eaed; }
+      .cg-lesson.light-mode .cg-submit-btn.danger { background: #fce8e6; color: #d93025; border: 1px solid #f6c5c1; }
+      .cg-lesson.light-mode .cg-submit-btn.danger:hover { background: #f9d4d0; }
+      .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+      .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+      .cg-lesson.light-mode .cg-submit-status.ok { color: #137333; background: #e6f4ea; }
+      .cg-lesson.light-mode .cg-submit-status.err { color: #b3261e; background: #fce8e6; }
+      .cg-lesson.light-mode .cg-submit-status a { color: #1a73e8; }
+    </style>
+
+    <!-- SUBMIT YOUR WORK -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Optional Practice: Audit a Workflow</h2>
+          <span class="cg-session-meta">No submission required, just mark the lesson complete</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> This lesson needs no submission</h4>
+          <p>Once you have watched the video, mark the lesson complete from your dashboard. The audit below is optional practice: the most useful thing you can do with this lesson, but not a gate.</p>
+        </div>
+        <p>For practice, run the self-audit on <strong>one of your own AI workflows</strong>. Classify the use into a risk tier with reasoning, run the five-point hygiene check with a pass or fail per item, and name at least one remediation you will make. If you would like a record of it, publish it to a public link and paste it below. A Gist, GitHub Pages page, Notion page, published Google Doc, or any public URL will do.</p>
+        <div class="cg-submit-box" data-exercise-submission="eu-ai-act" data-submission-input="euaaInput" data-submission-status="euaaStatus" data-submission-btn="euaaBtn" data-submission-validate="url" data-submission-card="euaaSubmittedCard" data-submission-card-url="euaaSubmittedUrl" data-submission-card-meta="euaaSubmittedMeta" data-submission-form="euaaFormWrap" data-submission-fab="euaaSubmitFab" id="euaaSubmitBox">
+          <div class="cg-submitted-card" id="euaaSubmittedCard">
+            <div class="cg-submitted-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Your submission
+            </div>
+            <a class="cg-submitted-url" id="euaaSubmittedUrl" href="#" target="_blank" rel="noopener"></a>
+            <div class="cg-submitted-meta" id="euaaSubmittedMeta"></div>
+            <div class="cg-submitted-actions">
+              <button type="button" class="cg-submit-btn secondary" id="euaaEditBtn" onclick="window.__euaaEditSubmission&&window.__euaaEditSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit / Resubmit
+              </button>
+              <button type="button" class="cg-submit-btn danger" id="euaaDeleteBtn" onclick="window.__euaaDeleteSubmission&&window.__euaaDeleteSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>
+          <div id="euaaFormWrap">
+            <span class="cg-submit-label">Public URL</span>
+            <div class="cg-submit-row">
+              <input type="url" class="cg-submit-input" id="euaaInput" placeholder="https://gist.github.com/yourname/... or any public link" autocomplete="off" spellcheck="false">
+              <button class="cg-submit-btn" id="euaaBtn" onclick="(window.submitExerciseUrl||window.__euaaSubmit)({exerciseId:'eu-ai-act',inputId:'euaaInput',statusId:'euaaStatus',btnId:'euaaBtn',validate:'url'})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Submit
+              </button>
+            </div>
+            <div class="cg-submit-status" id="euaaStatus" style="display:none;"></div>
+          </div>
+        </div>
+        <button type="button" class="cg-submit-fab" id="euaaSubmitFab" onclick="window.__euaaScrollToSubmit&&window.__euaaScrollToSubmit()" aria-label="Jump to submission">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit your URL
+        </button>
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> What to submit</h4>
+          <p>One public link containing your <code>audit.md</code>: risk tier with reasoning, the five-point check with pass or fail per item, and at least one remediation. Easiest options: a public GitHub <a href="https://gist.github.com" target="_blank" rel="noopener">Gist</a>, a public Notion page, a published Google Doc, or a GitHub Pages site. Do not include real personal or confidential data in what you publish.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Common Questions</h2>
+          <span class="cg-session-meta">Misreadings of the Act, cleared up</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info" style="margin-bottom: 1.5rem;">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> When in doubt, classify by use</h4>
+          <p>Most confusion about the Act dissolves once you remember it regulates the <em>use</em>, not the tool. Ask "what is this doing, to whom, and with what effect" rather than "is this technology allowed".</p>
+        </div>
+        <div class="cg-concept-card"><h4>"We only use ChatGPT, so the Act does not apply to us."</h4><p>It does. If your organisation uses AI, you are a deployer, and the Article 4 AI literacy obligation already applies. Most everyday uses are minimal-risk, but the literacy duty is not tier-dependent.</p></div>
+        <div class="cg-concept-card"><h4>"Our tool is minimal-risk, so we have no obligations."</h4><p>Minimal-risk means few <em>specific</em> obligations, not none. Article 4 (AI literacy) still applies, and limited-risk transparency duties kick in the moment people interact with a chatbot or see generative output.</p></div>
+        <div class="cg-concept-card"><h4>"Our model was tested as fair, so bias is handled."</h4><p>Fair inputs do not guarantee fair outcomes. The CV-screener case shows a model can discriminate without any explicit rule about the protected group. Test outcomes across groups, and re-test as data drifts.</p></div>
+        <div class="cg-concept-card"><h4>"Pasting customer data into a chatbot is fine, it is just a tool."</h4><p>It can be a GDPR breach. That data may land in logs you do not control or become training material. Strip personal and confidential data before prompting, and check the tool's data policy.</p></div>
+        <div class="cg-concept-card"><h4>"Do I really have to tell people AI was involved?"</h4><p>For limited-risk uses, yes: transparency is the obligation. Beyond the law, honest attribution is the attribution check in your five-point audit. No quiet pass-offs.</p></div>
+        <div class="cg-concept-card"><h4>"This is an EU law, I am not in the EU."</h4><p>It reaches AI uses that affect people in the EU, much like GDPR. If you deploy AI inside an EU-resident business or serve EU customers, assume it is relevant and audit accordingly.</p></div>
+        <h3>Common mistakes to avoid</h3>
+        <ul>
+          <li>Treating the Act as a one-off compliance box rather than an ongoing practice. AI literacy is a habit you repeat.</li>
+          <li>Classifying by technology instead of by use. The same model can be minimal-risk in one workflow and high-risk in another.</li>
+          <li>Skipping the documentation step. Undated, unrecorded audits do not help you when procurement or a regulator asks.</li>
+          <li>Publishing real personal or confidential data in your submitted audit. Describe the workflow without leaking the data it touches.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Video Transcript</h2>
+          <span class="cg-session-meta">The full walkthrough in text form</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <h3>A short primer</h3>
+        <p>Welcome to the AI Badge. We are going to look at the EU AI Act: a short primer, and a reminder of some of the obligations, especially as the capabilities of AI keep growing. Most professionals cannot name a single one of the categories we are about to look at. By the end of this video I hope you can, and more importantly, that you can identify the risks involved and keep good hygiene in how you use AI, because the stakes are high.</p>
+
+        <h3>The four risk tiers</h3>
+        <p>The two tiers that should be understood best are <strong>unacceptable</strong> and <strong>high-risk</strong>. One is banned, the other carries heavy obligations.</p>
+        <p>Examples of unacceptable, or banned, uses of AI: social-scoring systems. In some parts of the world this might be acceptable, but not in the EU, where a government ranks citizens by behaviour. Real-time biometric identification in public, and manipulation of vulnerable groups. Anything that manipulates users, for example into buying a product, can also fall into this category.</p>
+        <p>High-risk comes with heavy obligations: CV screening and hiring tools are considered high-risk, along with medical triage, some uses in education such as chatbots, and critical infrastructure such as energy and water. Limited-risk and minimal-risk are the other two, lower-level tiers.</p>
+
+        <h3>Article 4: AI literacy</h3>
+        <p>On AI literacy, Article 4 of the EU AI Act is the relevant one. You may have heard of it. It is part of the reason this badge exists: to promote AI literacy in the EU. It has been in force since February of last year.</p>
+        <p>The text: providers and deployers of AI systems shall take measures to ensure, to their best extent, a sufficient level of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training, and the context the AI systems are to be used in.</p>
+        <p>In practice, each organisation has to answer: who is covered, what specific obligation the organisation has, what "sufficient" means, when it applies to individuals, and what happens if nothing is done. Organisations have the obligation to provide this AI literacy.</p>
+
+        <h3>The five-point hygiene check</h3>
+        <p>Apply this to any AI workflow you own, wherever you use AI. It is a pass-or-fail check on five items: bias, privacy, consent, attribution, and transparency. An audit takes one real workflow and shows a real pass or fail per item, which is what teaches the discipline.</p>
+        <p>Take a concrete example: marketing emails with ChatGPT. The risk tier is minimal. The owner is the marketing lead. Then you record when the last audit was, and you go item by item. Bias: a human reviews the tone, so that is a pass. Privacy: customer data is in the prompt, so that is a fail; you cannot put private customer data into the prompt itself.</p>
+        <p>Going through each: <strong>bias</strong>, could the model produce systematically worse output for one group, and how would you spot it? Some bias may be invisible. <strong>Privacy</strong>, what personal or confidential data is in your prompts; customer data should not be put into the prompt. <strong>Consent</strong>, did the people whose data you use, or who receive AI output, agree to that use; for example opt-in lists only, which would be a pass. <strong>Attribution</strong>, are you crediting AI honestly to readers, clients, and regulators, with no quiet pass-offs; if a human author signed it, that is a pass. <strong>Transparency</strong>, do end users know AI is involved, and do they have a way to flag a bad output; if subscribers are not told, that is a fail.</p>
+        <p>And then: what is the remediation? Strip personal data before prompting, and add an "AI-assisted" line to the footer for full disclosure.</p>
+
+        <h3>Two cases where it bites</h3>
+        <p>A CV screener trained on historical hires shows the bias case. The model learns to downrank women because past hires skewed male. It looks fair on paper but discriminates in practice. That is high-risk under the Act, so audit obligations apply.</p>
+        <p>The data-leak case: an employee pastes customer data into ChatGPT. There is no malice, it was a shortcut, but sensitive data then sits in training material and logs you do not control. That is a GDPR breach. Article 4 is about training staff before this happens.</p>
+
+        <h3>The audit loop</h3>
+        <p>Classify: what risk tier is this AI use, unacceptable, high-risk, limited, or minimal? The tier sets the obligations. Check: does the use case require a fundamental rights impact assessment; if it is high-risk, the answer is yes. Apply: run the five-point hygiene check, pass or fail for each item: bias, privacy, consent, attribution, transparency. Document: leave an audit trail, so that down the road, if there are questions, there is an audit document. This is repeated for every AI workflow the team owns, and it is AI literacy in practice.</p>
+
+        <h3>Applying it across the organisation</h3>
+        <p>That is a short introduction to the regulatory frame. You apply it to workflows, mapping the use of AI across the organisation. It gets more complex as AI becomes more pervasive, but this is part of the regulation: building AI literacy logs, creating that audit trail, writing policies around usage, and training others. It can be repeated and reviewed annually.</p>
+        <p>Thank you very much. There is no submission associated with this lesson; you can simply mark it as complete.</p>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('lesson-theme');
+  if(t==='light') document.querySelector('.cg-lesson').classList.add('light-mode');
+
+  // Delegated copy handler: any button with [data-copy-btn] inside a .cg-code-block
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  var EXERCISE_ID = 'eu-ai-act';
+  var URL_REGEX = /^https?:\/\/[^\s]{6,}$/i;
+
+  function setStatus(kind, html) {
+    var el = document.getElementById('euaaStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+    el.innerHTML = html;
+  }
+
+  function validate(url) {
+    url = (url || '').trim();
+    if (!url) return { ok: false, msg: 'Please paste a public URL with your workflow audit.' };
+    if (!/^https?:\/\//i.test(url)) {
+      return { ok: false, msg: 'URL must start with <code>https://</code>.' };
+    }
+    if (!URL_REGEX.test(url)) {
+      return { ok: false, msg: 'That does not look like a valid URL. Try a Gist, GitHub Pages, Notion, or published Google Doc link.' };
+    }
+    return { ok: true, value: url };
+  }
+
+  function fmtDate(ts) {
+    try {
+      var d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+      if (!d || isNaN(d.getTime())) return '';
+      return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return ''; }
+  }
+  function renderSubmitted(value, ts) {
+    var card = document.getElementById('euaaSubmittedCard');
+    var urlA = document.getElementById('euaaSubmittedUrl');
+    var meta = document.getElementById('euaaSubmittedMeta');
+    var form = document.getElementById('euaaFormWrap');
+    var fab  = document.getElementById('euaaSubmitFab');
+    var status = document.getElementById('euaaStatus');
+    if (card && urlA) { urlA.textContent = value; urlA.href = value; card.classList.add('visible'); }
+    if (meta) meta.textContent = ts ? ('Submitted ' + fmtDate(ts)) : 'Submitted';
+    if (form) form.style.display = 'none';
+    if (fab) fab.classList.remove('visible');
+    if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+  }
+  function renderEditing() {
+    var card = document.getElementById('euaaSubmittedCard');
+    var form = document.getElementById('euaaFormWrap');
+    var fab  = document.getElementById('euaaSubmitFab');
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+  }
+
+  window.__euaaScrollToSubmit = window.__euaaScrollToSubmit || function() {
+    var box = document.getElementById('euaaSubmitBox');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('euaaInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__euaaEditSubmission = window.__euaaEditSubmission || function() {
+    renderEditing();
+    var input = document.getElementById('euaaInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__euaaDeleteSubmission = window.__euaaDeleteSubmission || async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    try {
+      var out = await deleteSubmission(user.uid, EXERCISE_ID);
+      if (out && out.success) {
+        var input = document.getElementById('euaaInput');
+        if (input) input.value = '';
+        renderEditing();
+        setStatus('ok', 'Submission deleted. You can submit a new URL any time.');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, false); } catch (e) {} }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    }
+  };
+
+  async function loadExisting() {
+    try {
+      var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || typeof getSubmission !== 'function') {
+        var fab = document.getElementById('euaaSubmitFab');
+        if (fab) fab.classList.add('visible');
+        return;
+      }
+      var existing = await getSubmission(user.uid, EXERCISE_ID);
+      var input = document.getElementById('euaaInput');
+      if (existing && existing.value) {
+        if (input) input.value = existing.value;
+        renderSubmitted(existing.value, existing.submittedAt);
+      } else {
+        var fab = document.getElementById('euaaSubmitFab');
+        if (fab) fab.classList.add('visible');
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  window.__euaaSubmit = async function() {
+    var input = document.getElementById('euaaInput');
+    var btn = document.getElementById('euaaBtn');
+    var res = validate(input.value);
+    if (!res.ok) { setStatus('err', res.msg); return; }
+
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh the page and try again.'); return; }
+
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting...';
+
+    try {
+      var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: res.value, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your audit: <a href="' + res.value + '" target="_blank" rel="noopener">' + res.value + '</a>');
+        renderSubmitted(res.value, new Date());
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {}
+        }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  };
+
+  setTimeout(loadExisting, 400);
+  setTimeout(loadExisting, 1500);
+})();
+</script>
+</body>
+</html>
