@@ -4699,7 +4699,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
             this._timer = setTimeout(function () { s0.sent = false; s0.error = false; }, 2600);
             return;
           }
-          var resp = await fetch(API + '/invite', {
+          // `API` const lives in a later script block (out of scope here), so
+          // resolve the worker base safely without risking a ReferenceError.
+          var apiBase = (typeof API !== 'undefined' && API) ? API : 'https://aibadge-report-mailer.victordelrosal.workers.dev/api';
+          var resp = await fetch(apiBase + '/invite', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
             body: JSON.stringify({ to: friend, code: code })
