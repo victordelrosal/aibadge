@@ -1271,11 +1271,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <nav class="nav">
     <a href="#/" class="logo"><img src="assets/img/ai-badge.png" alt="AI Badge" class="nav-logo"><span class="logo-ai">AI</span><span class="logo-badge">Badge</span></a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="#programme" class="nav-cta-gold">Get Access</a></li>
+      <li><a href="#" class="nav-cta-gold" @click.prevent="navGoogleSignup()">Sign up free</a></li>
       <li><a href="#dimensions">Dimensions</a></li>
       <li><a href="#how-it-works">How It Works</a></li>
       <li><a href="#guide">Guide</a></li>
-      <li><a href="#" class="nav-signin" @click.prevent="$store.ui.showModal('signin')">Sign In</a></li>
+      <li><a href="#" class="nav-signin" @click.prevent="$store.ui.showModal('signin')">Sign in</a></li>
     </ul>
     <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
       <span></span><span></span><span></span>
@@ -1298,7 +1298,15 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <h1 class="fade-in">Go From <span class="gold">AI Curious</span> to<br><span class="gold">AI Fluent</span> in Six Weeks</h1>
     <p class="sub fade-in">A self-paced AI capability programme that measures where you are, guides you forward, and proves how far you have come. Six dimensions. Real results.</p>
 
-    <a href="#programme" class="btn-cta fade-in">Get Access <span>&darr;</span></a>
+    <a href="#" class="btn-cta fade-in" @click.prevent="navGoogleSignup()" style="display:inline-flex;align-items:center;gap:10px;">
+      <span style="background:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;">
+        <svg width="15" height="15" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      </span>
+      Start free with Google
+    </a>
+    <div class="fade-in" style="margin-top:14px;">
+      <a href="#" @click.prevent="$store.ui.showModal('signin')" style="color:rgba(255,255,255,0.85);font-size:0.92rem;text-decoration:underline;text-underline-offset:3px;">or sign up with email</a>
+    </div>
   </div>
 </section>
 
@@ -1908,10 +1916,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <div class="lms-invite" x-data="inviteWidget()" x-show="$store.auth.isLoggedIn">
         <form @submit.prevent="send($event)" style="display:flex;align-items:center;">
           <input class="lms-invite-input" type="text" x-model="friend" placeholder="Invite a friend&hellip;" autocomplete="off" aria-label="Friend's email to invite">
-          <button class="lms-invite-btn" :class="sent && 'sent'" type="submit" title="Share your invite link">
-            <svg x-show="!sent" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-            <svg x-show="sent" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="lms-invite-label" x-text="sent ? label : 'Invite'"></span>
+          <button class="lms-invite-btn" :class="{ 'sent': sent && !error, 'invite-err': sent && error }" type="submit" :disabled="sending" title="Share your invite link">
+            <svg x-show="!sent && !sending" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+            <svg x-show="sent && !error" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="lms-invite-label" x-text="sending ? 'Sending…' : (sent ? label : 'Invite')"></span>
           </button>
         </form>
         <div class="lms-hearts" x-ref="hearts" aria-hidden="true"></div>
@@ -2004,6 +2012,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-invite-btn:hover { transform:translateY(-1px); box-shadow:0 4px 18px rgba(212,175,55,0.55); }
       .lms-invite-btn:active { transform:translateY(0) scale(0.96); }
       .lms-invite-btn.sent { background:linear-gradient(135deg,#1faa4d,#34C759); color:#fff; box-shadow:0 4px 18px rgba(52,199,89,0.5); }
+      .lms-invite-btn.invite-err { background:linear-gradient(135deg,#c0392b,#e74c3c); color:#fff; box-shadow:0 4px 18px rgba(231,76,60,0.45); }
+      .lms-invite-btn:disabled { opacity:0.75; cursor:default; }
       .lms-hearts { position:absolute; left:0; right:0; top:0; bottom:0; pointer-events:none; overflow:visible; z-index:300; }
       .lms-heart { position:absolute; bottom:8px; will-change:transform,opacity; animation:heartFloat 1.5s cubic-bezier(.22,.61,.36,1) forwards; }
       @keyframes heartFloat {
@@ -3801,6 +3811,20 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
   function navigate(hash) { window.location.hash = hash; }
 
+  // Seamless one-click Google sign-up/in from the landing navbar + hero.
+  // On success, onAuthStateChanged assigns the free tier and routes to the
+  // dashboard. If the popup is dismissed/blocked, or the user wants email,
+  // we fall back to the sign-in sheet (which has both Google and email).
+  window.navGoogleSignup = async function() {
+    try {
+      if (typeof signInWithGoogle !== 'function') { Alpine.store('ui').showModal('signin'); return; }
+      var res = await signInWithGoogle();
+      if (!res || !res.success) { Alpine.store('ui').showModal('signin'); }
+    } catch (e) {
+      Alpine.store('ui').showModal('signin');
+    }
+  };
+
   // ---------- Init ----------
   document.addEventListener('alpine:init', () => {
     registerStores(Alpine);
@@ -4602,7 +4626,12 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       label: 'Sent!',
       _timer: null,
 
+      sending: false,
+      error: false,
+
       async send(ev) {
+        if (this.sending) return;
+        this.error = false;
         var auth = Alpine.store('auth');
         var user = auth.user;
         if (!user) { Alpine.store('ui').showModal('signin'); return; }
@@ -4616,27 +4645,53 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         }
         var link = code ? (location.origin + '/?ref=' + code) : location.origin;
         var friend = (this.friend || '').trim();
-        var isEmail = /.+@.+\..+/.test(friend);
-        var name = (friend && friend.indexOf('@') > -1) ? friend.split('@')[0] : (friend || 'there');
-        var msg = 'Hi ' + name + ',\n\nI’ve been learning AI on AI Badge and thought you’d enjoy it. The first lessons are free — join with my link:\n' + link + '\n\nSee you in there!';
-        try { await navigator.clipboard.writeText(link); } catch (e) { /* clipboard blocked */ }
-        if (isEmail) {
-          try {
-            var mailto = 'mailto:' + encodeURIComponent(friend) +
-              '?subject=' + encodeURIComponent('Learn AI with me on AI Badge') +
-              '&body=' + encodeURIComponent(msg);
-            window.location.href = mailto;
-          } catch (e) { /* ignore */ }
-          this.label = 'Sent!';
-        } else {
-          this.label = 'Link copied!';
-        }
-        this.burst();
-        this.friend = '';
-        this.sent = true;
+        var isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(friend);
         var self = this;
-        clearTimeout(this._timer);
-        this._timer = setTimeout(function () { self.sent = false; }, 2000);
+
+        // No valid email typed: just copy the link (still delightful).
+        if (!isEmail) {
+          try { await navigator.clipboard.writeText(link); } catch (e) {}
+          this.label = 'Link copied!';
+          this.burst();
+          this.friend = '';
+          this.sent = true;
+          clearTimeout(this._timer);
+          this._timer = setTimeout(function () { self.sent = false; }, 2000);
+          return;
+        }
+
+        // Valid email: actually send the invite via the Cloudflare Worker.
+        this.sending = true;
+        var fromName = auth.firstName || auth.fullName || 'A friend';
+        var ok = false, errMsg = '';
+        try {
+          var resp = await fetch(API + '/invite', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to: friend, code: code, fromName: fromName, fromEmail: user.email })
+          });
+          var data = {};
+          try { data = await resp.json(); } catch (e) {}
+          ok = resp.ok && data && data.success;
+          if (!ok) errMsg = (data && data.error) || 'Could not send. Try again.';
+        } catch (e) { errMsg = 'Network error. Try again.'; }
+        this.sending = false;
+
+        if (ok) {
+          try { await navigator.clipboard.writeText(link); } catch (e) {}
+          this.label = 'Invite sent! 💌';
+          this.burst();
+          this.friend = '';
+          this.sent = true;
+          clearTimeout(this._timer);
+          this._timer = setTimeout(function () { self.sent = false; }, 2400);
+        } else {
+          this.label = errMsg;
+          this.error = true;
+          this.sent = true;
+          clearTimeout(this._timer);
+          this._timer = setTimeout(function () { self.sent = false; self.error = false; }, 2600);
+        }
       },
 
       burst() {

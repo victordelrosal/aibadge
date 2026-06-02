@@ -71,6 +71,9 @@ export default {
       const email = url.searchParams.get("email");
       return handleCheckEnrollment(email, env);
     }
+    if (path === "/api/invite" && request.method === "POST") {
+      return handleInvite(request, env);
+    }
 
     // ── Legacy: report mailer (POST to root) ──
     if (request.method === "POST" && (path === "/" || path === "")) {
@@ -762,6 +765,83 @@ async function sendHostNotification(env, slot) {
 }
 
 // ══════════════════════════════════════════
+// VIRAL TREE: INVITE EMAIL
+// ══════════════════════════════════════════
+
+async function handleInvite(request, env) {
+  let body;
+  try { body = await request.json(); }
+  catch (e) { return jsonResponse({ error: "Invalid JSON" }, 400); }
+
+  const to = String(body.to || "").trim().toLowerCase();
+  // referral code is the only link-controlling input; derive the URL ourselves
+  // so the endpoint can never be used to mail arbitrary links.
+  const code = String(body.code || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
+  const fromNameRaw = String(body.fromName || "").trim().slice(0, 60);
+  const fromName = fromNameRaw.replace(/[<>]/g, "") || "A friend";
+  const replyTo = String(body.fromEmail || "").trim().toLowerCase();
+
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRe.test(to)) return jsonResponse({ error: "Please enter a valid email address." }, 400);
+  if (!code) return jsonResponse({ error: "Missing referral code." }, 400);
+
+  // Light per-IP rate limit (abuse guard): 20 invites / hour.
+  try {
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+    const key = `invite_rl:${ip}`;
+    const count = parseInt((await env.SLOTS.get(key)) || "0", 10);
+    if (count >= 20) {
+      return jsonResponse({ error: "You've sent a lot of invites. Try again later." }, 429);
+    }
+    await env.SLOTS.put(key, String(count + 1), { expirationTtl: 3600 });
+  } catch (e) { /* KV hiccup: don't block the invite */ }
+
+  const site = env.SITE_URL || "https://aibadge.fiveinnolabs.com";
+  const link = `${site}/?ref=${encodeURIComponent(code)}`;
+  const safeFrom = escapeHtml(fromName);
+
+  const html = `<!DOCTYPE html><html><body style="margin:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<div style="max-width:520px;margin:0 auto;padding:24px;">
+  <div style="background:#fff;border-radius:18px;padding:32px 28px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+    <div style="font-size:2rem;margin-bottom:8px;">🌱</div>
+    <h1 style="font-size:22px;line-height:1.25;color:#000036;margin:0 0 10px;">${safeFrom} invited you to learn AI</h1>
+    <p style="font-size:15px;line-height:1.55;color:#3a3f4a;margin:0 0 22px;">${safeFrom} is learning AI on <strong>AI Badge</strong> and thought you'd enjoy it. The first lessons are free, no card needed. Jump in with their link:</p>
+    <a href="${link}" style="display:inline-block;padding:14px 22px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px;color:#0A0E27;background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%);">Start learning free →</a>
+    <p style="font-size:12px;color:#8a91a3;margin:22px 0 0;word-break:break-all;">Or paste this into your browser: ${link}</p>
+  </div>
+  <div style="text-align:center;font-size:11px;color:#999;padding:18px 0;">AI Badge by Victor del Rosal · <a href="https://fiveinnolabs.com" style="color:#D4AF37;">fiveinnolabs</a></div>
+</div>
+</body></html>`;
+
+  const payload = {
+    from: env.FROM_EMAIL,
+    to: to,
+    subject: `${fromName} invited you to AI Badge`,
+    html: html,
+  };
+  if (emailRe.test(replyTo)) payload.reply_to = replyTo;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const detail = await res.text();
+      console.log("invite send failed:", res.status, detail);
+      return jsonResponse({ error: "Couldn't send the invite right now." }, 502);
+    }
+    return jsonResponse({ success: true });
+  } catch (e) {
+    return jsonResponse({ error: "Couldn't send the invite right now." }, 502);
+  }
+}
+
+// ══════════════════════════════════════════
 // SESSION REMINDERS (Cron Trigger)
 // ══════════════════════════════════════════
 
@@ -1142,4 +1222,13 @@ function jsonResponse(data, status = 200) {
     status,
     headers: { "Content-Type": "application/json", ...corsHeaders() },
   });
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
