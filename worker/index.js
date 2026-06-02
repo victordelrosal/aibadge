@@ -38,6 +38,23 @@ function getWeeklyDates(startDate) {
 
 export default {
   async fetch(request, env) {
+    // Top-level guard: ANY unhandled throw still returns a response WITH CORS
+    // headers, so the browser never sees a header-less 500 (which surfaces as
+    // an opaque "Network error" / CORS failure on the client).
+    try {
+      return await route(request, env);
+    } catch (err) {
+      console.log("Unhandled worker error:", err && err.stack ? err.stack : String(err));
+      return jsonResponse({ error: "Server error. Please try again." }, 500);
+    }
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(sendSessionReminders(env));
+  }
+};
+
+async function route(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
 
@@ -81,12 +98,7 @@ export default {
     }
 
     return jsonResponse({ error: "Not found" }, 404);
-  },
-
-  async scheduled(event, env, ctx) {
-    ctx.waitUntil(sendSessionReminders(env));
-  }
-};
+}
 
 // ══════════════════════════════════════════
 // SLOT MANAGEMENT

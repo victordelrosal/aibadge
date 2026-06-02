@@ -4707,8 +4707,12 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           var data = {};
           try { data = await resp.json(); } catch (e) {}
           ok = resp.ok && data && data.success;
-          if (!ok) errMsg = (data && data.error) || 'Could not send. Try again.';
-        } catch (e) { errMsg = 'Network error. Try again.'; }
+          if (!ok) { errMsg = (data && data.error) || 'Could not send. Try again.';
+            console.error('[invite] HTTP', resp.status, data); }
+        } catch (e) {
+          errMsg = 'Network error. Try again.';
+          console.error('[invite] fetch threw:', e && e.name, e && e.message, e);
+        }
         this.sending = false;
 
         if (ok) {
