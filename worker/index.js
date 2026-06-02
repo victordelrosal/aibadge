@@ -769,6 +769,18 @@ async function sendHostNotification(env, slot) {
 // ══════════════════════════════════════════
 
 async function handleInvite(request, env) {
+  // ── Auth required. This endpoint sends mail from a verified domain, so it
+  // must never be an open relay. Verify the caller's Firebase ID token and
+  // derive their identity (name/email) from the token, NOT the request body.
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  if (!idToken) return jsonResponse({ error: "Sign in to send invites." }, 401);
+
+  const principal = await verifyFirebaseToken(idToken, env);
+  if (!principal || !principal.uid) {
+    return jsonResponse({ error: "Your session expired. Sign in again." }, 401);
+  }
+
   let body;
   try { body = await request.json(); }
   catch (e) { return jsonResponse({ error: "Invalid JSON" }, 400); }
@@ -777,24 +789,29 @@ async function handleInvite(request, env) {
   // referral code is the only link-controlling input; derive the URL ourselves
   // so the endpoint can never be used to mail arbitrary links.
   const code = String(body.code || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
-  const fromNameRaw = String(body.fromName || "").trim().slice(0, 60);
-  const fromName = fromNameRaw.replace(/[<>]/g, "") || "A friend";
-  const replyTo = String(body.fromEmail || "").trim().toLowerCase();
+
+  // Sender name/email come from the VERIFIED token, never the body. Strip
+  // control chars / newlines so nothing can be smuggled into the subject.
+  const sanitize = (s) => String(s || "").replace(/[\r\n\t\x00-\x1F\x7F<>]/g, "").trim().slice(0, 60);
+  const fromName = sanitize(principal.name || (principal.email ? principal.email.split("@")[0] : "")) || "A friend";
+  const replyTo = String(principal.email || "").trim().toLowerCase();
 
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRe.test(to)) return jsonResponse({ error: "Please enter a valid email address." }, 400);
   if (!code) return jsonResponse({ error: "Missing referral code." }, 400);
 
-  // Light per-IP rate limit (abuse guard): 20 invites / hour.
+  // Per-USER rate limit (20 invites/hour), FAIL-CLOSED on KV error so the
+  // endpoint can't be turned into a relay by inducing KV failures.
+  const rlKey = `invite_rl:${principal.uid}`;
   try {
-    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-    const key = `invite_rl:${ip}`;
-    const count = parseInt((await env.SLOTS.get(key)) || "0", 10);
+    const count = parseInt((await env.SLOTS.get(rlKey)) || "0", 10);
     if (count >= 20) {
       return jsonResponse({ error: "You've sent a lot of invites. Try again later." }, 429);
     }
-    await env.SLOTS.put(key, String(count + 1), { expirationTtl: 3600 });
-  } catch (e) { /* KV hiccup: don't block the invite */ }
+    await env.SLOTS.put(rlKey, String(count + 1), { expirationTtl: 3600 });
+  } catch (e) {
+    return jsonResponse({ error: "Couldn't send the invite right now." }, 503);
+  }
 
   const site = env.SITE_URL || "https://aibadge.fiveinnolabs.com";
   const link = `${site}/?ref=${encodeURIComponent(code)}`;
@@ -839,6 +856,64 @@ async function handleInvite(request, env) {
   } catch (e) {
     return jsonResponse({ error: "Couldn't send the invite right now." }, 502);
   }
+}
+
+// Verify a Firebase ID token by checking its RS256 signature against Google's
+// public JWKS and validating the aud/iss/exp claims. Keyless (no API key /
+// secret needed); this is the same verification the Firebase Admin SDK does.
+// Returns { uid, email, name } when valid, else null.
+async function verifyFirebaseToken(idToken, env) {
+  try {
+    const projectId = env.FIREBASE_PROJECT_ID || "ai-badge-2026";
+    const parts = String(idToken || "").split(".");
+    if (parts.length !== 3) return null;
+
+    const header = JSON.parse(b64urlToString(parts[0]));
+    const payload = JSON.parse(b64urlToString(parts[1]));
+    if (!header.kid || header.alg !== "RS256") return null;
+
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.aud !== projectId) return null;
+    if (payload.iss !== `https://securetoken.google.com/${projectId}`) return null;
+    if (!payload.exp || payload.exp < now) return null;
+    if (payload.iat && payload.iat > now + 300) return null;
+    const sub = payload.sub || payload.user_id;
+    if (!sub) return null;
+
+    const jwksRes = await fetch(
+      "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com"
+    );
+    if (!jwksRes.ok) return null;
+    const jwks = await jwksRes.json();
+    const jwk = (jwks.keys || []).find((k) => k.kid === header.kid);
+    if (!jwk) return null;
+
+    const key = await crypto.subtle.importKey(
+      "jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]
+    );
+    const signed = new TextEncoder().encode(parts[0] + "." + parts[1]);
+    const sig = b64urlToBytes(parts[2]);
+    const valid = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, sig, signed);
+    if (!valid) return null;
+
+    return { uid: sub, email: payload.email || "", name: payload.name || "" };
+  } catch (e) {
+    return null;
+  }
+}
+
+function b64urlToBytes(s) {
+  s = String(s).replace(/-/g, "+").replace(/_/g, "/");
+  const pad = s.length % 4;
+  if (pad) s += "=".repeat(4 - pad);
+  const bin = atob(s);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+function b64urlToString(s) {
+  return new TextDecoder().decode(b64urlToBytes(s));
 }
 
 // ══════════════════════════════════════════

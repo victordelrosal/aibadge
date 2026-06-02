@@ -4661,14 +4661,23 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         }
 
         // Valid email: actually send the invite via the Cloudflare Worker.
+        // The worker requires a Firebase ID token and derives the sender's
+        // name/email from it (never from the body), so it can't be a relay.
         this.sending = true;
-        var fromName = auth.firstName || auth.fullName || 'A friend';
         var ok = false, errMsg = '';
         try {
+          var idToken = '';
+          try { idToken = await firebase.auth().currentUser.getIdToken(); } catch (e) {}
+          if (!idToken) {
+            this.sending = false; this.label = 'Sign in again'; this.error = true; this.sent = true;
+            var s0 = this; clearTimeout(this._timer);
+            this._timer = setTimeout(function () { s0.sent = false; s0.error = false; }, 2600);
+            return;
+          }
           var resp = await fetch(API + '/invite', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ to: friend, code: code, fromName: fromName, fromEmail: user.email })
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+            body: JSON.stringify({ to: friend, code: code })
           });
           var data = {};
           try { data = await resp.json(); } catch (e) {}
