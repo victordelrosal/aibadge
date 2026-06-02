@@ -1924,6 +1924,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </form>
         <div class="lms-hearts" x-ref="hearts" aria-hidden="true"></div>
       </div>
+      <button class="lms-tree-btn" x-show="$store.auth.isLoggedIn" @click="$store.ui.showModal('tree')" title="Your Tree" aria-label="Your Tree">
+        <span style="font-size:17px;line-height:1;">🌳</span>
+        <span class="lms-tree-badge" x-show="$store.ui.treeCount > 0" x-text="$store.ui.treeCount"></span>
+      </button>
       <span class="lms-topbar-identity" x-show="$store.auth.fullName">
         <span class="lms-topbar-name" x-text="$store.auth.fullName"></span>
         <span class="lms-topbar-sid" x-show="$store.auth.studentId" x-text="'NCI ' + $store.auth.studentId"></span>
@@ -2025,6 +2029,12 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-dark .lms-invite-input { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); color:#f5f5f5; }
       .lms-dark .lms-invite-input::placeholder { color:rgba(255,255,255,0.4); }
       .lms-dark .lms-tree-link { color:rgba(255,255,255,0.75) !important; }
+      .lms-tree-btn { position:relative; display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(60,60,67,0.15); background:#fff; cursor:pointer; transition:background .2s, transform .12s, border-color .2s; flex:0 0 auto; }
+      .lms-tree-btn:hover { background:#F2F2F7; transform:translateY(-1px); }
+      .lms-tree-btn:active { transform:translateY(0) scale(0.95); }
+      .lms-tree-badge { position:absolute; top:-5px; right:-5px; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:linear-gradient(135deg,#1faa4d,#34C759); color:#fff; font:700 11px/18px -apple-system,sans-serif; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
+      .lms-dark .lms-tree-btn { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); }
+      .lms-dark .lms-tree-btn:hover { background:rgba(255,255,255,0.12); }
       @media (max-width:600px) {
         .lms-invite-input { display:none; }
         .lms-invite-btn { border-radius:999px; padding:9px 13px; }
@@ -2265,39 +2275,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     </template>
 
     <!-- Your Tree (Viral Tree status; visible to all logged-in users) -->
-    <div x-data="referralTree()" x-show="$store.auth.isLoggedIn" style="margin-top:32px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <h2 class="lms-heading" style="font-size:1.3rem;margin:0;">Your Tree</h2>
-        <span class="lms-subheading" style="font-size:0.9rem;font-weight:600;" x-text="level.emoji + ' ' + level.name"></span>
-      </div>
-      <div class="lms-module-card" style="padding:20px;">
-        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;">
-          <span style="font-size:2rem;font-weight:700;color:var(--gold-rich,#B8860B);" x-text="count"></span>
-          <span class="lms-subheading" style="font-size:0.9rem;" x-text="count === 1 ? 'friend joined through you' : 'friends joined through you'"></span>
-        </div>
-        <p class="lms-subheading" x-show="next" style="font-size:0.82rem;margin:0 0 16px;" x-text="'Invite ' + nextGap + ' more to reach ' + (next ? next.emoji + ' ' + next.name : '')"></p>
-        <p class="lms-subheading" x-show="!next" style="font-size:0.82rem;margin:0 0 16px;">You&rsquo;ve grown a whole forest. Incredible. &#127794;</p>
-
-        <!-- Share link -->
-        <div style="display:flex;gap:8px;align-items:center;background:rgba(120,120,128,0.08);border-radius:10px;padding:8px 10px;margin-bottom:16px;">
-          <input readonly :value="link" x-ref="linkInput" class="lms-tree-link" style="flex:1;min-width:0;border:none;background:none;font:500 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.85);outline:none;">
-          <button @click="copyLink($event)" :class="copied && 'sent'" class="lms-invite-btn" style="border-radius:8px;padding:8px 13px;" x-text="copied ? 'Copied!' : 'Copy link'"></button>
-        </div>
-
-        <!-- Tree list -->
-        <template x-if="loading"><p class="lms-subheading" style="font-size:0.85rem;margin:0;">Loading your tree&hellip;</p></template>
-        <template x-if="!loading && referrals.length === 0">
-          <p class="lms-subheading" style="font-size:0.85rem;margin:0;">No one yet. Share your link and watch your tree grow. &#127793;</p>
-        </template>
-        <template x-for="r in referrals" :key="r.id">
-          <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(0,0,0,0.06);">
-            <span style="font-size:16px;">&#127807;</span>
-            <span class="lms-tree-link" style="flex:1;min-width:0;font:500 14px/1.3 -apple-system,sans-serif;color:#1c1c1e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="r.referredEmail || 'A new learner'"></span>
-            <span style="font-size:11px;font-weight:600;color:#1d6e36;background:rgba(52,199,89,0.12);padding:2px 8px;border-radius:999px;" x-text="r.status === 'paid' ? 'Paid' : 'Joined'"></span>
-          </div>
-        </template>
-      </div>
-    </div>
+    <!-- Your Tree moved to a navbar-triggered modal (#tree). -->
 
     <!-- Explorer History (visible to all logged-in users) -->
     <div x-data="explorerHistory()" style="margin-top:32px;">
@@ -3124,6 +3102,52 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 </div>
 
 <!-- ===================== SIGN-IN MODAL ===================== -->
+<!-- ===================== YOUR TREE MODAL (Viral Tree) ===================== -->
+<div x-show="$store.ui.activeModal === 'tree'"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+     @keydown.escape.window="$store.ui.closeModal()"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"
+     @click.self="$store.ui.closeModal()">
+  <div x-data="referralTree()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;max-width:440px;width:calc(100% - 40px);max-height:85vh;overflow-y:auto;padding:28px 26px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <button @click="$store.ui.closeModal()" aria-label="Close" style="position:absolute;top:12px;right:14px;width:32px;height:32px;border:none;background:rgba(120,120,128,0.12);border-radius:50%;cursor:pointer;font-size:18px;line-height:1;color:#3a3f4a;">&times;</button>
+
+    <!-- Hero: level + count -->
+    <div style="text-align:center;margin-bottom:14px;">
+      <div style="font-size:3.2rem;line-height:1;" x-text="level.emoji"></div>
+      <div style="font-weight:700;font-size:1.05rem;color:#000036;margin-top:4px;" x-text="'You are a ' + level.name"></div>
+    </div>
+    <div style="text-align:center;margin-bottom:4px;">
+      <span style="font-size:2.6rem;font-weight:800;color:var(--gold-rich,#B8860B);" x-text="count"></span>
+      <div class="lms-subheading" style="font-size:0.92rem;margin-top:-2px;" x-text="count === 1 ? 'friend joined through you' : 'friends joined through you'"></div>
+    </div>
+    <p class="lms-subheading" x-show="next" style="text-align:center;font-size:0.85rem;margin:6px 0 18px;" x-text="'Invite ' + nextGap + ' more to reach ' + (next ? next.emoji + ' ' + next.name : '')"></p>
+    <p class="lms-subheading" x-show="!next" style="text-align:center;font-size:0.85rem;margin:6px 0 18px;">You&rsquo;ve grown a whole forest. Incredible. &#127794;</p>
+
+    <!-- Share link -->
+    <div style="display:flex;gap:8px;align-items:center;background:rgba(120,120,128,0.08);border-radius:10px;padding:8px 10px;margin-bottom:18px;">
+      <input readonly :value="link" x-ref="linkInput" class="lms-tree-link" style="flex:1;min-width:0;border:none;background:none;font:500 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.85);outline:none;">
+      <button @click="copyLink($event)" :class="copied && 'sent'" class="lms-invite-btn" style="border-radius:8px;padding:8px 13px;" x-text="copied ? 'Copied!' : 'Copy link'"></button>
+    </div>
+
+    <!-- Who joined -->
+    <div style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.03em;text-transform:uppercase;color:rgba(60,60,67,0.5);margin-bottom:6px;">Your tree</div>
+    <template x-if="loading"><p class="lms-subheading" style="font-size:0.85rem;margin:0;">Loading your tree&hellip;</p></template>
+    <template x-if="!loading && referrals.length === 0">
+      <p class="lms-subheading" style="font-size:0.85rem;margin:0;">No one yet. Share your link and watch your tree grow. &#127793;</p>
+    </template>
+    <template x-for="r in referrals" :key="r.id">
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(0,0,0,0.06);">
+        <span style="font-size:16px;">&#127807;</span>
+        <span class="lms-tree-link" style="flex:1;min-width:0;font:500 14px/1.3 -apple-system,sans-serif;color:#1c1c1e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="r.referredEmail || 'A new learner'"></span>
+        <span style="font-size:11px;font-weight:600;color:#1d6e36;background:rgba(52,199,89,0.12);padding:2px 8px;border-radius:999px;" x-text="r.status === 'paid' ? 'Paid' : 'Joined'"></span>
+      </div>
+    </template>
+  </div>
+</div>
+
 <!-- ===================== UPGRADE MODAL (freemium lock) ===================== -->
 <div x-show="$store.ui.activeModal === 'upgrade'"
      x-transition:enter="transition ease-out duration-300"
@@ -3774,6 +3798,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       activeModal: null,
       activeModuleId: null,
       activeLessonId: null,
+      treeCount: 0,
       showModal(name) { this.activeModal = name; document.body.style.overflow = 'hidden'; },
       closeModal() { this.activeModal = null; document.body.style.overflow = ''; }
     });
@@ -4776,6 +4801,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.level = info.level;
         this.next = info.next;
         this.nextGap = info.next ? Math.max(1, info.next.min - this.count) : 0;
+        try { Alpine.store('ui').treeCount = this.count; } catch (e) {}
       },
 
       async copyLink() {
