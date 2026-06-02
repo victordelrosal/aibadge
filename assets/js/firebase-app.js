@@ -928,6 +928,173 @@ async function getAdminAllSubmissions() {
 }
 
 /* --------------------------------------------------------------------------
+   Viral Tree (referrals) - money-free for now.
+   Each user gets a shareable code (referral_codes/{code} -> uid). When a new
+   account is created through a ?ref=CODE link, we write a referrals edge
+   owned by the referred user. The referrer's tree is just a query of edges
+   where referrerId == them. A "token" today = one signed-up referral.
+   Later: flip status signed_up -> paid (admin/server) and pay commission.
+   -------------------------------------------------------------------------- */
+
+var REFERRAL_PENDING_KEY = "aibadge.ref";
+var REFERRAL_PENDING_TS_KEY = "aibadge.ref.ts";
+var REFERRAL_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+// Read ?ref=CODE on page load and stash it so it survives the Google popup
+// round-trip. Call once at startup. Never overwrites a fresher pending ref.
+function captureReferralParam() {
+  try {
+    var params = new URLSearchParams(window.location.search || "");
+    var code = (params.get("ref") || "").trim();
+    if (!code) return;
+    code = code.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 40);
+    if (!code) return;
+    window.localStorage.setItem(REFERRAL_PENDING_KEY, code);
+    window.localStorage.setItem(REFERRAL_PENDING_TS_KEY, String(Date.now()));
+  } catch (e) { /* private mode / no storage */ }
+}
+
+function _readPendingReferral() {
+  try {
+    var code = window.localStorage.getItem(REFERRAL_PENDING_KEY);
+    var ts = parseInt(window.localStorage.getItem(REFERRAL_PENDING_TS_KEY) || "0", 10);
+    if (!code) return null;
+    if (ts && (Date.now() - ts) > REFERRAL_TTL_MS) { _clearPendingReferral(); return null; }
+    return code;
+  } catch (e) { return null; }
+}
+
+function _clearPendingReferral() {
+  try {
+    window.localStorage.removeItem(REFERRAL_PENDING_KEY);
+    window.localStorage.removeItem(REFERRAL_PENDING_TS_KEY);
+  } catch (e) { /* ignore */ }
+}
+
+function _slugForCode(profile, email) {
+  var base = "";
+  if (profile && profile.firstName) base = profile.firstName;
+  else if (profile && profile.fullName) base = profile.fullName;
+  else if (email) base = String(email).split("@")[0];
+  base = String(base).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12);
+  if (!base) base = "ai";
+  return base;
+}
+
+function _randSuffix() {
+  // 4 chars, no Date/crypto dependency assumptions; Math.random is fine here.
+  return Math.random().toString(36).replace(/[^a-z0-9]/g, "").slice(0, 4).padEnd(4, "0");
+}
+
+// Resolve a referral code to its owner uid (public read).
+async function resolveReferralCode(code) {
+  initFirebase();
+  if (!code) return null;
+  try {
+    var doc = await db.collection("referral_codes").doc(String(code).toLowerCase()).get();
+    if (!doc.exists) return null;
+    var data = doc.data();
+    return data && data.uid ? data.uid : null;
+  } catch (e) {
+    console.warn("resolveReferralCode:", e.message);
+    return null;
+  }
+}
+
+// Make sure this user has a referral code; create one if missing.
+// Returns the code. Safe to call repeatedly (idempotent once set).
+async function ensureReferralCode(userId, profile, email) {
+  initFirebase();
+  if (!userId) return null;
+  if (profile && profile.referralCode) return profile.referralCode;
+  var attempt = 0;
+  while (attempt < 5) {
+    var code = _slugForCode(profile, email) + "-" + _randSuffix();
+    try {
+      var existing = await db.collection("referral_codes").doc(code).get();
+      if (existing.exists) { attempt++; continue; }
+      await db.collection("referral_codes").doc(code).set({
+        uid: userId,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      await updateUserProfile(userId, { referralCode: code });
+      if (profile) profile.referralCode = code;
+      return code;
+    } catch (e) {
+      console.warn("ensureReferralCode:", e.message);
+      attempt++;
+    }
+  }
+  return null;
+}
+
+// On a brand-new account, consume any pending ?ref= and write the edge.
+// referredId is always the new user (enforced by rules). No self-referral.
+async function consumePendingReferral(newUserId, newUserEmail) {
+  initFirebase();
+  if (!newUserId) return;
+  var code = _readPendingReferral();
+  if (!code) return;
+  try {
+    var referrerId = await resolveReferralCode(code);
+    if (!referrerId || referrerId === newUserId) { _clearPendingReferral(); return; }
+    // Guard against duplicate edges for the same referred user.
+    var dupe = await db.collection("referrals")
+      .where("referredId", "==", newUserId).limit(1).get();
+    if (!dupe.empty) { _clearPendingReferral(); return; }
+    await db.collection("referrals").add({
+      referrerId: referrerId,
+      referredId: newUserId,
+      referredEmail: (newUserEmail || "").toLowerCase(),
+      referralCode: code,
+      status: "signed_up",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {
+    console.warn("consumePendingReferral:", e.message);
+  }
+  _clearPendingReferral();
+}
+
+// The referrer's tree: every signup that came through their link.
+async function getMyReferrals(userId) {
+  initFirebase();
+  if (!userId) return [];
+  try {
+    var snap = await db.collection("referrals")
+      .where("referrerId", "==", userId).get();
+    var rows = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+    rows.sort(function(a, b) {
+      var ta = a.createdAt && a.createdAt.seconds ? a.createdAt.seconds : 0;
+      var tb = b.createdAt && b.createdAt.seconds ? b.createdAt.seconds : 0;
+      return tb - ta;
+    });
+    return rows;
+  } catch (e) {
+    console.warn("getMyReferrals:", e.message);
+    return [];
+  }
+}
+
+// Tree level ladder (cosmetic status; no monetary meaning).
+function referralTreeLevel(count) {
+  count = count || 0;
+  var levels = [
+    { min: 0,  name: "Seedling", emoji: "🌱" },
+    { min: 1,  name: "Sprout",   emoji: "🌿" },
+    { min: 3,  name: "Sapling",  emoji: "🪴" },
+    { min: 6,  name: "Tree",     emoji: "🌳" },
+    { min: 12, name: "Forest",   emoji: "🌲" }
+  ];
+  var current = levels[0], next = null;
+  for (var i = 0; i < levels.length; i++) {
+    if (count >= levels[i].min) current = levels[i];
+    else { next = levels[i]; break; }
+  }
+  return { level: current, next: next, count: count };
+}
+
+/* --------------------------------------------------------------------------
    Helpers
    -------------------------------------------------------------------------- */
 

@@ -100,6 +100,43 @@ service cloud.firestore {
     }
 
     // ----------------------------------------------------------------
+    // Viral Tree: referral code -> owner uid map.
+    // Public read so a share link (?ref=CODE) resolves for visitors who
+    // are not yet signed in. A user may only create the code that points
+    // to their own uid. No money attached: the code just resolves a referrer.
+    // ----------------------------------------------------------------
+    match /referral_codes/{code} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------
+    // Viral Tree: referral edges (who referred whom).
+    // The REFERRED user creates the edge for themselves on signup
+    // (referredId must equal their own uid, and they cannot refer
+    // themselves), so no one can fabricate referrals for other accounts.
+    // Both parties + admin can read. status flips signed_up -> paid
+    // later, admin/server only.
+    // ----------------------------------------------------------------
+    match /referrals/{rid} {
+      allow read: if request.auth != null
+                  && (resource.data.referrerId == request.auth.uid
+                      || resource.data.referredId == request.auth.uid
+                      || isAdmin());
+      allow create: if request.auth != null
+                    && request.resource.data.referredId == request.auth.uid
+                    && request.resource.data.referrerId != request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Collection-group read so admin analytics can sweep all referrals.
+    match /{path=**}/referrals/{rid} {
+      allow read: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------
     // Default deny
     // ----------------------------------------------------------------
     match /{document=**} {

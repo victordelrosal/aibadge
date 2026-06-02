@@ -1904,6 +1904,18 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <template x-if="$store.auth.isAdmin">
         <a href="#/admin" class="lms-topbar-link">Admin</a>
       </template>
+      <!-- Viral Tree: one-tap delight to invite a friend -->
+      <div class="lms-invite" x-data="inviteWidget()" x-show="$store.auth.isLoggedIn">
+        <form @submit.prevent="send($event)" style="display:flex;align-items:center;">
+          <input class="lms-invite-input" type="text" x-model="friend" placeholder="Invite a friend&hellip;" autocomplete="off" aria-label="Friend's email to invite">
+          <button class="lms-invite-btn" :class="sent && 'sent'" type="submit" title="Share your invite link">
+            <svg x-show="!sent" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+            <svg x-show="sent" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="lms-invite-label" x-text="sent ? label : 'Invite'"></span>
+          </button>
+        </form>
+        <div class="lms-hearts" x-ref="hearts" aria-hidden="true"></div>
+      </div>
       <span class="lms-topbar-identity" x-show="$store.auth.fullName">
         <span class="lms-topbar-name" x-text="$store.auth.fullName"></span>
         <span class="lms-topbar-sid" x-show="$store.auth.studentId" x-text="'NCI ' + $store.auth.studentId"></span>
@@ -1920,8 +1932,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <h1 class="lms-heading" x-text="$store.auth.loading ? 'Your Learning' : ('Welcome' + ($store.auth.firstTime ? '' : ' back') + ($store.auth.firstName ? ', ' + $store.auth.firstName : ''))"></h1>
     <p class="lms-subheading" x-text="$store.auth.loading ? 'Loading...' : ($store.auth.isEnrolled ? 'Continue where you left off.' : '')"></p>
 
-    <!-- Not enrolled: show refresh button instead of scary "Access Required" -->
-    <template x-if="!$store.auth.isEnrolled && !$store.auth.loading">
+    <!-- Not enrolled (legacy loading race only): refresh button.
+         Free-tier users skip this and see the tutorial list directly. -->
+    <template x-if="!$store.auth.isEnrolled && !$store.auth.loading && !$store.auth.isFreeTier">
       <div class="lms-module-card" style="padding:28px;text-align:center;cursor:pointer;"
            @click="
              $el.querySelector('p').textContent = 'Refreshing...';
@@ -1974,6 +1987,39 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-chevron { color:rgba(60,60,67,0.3); transition:transform 0.25s ease; }
       .lms-module-card a { color:inherit; }
       .lms-module-card a:hover { color:inherit; }
+
+      /* Freemium: locked tutorials + free tag */
+      .lms-module-card.lms-locked { opacity:0.72; }
+      .lms-module-card.lms-locked .lms-module-icon { filter:grayscale(0.5); }
+      .lms-module-card.lms-locked:hover { opacity:0.92; }
+      .lms-free-tag { display:inline-block; margin-left:8px; font-size:11px; font-weight:700; letter-spacing:0.02em; color:#1d6e36; background:rgba(52,199,89,0.14); padding:2px 8px; border-radius:999px; vertical-align:middle; }
+      .lms-module-title { display:flex; align-items:center; flex-wrap:wrap; gap:2px; }
+
+      /* Viral Tree: navbar invite widget + love bubbles */
+      .lms-invite { display:flex; align-items:center; position:relative; }
+      .lms-invite-input { width:150px; max-width:32vw; padding:9px 13px; border:1px solid rgba(60,60,67,0.18); border-right:none; border-radius:999px 0 0 999px; font:500 13px/1 -apple-system,sans-serif; background:#fff; color:#1c1c1e; outline:none; min-height:38px; box-sizing:border-box; transition:width .25s ease, box-shadow .2s, border-color .2s; }
+      .lms-invite-input::placeholder { color:rgba(60,60,67,0.45); }
+      .lms-invite-input:focus { width:190px; box-shadow:0 0 0 3px rgba(212,175,55,0.18); border-color:var(--gold-rich,#B8860B); }
+      .lms-invite-btn { display:flex; align-items:center; gap:6px; padding:9px 15px; min-height:38px; border:none; border-radius:0 999px 999px 0; cursor:pointer; font:700 13px/1 -apple-system,sans-serif; color:#0A0E27; background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%); box-shadow:0 2px 12px rgba(212,175,55,0.4); transition:transform .12s ease, box-shadow .2s, background .3s, color .3s; white-space:nowrap; }
+      .lms-invite-btn:hover { transform:translateY(-1px); box-shadow:0 4px 18px rgba(212,175,55,0.55); }
+      .lms-invite-btn:active { transform:translateY(0) scale(0.96); }
+      .lms-invite-btn.sent { background:linear-gradient(135deg,#1faa4d,#34C759); color:#fff; box-shadow:0 4px 18px rgba(52,199,89,0.5); }
+      .lms-hearts { position:absolute; left:0; right:0; top:0; bottom:0; pointer-events:none; overflow:visible; z-index:300; }
+      .lms-heart { position:absolute; bottom:8px; will-change:transform,opacity; animation:heartFloat 1.5s cubic-bezier(.22,.61,.36,1) forwards; }
+      @keyframes heartFloat {
+        0%   { opacity:0; transform:translateY(4px) scale(0.4) rotate(0deg); }
+        18%  { opacity:1; transform:translateY(-8px) scale(1.05) rotate(var(--r,0deg)); }
+        100% { opacity:0; transform:translateY(-96px) scale(1.25) rotate(var(--r,0deg)); }
+      }
+      @media (prefers-reduced-motion: reduce) { .lms-heart { animation-duration:0.01s; opacity:0; } }
+      .lms-dark .lms-invite-input { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); color:#f5f5f5; }
+      .lms-dark .lms-invite-input::placeholder { color:rgba(255,255,255,0.4); }
+      .lms-dark .lms-tree-link { color:rgba(255,255,255,0.75) !important; }
+      @media (max-width:600px) {
+        .lms-invite-input { display:none; }
+        .lms-invite-btn { border-radius:999px; padding:9px 13px; }
+        .lms-invite-label { display:none; }
+      }
 
       /* Pending modules */
       .lms-pending { opacity:0.45; }
@@ -2162,32 +2208,44 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       #view-admin.lms-dark .amx-sub-item { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.07); }
     </style>
 
-    <!-- Enrolled: Tutorial cards (each tutorial = its own card) -->
-    <template x-if="$store.auth.isEnrolled">
+    <!-- Tutorial cards (each tutorial = its own card). Visible to every
+         signed-in user; free-tier users see locks on non-free tutorials. -->
+    <template x-if="$store.auth.isLoggedIn">
       <div x-data="lmsDashboard()">
         <template x-for="tut in tutorials" :key="tut.id">
-          <div class="lms-module-card" :class="tut.pending && 'lms-pending'">
-            <div class="lms-module-header" @click="!tut.pending && navigate('#/lesson/' + tut.moduleId + '/' + tut.id)">
+          <div class="lms-module-card"
+               :class="{ 'lms-pending': tut.pending, 'lms-locked': !tut.pending && !$store.auth.canAccessTutorial(tut) }">
+            <div class="lms-module-header"
+                 @click="tut.pending ? null : ($store.auth.canAccessTutorial(tut) ? navigate('#/lesson/' + tut.moduleId + '/' + tut.id) : $store.ui.showModal('upgrade'))">
               <div class="lms-module-icon" :style="'background:' + tut.iconBg">
                 <span x-text="tut.icon"></span>
               </div>
               <div class="lms-module-info">
-                <div class="lms-module-title" x-text="tut.title"></div>
+                <div class="lms-module-title">
+                  <span x-text="tut.title"></span>
+                  <span x-show="tut.free && $store.auth.isFreeTier" class="lms-free-tag">Free</span>
+                </div>
                 <div class="lms-module-meta">
                   <span x-text="tut.level" style="text-transform:capitalize;"></span>
                   <span class="dot">&#183;</span>
                   <span x-text="tut.durationMinutes + ' min'"></span>
                   <span class="dot">&#183;</span>
-                  <span x-text="tut.pending ? 'Coming soon' : (progress[tut.id] ? 'Completed' : 'Not started')"></span>
+                  <span x-show="$store.auth.canAccessTutorial(tut) || tut.pending" x-text="tut.pending ? 'Coming soon' : (progress[tut.id] ? 'Completed' : 'Not started')"></span>
+                  <span x-show="!$store.auth.canAccessTutorial(tut) && !tut.pending" style="color:var(--gold-rich,#B8860B);font-weight:600;">Unlock with full access</span>
                 </div>
                 <div class="lms-progress-track">
                   <div class="lms-progress-fill" :style="'width:' + (progress[tut.id] ? 100 : 0) + '%'"></div>
                 </div>
               </div>
-              <template x-if="!tut.pending">
+              <!-- Completion tick (only when accessible & not pending) -->
+              <template x-if="!tut.pending && $store.auth.canAccessTutorial(tut)">
                 <div class="lms-lesson-check" :class="progress[tut.id] && 'checked'" @click.stop="toggleComplete(tut)" style="margin-right:4px;">
                   <svg x-show="progress[tut.id]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
+              </template>
+              <!-- Lock icon for gated tutorials -->
+              <template x-if="!tut.pending && !$store.auth.canAccessTutorial(tut)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold-rich,#B8860B);margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               </template>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:rgba(60,60,67,0.3);"><path d="M6 4l4 4-4 4"/></svg>
             </div>
@@ -2195,6 +2253,41 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </template>
       </div>
     </template>
+
+    <!-- Your Tree (Viral Tree status; visible to all logged-in users) -->
+    <div x-data="referralTree()" x-show="$store.auth.isLoggedIn" style="margin-top:32px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h2 class="lms-heading" style="font-size:1.3rem;margin:0;">Your Tree</h2>
+        <span class="lms-subheading" style="font-size:0.9rem;font-weight:600;" x-text="level.emoji + ' ' + level.name"></span>
+      </div>
+      <div class="lms-module-card" style="padding:20px;">
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;">
+          <span style="font-size:2rem;font-weight:700;color:var(--gold-rich,#B8860B);" x-text="count"></span>
+          <span class="lms-subheading" style="font-size:0.9rem;" x-text="count === 1 ? 'friend joined through you' : 'friends joined through you'"></span>
+        </div>
+        <p class="lms-subheading" x-show="next" style="font-size:0.82rem;margin:0 0 16px;" x-text="'Invite ' + nextGap + ' more to reach ' + (next ? next.emoji + ' ' + next.name : '')"></p>
+        <p class="lms-subheading" x-show="!next" style="font-size:0.82rem;margin:0 0 16px;">You&rsquo;ve grown a whole forest. Incredible. &#127794;</p>
+
+        <!-- Share link -->
+        <div style="display:flex;gap:8px;align-items:center;background:rgba(120,120,128,0.08);border-radius:10px;padding:8px 10px;margin-bottom:16px;">
+          <input readonly :value="link" x-ref="linkInput" class="lms-tree-link" style="flex:1;min-width:0;border:none;background:none;font:500 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.85);outline:none;">
+          <button @click="copyLink($event)" :class="copied && 'sent'" class="lms-invite-btn" style="border-radius:8px;padding:8px 13px;" x-text="copied ? 'Copied!' : 'Copy link'"></button>
+        </div>
+
+        <!-- Tree list -->
+        <template x-if="loading"><p class="lms-subheading" style="font-size:0.85rem;margin:0;">Loading your tree&hellip;</p></template>
+        <template x-if="!loading && referrals.length === 0">
+          <p class="lms-subheading" style="font-size:0.85rem;margin:0;">No one yet. Share your link and watch your tree grow. &#127793;</p>
+        </template>
+        <template x-for="r in referrals" :key="r.id">
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(0,0,0,0.06);">
+            <span style="font-size:16px;">&#127807;</span>
+            <span class="lms-tree-link" style="flex:1;min-width:0;font:500 14px/1.3 -apple-system,sans-serif;color:#1c1c1e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="r.referredEmail || 'A new learner'"></span>
+            <span style="font-size:11px;font-weight:600;color:#1d6e36;background:rgba(52,199,89,0.12);padding:2px 8px;border-radius:999px;" x-text="r.status === 'paid' ? 'Paid' : 'Joined'"></span>
+          </div>
+        </template>
+      </div>
+    </div>
 
     <!-- Explorer History (visible to all logged-in users) -->
     <div x-data="explorerHistory()" style="margin-top:32px;">
@@ -3021,6 +3114,27 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 </div>
 
 <!-- ===================== SIGN-IN MODAL ===================== -->
+<!-- ===================== UPGRADE MODAL (freemium lock) ===================== -->
+<div x-show="$store.ui.activeModal === 'upgrade'"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     @keydown.escape.window="$store.ui.closeModal()"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"
+     @click.self="$store.ui.closeModal()">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;max-width:380px;width:calc(100% - 40px);padding:32px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="font-size:2.4rem;margin-bottom:10px;">&#128081;</div>
+    <h2 style="font:700 22px/1.25 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;margin:0 0 8px;color:#000036;">Unlock the full path</h2>
+    <p style="font:400 15px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.7);margin:0 0 22px;">You&rsquo;ve got the first three tutorials free. Full access opens every tutorial plus the verifiable AI Badge.</p>
+    <a href="mailto:victor@fiveinnolabs.com?subject=AI%20Badge%20full%20access&body=Hi%20Victor%2C%20I%27d%20like%20full%20access%20to%20AI%20Badge."
+       style="display:block;width:100%;padding:14px;border-radius:12px;font:700 16px/1.3 -apple-system,sans-serif;text-decoration:none;background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%);color:#0A0E27;box-shadow:0 4px 20px rgba(212,175,55,0.4);margin-bottom:10px;">Get full access</a>
+    <button @click="$store.ui.closeModal()" style="font:500 15px/1.4 -apple-system,sans-serif;color:#007AFF;background:none;border:none;cursor:pointer;padding:8px;min-height:44px;">Keep exploring the free lessons</button>
+  </div>
+</div>
+
 <div x-show="$store.ui.activeModal === 'signin'"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
@@ -3600,7 +3714,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="assets/js/firebase-app.js?v=4"></script>
+<script src="assets/js/firebase-app.js?v=5"></script>
 
 <!-- SPA Init -->
 <script>
@@ -3614,6 +3728,15 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       get isLoggedIn() { return !!this.user; },
       get isEnrolled() { return this.profile?.enrolled === true; },
       get isAdmin() { return ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(this.user?.email); },
+      get plan() { return this.profile?.plan || (this.isEnrolled ? 'full' : null); },
+      get isFreeTier() { return this.isLoggedIn && !this.isEnrolled && !this.isAdmin; },
+      // Freemium gate: full-access users (NCI, paid, admin) see everything;
+      // free-tier users see only tutorials flagged free:true.
+      canAccessTutorial(tut) {
+        if (!tut) return false;
+        if (this.isAdmin || this.isEnrolled) return true;
+        return tut.free === true;
+      },
       get firstName() {
         var p = this.profile || {};
         if (p.firstName) return p.firstName;
@@ -3662,7 +3785,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       switch (parsed.path) {
         case 'admin': ui.view = auth.isAdmin ? 'admin' : 'dashboard'; break;
         case 'lesson':
-          if (auth.isEnrolled && parsed.params[0] && parsed.params[1]) {
+          var _lid = parsed.params[1];
+          var _tut = (window._lmsTutorials || []).filter(function(t){ return t.id === _lid; })[0];
+          var _canView = auth.isEnrolled || auth.isAdmin || (_tut && _tut.free === true);
+          if (_canView && parsed.params[0] && parsed.params[1]) {
             ui.view = 'lesson'; ui.activeModuleId = parsed.params[0]; ui.activeLessonId = parsed.params[1];
           } else { ui.view = 'dashboard'; }
           break;
@@ -3681,6 +3807,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     const route = initRouter(Alpine);
 
     initFirebase();
+    try { if (typeof captureReferralParam === 'function') captureReferralParam(); } catch(e) {}
     onAuthChange(async (user) => {
       const auth = Alpine.store('auth');
       if (user) {
@@ -3695,22 +3822,31 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         } catch(e) {
           console.warn('Profile load timeout/error, using fallback:', e.message);
         }
+        var isBrandNew = !profile;
         if (!profile) {
-          // Brand new user: set email and createdAt. NEVER overwrite enrolled.
+          // Brand new user. Full access for admin, NCI emails, and booked
+          // (paid) emails. Everyone else lands on the FREE tier: they can see
+          // the free tutorials, but the rest stay locked until they upgrade.
           var isAdmin = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(user.email);
-          var newData = { email: user.email, createdAt: new Date().toISOString(), enrolled: true };
-          // Auto-enroll if email matches a booked slot (Stripe payment completed)
-          if (!isAdmin) {
+          var isNci = (typeof isNciEmail === 'function') && isNciEmail(user.email);
+          var newData = { email: user.email, createdAt: new Date().toISOString() };
+          if (isAdmin || isNci) {
+            newData.enrolled = true;
+            newData.plan = 'full';
+          } else {
+            // Default to free; flip to paid only if a booking/payment exists.
+            newData.enrolled = false;
+            newData.plan = 'free';
             try {
               var enrollRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(user.email));
               var enrollData = await enrollRes.json();
               if (enrollData.enrolled) {
                 newData.enrolled = true;
+                newData.plan = enrollData.plan || 'paid';
                 if (enrollData.name) newData.displayName = enrollData.name;
-                if (enrollData.plan) newData.plan = enrollData.plan;
                 if (enrollData.slotLabel) newData.slotLabel = enrollData.slotLabel;
               }
-            } catch(e) { console.warn('Auto-enrollment check failed:', e.message); }
+            } catch(e) { console.warn('Enrollment check failed (free tier):', e.message); }
           }
           try {
             await Promise.race([
@@ -3719,16 +3855,28 @@ document.querySelectorAll('#navLinks a').forEach(a => {
             ]);
           } catch(e) { console.warn('Profile create timeout:', e.message); }
           try { profile = await getUserProfile(user.uid); } catch(e) {}
-          if (!profile) profile = { email: user.email, enrolled: isAdmin };
+          if (!profile) profile = newData;
         }
-        // Auto-enroll existing users who don't have enrolled set yet
-        // (handles race condition where updateLastActive creates sparse doc before profile setup)
-        if (profile && profile.enrolled !== true) {
+        // Auto-enroll only LEGACY existing users (created before the freemium
+        // plan field existed). Free-tier users must NOT be auto-enrolled.
+        if (profile && profile.enrolled !== true && profile.plan == null) {
           try {
-            await updateUserProfile(user.uid, { enrolled: true });
+            await updateUserProfile(user.uid, { enrolled: true, plan: 'full' });
             profile.enrolled = true;
-          } catch(e) { console.warn('Auto-enroll update failed:', e.message); }
+            profile.plan = 'full';
+          } catch(e) { console.warn('Legacy auto-enroll update failed:', e.message); }
         }
+        // Viral Tree: give every user a share code, and record the referral
+        // that brought a brand-new user in (money-free; just tracks the edge).
+        try {
+          if (isBrandNew && typeof consumePendingReferral === 'function') {
+            await consumePendingReferral(user.uid, user.email);
+          }
+          if (typeof ensureReferralCode === 'function') {
+            var _code = await ensureReferralCode(user.uid, profile, user.email);
+            if (_code) profile.referralCode = _code;
+          }
+        } catch(e) { console.warn('Referral setup:', e.message); }
         // Ensure profile always has email (fixes sparse docs from Google sign-in UID mismatch)
         if (profile && !profile.email) {
           profile.email = user.email;
@@ -4279,29 +4427,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.submitting = true;
         const result = await signInWithGoogle();
         if (result.success) {
-          // Check if this Google user has a paid booking (NCI emails bypass).
-          var gUser = firebase.auth().currentUser;
-          if (gUser) {
-            var isAdmin = ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(gUser.email);
-            var isNci = typeof isNciEmail === 'function' && isNciEmail(gUser.email);
-            if (!isAdmin && !isNci) {
-              try {
-                var checkRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(gUser.email));
-                var checkData = await checkRes.json();
-                if (!checkData.enrolled) {
-                  // Check if they already have a Firestore profile with enrolled:true (returning user)
-                  var existingProfile = await getUserProfile(gUser.uid);
-                  if (!existingProfile || existingProfile.enrolled !== true) {
-                    await firebase.auth().signOut();
-                    this.error = 'Access to AI Badge is currently by invitation. Email victor@fiveinnolabs.com to request access.';
-                    this.submitting = false;
-                    return;
-                  }
-                }
-              } catch(e) { /* allow through on network error */ }
-            }
-          }
-          // Wait for onAuthStateChanged to finish loading the profile
+          // Freemium: everyone is welcome. onAuthStateChanged assigns the
+          // right tier (full for admin/NCI/paid, free for everyone else).
           var maxWait = 80;
           while (Alpine.store('auth').loading && maxWait-- > 0) {
             await new Promise(r => setTimeout(r, 100));
@@ -4363,24 +4490,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           return;
         }
         this.submitting = true;
-        // NCI emails get free access via email verification (skip booking gate).
-        // Non-NCI emails still need an active invitation in the worker's enrolment list.
-        var isNci = typeof isNciEmail === 'function' && isNciEmail(this.email);
-        if (!isNci) {
-          try {
-            var checkRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(this.email));
-            var checkData = await checkRes.json();
-            if (!checkData.enrolled) {
-              this.error = 'Access to AI Badge is currently by invitation. Email victor@fiveinnolabs.com to request access.';
-              this.submitting = false;
-              return;
-            }
-          } catch(e) {
-            this.error = 'Could not verify access. Please try again.';
-            this.submitting = false;
-            return;
-          }
-        }
+        // Freemium: anyone can create an account. onAuthStateChanged assigns
+        // the tier (full for admin/NCI/paid, free for everyone else).
         const result = await createAccount(this.email, this.password);
         if (result.success) {
           Alpine.store('ui').closeModal();
@@ -4436,9 +4547,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
   // ---------- LMS Dashboard Component ----------
   window._lmsTutorials = [
-    { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 7, type: 'video', lessonPath: 'tutorials/hello-world/hello-world.html' },
-    { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 9, type: 'video', lessonPath: 'tutorials/hello-world-2/hello-world-2.html' },
-    { id: 'ai-foundations', moduleId: 'ai-foundations', title: 'AI Foundations 101', icon: '🧠', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', durationMinutes: 10, type: 'video', lessonPath: 'tutorials/ai-foundations/ai-foundations.html' },
+    { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 7, type: 'video', lessonPath: 'tutorials/hello-world/hello-world.html', free: true },
+    { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 9, type: 'video', lessonPath: 'tutorials/hello-world-2/hello-world-2.html', free: true },
+    { id: 'ai-foundations', moduleId: 'ai-foundations', title: 'AI Foundations 101', icon: '🧠', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', durationMinutes: 10, type: 'video', lessonPath: 'tutorials/ai-foundations/ai-foundations.html', free: true },
     { id: 'retro-game', moduleId: 'retro-game', title: 'Retro Game', icon: '🎮', iconBg: 'rgba(255,59,48,0.12)', level: 'beginner', durationMinutes: 12, type: 'video', lessonPath: 'tutorials/retro-game/retro-game.html' },
     { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', durationMinutes: 11, type: 'video', lessonPath: 'tutorials/GitHub/GitHub.html' },
     { id: 'opencode', moduleId: 'opencode', title: 'Install OpenCode', icon: '🦊', iconBg: 'rgba(48,209,88,0.12)', level: 'beginner', durationMinutes: 8, type: 'guide', lessonPath: 'tutorials/opencode/opencode.html' },
@@ -4479,6 +4590,139 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.progress[tut.id] = newVal;
         var user = Alpine.store('auth').user;
         if (user) saveTutorialCompletion(user.uid, tut.id, newVal);
+      }
+    };
+  };
+
+  // ---------- Invite Widget (navbar Viral Tree delight) ----------
+  window.inviteWidget = function() {
+    return {
+      friend: '',
+      sent: false,
+      label: 'Sent!',
+      _timer: null,
+
+      async send(ev) {
+        var auth = Alpine.store('auth');
+        var user = auth.user;
+        if (!user) { Alpine.store('ui').showModal('signin'); return; }
+        var profile = auth.profile || {};
+        var code = profile.referralCode;
+        if (!code && typeof ensureReferralCode === 'function') {
+          try {
+            code = await ensureReferralCode(user.uid, profile, user.email);
+            if (code && auth.profile) auth.profile.referralCode = code;
+          } catch (e) { /* ignore */ }
+        }
+        var link = code ? (location.origin + '/?ref=' + code) : location.origin;
+        var friend = (this.friend || '').trim();
+        var isEmail = /.+@.+\..+/.test(friend);
+        var name = (friend && friend.indexOf('@') > -1) ? friend.split('@')[0] : (friend || 'there');
+        var msg = 'Hi ' + name + ',\n\nI’ve been learning AI on AI Badge and thought you’d enjoy it. The first lessons are free — join with my link:\n' + link + '\n\nSee you in there!';
+        try { await navigator.clipboard.writeText(link); } catch (e) { /* clipboard blocked */ }
+        if (isEmail) {
+          try {
+            var mailto = 'mailto:' + encodeURIComponent(friend) +
+              '?subject=' + encodeURIComponent('Learn AI with me on AI Badge') +
+              '&body=' + encodeURIComponent(msg);
+            window.location.href = mailto;
+          } catch (e) { /* ignore */ }
+          this.label = 'Sent!';
+        } else {
+          this.label = 'Link copied!';
+        }
+        this.burst();
+        this.friend = '';
+        this.sent = true;
+        var self = this;
+        clearTimeout(this._timer);
+        this._timer = setTimeout(function () { self.sent = false; }, 2000);
+      },
+
+      burst() {
+        var host = this.$refs.hearts;
+        if (!host) return;
+        var emojis = ['❤️', '💛', '✨', '💚', '💖', '🌟'];
+        for (var i = 0; i < 10; i++) {
+          var s = document.createElement('span');
+          s.className = 'lms-heart';
+          s.textContent = emojis[i % emojis.length];
+          s.style.left = (12 + Math.random() * 76) + '%';
+          s.style.setProperty('--r', (Math.random() * 70 - 35) + 'deg');
+          s.style.fontSize = (13 + Math.random() * 11) + 'px';
+          s.style.animationDelay = (Math.random() * 0.2) + 's';
+          host.appendChild(s);
+          (function (node) {
+            setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, 1800);
+          })(s);
+        }
+      }
+    };
+  };
+
+  // ---------- Referral Tree (dashboard status panel) ----------
+  window.referralTree = function() {
+    return {
+      referrals: [],
+      count: 0,
+      loading: true,
+      copied: false,
+      level: { emoji: '🌱', name: 'Seedling' },
+      next: null,
+      nextGap: 0,
+      link: '',
+      _lastUid: null,
+      _timer: null,
+
+      init() {
+        var self = this;
+        setInterval(function () {
+          var user = Alpine.store('auth').user;
+          var uid = user ? user.uid : null;
+          if (uid && uid !== self._lastUid) { self._lastUid = uid; self.load(uid); }
+          else if (!uid) { self._lastUid = null; self.referrals = []; self.count = 0; self.link = ''; }
+        }, 400);
+      },
+
+      async load(uid) {
+        this.loading = true;
+        var auth = Alpine.store('auth');
+        var profile = auth.profile || {};
+        var code = profile.referralCode;
+        if (!code && typeof ensureReferralCode === 'function') {
+          try {
+            code = await ensureReferralCode(uid, profile, (auth.user || {}).email);
+            if (code && auth.profile) auth.profile.referralCode = code;
+          } catch (e) { /* ignore */ }
+        }
+        this.link = code ? (location.origin + '/?ref=' + code) : location.origin;
+        try {
+          var rows = (typeof getMyReferrals === 'function') ? await getMyReferrals(uid) : [];
+          this.referrals = rows;
+          this.count = rows.length;
+        } catch (e) { this.referrals = []; this.count = 0; }
+        this.recompute();
+        this.loading = false;
+      },
+
+      recompute() {
+        var info = (typeof referralTreeLevel === 'function')
+          ? referralTreeLevel(this.count)
+          : { level: { emoji: '🌱', name: 'Seedling' }, next: null };
+        this.level = info.level;
+        this.next = info.next;
+        this.nextGap = info.next ? Math.max(1, info.next.min - this.count) : 0;
+      },
+
+      async copyLink() {
+        try { await navigator.clipboard.writeText(this.link); }
+        catch (e) {
+          try { this.$refs.linkInput.select(); document.execCommand('copy'); } catch (_) {}
+        }
+        this.copied = true;
+        var self = this;
+        clearTimeout(this._timer);
+        this._timer = setTimeout(function () { self.copied = false; }, 1800);
       }
     };
   };
