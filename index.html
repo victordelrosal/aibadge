@@ -2271,6 +2271,21 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             </div>
           </div>
         </template>
+
+        <!-- Certificate CTA: appears once every tutorial is complete -->
+        <div x-show="allComplete || certMsg" x-transition
+             style="margin-top:24px;border-radius:18px;padding:20px 22px;background:linear-gradient(135deg,rgba(184,134,11,0.10),rgba(245,231,160,0.18));border:1px solid rgba(184,134,11,0.28);">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div style="font-size:2rem;line-height:1;">&#127891;</div>
+            <div style="flex:1;min-width:200px;">
+              <div style="font:700 17px/1.25 -apple-system,sans-serif;color:#000036;">You&rsquo;ve completed every tutorial</div>
+              <div class="lms-subheading" style="font-size:0.9rem;margin-top:2px;">Request your verified AI Badge certificate. Victor reviews your work personally, then issues it as a verifiable credential. Money back if it isn&rsquo;t issued.</div>
+            </div>
+            <button x-show="certState==='idle'" @click="requestCertificate()" class="lms-invite-btn" style="border-radius:12px;padding:13px 20px;font-weight:700;white-space:nowrap;">Request certificate &rarr;</button>
+            <span x-show="certState==='working'" class="lms-subheading" style="font-size:0.9rem;white-space:nowrap;">Starting&hellip;</span>
+          </div>
+          <p x-show="certMsg" x-text="certMsg" style="margin:14px 0 0;font:600 14px/1.45 -apple-system,sans-serif;color:#1d6e36;"></p>
+        </div>
       </div>
     </template>
 
@@ -4648,8 +4663,21 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   window.lmsDashboard = function() {
     return {
       progress: {},
+      certState: 'idle',   // idle | working | requested | paid
+      certMsg: '',
 
       tutorials: window._lmsTutorials.map(function(t) { return Object.assign({}, t); }),
+
+      // Every real (non-pending) tutorial is marked complete.
+      get allComplete() {
+        var done = this.progress;
+        var real = this.tutorials.filter(function(t) { return !t.pending; });
+        return real.length > 0 && real.every(function(t) { return !!done[t.id]; });
+      },
+
+      get _apiBase() {
+        return (typeof API !== 'undefined' && API) ? API : 'https://aibadge-report-mailer.victordelrosal.workers.dev/api';
+      },
 
       init() {
         var self = this;
@@ -4662,9 +4690,59 @@ document.querySelectorAll('#navLinks a').forEach(a => {
                 if (completions[tutId].completed) self.progress[tutId] = true;
               });
             });
+            // Returning from Stripe Checkout? Confirm the payment server-side.
+            try {
+              var sp = new URLSearchParams(location.search);
+              if (sp.get('cert') === 'success' && sp.get('cs')) self.confirmCert(sp.get('cs'));
+              else if (sp.get('cert') === 'cancelled') {
+                self.certMsg = 'Checkout cancelled. You can request your certificate whenever you’re ready.';
+                try { history.replaceState({}, '', location.pathname + location.hash); } catch (e) {}
+              }
+            } catch (e) {}
           }
         }, 200);
         setTimeout(function() { clearInterval(checkUser); }, 5000);
+      },
+
+      async requestCertificate() {
+        if (this.certState !== 'idle') return;
+        this.certState = 'working'; this.certMsg = '';
+        try {
+          var token = await firebase.auth().currentUser.getIdToken();
+          var resp = await fetch(this._apiBase + '/cert-checkout', {
+            method: 'POST', headers: { 'Authorization': 'Bearer ' + token }
+          });
+          var data = await resp.json();
+          if (!resp.ok) { this.certState = 'idle'; this.certMsg = (data && data.error) || 'Could not start. Try again.'; return; }
+          if (data.checkoutUrl) { window.location.href = data.checkoutUrl; return; }
+          if (data.free) {
+            this.certState = 'requested';
+            this.certMsg = '✅ Request received. Victor will review your work and issue your certificate. You’ll hear within 72 hours.';
+            return;
+          }
+          this.certState = 'idle';
+        } catch (e) { this.certState = 'idle'; this.certMsg = 'Network error. Try again.'; }
+      },
+
+      async confirmCert(cs) {
+        this.certState = 'working';
+        try {
+          var token = await firebase.auth().currentUser.getIdToken();
+          var resp = await fetch(this._apiBase + '/cert-confirm', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: cs })
+          });
+          var data = await resp.json();
+          if (resp.ok && data.paid) {
+            this.certState = 'paid';
+            this.certMsg = '🎉 Payment received! Victor will review your work and issue your verified certificate. You’ll hear within 72 hours.';
+          } else {
+            this.certState = 'idle';
+            this.certMsg = (data && data.error) ? data.error : 'We couldn’t confirm the payment yet. If you were charged, it will still be reviewed.';
+          }
+        } catch (e) { this.certState = 'idle'; this.certMsg = 'Could not confirm payment.'; }
+        try { history.replaceState({}, '', location.pathname + location.hash); } catch (e) {}
       },
 
       toggleComplete(tut) {

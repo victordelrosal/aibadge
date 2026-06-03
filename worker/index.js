@@ -95,6 +95,20 @@ async function route(request, env) {
       return handleTree(request, env);
     }
 
+    // ── Certificates (pay-first, human-reviewed) ──
+    if (path === "/api/cert-checkout" && request.method === "POST") {
+      return handleCertCheckout(request, env);
+    }
+    if (path === "/api/cert-confirm" && request.method === "POST") {
+      return handleCertConfirm(request, env);
+    }
+    if (path === "/api/cert-requests" && request.method === "GET") {
+      return handleCertRequests(request, env);
+    }
+    if (path === "/api/cert-pricing" && request.method === "POST") {
+      return handleCertPricing(request, env);
+    }
+
     // ── Legacy: report mailer (POST to root) ──
     if (request.method === "POST" && (path === "/" || path === "")) {
       return handleReportEmail(request, env);
@@ -871,6 +885,230 @@ async function handleInvite(request, env) {
   } catch (e) {
     return jsonResponse({ error: "Couldn't send the invite right now." }, 502);
   }
+}
+
+// ══════════════════════════════════════════
+// CERTIFICATES — pay-first, human-reviewed issuance
+// ══════════════════════════════════════════
+// Flow: learner requests a cert -> worker resolves the price server-side
+// (NCI/admin/override = free; everyone else €49, coupons honoured by Stripe)
+// -> Stripe Checkout -> on confirmed payment the worker records the request in
+// KV (server-authoritative, so a client can never forge "paid") and emails
+// Victor to review. Issuance itself stays manual via certs.fiveinnolabs.com.
+
+const CERT_PRICE_CENTS = 4900;            // default €49 for non-NCI learners
+const CERT_CURRENCY = "eur";
+const CERT_ADMIN_EMAILS = ["victor@fiveinnolabs.com", "victordelrosal@gmail.com"];
+const CERT_ALERT_TO = "victordelrosal@gmail.com";
+
+function certIsNciEmail(email) {
+  const e = String(email || "").trim().toLowerCase();
+  return e.endsWith(".ncirl.ie") || e.endsWith("@ncirl.ie");
+}
+function certIsAdmin(email) {
+  return CERT_ADMIN_EMAILS.includes(String(email || "").trim().toLowerCase());
+}
+
+// Resolve what THIS learner pays, server-side. Returns { cents, reason }.
+// cents === 0 means a comped (free) cert that still goes through review.
+async function resolveCertPrice(email, env) {
+  const e = String(email || "").trim().toLowerCase();
+  if (certIsAdmin(e)) return { cents: 0, reason: "admin" };
+  if (certIsNciEmail(e)) return { cents: 0, reason: "nci" };
+  try {
+    const raw = await env.SLOTS.get(`certprice:${e}`);
+    if (raw) {
+      const o = JSON.parse(raw);
+      if (typeof o.cents === "number" && o.cents >= 0) {
+        return { cents: o.cents, reason: o.cents === 0 ? "comped-override" : "discount-override" };
+      }
+    }
+  } catch (e2) { /* fall through to default */ }
+  return { cents: CERT_PRICE_CENTS, reason: "standard" };
+}
+
+async function writeCertRequest(env, rec) {
+  const key = `certreq:${rec.uid}`;
+  const existingRaw = await env.SLOTS.get(key);
+  const existing = existingRaw ? JSON.parse(existingRaw) : null;
+  // Preserve an earlier review decision if the record is rewritten.
+  const merged = Object.assign(
+    { reviewStatus: "pending", requestedAt: new Date().toISOString() },
+    existing || {},
+    rec
+  );
+  await env.SLOTS.put(key, JSON.stringify(merged));
+  return { record: merged, isNew: !existing };
+}
+
+async function sendCertAlert(env, rec) {
+  try {
+    const site = env.SITE_URL || "https://aibadge.fiveinnolabs.com";
+    const amount = rec.amountCents ? `€${(rec.amountCents / 100).toFixed(2)}` : "Free (comped)";
+    const html = `<!DOCTYPE html><html><body style="margin:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<div style="max-width:520px;margin:0 auto;padding:24px;">
+  <div style="background:#fff;border-radius:18px;padding:32px 28px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+    <div style="font-size:2rem;margin-bottom:8px;">🎓</div>
+    <h1 style="font-size:21px;line-height:1.25;color:#000036;margin:0 0 10px;">New certificate request to review</h1>
+    <p style="font-size:15px;line-height:1.55;color:#3a3f4a;margin:0 0 6px;"><strong>Learner:</strong> ${escapeHtml(rec.email)}</p>
+    <p style="font-size:15px;line-height:1.55;color:#3a3f4a;margin:0 0 6px;"><strong>Paid:</strong> ${escapeHtml(amount)} (${escapeHtml(rec.priceReason || "")})</p>
+    <p style="font-size:15px;line-height:1.55;color:#3a3f4a;margin:0 0 22px;">Go through their submissions, then issue or coach-to-resubmit.</p>
+    <a href="${site}/#/admin" style="display:inline-block;padding:13px 20px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;color:#0A0E27;background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%);">Open review queue →</a>
+  </div>
+</div>
+</body></html>`;
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: env.FROM_EMAIL, to: CERT_ALERT_TO, subject: "🎓 Certificate request — review needed", html }),
+    });
+  } catch (e) { console.log("cert alert failed:", e.message); }
+}
+
+// POST /api/cert-checkout — start a cert request (free path records immediately;
+// paid path returns a Stripe Checkout URL). Auth required.
+async function handleCertCheckout(request, env) {
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  if (!idToken) return jsonResponse({ error: "Sign in to request your certificate." }, 401);
+  const principal = await verifyFirebaseToken(idToken, env);
+  if (!principal || !principal.uid) return jsonResponse({ error: "Your session expired. Sign in again." }, 401);
+
+  const email = String(principal.email || "").trim().toLowerCase();
+  if (!email) return jsonResponse({ error: "No email on your account." }, 400);
+
+  const price = await resolveCertPrice(email, env);
+
+  // Free / comped: record the request now and alert Victor. No Stripe.
+  if (price.cents === 0) {
+    const { record, isNew } = await writeCertRequest(env, {
+      uid: principal.uid, email, amountCents: 0, currency: CERT_CURRENCY,
+      status: "comped", priceReason: price.reason,
+    });
+    if (isNew) await sendCertAlert(env, record);
+    return jsonResponse({ free: true, status: "comped" });
+  }
+
+  // Paid: create a Stripe Checkout Session (coupons honoured via promotion codes).
+  const site = env.SITE_URL || "https://aibadge.fiveinnolabs.com";
+  const params = new URLSearchParams({
+    "mode": "payment",
+    "success_url": `${site}/?cert=success&cs={CHECKOUT_SESSION_ID}`,
+    "cancel_url": `${site}/?cert=cancelled`,
+    "allow_promotion_codes": "true",
+    "customer_email": email,
+    "line_items[0][price_data][currency]": CERT_CURRENCY,
+    "line_items[0][price_data][unit_amount]": String(price.cents),
+    "line_items[0][price_data][product_data][name]": "AI Badge — Verified Certificate",
+    "line_items[0][price_data][product_data][description]": "Human-reviewed certificate of completion, issued as a verifiable credential after your work is validated.",
+    "line_items[0][quantity]": "1",
+    "metadata[type]": "cert",
+    "metadata[uid]": principal.uid,
+    "metadata[email]": email,
+    "metadata[priceReason]": price.reason,
+    "expires_at": Math.floor(Date.now() / 1000 + 1800).toString(),
+  });
+  const sres = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`, "Content-Type": "application/x-www-form-urlencoded" },
+    body: params.toString(),
+  });
+  const session = await sres.json();
+  if (!sres.ok) {
+    console.error("cert stripe error:", JSON.stringify(session));
+    return jsonResponse({ error: "Could not start checkout.", detail: session.error?.message }, 502);
+  }
+  return jsonResponse({ checkoutUrl: session.url, amountCents: price.cents });
+}
+
+// POST /api/cert-confirm { sessionId } — verify the payment with Stripe and
+// record the request. Server-authoritative: the "paid" flag comes from Stripe,
+// never the client. Idempotent per uid. Auth required.
+async function handleCertConfirm(request, env) {
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  if (!idToken) return jsonResponse({ error: "Sign in again." }, 401);
+  const principal = await verifyFirebaseToken(idToken, env);
+  if (!principal || !principal.uid) return jsonResponse({ error: "Your session expired." }, 401);
+
+  let body; try { body = await request.json(); } catch (e) { return jsonResponse({ error: "Invalid JSON" }, 400); }
+  const sessionId = String(body.sessionId || "").trim();
+  if (!sessionId || !/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return jsonResponse({ error: "Missing session." }, 400);
+
+  const sres = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
+    headers: { "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}` },
+  });
+  const session = await sres.json();
+  if (!sres.ok) return jsonResponse({ error: "Could not verify payment." }, 502);
+
+  // Bind the payment to the caller and confirm it actually cleared.
+  if (session.metadata?.type !== "cert" || session.metadata?.uid !== principal.uid) {
+    return jsonResponse({ error: "This payment doesn't match your account." }, 403);
+  }
+  if (session.payment_status !== "paid") {
+    return jsonResponse({ paid: false, status: session.payment_status || "unpaid" });
+  }
+
+  const { record, isNew } = await writeCertRequest(env, {
+    uid: principal.uid,
+    email: String(session.metadata?.email || principal.email || "").toLowerCase(),
+    amountCents: session.amount_total || 0,
+    currency: session.currency || CERT_CURRENCY,
+    status: "paid",
+    priceReason: session.metadata?.priceReason || "standard",
+    stripeSessionId: session.id,
+    stripePaymentIntent: session.payment_intent || null,
+  });
+  if (isNew || record.status !== "paid") {
+    // First confirmation (or upgrade from comped): notify once.
+    if (isNew) await sendCertAlert(env, record);
+  }
+  return jsonResponse({ paid: true, status: "paid", amountCents: record.amountCents });
+}
+
+// GET /api/cert-requests — admin-only review queue.
+async function handleCertRequests(request, env) {
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  const principal = idToken ? await verifyFirebaseToken(idToken, env) : null;
+  if (!principal || !certIsAdmin(principal.email)) return jsonResponse({ error: "Admins only." }, 403);
+
+  const out = [];
+  let cursor;
+  do {
+    const list = await env.SLOTS.list({ prefix: "certreq:", cursor });
+    for (const k of list.keys) {
+      const raw = await env.SLOTS.get(k.name);
+      if (raw) out.push(JSON.parse(raw));
+    }
+    cursor = list.list_complete ? null : list.cursor;
+  } while (cursor);
+  out.sort((a, b) => String(b.requestedAt || "").localeCompare(String(a.requestedAt || "")));
+  return jsonResponse({ requests: out });
+}
+
+// POST /api/cert-pricing { email, cents } — admin sets a per-learner override.
+// cents: 0 = free for that contact; >0 = custom price in cents; <0 = remove.
+async function handleCertPricing(request, env) {
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  const principal = idToken ? await verifyFirebaseToken(idToken, env) : null;
+  if (!principal || !certIsAdmin(principal.email)) return jsonResponse({ error: "Admins only." }, 403);
+
+  let body; try { body = await request.json(); } catch (e) { return jsonResponse({ error: "Invalid JSON" }, 400); }
+  const email = String(body.email || "").trim().toLowerCase();
+  const cents = Number(body.cents);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return jsonResponse({ error: "Valid email required." }, 400);
+  if (!Number.isFinite(cents)) return jsonResponse({ error: "cents must be a number." }, 400);
+
+  if (cents < 0) {
+    await env.SLOTS.delete(`certprice:${email}`);
+    return jsonResponse({ success: true, removed: true });
+  }
+  await env.SLOTS.put(`certprice:${email}`, JSON.stringify({
+    cents, setBy: principal.email, setAt: new Date().toISOString(), note: String(body.note || "").slice(0, 200),
+  }));
+  return jsonResponse({ success: true, email, cents });
 }
 
 // ══════════════════════════════════════════
