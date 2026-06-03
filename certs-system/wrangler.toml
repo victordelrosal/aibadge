@@ -1,0 +1,28 @@
+name = "aibadge-certs"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+FROM_EMAIL = "AI Badge <victor@fiveinnolabs.com>"
+FIREBASE_PROJECT_ID = "ai-badge-2026"
+ISSUER_PUBLIC_MULTIKEY = "z6Mkndn7gwQiwEpr5wvUJiuHK7SN5aKRBNdV1J5HVRf4UK8h"
+ISSUER_PUBLIC_JWK = '{"kty":"OKP","crv":"Ed25519","alg":"Ed25519","x":"eY9N8-Hd_LKnz71sjiqi1csf50OFr6Alexpu3ogl5W4","key_ops":["verify"]}'
+
+# Secrets (set via `wrangler secret put`): ISSUER_PRIVATE_JWK, RESEND_API_KEY
+
+[[kv_namespaces]]
+binding = "CERTS_KV"
+id = "9b8899effb804056a435ae5af6151966"
+
+[[r2_buckets]]
+binding = "CERTS_R2"
+bucket_name = "aibadge-certs"
+
+[browser]
+binding = "BROWSER"
+
+# certs.fiveinnolabs.com — live custom domain (cut over from GitHub Pages 2026-06-03).
+[[routes]]
+pattern = "certs.fiveinnolabs.com"
+custom_domain = true

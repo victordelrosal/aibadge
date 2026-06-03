@@ -1,0 +1,17 @@
+{
+  "name": "aibadge-certs",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "AI Badge verifiable credential system (issuer, verification, certs.fiveinnolabs.com)",
+  "scripts": {
+    "keygen": "node scripts/keygen.mjs",
+    "test:crypto": "node scripts/test-crypto.mjs",
+    "render": "node scripts/render-local.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/puppeteer": "^1.1.0",
+    "puppeteer-core": "^25.1.0",
+    "qrcode-generator": "^2.0.4"
+  }
+}
