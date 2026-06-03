@@ -3123,8 +3123,17 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <span style="font-size:2.6rem;font-weight:800;color:var(--gold-rich,#B8860B);" x-text="count"></span>
       <div class="lms-subheading" style="font-size:0.92rem;margin-top:-2px;" x-text="count === 1 ? 'friend joined through you' : 'friends joined through you'"></div>
     </div>
-    <p class="lms-subheading" x-show="next" style="text-align:center;font-size:0.85rem;margin:6px 0 18px;" x-text="'Invite ' + nextGap + ' more to reach ' + (next ? next.emoji + ' ' + next.name : '')"></p>
-    <p class="lms-subheading" x-show="!next" style="text-align:center;font-size:0.85rem;margin:6px 0 18px;">You&rsquo;ve grown a whole forest. Incredible. &#127794;</p>
+    <!-- Progress to the next tier (no dead end: the ladder keeps climbing) -->
+    <div x-show="next" style="margin:12px 6px 7px;">
+      <div style="height:8px;border-radius:999px;background:rgba(120,120,128,0.14);overflow:hidden;">
+        <div style="height:100%;border-radius:999px;background:linear-gradient(90deg,#34C759,#1d6e36);transition:width .6s cubic-bezier(.2,.8,.2,1);" :style="'width:' + progressPct + '%'"></div>
+      </div>
+    </div>
+    <p class="lms-subheading" x-show="next" style="text-align:center;font-size:0.85rem;margin:7px 0 6px;" x-text="'Invite ' + nextGap + ' more to reach ' + (next ? next.emoji + ' ' + next.name : '')"></p>
+    <p class="lms-subheading" x-show="!next" style="text-align:center;font-size:0.85rem;margin:12px 0 6px;">Your ecosystem keeps growing. Keep planting. &#127757;</p>
+    <!-- Movement reframe: the whole network, shown once it runs deeper than direct invites -->
+    <p x-show="networkTotal > count" style="text-align:center;font-size:0.85rem;margin:4px 0 16px;color:#1d6e36;font-weight:600;" x-text="'🌍 A network of ' + networkTotal + ' learners across ' + networkDepth + ' levels'"></p>
+    <div x-show="!(networkTotal > count)" style="height:12px;"></div>
 
     <!-- Share link -->
     <div style="display:flex;gap:8px;align-items:center;background:rgba(120,120,128,0.08);border-radius:10px;padding:8px 10px;margin-bottom:18px;">
@@ -3142,6 +3151,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(0,0,0,0.06);">
         <span style="font-size:16px;">&#127807;</span>
         <span class="lms-tree-link" style="flex:1;min-width:0;font:500 14px/1.3 -apple-system,sans-serif;color:#1c1c1e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="r.referredEmail || 'A new learner'"></span>
+        <span x-show="subtree[r.referredId] > 0" style="font-size:11px;font-weight:600;color:#1d4d8c;background:rgba(29,77,140,0.10);padding:2px 8px;border-radius:999px;white-space:nowrap;" x-text="'+' + subtree[r.referredId] + ' grew'" title="Learners who joined through this person"></span>
         <span style="font-size:11px;font-weight:600;color:#1d6e36;background:rgba(52,199,89,0.12);padding:2px 8px;border-radius:999px;" x-text="r.status === 'paid' ? 'Paid' : 'Joined'"></span>
       </div>
     </template>
@@ -4766,6 +4776,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       level: { emoji: '🌱', name: 'Seedling' },
       next: null,
       nextGap: 0,
+      progressPct: 0,
+      networkTotal: 0,
+      networkDepth: 0,
+      subtree: {},
       link: '',
       _lastUid: null,
       _timer: null,
@@ -4799,16 +4813,45 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         } catch (e) { this.referrals = []; this.count = 0; }
         this.recompute();
         this.loading = false;
+        this.loadNetwork();   // deeper branches (async, non-blocking, graceful)
       },
 
       recompute() {
         var info = (typeof referralTreeLevel === 'function')
           ? referralTreeLevel(this.count)
-          : { level: { emoji: '🌱', name: 'Seedling' }, next: null };
+          : { level: { emoji: '🌱', name: 'Seedling', min: 0 }, next: null };
         this.level = info.level;
         this.next = info.next;
         this.nextGap = info.next ? Math.max(1, info.next.min - this.count) : 0;
+        var floor = (info.level && info.level.min) || 0;
+        this.progressPct = info.next
+          ? Math.max(2, Math.min(100, Math.round((this.count - floor) / (info.next.min - floor) * 100)))
+          : 100;
         try { Alpine.store('ui').treeCount = this.count; } catch (e) {}
+      },
+
+      // Fetch the full descendant network (second level and beyond) from the
+      // worker. The client can only read its own direct edges (Firestore rules),
+      // so the worker aggregates with admin access and returns counts only for
+      // deeper levels (no grandchild emails). Fails silently to the flat list.
+      async loadNetwork() {
+        try {
+          var u = (firebase.auth().currentUser);
+          if (!u) return;
+          var idToken = await u.getIdToken();
+          var apiBase = (typeof API !== 'undefined' && API) ? API : 'https://aibadge-report-mailer.victordelrosal.workers.dev/api';
+          var resp = await fetch(apiBase + '/tree', {
+            headers: { 'Authorization': 'Bearer ' + idToken }
+          });
+          if (!resp.ok) return;
+          var data = await resp.json();
+          if (!data || typeof data.total !== 'number') return;
+          var map = {};
+          (data.direct || []).forEach(function (d) { if (d.referredId) map[d.referredId] = d.subtree || 0; });
+          this.subtree = map;
+          this.networkTotal = data.total || 0;
+          this.networkDepth = data.depth || 0;
+        } catch (e) { /* graceful: keep the flat direct list */ }
       },
 
       async copyLink() {

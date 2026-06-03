@@ -91,6 +91,9 @@ async function route(request, env) {
     if (path === "/api/invite" && request.method === "POST") {
       return handleInvite(request, env);
     }
+    if (path === "/api/tree" && request.method === "GET") {
+      return handleTree(request, env);
+    }
 
     // ── Legacy: report mailer (POST to root) ──
     if (request.method === "POST" && (path === "/" || path === "")) {
@@ -551,7 +554,7 @@ async function verifyStripeWebhook(payload, sigHeader, secret) {
 // GOOGLE CALENDAR
 // ══════════════════════════════════════════
 
-async function getGoogleAccessToken(env) {
+async function getGoogleAccessToken(env, scope = "https://www.googleapis.com/auth/calendar") {
   const sa = JSON.parse(env.GOOGLE_SERVICE_ACCOUNT);
   const now = Math.floor(Date.now() / 1000);
 
@@ -559,7 +562,7 @@ async function getGoogleAccessToken(env) {
   const header = { alg: "RS256", typ: "JWT" };
   const claim = {
     iss: sa.client_email,
-    scope: "https://www.googleapis.com/auth/calendar",
+    scope: scope,
     aud: "https://oauth2.googleapis.com/token",
     iat: now,
     exp: now + 3600,
@@ -867,6 +870,114 @@ async function handleInvite(request, env) {
     return jsonResponse({ success: true });
   } catch (e) {
     return jsonResponse({ error: "Couldn't send the invite right now." }, 502);
+  }
+}
+
+// ══════════════════════════════════════════
+// VIRAL TREE — full descendant network
+// ══════════════════════════════════════════
+// The client can only read its OWN direct referral edges (Firestore rules
+// restrict referrals reads to referrer/referred/admin). To show the second
+// level and deeper, this endpoint verifies the caller's Firebase token, then
+// uses the service account (read-only Firestore) to walk the graph. Privacy:
+// only the caller's DIRECT children carry an email (they can already read those
+// edges); every deeper level contributes to counts only — never emails.
+async function handleTree(request, env) {
+  const auth = request.headers.get("Authorization") || "";
+  const idToken = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (!idToken) return jsonResponse({ error: "Sign in." }, 401);
+
+  const principal = await verifyFirebaseToken(idToken, env);
+  if (!principal || !principal.uid) {
+    return jsonResponse({ error: "Your session expired. Sign in again." }, 401);
+  }
+
+  let token;
+  try {
+    token = await getGoogleAccessToken(env, "https://www.googleapis.com/auth/datastore");
+  } catch (e) {
+    console.log("tree: token error", String(e));
+    return jsonResponse({ error: "tree_unavailable" }, 200); // graceful: client keeps flat list
+  }
+
+  const projectId = env.FIREBASE_PROJECT_ID || "ai-badge-2026";
+  const queryUrl =
+    `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
+
+  // Return all referral edges whose referrerId is in `ids` (batched, IN<=30).
+  async function childrenOf(ids) {
+    const out = [];
+    for (let i = 0; i < ids.length; i += 30) {
+      const batch = ids.slice(i, i + 30);
+      const where = batch.length === 1
+        ? { fieldFilter: { field: { fieldPath: "referrerId" }, op: "EQUAL", value: { stringValue: batch[0] } } }
+        : { fieldFilter: { field: { fieldPath: "referrerId" }, op: "IN", value: { arrayValue: { values: batch.map((b) => ({ stringValue: b })) } } } };
+      const body = { structuredQuery: { from: [{ collectionId: "referrals" }], where, limit: 1000 } };
+      const res = await fetch(queryUrl, {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("firestore " + res.status + " " + (await res.text()).slice(0, 160));
+      const rows = await res.json();
+      for (const r of rows) {
+        if (!r.document) continue;
+        const f = r.document.fields || {};
+        out.push({
+          referrerId: (f.referrerId && f.referrerId.stringValue) || "",
+          referredId: (f.referredId && f.referredId.stringValue) || "",
+          referredEmail: (f.referredEmail && f.referredEmail.stringValue) || "",
+          status: (f.status && f.status.stringValue) || "signed_up",
+        });
+      }
+    }
+    return out;
+  }
+
+  try {
+    const MAX_DEPTH = 8, MAX_NODES = 5000;
+    const direct = await childrenOf([principal.uid]);
+
+    const seen = new Set([principal.uid]);
+    const rootOf = {};                 // referredId -> the direct child it descends from
+    const subtree = {};                // direct child id -> count of deeper descendants
+    direct.forEach((d) => { if (d.referredId) { seen.add(d.referredId); rootOf[d.referredId] = d.referredId; } });
+
+    let frontier = direct.slice();
+    let depth = direct.length ? 1 : 0;
+    let nodes = direct.length;
+
+    while (frontier.length && depth < MAX_DEPTH && nodes < MAX_NODES) {
+      const ids = frontier.map((n) => n.referredId).filter(Boolean);
+      const kids = await childrenOf(ids);
+      const next = [];
+      for (const k of kids) {
+        if (!k.referredId || seen.has(k.referredId)) continue; // de-dup + cycle guard
+        seen.add(k.referredId);
+        const root = rootOf[k.referrerId];
+        if (root) { rootOf[k.referredId] = root; subtree[root] = (subtree[root] || 0) + 1; }
+        next.push(k);
+        nodes++;
+        if (nodes >= MAX_NODES) break;
+      }
+      frontier = next;
+      if (next.length) depth++;
+    }
+
+    return jsonResponse({
+      total: nodes,                    // total descendants (direct + deeper)
+      directCount: direct.length,
+      depth,
+      direct: direct.map((d) => ({
+        referredId: d.referredId,
+        email: d.referredEmail,        // direct only — caller can already read these
+        status: d.status,
+        subtree: subtree[d.referredId] || 0,
+      })),
+    });
+  } catch (e) {
+    console.log("tree: query error", String(e));
+    return jsonResponse({ error: "tree_unavailable" }, 200); // graceful
   }
 }
 

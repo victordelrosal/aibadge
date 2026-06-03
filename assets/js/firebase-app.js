@@ -1080,11 +1080,15 @@ async function getMyReferrals(userId) {
 function referralTreeLevel(count) {
   count = count || 0;
   var levels = [
-    { min: 0,  name: "Seedling", emoji: "🌱" },
-    { min: 1,  name: "Sprout",   emoji: "🌿" },
-    { min: 3,  name: "Sapling",  emoji: "🪴" },
-    { min: 6,  name: "Tree",     emoji: "🌳" },
-    { min: 12, name: "Forest",   emoji: "🌲" }
+    { min: 0,   name: "Seedling",   emoji: "🌱" },
+    { min: 1,   name: "Sprout",     emoji: "🌿" },
+    { min: 3,   name: "Sapling",    emoji: "🪴" },
+    { min: 6,   name: "Tree",       emoji: "🌳" },
+    { min: 12,  name: "Forest",     emoji: "🌲" },
+    { min: 25,  name: "Woodland",   emoji: "🏞️" },
+    { min: 50,  name: "Rainforest", emoji: "🌴" },
+    { min: 100, name: "Wilderness", emoji: "🏔️" },
+    { min: 250, name: "Ecosystem",  emoji: "🌍" }
   ];
   var current = levels[0], next = null;
   for (var i = 0; i < levels.length; i++) {
