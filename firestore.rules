@@ -137,6 +137,23 @@ service cloud.firestore {
     }
 
     // ----------------------------------------------------------------
+    // Viral Tree: outstanding invites (who was emailed, not yet joined).
+    // The INVITER creates/refreshes their own invite record (inviterId
+    // must equal their own uid). Only the inviter + admin can read them.
+    // No PII of third parties is exposed to anyone but the sender.
+    // ----------------------------------------------------------------
+    match /invites/{iid} {
+      allow read: if request.auth != null
+                  && (resource.data.inviterId == request.auth.uid || isAdmin());
+      allow create, update: if request.auth != null
+                  && request.resource.data.inviterId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+    match /{path=**}/invites/{iid} {
+      allow read: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------
     // Default deny
     // ----------------------------------------------------------------
     match /{document=**} {

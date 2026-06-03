@@ -3141,20 +3141,43 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <button @click="copyLink($event)" :class="copied && 'sent'" class="lms-invite-btn" style="border-radius:8px;padding:8px 13px;" x-text="copied ? 'Copied!' : 'Copy link'"></button>
     </div>
 
-    <!-- Who joined -->
-    <div style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.03em;text-transform:uppercase;color:rgba(60,60,67,0.5);margin-bottom:6px;">Your tree</div>
+    <!-- Loading / empty states -->
     <template x-if="loading"><p class="lms-subheading" style="font-size:0.85rem;margin:0;">Loading your tree&hellip;</p></template>
-    <template x-if="!loading && referrals.length === 0">
+    <template x-if="!loading && referrals.length === 0 && pending.length === 0">
       <p class="lms-subheading" style="font-size:0.85rem;margin:0;">No one yet. Share your link and watch your tree grow. &#127793;</p>
     </template>
-    <template x-for="r in referrals" :key="r.id">
-      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(0,0,0,0.06);">
-        <span style="font-size:16px;">&#127807;</span>
-        <span class="lms-tree-link" style="flex:1;min-width:0;font:500 14px/1.3 -apple-system,sans-serif;color:#1c1c1e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="r.referredEmail || 'A new learner'"></span>
-        <span x-show="subtree[r.referredId] > 0" style="font-size:11px;font-weight:600;color:#1d4d8c;background:rgba(29,77,140,0.10);padding:2px 8px;border-radius:999px;white-space:nowrap;" x-text="'+' + subtree[r.referredId] + ' grew'" title="Learners who joined through this person"></span>
-        <span style="font-size:11px;font-weight:600;color:#1d6e36;background:rgba(52,199,89,0.12);padding:2px 8px;border-radius:999px;" x-text="r.status === 'paid' ? 'Paid' : 'Joined'"></span>
+
+    <!-- Joined -->
+    <div x-show="!loading && referrals.length > 0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+        <span style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.03em;text-transform:uppercase;color:rgba(60,60,67,0.5);">Joined</span>
+        <span style="font:700 12px/1 -apple-system,sans-serif;color:#1d6e36;background:rgba(52,199,89,0.12);padding:3px 9px;border-radius:999px;" x-text="referrals.length"></span>
       </div>
-    </template>
+      <template x-for="r in referrals" :key="r.id">
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(0,0,0,0.06);">
+          <span style="font-size:16px;">&#127807;</span>
+          <span class="lms-tree-link" style="flex:1;min-width:0;font:500 14px/1.3 -apple-system,sans-serif;color:#1c1c1e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="r.referredEmail || 'A new learner'"></span>
+          <span x-show="subtree[r.referredId] > 0" style="font-size:11px;font-weight:600;color:#1d4d8c;background:rgba(29,77,140,0.10);padding:2px 8px;border-radius:999px;white-space:nowrap;" x-text="'+' + subtree[r.referredId] + ' grew'" title="Learners who joined through this person"></span>
+          <span style="font-size:11px;font-weight:600;color:#1d6e36;background:rgba(52,199,89,0.12);padding:2px 8px;border-radius:999px;" x-text="r.status === 'paid' ? 'Paid' : 'Joined'"></span>
+        </div>
+      </template>
+    </div>
+
+    <!-- Pending (invited, not yet joined) -->
+    <div x-show="!loading && pending.length > 0" style="margin-top:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+        <span style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.03em;text-transform:uppercase;color:rgba(60,60,67,0.5);">Invited &middot; awaiting</span>
+        <span style="font:700 12px/1 -apple-system,sans-serif;color:#9a6a00;background:rgba(184,134,11,0.14);padding:3px 9px;border-radius:999px;" x-text="pending.length"></span>
+      </div>
+      <template x-for="i in pending" :key="i.id">
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(0,0,0,0.06);">
+          <span style="font-size:16px;opacity:0.55;">&#9993;&#65039;</span>
+          <span class="lms-tree-link" style="flex:1;min-width:0;font:500 14px/1.3 -apple-system,sans-serif;color:rgba(60,60,67,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="i.email"></span>
+          <span style="font-size:11px;font-weight:600;color:#9a6a00;background:rgba(184,134,11,0.14);padding:2px 8px;border-radius:999px;">Awaiting</span>
+        </div>
+      </template>
+      <p class="lms-subheading" style="font-size:0.78rem;margin:8px 0 0;color:rgba(60,60,67,0.5);">They&rsquo;ll move up to <span style="color:#1d6e36;font-weight:600;">Joined</span> the moment they sign in with your link.</p>
+    </div>
   </div>
 </div>
 
@@ -3758,7 +3781,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="assets/js/firebase-app.js?v=5"></script>
+<script src="assets/js/firebase-app.js?v=6"></script>
 
 <!-- SPA Init -->
 <script>
@@ -4729,6 +4752,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.sending = false;
 
         if (ok) {
+          // Track the outstanding invite so the tree can show who hasn't joined yet.
+          try { if (typeof recordInvite === 'function') await recordInvite(user.uid, friend, code); } catch (e) {}
           try { await navigator.clipboard.writeText(link); } catch (e) {}
           this.label = 'Invite sent! 💌';
           this.burst();
@@ -4770,6 +4795,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   window.referralTree = function() {
     return {
       referrals: [],
+      invites: [],
       count: 0,
       loading: true,
       copied: false,
@@ -4790,8 +4816,25 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           var user = Alpine.store('auth').user;
           var uid = user ? user.uid : null;
           if (uid && uid !== self._lastUid) { self._lastUid = uid; self.load(uid); }
-          else if (!uid) { self._lastUid = null; self.referrals = []; self.count = 0; self.link = ''; }
+          else if (!uid) { self._lastUid = null; self.referrals = []; self.invites = []; self.count = 0; self.link = ''; }
         }, 400);
+        // Refetch every time the tree opens, so a freshly-joined friend (or a
+        // just-sent invite) shows up without a full page reload.
+        this.$watch('$store.ui.activeModal', function (v) {
+          if (v === 'tree' && self._lastUid) self.load(self._lastUid);
+        });
+      },
+
+      // Invited emails that have not yet turned into a join. We match an invite
+      // to a join by email, so once someone signs up they leave this list.
+      get pending() {
+        var joined = {};
+        (this.referrals || []).forEach(function (r) {
+          if (r.referredEmail) joined[String(r.referredEmail).toLowerCase()] = true;
+        });
+        return (this.invites || []).filter(function (i) {
+          return i.email && !joined[String(i.email).toLowerCase()];
+        });
       },
 
       async load(uid) {
@@ -4811,6 +4854,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           this.referrals = rows;
           this.count = rows.length;
         } catch (e) { this.referrals = []; this.count = 0; }
+        try {
+          this.invites = (typeof getMyInvites === 'function') ? await getMyInvites(uid) : [];
+        } catch (e) { this.invites = []; }
         this.recompute();
         this.loading = false;
         this.loadNetwork();   // deeper branches (async, non-blocking, graceful)

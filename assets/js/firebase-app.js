@@ -1076,6 +1076,56 @@ async function getMyReferrals(userId) {
   }
 }
 
+// Record an invite the moment it is emailed, so the inviter can see who is
+// still outstanding (invited but not yet signed up). Idempotent per email:
+// re-inviting the same address just refreshes the timestamp, never duplicates.
+// The edge that proves a join lives in `referrals`; this only tracks the ask.
+async function recordInvite(inviterId, email, code) {
+  initFirebase();
+  if (!inviterId) return;
+  var to = String(email || "").trim().toLowerCase();
+  if (!to) return;
+  try {
+    var existing = await db.collection("invites")
+      .where("inviterId", "==", inviterId)
+      .where("email", "==", to).limit(1).get();
+    var payload = {
+      inviterId: inviterId,
+      email: to,
+      referralCode: code || "",
+      status: "sent",
+      sentAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (!existing.empty) {
+      await existing.docs[0].ref.set(payload, { merge: true });
+    } else {
+      await db.collection("invites").add(payload);
+    }
+  } catch (e) {
+    console.warn("recordInvite:", e.message);
+  }
+}
+
+// Every invite this user has sent (so the tree can show who has yet to join).
+async function getMyInvites(userId) {
+  initFirebase();
+  if (!userId) return [];
+  try {
+    var snap = await db.collection("invites")
+      .where("inviterId", "==", userId).get();
+    var rows = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+    rows.sort(function (a, b) {
+      var ta = a.sentAt && a.sentAt.seconds ? a.sentAt.seconds : 0;
+      var tb = b.sentAt && b.sentAt.seconds ? b.sentAt.seconds : 0;
+      return tb - ta;
+    });
+    return rows;
+  } catch (e) {
+    console.warn("getMyInvites:", e.message);
+    return [];
+  }
+}
+
 // Tree level ladder (cosmetic status; no monetary meaning).
 function referralTreeLevel(count) {
   count = count || 0;
