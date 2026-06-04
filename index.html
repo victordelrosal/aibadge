@@ -1924,6 +1924,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </form>
         <div class="lms-hearts" x-ref="hearts" aria-hidden="true"></div>
       </div>
+      <button class="lms-tree-btn" x-show="$store.auth.isLoggedIn" @click="$store.ui.showModal('cert')" title="AI Badge Certificate" aria-label="AI Badge Certificate">
+        <span style="font-size:17px;line-height:1;">🎓</span>
+      </button>
       <button class="lms-tree-btn" x-show="$store.auth.isLoggedIn" @click="$store.ui.showModal('tree')" title="Your Tree" aria-label="Your Tree">
         <span style="font-size:17px;line-height:1;">🌳</span>
         <span class="lms-tree-badge" x-show="$store.ui.treeCount > 0" x-text="$store.ui.treeCount"></span>
@@ -1978,8 +1981,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-topbar-name { font-size:0.85rem; font-weight:600; color:#000036; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
       .lms-topbar-sid { font-size:0.72rem; font-weight:500; color:rgba(60,60,67,0.55); letter-spacing:0.02em; }
       .lms-signout-btn { font-size:0.85rem; font-weight:500; color:#FF3B30; background:none; border:none; cursor:pointer; padding:8px 0; min-height:44px; }
-      .lms-theme-toggle { background:none; border:1px solid rgba(60,60,67,0.15); border-radius:8px; padding:6px; cursor:pointer; color:rgba(60,60,67,0.6); display:flex; align-items:center; }
-      .lms-theme-toggle:hover { border-color:rgba(60,60,67,0.3); color:#000; }
+      .lms-theme-toggle { width:40px; height:40px; justify-content:center; background:rgba(120,120,128,0.08); border:1px solid rgba(60,60,67,0.12); border-radius:12px; cursor:pointer; color:rgba(60,60,67,0.6); display:flex; align-items:center; transition:background .2s, border-color .2s, transform .12s var(--ease-spring,cubic-bezier(.34,1.56,.64,1)); }
+      .lms-theme-toggle:hover { background:rgba(120,120,128,0.14); border-color:rgba(60,60,67,0.22); color:#000; }
+      .lms-theme-toggle:active { transform:scale(0.94); }
 
       /* Headings */
       .lms-heading { font:700 28px/1.2 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; margin-bottom:8px; color:#000; }
@@ -2009,14 +2013,15 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
       /* Viral Tree: navbar invite widget + love bubbles */
       .lms-invite { display:flex; align-items:center; position:relative; }
-      .lms-invite-input { width:150px; max-width:32vw; padding:9px 13px; border:1px solid rgba(60,60,67,0.18); border-right:none; border-radius:999px 0 0 999px; font:500 13px/1 -apple-system,sans-serif; background:#fff; color:#1c1c1e; outline:none; min-height:38px; box-sizing:border-box; transition:width .25s ease, box-shadow .2s, border-color .2s; }
-      .lms-invite-input::placeholder { color:rgba(60,60,67,0.45); }
-      .lms-invite-input:focus { width:190px; box-shadow:0 0 0 3px rgba(212,175,55,0.18); border-color:var(--gold-rich,#B8860B); }
-      .lms-invite-btn { display:flex; align-items:center; gap:6px; padding:9px 15px; min-height:38px; border:none; border-radius:0 999px 999px 0; cursor:pointer; font:700 13px/1 -apple-system,sans-serif; color:#0A0E27; background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%); box-shadow:0 2px 12px rgba(212,175,55,0.4); transition:transform .12s ease, box-shadow .2s, background .3s, color .3s; white-space:nowrap; }
-      .lms-invite-btn:hover { transform:translateY(-1px); box-shadow:0 4px 18px rgba(212,175,55,0.55); }
-      .lms-invite-btn:active { transform:translateY(0) scale(0.96); }
-      .lms-invite-btn.sent { background:linear-gradient(135deg,#1faa4d,#34C759); color:#fff; box-shadow:0 4px 18px rgba(52,199,89,0.5); }
-      .lms-invite-btn.invite-err { background:linear-gradient(135deg,#c0392b,#e74c3c); color:#fff; box-shadow:0 4px 18px rgba(231,76,60,0.45); }
+      .lms-invite-input { width:152px; max-width:32vw; padding:0 16px; height:40px; border:1px solid rgba(60,60,67,0.16); border-right:none; border-radius:999px 0 0 999px; font:500 13px/1 -apple-system,sans-serif; background:#fff; color:#1c1c1e; outline:none; box-sizing:border-box; transition:width .28s var(--ease-spring,cubic-bezier(.34,1.4,.64,1)), box-shadow .2s, border-color .2s; }
+      .lms-invite-input::placeholder { color:rgba(60,60,67,0.42); }
+      .lms-invite-input:focus { width:204px; box-shadow:0 0 0 4px rgba(212,175,55,0.16); border-color:var(--gold-rich,#B8860B); }
+      /* Apple-grade gloss: lit from above, layered depth, spring press */
+      .lms-invite-btn { display:flex; align-items:center; gap:8px; padding:0 18px; height:40px; border:none; border-radius:0 999px 999px 0; cursor:pointer; font:700 13px/1 -apple-system,sans-serif; letter-spacing:0.01em; color:#3c2e00; background:linear-gradient(180deg,#F6E7A2 0%,#E4C24C 44%,#C99A1E 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(120,82,0,0.22),0 1px 2px rgba(90,66,0,0.22),0 5px 16px rgba(201,154,30,0.38); transition:transform .14s var(--ease-spring,cubic-bezier(.34,1.56,.64,1)), box-shadow .22s var(--ease-default,cubic-bezier(.25,.1,.25,1)), background .3s, color .3s; white-space:nowrap; }
+      .lms-invite-btn:hover { transform:translateY(-1px); box-shadow:inset 0 1px 0 rgba(255,255,255,0.75),inset 0 -1px 0 rgba(120,82,0,0.22),0 2px 4px rgba(90,66,0,0.22),0 8px 22px rgba(201,154,30,0.5); }
+      .lms-invite-btn:active { transform:translateY(0) scale(0.965); box-shadow:inset 0 1px 3px rgba(120,82,0,0.3),0 1px 2px rgba(90,66,0,0.2); }
+      .lms-invite-btn.sent { background:linear-gradient(180deg,#5ED98A 0%,#34C759 55%,#1faa4d 100%); color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,0.5),0 5px 16px rgba(52,199,89,0.45); }
+      .lms-invite-btn.invite-err { background:linear-gradient(180deg,#FF6B5E 0%,#FF3B30 60%,#d62b20 100%); color:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,0.4),0 5px 16px rgba(255,59,48,0.42); }
       .lms-invite-btn:disabled { opacity:0.75; cursor:default; }
       .lms-hearts { position:absolute; left:0; right:0; top:0; bottom:0; pointer-events:none; overflow:visible; z-index:300; }
       .lms-heart { position:absolute; bottom:8px; will-change:transform,opacity; animation:heartFloat 1.5s cubic-bezier(.22,.61,.36,1) forwards; }
@@ -2029,7 +2034,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-dark .lms-invite-input { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); color:#f5f5f5; }
       .lms-dark .lms-invite-input::placeholder { color:rgba(255,255,255,0.4); }
       .lms-dark .lms-tree-link { color:rgba(255,255,255,0.75) !important; }
-      .lms-tree-btn { position:relative; display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(60,60,67,0.15); background:#fff; cursor:pointer; transition:background .2s, transform .12s, border-color .2s; flex:0 0 auto; }
+      .lms-tree-btn { position:relative; display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; border:1px solid rgba(60,60,67,0.12); background:#fff; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); transition:background .2s, transform .12s var(--ease-spring,cubic-bezier(.34,1.56,.64,1)), border-color .2s; flex:0 0 auto; }
       .lms-tree-btn:hover { background:#F2F2F7; transform:translateY(-1px); }
       .lms-tree-btn:active { transform:translateY(0) scale(0.95); }
       .lms-tree-badge { position:absolute; top:-5px; right:-5px; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:linear-gradient(135deg,#1faa4d,#34C759); color:#fff; font:700 11px/18px -apple-system,sans-serif; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
@@ -2037,7 +2042,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-dark .lms-tree-btn:hover { background:rgba(255,255,255,0.12); }
       @media (max-width:600px) {
         .lms-invite-input { display:none; }
-        .lms-invite-btn { border-radius:999px; padding:9px 13px; }
+        .lms-invite-btn { border-radius:999px; padding:0 16px; }
         .lms-invite-label { display:none; }
       }
 
@@ -2279,9 +2284,14 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <div style="font-size:2rem;line-height:1;">&#127891;</div>
             <div style="flex:1;min-width:200px;">
               <div style="font:700 17px/1.25 -apple-system,sans-serif;color:#000036;">You&rsquo;ve completed every tutorial</div>
-              <div class="lms-subheading" style="font-size:0.9rem;margin-top:2px;">Request your verified AI Badge certificate. Victor reviews your work personally, then issues it as a verifiable credential. Money back if it isn&rsquo;t issued.</div>
+              <div class="lms-subheading" style="font-size:0.9rem;margin-top:2px;">
+                <span x-show="$store.auth.isNci">Free for you as an NCI student. Victor reviews your work personally, then issues your verifiable credential. </span>
+                <span x-show="!$store.auth.isNci">&euro;49 one-time. Victor reviews your work personally, then issues your verifiable credential. </span>
+                <a href="#" @click.prevent="$store.ui.showModal('cert')" style="color:#1d4d8c;font-weight:600;text-decoration:none;white-space:nowrap;">See how it works &rsaquo;</a>
+              </div>
             </div>
-            <button x-show="certState==='idle'" @click="requestCertificate()" class="lms-invite-btn" style="border-radius:12px;padding:13px 20px;font-weight:700;white-space:nowrap;">Request certificate &rarr;</button>
+            <button x-show="certState==='idle' && certLaunched" @click="requestCertificate()" class="lms-invite-btn" style="border-radius:12px;padding:13px 20px;height:auto;font-weight:700;white-space:nowrap;">Request certificate &rarr;</button>
+            <span x-show="certState==='idle' && !certLaunched" style="display:inline-flex;align-items:center;gap:6px;padding:13px 18px;border-radius:12px;background:rgba(255,149,0,0.12);color:#9a5a00;font:700 13px/1 -apple-system,sans-serif;white-space:nowrap;">&#128197; Opens 17 June 2026</span>
             <span x-show="certState==='working'" class="lms-subheading" style="font-size:0.9rem;white-space:nowrap;">Starting&hellip;</span>
           </div>
           <p x-show="certMsg" x-text="certMsg" style="margin:14px 0 0;font:600 14px/1.45 -apple-system,sans-serif;color:#1d6e36;"></p>
@@ -3126,14 +3136,20 @@ input[type="range"].explorer-slider::-moz-range-thumb{
      @keydown.escape.window="$store.ui.closeModal()"
      style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"
      @click.self="$store.ui.closeModal()">
-  <div x-data="referralTree()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff;background-image:radial-gradient(rgba(0,0,54,0.04) 1px, transparent 1px);background-size:22px 22px;border-radius:20px;max-width:440px;width:calc(100% - 40px);max-height:85vh;overflow-y:auto;padding:28px 26px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-    <button @click="$store.ui.closeModal()" aria-label="Close" style="position:absolute;top:12px;right:14px;width:32px;height:32px;border:none;background:rgba(120,120,128,0.12);border-radius:50%;cursor:pointer;font-size:18px;line-height:1;color:#3a3f4a;">&times;</button>
+  <div x-data="referralTree()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff;background-image:radial-gradient(rgba(0,0,54,0.055) 1px, transparent 1px),radial-gradient(rgba(0,0,54,0.038) 1px, transparent 1px);background-size:26px 26px,26px 26px;background-position:0 0,13px 13px;border-radius:20px;max-width:440px;width:calc(100% - 40px);max-height:85vh;overflow:hidden auto;padding:0 24px 24px;box-shadow:0 24px 70px rgba(0,0,0,0.32),0 2px 8px rgba(0,0,0,0.12);">
+    <button @click="$store.ui.closeModal()" aria-label="Close" style="position:absolute;top:16px;right:16px;z-index:3;width:32px;height:32px;border:none;background:rgba(255,255,255,0.22);border-radius:50%;cursor:pointer;font-size:18px;line-height:1;color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.4);transition:background .2s var(--ease-out,cubic-bezier(.25,.1,.25,1));" @mouseenter="$el.style.background='rgba(255,255,255,0.34)'" @mouseleave="$el.style.background='rgba(255,255,255,0.22)'">&times;</button>
 
-    <!-- Hero: level + count -->
-    <div style="text-align:center;margin-bottom:14px;">
-      <div style="font-size:3.2rem;line-height:1;" x-text="level.emoji"></div>
-      <div style="font-weight:700;font-size:1.05rem;color:#000036;margin-top:4px;" x-text="'You are a ' + level.name"></div>
+    <!-- Level-themed header band: full-bleed, rounded to match the card, tinted per tier -->
+    <div style="margin:0 -24px 24px;padding:36px 24px 28px;border-radius:20px 20px 0 0;position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,#7ec97e,#4ba36a);transition:background .5s var(--ease-default,cubic-bezier(.25,.1,.25,1));" :style="'background:' + (level.grad || 'linear-gradient(135deg,#7ec97e,#4ba36a)')">
+      <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(130% 90% at 50% -15%,rgba(255,255,255,0.32),rgba(255,255,255,0) 62%);pointer-events:none;"></div>
+      <div aria-hidden="true" style="position:absolute;inset:0;opacity:0.10;background-image:radial-gradient(rgba(255,255,255,0.95) 1px,transparent 1px);background-size:18px 18px;pointer-events:none;"></div>
+      <div style="position:relative;text-align:center;">
+        <div style="width:88px;height:88px;margin:0 auto 12px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:2.7rem;line-height:1;background:rgba(255,255,255,0.20);box-shadow:inset 0 1px 0 rgba(255,255,255,0.45),0 8px 22px rgba(0,0,0,0.20);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);" x-text="level.emoji"></div>
+        <div style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.85);margin-bottom:8px;">Your level</div>
+        <div style="font:700 24px/1.15 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.18);" x-text="level.name"></div>
+      </div>
     </div>
+
     <div style="text-align:center;margin-bottom:4px;">
       <span style="font-size:2.6rem;font-weight:800;color:var(--gold-rich,#B8860B);" x-text="count"></span>
       <div class="lms-subheading" style="font-size:0.92rem;margin-top:-2px;" x-text="count === 1 ? 'friend joined through you' : 'friends joined through you'"></div>
@@ -3204,6 +3220,68 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       </template>
       <p class="lms-subheading" style="font-size:0.78rem;margin:8px 0 0;color:rgba(60,60,67,0.5);">They&rsquo;ll move up to <span style="color:#1d6e36;font-weight:600;">Joined</span> the moment they sign in with your link.</p>
     </div>
+  </div>
+</div>
+
+<!-- ===================== CERTIFICATE MODAL (notice + VdR proof + policy) ===================== -->
+<div x-show="$store.ui.activeModal === 'cert'"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+     @keydown.escape.window="$store.ui.closeModal()"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"
+     @click.self="$store.ui.closeModal()">
+  <div x-data="certNotice()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff;background-image:radial-gradient(rgba(0,0,54,0.055) 1px, transparent 1px),radial-gradient(rgba(0,0,54,0.038) 1px, transparent 1px);background-size:26px 26px,26px 26px;background-position:0 0,13px 13px;border-radius:20px;max-width:460px;width:calc(100% - 40px);max-height:88vh;overflow:hidden auto;padding:0 24px 24px;box-shadow:0 24px 70px rgba(0,0,0,0.32),0 2px 8px rgba(0,0,0,0.12);">
+    <button @click="$store.ui.closeModal()" aria-label="Close" style="position:absolute;top:16px;right:16px;z-index:3;width:32px;height:32px;border:none;background:rgba(255,255,255,0.22);border-radius:50%;cursor:pointer;font-size:18px;line-height:1;color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.4);transition:background .2s;" @mouseenter="$el.style.background='rgba(255,255,255,0.34)'" @mouseleave="$el.style.background='rgba(255,255,255,0.22)'">&times;</button>
+
+    <!-- Brand header band -->
+    <div style="margin:0 -24px 24px;padding:36px 24px 28px;border-radius:20px 20px 0 0;position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,#1d4d8c 0%,#000036 100%);">
+      <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(130% 90% at 50% -15%,rgba(255,255,255,0.22),rgba(255,255,255,0) 60%);pointer-events:none;"></div>
+      <div aria-hidden="true" style="position:absolute;inset:0;opacity:0.08;background-image:radial-gradient(rgba(255,255,255,0.95) 1px,transparent 1px);background-size:18px 18px;pointer-events:none;"></div>
+      <div style="position:relative;text-align:center;">
+        <div style="width:84px;height:84px;margin:0 auto 12px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:2.6rem;line-height:1;background:rgba(255,255,255,0.16);box-shadow:inset 0 1px 0 rgba(255,255,255,0.4),0 8px 22px rgba(0,0,0,0.22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);">🎓</div>
+        <div style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.78);margin-bottom:8px;">Verifiable credential</div>
+        <div style="font:700 24px/1.2 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:#fff;">The AI Badge Certificate</div>
+      </div>
+    </div>
+
+    <!-- Proof: Victor's own live credential -->
+    <div style="background:#F2F2F7;border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div style="width:44px;height:44px;border-radius:12px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:linear-gradient(135deg,#1d4d8c,#000036);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,0.25);">🏅</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font:600 15px/1.2 -apple-system,sans-serif;color:#000036;">See a real one</div>
+        <div style="font:400 13px/1.35 -apple-system,sans-serif;color:rgba(60,60,67,0.6);">Victor del Rosal’s own AI Badge, live and verifiable.</div>
+      </div>
+      <a href="https://certs.fiveinnolabs.com/y5u85" target="_blank" rel="noopener" style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:36px;border-radius:999px;background:#007AFF;color:#fff;font:600 13px/1 -apple-system,sans-serif;text-decoration:none;box-shadow:0 4px 12px rgba(0,122,255,0.3);transition:transform .14s var(--ease-spring,cubic-bezier(.34,1.56,.64,1));" @mouseenter="$el.style.transform='translateY(-1px)'" @mouseleave="$el.style.transform='translateY(0)'">Verify ↗</a>
+    </div>
+
+    <!-- Earn your own -->
+    <h3 style="font:700 18px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 6px;">Earn your own</h3>
+    <p style="font:400 14px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.75);margin:0 0 16px;">Complete every tutorial, then request your certificate. Victor reviews your work personally and issues it as a verifiable credential you can share on LinkedIn.</p>
+
+    <!-- Availability + price (NCI sees free; everyone else €49) -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(255,149,0,0.12);color:#9a5a00;font:600 13px/1 -apple-system,sans-serif;">📅 Opens 17 June 2026</span>
+      <span x-show="$store.auth.isNci" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(52,199,89,0.14);color:#1d6e36;font:700 13px/1 -apple-system,sans-serif;">🎉 Free for NCI students</span>
+      <span x-show="!$store.auth.isNci" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(29,77,140,0.1);color:#1d4d8c;font:700 13px/1 -apple-system,sans-serif;">€49 one-time</span>
+    </div>
+    <p x-show="$store.auth.isNci" style="font:600 13px/1.45 -apple-system,sans-serif;color:#1d6e36;margin:-8px 0 20px;">As an NCI student, your certificate is completely free — no payment, ever.</p>
+
+    <!-- How review and payment works -->
+    <div style="background:#F2F2F7;border-radius:16px;padding:18px 18px 6px;">
+      <h3 style="font:700 15px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 12px;">How review &amp; payment works</h3>
+      <template x-for="(step, i) in steps" :key="i">
+        <div style="display:flex;gap:12px;padding-bottom:14px;">
+          <div style="flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#1d4d8c;color:#fff;font:700 13px/24px -apple-system,sans-serif;text-align:center;" x-text="i + 1"></div>
+          <p style="flex:1;font:400 13.5px/1.45 -apple-system,sans-serif;color:rgba(60,60,67,0.85);margin:1px 0 0;" x-html="step"></p>
+        </div>
+      </template>
+    </div>
+    <p x-show="$store.auth.isNci" style="font:600 13px/1.45 -apple-system,sans-serif;color:#1d6e36;margin:14px 0 0;">For you the review is the same, but every attempt is free — the prices above don’t apply.</p>
+    <p x-show="!$store.auth.isNci" style="font:400 12.5px/1.45 -apple-system,sans-serif;color:rgba(60,60,67,0.55);margin:14px 0 0;">Reviewed within 72 hours. Your work, your credential — issued only when it genuinely meets the bar.</p>
+
+    <button @click="$store.ui.closeModal()" style="width:100%;margin-top:20px;height:48px;border:none;border-radius:14px;background:#1d4d8c;color:#fff;font:600 15px/1 -apple-system,sans-serif;cursor:pointer;box-shadow:0 6px 18px rgba(29,77,140,0.3),inset 0 1px 0 rgba(255,255,255,0.18);transition:transform .14s var(--ease-spring,cubic-bezier(.34,1.56,.64,1));" @mouseenter="$el.style.transform='translateY(-1px)'" @mouseleave="$el.style.transform='translateY(0)'">Got it</button>
   </div>
 </div>
 
@@ -3821,6 +3899,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       get isLoggedIn() { return !!this.user; },
       get isEnrolled() { return this.profile?.enrolled === true; },
       get isAdmin() { return ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(this.user?.email); },
+      get isNci() { return !!(this.user && typeof isNciEmail === 'function' && isNciEmail(this.user.email)); },
       get plan() { return this.profile?.plan || (this.isEnrolled ? 'full' : null); },
       get isFreeTier() { return this.isLoggedIn && !this.isEnrolled && !this.isAdmin; },
       // Freemium gate: full-access users (NCI, paid, admin) see everything;
@@ -4679,6 +4758,12 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
       tutorials: window._lmsTutorials.map(function(t) { return Object.assign({}, t); }),
 
+      // Certificate requests open 17 June 2026 (once the terminal-use
+      // tutorials land). Before then the CTA shows a date, not a button.
+      get certLaunched() {
+        return new Date() >= new Date('2026-06-17T00:00:00');
+      },
+
       // Every real (non-pending) tutorial is marked complete.
       get allComplete() {
         var done = this.progress;
@@ -4717,6 +4802,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
       async requestCertificate() {
         if (this.certState !== 'idle') return;
+        if (!this.certLaunched) { this.certMsg = 'Certificates open 17 June 2026.'; return; }
         this.certState = 'working'; this.certMsg = '';
         try {
           var token = await firebase.auth().currentUser.getIdToken();
@@ -4762,6 +4848,18 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         var user = Alpine.store('auth').user;
         if (user) saveTutorialCompletion(user.uid, tut.id, newVal);
       }
+    };
+  };
+
+  // ---------- Certificate notice (navbar 🎓 modal: proof + policy) ----------
+  window.certNotice = function() {
+    return {
+      steps: [
+        'You submit all your tutorial work and pay <strong>€49</strong>. Victor reviews everything internally.',
+        'If it isn’t a pass yet, you get a <strong>second attempt free</strong> — revise and resubmit at no cost.',
+        'If the second attempt doesn’t pass, the third and final attempt is <strong>half price (€24.50)</strong>.',
+        'Any attempt after that is <strong>full price (€49)</strong>.'
+      ]
     };
   };
 

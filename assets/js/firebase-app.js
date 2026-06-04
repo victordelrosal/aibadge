@@ -1129,16 +1129,19 @@ async function getMyInvites(userId) {
 // Tree level ladder (cosmetic status; no monetary meaning).
 function referralTreeLevel(count) {
   count = count || 0;
+  // Each tier carries its own header gradient: greens for the early ladder,
+  // crescendoing into brand lapis/navy at the summit. White header text reads
+  // on every one of these.
   var levels = [
-    { min: 0,   name: "Seedling",   emoji: "🌱" },
-    { min: 1,   name: "Sprout",     emoji: "🌿" },
-    { min: 3,   name: "Sapling",    emoji: "🪴" },
-    { min: 6,   name: "Tree",       emoji: "🌳" },
-    { min: 12,  name: "Forest",     emoji: "🌲" },
-    { min: 25,  name: "Woodland",   emoji: "🏞️" },
-    { min: 50,  name: "Rainforest", emoji: "🌴" },
-    { min: 100, name: "Wilderness", emoji: "🏔️" },
-    { min: 250, name: "Ecosystem",  emoji: "🌍" }
+    { min: 0,   name: "Seedling",   emoji: "🌱", grad: "linear-gradient(135deg,#7ec97e 0%,#4ba36a 100%)" },
+    { min: 1,   name: "Sprout",     emoji: "🌿", grad: "linear-gradient(135deg,#6fc06f 0%,#2f9e5a 100%)" },
+    { min: 3,   name: "Sapling",    emoji: "🪴", grad: "linear-gradient(135deg,#74c24a 0%,#359a4a 100%)" },
+    { min: 6,   name: "Tree",       emoji: "🌳", grad: "linear-gradient(135deg,#4caf6a 0%,#2a7d4f 100%)" },
+    { min: 12,  name: "Forest",     emoji: "🌲", grad: "linear-gradient(135deg,#2f9e6f 0%,#13633c 100%)" },
+    { min: 25,  name: "Woodland",   emoji: "🏞️", grad: "linear-gradient(135deg,#7bbf6a 0%,#2f8f5a 60%,#1f6b4a 100%)" },
+    { min: 50,  name: "Rainforest", emoji: "🌴", grad: "linear-gradient(135deg,#2fae6a 0%,#0f6b4a 100%)" },
+    { min: 100, name: "Wilderness", emoji: "🏔️", grad: "linear-gradient(135deg,#6f8fc4 0%,#1d4d8c 100%)" },
+    { min: 250, name: "Ecosystem",  emoji: "🌍", grad: "linear-gradient(135deg,#2f6fd0 0%,#000036 100%)" }
   ];
   var current = levels[0], next = null;
   for (var i = 0; i < levels.length; i++) {
