@@ -1,7 +1,7 @@
 // pages.js — public HTML: the verify landing and the per-credential brag/verify page.
 // Cosmic AI Badge brand. The credential page verifies the Ed25519 signature live
 // in the visitor's own browser (trustless) by importing the shared crypto-core.
-import { FRAMEWORK_NAMES, ALIGNMENT_SUBLINE, ALIGNMENT_DISCLAIMER } from "./lib/credential.js";
+import { FRAMEWORK_NAMES, ALIGNMENT_SUBLINE, ALIGNMENT_DISCLAIMER, LEVELS, DEFAULT_LEVEL } from "./lib/credential.js";
 
 export function fmtDate(ymd) {
   try {
@@ -123,6 +123,8 @@ export function credentialPage(rec, host) {
     ? `${rec.name} holds a HELIOS legacy credential from fiveinnolabs. Cryptographically verifiable.`
     : `${rec.name} has earned the AI Badge from fiveinnolabs — a cryptographically verifiable credential.`;
   const issued = fmtDate(rec.issuedDate);
+  // Non-legacy AI Badges carry a level designation + the competencies certified.
+  const lvl = rec.legacy ? null : (LEVELS[rec.level || DEFAULT_LEVEL] || LEVELS[DEFAULT_LEVEL]);
   const legacyBadge = rec.legacy
     ? `<div class="legacy-chip">HELIOS · legacy credential (not re-issued)</div>`
     : "";
@@ -164,6 +166,13 @@ ${FONTS}<style>${HEAD_STYLE}
   .eyebrow{font-size:14px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-top:14px}
   .name{font-family:"Cormorant Garamond",serif;font-weight:700;font-size:58px;line-height:1.04;margin:8px 0 4px;color:#fff}
   .earned{color:var(--muted);font-size:18px}
+  .designation{margin-top:10px;font-size:20px;font-weight:600;color:var(--gold);letter-spacing:.03em}
+  .competencies{margin-top:24px;text-align:left;border:1px solid var(--hair);border-radius:16px;padding:20px 22px;background:rgba(255,255,255,.02)}
+  .competencies h3{font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:14px;text-align:center}
+  .comp-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:11px 22px}
+  .comp-list li{position:relative;padding-left:24px;font-size:14.5px;line-height:1.5;color:var(--ink)}
+  .comp-list li svg{position:absolute;left:0;top:3px;width:15px;height:15px}
+  @media(max-width:520px){.comp-list{grid-template-columns:1fr}}
   .status{display:inline-flex;align-items:center;gap:10px;margin:22px 0 6px;padding:11px 20px;border-radius:999px;
     border:1px solid var(--hair);font-weight:600;font-size:15px;background:rgba(255,255,255,.03)}
   .status .ico{width:20px;height:20px;flex:0 0 auto}
@@ -204,6 +213,7 @@ ${FONTS}<style>${HEAD_STYLE}
     <div class="eyebrow">${rec.legacy ? "HELIOS Programme" : "The AI Badge"}</div>
     <div class="name">${esc(rec.name)}</div>
     <div class="earned">${rec.legacy ? "completed the HELIOS programme" : "has earned the AI Badge"}${rec.cohort ? " · " + esc(rec.cohort) : ""}</div>
+    ${lvl ? `<div class="designation">${esc(lvl.designation)}</div>` : ""}
     <div id="status" class="status"><span class="ico" id="statusIco"></span><span id="statusTxt">Verifying signature…</span></div>
     <div class="meta">
       <div><div class="k">Credential ID</div><div class="v mono">${esc(rec.ucid)}</div></div>
@@ -218,6 +228,12 @@ ${FONTS}<style>${HEAD_STYLE}
       <a class="btn" href="${liShare}" target="_blank" rel="noopener">Share</a>
     </div>
     <div class="verify-note">This page checks the credential's <b>Ed25519</b> signature live, in your browser, against the public key published by fiveinnolabs. Nothing is taken on trust.</div>
+    ${lvl ? `<div class="competencies">
+      <h3>Competencies demonstrated</h3>
+      <ul class="comp-list">
+        ${lvl.competencies.map((c) => `<li><svg viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(c)}</li>`).join("")}
+      </ul>
+    </div>` : ""}
     ${rec.legacy ? "" : `<div class="frameworks">
       <h3>Framework Alignment</h3>
       <div class="fw-sub">${esc(ALIGNMENT_SUBLINE)}</div>

@@ -67,12 +67,36 @@ export const ALIGNMENT_SUBLINE = "The AI Badge programme is mapped to these inte
 export const ALIGNMENT_DISCLAIMER =
   "Independent mapping by fiveinnolabs indicating the frameworks this credential relates to. It is not a graded assessment and does not certify a level within any framework. The AI Badge is not endorsed by, accredited by, or affiliated with these organisations.";
 
+// The AI Badge is structured in levels. Level 1 ("AI Builder") is the
+// non-terminal Foundations track; every AI Badge issued today is Level 1.
+// Each level carries a designation and the competencies it certifies.
+export const LEVELS = {
+  1: {
+    level: "Level 1",
+    name: "AI Builder",
+    designation: "Level 1 · AI Builder",
+    competencies: [
+      "Build and iterate a working web page from a plain-language brief, using AI as a coding partner",
+      "Deploy a live project to the web via GitHub",
+      "Explain in plain terms how frontier AI models work, and where they fail",
+      "Direct AI as a thinking and interview partner to clarify and pressure-test ideas",
+      "Choose among different AI systems for the right task",
+      "Apply AI responsibly within the EU AI Act's AI-literacy expectations",
+    ],
+  },
+};
+
+// New AI Badges issued today are Level 1. (Level 2 — the terminal track —
+// will get its own designation and competencies when its certificate opens.)
+export const DEFAULT_LEVEL = 1;
+
 // Build the unsigned credential. `data` = { ucid, name, email, issuedDate (YYYY-MM-DD),
 // cohort?, legacy?, source? }. `issuedDate` is rendered to an ISO instant at noon UTC
 // so the displayed calendar date is stable across timezones.
 export function buildCredential(data) {
   const issuanceInstant = data.issuedDate + "T12:00:00Z";
   const subjectId = "urn:ucid:" + data.ucid;
+  const lvl = LEVELS[data.level || DEFAULT_LEVEL] || LEVELS[DEFAULT_LEVEL];
   const cred = {
     "@context": [
       "https://www.w3.org/ns/credentials/v2",
@@ -88,6 +112,11 @@ export function buildCredential(data) {
       type: ["AchievementSubject"],
       name: data.name,
       achievement: ACHIEVEMENT,
+      // The level this credential certifies, and the competencies the holder
+      // demonstrated. Signed as part of the VC (eddsa-jcs-2022 covers all fields).
+      level: lvl.level,
+      levelName: lvl.name,
+      competencies: lvl.competencies,
     },
     credentialStatus: {
       id: "https://certs.fiveinnolabs.com/api/verify/" + data.ucid,

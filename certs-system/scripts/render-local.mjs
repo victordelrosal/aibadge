@@ -8,6 +8,7 @@ import { homedir } from "node:os";
 import puppeteer from "puppeteer-core";
 import { badgeCardHtml, ogHtml, pdfHtml } from "../src/lib/templates.js";
 import { qrSvg } from "../src/lib/qr.js";
+import { LEVELS } from "../src/lib/credential.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
@@ -41,6 +42,8 @@ const d = {
   logoWhite,
   logoDark,
   cohort: "",
+  designation: LEVELS[1].designation,
+  competencies: LEVELS[1].competencies,
   qr: qrSvg(verifyUrl, { size: 150, fg: "#0b1440", bg: "transparent", ecl: "M" }),
 };
 
@@ -66,7 +69,7 @@ async function shot(html, w, h, file, scale = 1) {
 
 await shot(badgeCardHtml(d), 1080, 1080, "badge.png", 1);
 await shot(ogHtml(d), 1200, 630, "og.png", 1);
-await shot(badgeCardHtml({ ...d, name: "Michael Webb", ucid: "w7r56", cohort: "HELIOS Aug25", legacy: true, issuedDisplay: "28 August 2025" }), 1080, 1080, "badge-legacy.png", 1);
+await shot(badgeCardHtml({ ...d, name: "Michael Webb", ucid: "w7r56", cohort: "HELIOS Aug25", legacy: true, designation: "", competencies: [], issuedDisplay: "28 August 2025" }), 1080, 1080, "badge-legacy.png", 1);
 
 // PDF (A4)
 {

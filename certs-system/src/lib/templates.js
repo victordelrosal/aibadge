@@ -79,6 +79,7 @@ export function badgeCardHtml(d) {
     padding:70px 92px 52px;text-align:center}
   .aligned{margin-top:20px;font-size:15px;color:var(--muted);letter-spacing:.01em}
   .aligned b{color:var(--gold);font-weight:600}
+  .designation{margin-top:12px;font-size:30px;font-weight:600;color:var(--gold);letter-spacing:.03em}
   .brand{display:flex;align-items:center;gap:10px;font-size:20px;letter-spacing:.34em;
     text-transform:uppercase;color:var(--muted);font-weight:500}
   .brand .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
@@ -123,6 +124,7 @@ export function badgeCardHtml(d) {
     <div class="eyebrow">${d.legacy ? "HELIOS Programme" : "The AI Badge"}</div>
     <div class="name">${esc(d.name)}</div>
     <div class="sub">${d.legacy ? "completed the <b>HELIOS</b> programme" : "has earned the <b>AI Badge</b>"}${d.cohort ? " · " + esc(d.cohort) : ""}</div>
+    ${d.designation ? `<div class="designation">${esc(d.designation)}</div>` : ""}
     <div class="divider"></div>
     <div class="meta">
       <div class="qr">${d.qr}</div>
@@ -181,6 +183,7 @@ export function ogHtml(d) {
     <div class="eyebrow">Verified Credential</div>
     <div class="name">${esc(d.name)}</div>
     <div class="sub">${d.legacy ? "completed the HELIOS programme" : "has earned the AI Badge"}${d.cohort ? " · " + esc(d.cohort) : ""}</div>
+    ${d.designation ? `<div class="sub" style="margin-top:6px;color:var(--gold);font-weight:600;font-size:21px">${esc(d.designation)}</div>` : ""}
     <div class="row">
       <span class="pill">${esc(d.ucid)}</span>
       <span class="vtag">${checkIcon()} Cryptographically verifiable</span>
@@ -228,7 +231,7 @@ export function pdfHtml(d) {
     text-transform:uppercase;color:var(--gold);margin-top:9px}
   .rule{width:62mm;height:2px;margin:13px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
   /* credential card */
-  .card{display:flex;gap:12mm;align-items:center;margin-top:11mm}
+  .card{display:flex;gap:12mm;align-items:center;margin-top:8mm}
   .card .emblem{width:46mm;height:auto;flex:0 0 auto;filter:drop-shadow(0 6px 14px rgba(23,63,115,.22))}
   .fields{flex:1}
   .awarded{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);font-weight:600}
@@ -239,7 +242,7 @@ export function pdfHtml(d) {
   .grid .v{font-size:16px;color:var(--ink);font-weight:600;margin-top:3px}
   .grid .v.mono{font-family:"JetBrains Mono",monospace;color:var(--navy2);letter-spacing:.06em}
   /* letter */
-  .letter{margin-top:10mm;font-size:12.5px;line-height:1.72;color:var(--body)}
+  .letter{margin-top:7mm;font-size:12.5px;line-height:1.72;color:var(--body)}
   .letter p{margin-bottom:8px}
   .sign{margin-top:9mm;display:flex;justify-content:space-between;align-items:flex-end}
   .sig .who{font-family:"Cormorant Garamond",serif;font-size:26px;color:var(--navy);border-bottom:1px solid var(--hair);
@@ -253,12 +256,19 @@ export function pdfHtml(d) {
   .seal .ring small{display:block;font-family:Inter;font-size:6.5px;letter-spacing:.24em;color:var(--gold);
     margin-top:4px;font-weight:600}
   /* framework alignment */
-  .fw{margin-top:7mm;border:1px solid var(--hair);border-radius:7px;padding:5mm 7mm 4mm;background:#fbfcfe}
+  .fw{margin-top:5mm;border:1px solid var(--hair);border-radius:7px;padding:5mm 7mm 4mm;background:#fbfcfe}
   .fw-h{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:700;text-align:center;margin-bottom:2mm}
   .fw-sub{font-size:9.5px;color:var(--muted);text-align:center;margin-bottom:3.5mm}
   .fw-grid{display:flex;flex-wrap:wrap;gap:2mm 2.5mm;justify-content:center}
   .fw-chip{font-size:10px;color:var(--ink);font-weight:600;border:1px solid var(--hair);border-radius:999px;padding:1.6mm 3.5mm;background:#fff}
   .fw-note{margin-top:3.5mm;font-size:8px;color:var(--muted);line-height:1.45;text-align:center}
+  /* level designation + competencies */
+  .cred-level{text-align:center;font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-top:6px}
+  .comp{margin-top:5mm;border:1px solid var(--hair);border-radius:7px;padding:4.5mm 7mm 4mm;background:#fbfcfe}
+  .comp-h{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--navy2);font-weight:700;text-align:center;margin-bottom:3mm}
+  .comp ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:1.7mm 7mm}
+  .comp li{position:relative;padding-left:5mm;font-size:9.5px;line-height:1.38;color:var(--ink)}
+  .comp li::before{content:"";position:absolute;left:0;top:1.3mm;width:2mm;height:2mm;border-radius:50%;background:var(--gold)}
   /* verification footer */
   .verify{margin-top:auto;display:flex;gap:11mm;align-items:center;border-top:1px solid var(--hair);
     padding-top:6mm}
@@ -284,6 +294,7 @@ export function pdfHtml(d) {
     <div class="brand"><span class="dot"></span>fiveinnolabs</div>
     <div class="title">Certificate of Achievement<small>${d.legacy ? "HELIOS · The AI Foundations Programme" : "The AI Badge"}</small></div>
     <div class="rule"></div>
+    ${d.designation ? `<div class="cred-level">${esc(d.designation)}</div>` : ""}
 
     <div class="card">
       <img class="emblem" src="${d.emblemDataUri}" alt="The AI Badge">
@@ -302,6 +313,11 @@ export function pdfHtml(d) {
       <p>has earned <b>the AI Badge</b> from fiveinnolabs, in recognition of demonstrated, applied mastery of human-centred artificial intelligence: the fluent use of frontier AI tools to do real work with sound judgement, an evaluator's mindset, and responsible practice.</p>
       <p>The AI Badge is awarded not for watching, but for doing. This certificate is a cryptographically signed, independently verifiable credential, confirmable at any time via the link and code below.</p>
     </div>
+
+    ${d.competencies && d.competencies.length ? `<div class="comp">
+      <div class="comp-h">Competencies demonstrated</div>
+      <ul>${d.competencies.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
+    </div>` : ""}
 
     ${d.legacy ? "" : `<div class="fw">
       <div class="fw-h">Framework Alignment</div>

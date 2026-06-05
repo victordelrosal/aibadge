@@ -9,7 +9,7 @@ import {
   UCID_RE,
   multikeyToPublicKey,
 } from "./lib/crypto-core.js";
-import { buildCredential, buildLegacyCredential, ISSUER_PROFILE, ACHIEVEMENT, VERIFICATION_METHOD } from "./lib/credential.js";
+import { buildCredential, buildLegacyCredential, ISSUER_PROFILE, ACHIEVEMENT, VERIFICATION_METHOD, LEVELS, DEFAULT_LEVEL } from "./lib/credential.js";
 import { qrSvg } from "./lib/qr.js";
 import { renderArtifacts } from "./lib/render.js";
 import { sendBadgeEmail } from "./lib/email.js";
@@ -156,11 +156,16 @@ async function loadAssets(env) {
 
 function renderData(rec, host, assets) {
   const verifyUrl = `https://${host}/${rec.ucid}`;
+  // Non-legacy AI Badges carry a level designation + competencies. Legacy
+  // (HELIOS) certs do not — they render exactly as before.
+  const lvl = rec.legacy ? null : (LEVELS[rec.level || DEFAULT_LEVEL] || LEVELS[DEFAULT_LEVEL]);
   return {
     name: rec.name,
     ucid: rec.ucid,
     cohort: rec.cohort || "",
     legacy: !!rec.legacy,
+    designation: lvl ? lvl.designation : "",
+    competencies: lvl ? lvl.competencies : [],
     issuedDisplay: fmtDate(rec.issuedDate),
     verifyUrl,
     verifyHost: host,
