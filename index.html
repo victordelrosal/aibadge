@@ -2207,6 +2207,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .amx-cell { font-size:0.8rem; }
       .amx-tick { color:#34C759; font-weight:800; }
       .amx-blank { opacity:0.22; }
+      /* Level 2 (terminal) columns: very light grey tint + a divider on the first L2 column */
+      .amx-table td.amx-l2, .amx-table th.amx-l2 { background:rgba(60,60,67,0.045); }
+      .amx-table thead th.amx-l2 { background:#e9ebf2; }
+      .amx-table .amx-l2-start { border-left:2px solid rgba(255,149,0,0.45); }
+      .amx-table thead th.amx-l2-start { box-shadow:inset 2px 0 0 rgba(255,149,0,0.55); }
       .amx-td-num { font-variant-numeric:tabular-nums; }
       .amx-foot td { font-weight:700; font-size:0.75rem; opacity:0.7; background:#f7f8fc; border-top:2px solid rgba(0,0,0,0.08); }
       .amx-foot .amx-td-name { background:#f7f8fc; }
@@ -2978,7 +2983,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <div class="amx-card" x-show="!loading && users.length > 0">
       <div class="amx-card-head">
         <h2 class="amx-card-title">Completion matrix</h2>
-        <span class="amx-card-sub" x-text="allTutorials.length + ' tutorials · click a row for full detail'"></span>
+        <span class="amx-card-sub" x-text="allTutorials.length + ' tutorials · Level 1 then Level 2 (tinted) · click a row for full detail'"></span>
       </div>
       <div class="amx-scroll">
         <table class="amx-table">
@@ -2986,8 +2991,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <tr>
               <th class="amx-sticky amx-th-name" @click="setSort('name')">Learner <span x-show="sortKey==='name'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
               <th class="amx-th-id" @click="setSort('studentId')">ID</th>
-              <template x-for="t in allTutorials" :key="t.id">
-                <th class="amx-th-tut" :title="t.title"><span x-text="t.icon || '•'"></span></th>
+              <template x-for="(t, ti) in allTutorials" :key="t.id">
+                <th class="amx-th-tut" :class="{ 'amx-l2': t.track === 2, 'amx-l2-start': t.track === 2 && (ti === 0 || allTutorials[ti-1].track !== 2) }" :title="t.title + (t.track === 2 ? '  ·  Level 2' : '  ·  Level 1')"><span x-text="t.icon || '•'"></span></th>
               </template>
               <th class="amx-th-num" @click="setSort('completion')">% <span x-show="sortKey==='completion'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
               <th class="amx-th-num" @click="setSort('logins')">Logins <span x-show="sortKey==='logins'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
@@ -3004,8 +3009,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                   <span class="amx-name" x-text="displayName(u)"></span>
                 </td>
                 <td class="amx-td-id" x-text="u.studentId || '—'"></td>
-                <template x-for="t in allTutorials" :key="t.id">
-                  <td class="amx-cell">
+                <template x-for="(t, ti) in allTutorials" :key="t.id">
+                  <td class="amx-cell" :class="{ 'amx-l2': t.track === 2, 'amx-l2-start': t.track === 2 && (ti === 0 || allTutorials[ti-1].track !== 2) }">
                     <span x-show="completionInfo(u.id, t.id)" class="amx-tick" :title="formatDateTime(completionInfo(u.id, t.id) && completionInfo(u.id, t.id).completedAt)">✓</span>
                     <span x-show="!completionInfo(u.id, t.id)" class="amx-blank">·</span>
                   </td>
@@ -3115,8 +3120,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <tr class="amx-foot">
               <td class="amx-sticky amx-td-name">Completed</td>
               <td></td>
-              <template x-for="t in allTutorials" :key="t.id">
-                <td class="amx-cell" x-text="tutorialDoneCount(t.id)"></td>
+              <template x-for="(t, ti) in allTutorials" :key="t.id">
+                <td class="amx-cell" :class="{ 'amx-l2': t.track === 2, 'amx-l2-start': t.track === 2 && (ti === 0 || allTutorials[ti-1].track !== 2) }" x-text="tutorialDoneCount(t.id)"></td>
               </template>
               <td colspan="5"></td>
             </tr>
