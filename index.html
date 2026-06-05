@@ -2297,13 +2297,14 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <h2 class="lms-heading" style="font-size:1.25rem;margin:0;">AI on the Terminal</h2>
             <p class="lms-subheading" style="font-size:0.85rem;margin:3px 0 0;max-width:48ch;">OpenCode &amp; Claude Code. An optional, advanced track &mdash; <strong>not required</strong> for your Level 1 certificate.</p>
           </div>
-          <span style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(255,149,0,0.12);color:#9a5a00;font:700 12.5px/1 -apple-system,sans-serif;">Optional</span>
+          <span x-show="l2Open" style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(255,149,0,0.12);color:#9a5a00;font:700 12.5px/1 -apple-system,sans-serif;">Optional</span>
+          <span x-show="!l2Open" style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(255,149,0,0.12);color:#9a5a00;font:700 12.5px/1 -apple-system,sans-serif;white-space:nowrap;">&#128197; Opens 17 June 2026</span>
         </div>
         <template x-for="tut in tutorials.filter(t => t.track === 2)" :key="tut.id">
           <div class="lms-module-card"
-               :class="{ 'lms-pending': tut.pending, 'lms-locked': !tut.pending && !$store.auth.canAccessTutorial(tut) }">
+               :class="{ 'lms-pending': tut.pending || !l2Open, 'lms-locked': l2Open && !tut.pending && !$store.auth.canAccessTutorial(tut) }">
             <div class="lms-module-header"
-                 @click="tut.pending ? null : ($store.auth.canAccessTutorial(tut) ? navigate('#/lesson/' + tut.moduleId + '/' + tut.id) : $store.ui.showModal('upgrade'))">
+                 @click="(tut.pending || !l2Open) ? null : ($store.auth.canAccessTutorial(tut) ? navigate('#/lesson/' + tut.moduleId + '/' + tut.id) : $store.ui.showModal('upgrade'))">
               <div class="lms-module-icon" :style="'background:' + tut.iconBg">
                 <span x-text="tut.icon"></span>
               </div>
@@ -2317,21 +2318,22 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                   <span class="dot">&#183;</span>
                   <span x-text="tut.durationMinutes + ' min'"></span>
                   <span class="dot">&#183;</span>
-                  <span x-show="$store.auth.canAccessTutorial(tut) || tut.pending" x-text="tut.pending ? 'Coming soon' : (progress[tut.id] ? 'Completed' : 'Not started')"></span>
-                  <span x-show="!$store.auth.canAccessTutorial(tut) && !tut.pending" style="color:var(--gold-rich,#B8860B);font-weight:600;">Unlock with full access</span>
+                  <span x-show="!l2Open" style="color:#9a5a00;font-weight:600;">Opens 17 June 2026</span>
+                  <span x-show="l2Open && ($store.auth.canAccessTutorial(tut) || tut.pending)" x-text="tut.pending ? 'Coming soon' : (progress[tut.id] ? 'Completed' : 'Not started')"></span>
+                  <span x-show="l2Open && !$store.auth.canAccessTutorial(tut) && !tut.pending" style="color:var(--gold-rich,#B8860B);font-weight:600;">Unlock with full access</span>
                 </div>
                 <div class="lms-progress-track">
                   <div class="lms-progress-fill" :style="'width:' + (progress[tut.id] ? 100 : 0) + '%'"></div>
                 </div>
               </div>
-              <!-- Completion tick (only when accessible & not pending) -->
-              <template x-if="!tut.pending && $store.auth.canAccessTutorial(tut)">
+              <!-- Completion tick (only when open, accessible & not pending) -->
+              <template x-if="l2Open && !tut.pending && $store.auth.canAccessTutorial(tut)">
                 <div class="lms-lesson-check" :class="progress[tut.id] && 'checked'" @click.stop="toggleComplete(tut)" style="margin-right:4px;">
                   <svg x-show="progress[tut.id]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
               </template>
               <!-- Lock icon for gated tutorials -->
-              <template x-if="!tut.pending && !$store.auth.canAccessTutorial(tut)">
+              <template x-if="l2Open && !tut.pending && !$store.auth.canAccessTutorial(tut)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold-rich,#B8860B);margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               </template>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:rgba(60,60,67,0.3);"><path d="M6 4l4 4-4 4"/></svg>
@@ -3324,7 +3326,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
     <!-- Availability + price (NCI sees free; everyone else €49) -->
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(255,149,0,0.12);color:#9a5a00;font:600 13px/1 -apple-system,sans-serif;">📅 Opens 17 June 2026</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(52,199,89,0.14);color:#1d6e36;font:600 13px/1 -apple-system,sans-serif;">✅ Level 1 open now</span>
       <span x-show="$store.auth.isNci" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(52,199,89,0.14);color:#1d6e36;font:700 13px/1 -apple-system,sans-serif;">🎉 Free for NCI students</span>
       <span x-show="!$store.auth.isNci" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(29,77,140,0.1);color:#1d4d8c;font:700 13px/1 -apple-system,sans-serif;">€49 one-time</span>
     </div>
@@ -4824,9 +4826,15 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 
       tutorials: window._lmsTutorials.map(function(t) { return Object.assign({}, t); }),
 
-      // Certificate requests open 17 June 2026 (once the terminal-use
-      // tutorials land). Before then the CTA shows a date, not a button.
+      // The Level 1 certificate is open now — Level 1 (Foundations) no
+      // longer waits on the terminal track.
       get certLaunched() {
+        return true;
+      },
+
+      // Level 2 (the AI-on-the-Terminal track) launches 17 June 2026.
+      // Until then its lessons show as "Opens 17 June 2026".
+      get l2Open() {
         return new Date() >= new Date('2026-06-17T00:00:00');
       },
 
