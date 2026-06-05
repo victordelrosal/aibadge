@@ -2241,7 +2241,16 @@ input[type="range"].explorer-slider::-moz-range-thumb{
          signed-in user; free-tier users see locks on non-free tutorials. -->
     <template x-if="$store.auth.isLoggedIn">
       <div x-data="lmsDashboard()">
-        <template x-for="tut in tutorials" :key="tut.id">
+        <!-- ===== LEVEL 1 · Foundations (required for the certificate) ===== -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:4px 0 14px;">
+          <div>
+            <span style="display:inline-block;font:700 11px/1 -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#1d4d8c;margin-bottom:6px;">Level 1</span>
+            <h2 class="lms-heading" style="font-size:1.25rem;margin:0;">Foundations</h2>
+            <p class="lms-subheading" style="font-size:0.85rem;margin:3px 0 0;max-width:44ch;">Finish all of these and submit your work, then request your certificate. No terminal needed.</p>
+          </div>
+          <span x-show="$store.auth.isLoggedIn" x-text="l1Done + ' / ' + l1Real.length + ' complete'" style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(29,77,140,0.10);color:#1d4d8c;font:700 12.5px/1 -apple-system,sans-serif;"></span>
+        </div>
+        <template x-for="tut in tutorials.filter(t => t.track === 1)" :key="tut.id">
           <div class="lms-module-card"
                :class="{ 'lms-pending': tut.pending, 'lms-locked': !tut.pending && !$store.auth.canAccessTutorial(tut) }">
             <div class="lms-module-header"
@@ -2281,13 +2290,62 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           </div>
         </template>
 
-        <!-- Certificate CTA: appears once every tutorial is complete -->
+        <!-- ===== LEVEL 2 · AI on the Terminal (optional, not required for the cert) ===== -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:30px 0 14px;padding-top:22px;border-top:1px solid rgba(0,0,54,0.08);">
+          <div>
+            <span style="display:inline-block;font:700 11px/1 -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#9a5a00;margin-bottom:6px;">Level 2</span>
+            <h2 class="lms-heading" style="font-size:1.25rem;margin:0;">AI on the Terminal</h2>
+            <p class="lms-subheading" style="font-size:0.85rem;margin:3px 0 0;max-width:48ch;">OpenCode &amp; Claude Code. An optional, advanced track &mdash; <strong>not required</strong> for your Level 1 certificate.</p>
+          </div>
+          <span style="flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(255,149,0,0.12);color:#9a5a00;font:700 12.5px/1 -apple-system,sans-serif;">Optional</span>
+        </div>
+        <template x-for="tut in tutorials.filter(t => t.track === 2)" :key="tut.id">
+          <div class="lms-module-card"
+               :class="{ 'lms-pending': tut.pending, 'lms-locked': !tut.pending && !$store.auth.canAccessTutorial(tut) }">
+            <div class="lms-module-header"
+                 @click="tut.pending ? null : ($store.auth.canAccessTutorial(tut) ? navigate('#/lesson/' + tut.moduleId + '/' + tut.id) : $store.ui.showModal('upgrade'))">
+              <div class="lms-module-icon" :style="'background:' + tut.iconBg">
+                <span x-text="tut.icon"></span>
+              </div>
+              <div class="lms-module-info">
+                <div class="lms-module-title">
+                  <span x-text="tut.title"></span>
+                  <span x-show="tut.free && $store.auth.isFreeTier" class="lms-free-tag">Free</span>
+                </div>
+                <div class="lms-module-meta">
+                  <span x-text="tut.level" style="text-transform:capitalize;"></span>
+                  <span class="dot">&#183;</span>
+                  <span x-text="tut.durationMinutes + ' min'"></span>
+                  <span class="dot">&#183;</span>
+                  <span x-show="$store.auth.canAccessTutorial(tut) || tut.pending" x-text="tut.pending ? 'Coming soon' : (progress[tut.id] ? 'Completed' : 'Not started')"></span>
+                  <span x-show="!$store.auth.canAccessTutorial(tut) && !tut.pending" style="color:var(--gold-rich,#B8860B);font-weight:600;">Unlock with full access</span>
+                </div>
+                <div class="lms-progress-track">
+                  <div class="lms-progress-fill" :style="'width:' + (progress[tut.id] ? 100 : 0) + '%'"></div>
+                </div>
+              </div>
+              <!-- Completion tick (only when accessible & not pending) -->
+              <template x-if="!tut.pending && $store.auth.canAccessTutorial(tut)">
+                <div class="lms-lesson-check" :class="progress[tut.id] && 'checked'" @click.stop="toggleComplete(tut)" style="margin-right:4px;">
+                  <svg x-show="progress[tut.id]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+              </template>
+              <!-- Lock icon for gated tutorials -->
+              <template x-if="!tut.pending && !$store.auth.canAccessTutorial(tut)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold-rich,#B8860B);margin-right:4px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </template>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:rgba(60,60,67,0.3);"><path d="M6 4l4 4-4 4"/></svg>
+            </div>
+          </div>
+        </template>
+
+        <!-- Certificate CTA: appears once every Level 1 tutorial is complete -->
         <div x-show="allComplete || certMsg" x-transition
              style="margin-top:24px;border-radius:18px;padding:20px 22px;background:linear-gradient(135deg,rgba(184,134,11,0.10),rgba(245,231,160,0.18));border:1px solid rgba(184,134,11,0.28);">
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
             <div style="font-size:2rem;line-height:1;">&#127891;</div>
             <div style="flex:1;min-width:200px;">
-              <div style="font:700 17px/1.25 -apple-system,sans-serif;color:#000036;">You&rsquo;ve completed every tutorial</div>
+              <div style="font:700 17px/1.25 -apple-system,sans-serif;color:#000036;">You&rsquo;ve finished Level 1</div>
               <div class="lms-subheading" style="font-size:0.9rem;margin-top:2px;">
                 <span x-show="$store.auth.isNci">Free for you as an NCI student. Victor reviews your work personally, then issues your verifiable credential. </span>
                 <span x-show="!$store.auth.isNci">&euro;49 one-time. Victor reviews your work personally, then issues your verifiable credential. </span>
@@ -3262,7 +3320,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
     <!-- Earn your own -->
     <h3 style="font:700 18px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 6px;">Earn your own</h3>
-    <p style="font:400 14px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.75);margin:0 0 16px;">Complete every tutorial, then request your certificate. Victor reviews your work personally and issues it as a verifiable credential you can share on LinkedIn.</p>
+    <p style="font:400 14px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.75);margin:0 0 16px;">Finish all the <strong>Level 1</strong> tutorials and submit your work, then request your certificate. The <strong>Level 2</strong> terminal track (OpenCode, Claude Code) is optional and not required. Victor reviews your work personally and issues it as a verifiable credential you can share on LinkedIn.</p>
 
     <!-- Availability + price (NCI sees free; everyone else €49) -->
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
@@ -4737,21 +4795,25 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   };
 
   // ---------- LMS Dashboard Component ----------
+  // track: 1 = Level 1 (Foundations, no terminal) — required for the €49 certificate.
+  // track: 2 = Level 2 (AI on the Terminal: OpenCode / Claude Code) — optional, not required for the certificate.
   window._lmsTutorials = [
-    { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 7, type: 'video', lessonPath: 'tutorials/hello-world/hello-world.html', free: true },
-    { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', durationMinutes: 9, type: 'video', lessonPath: 'tutorials/hello-world-2/hello-world-2.html', free: true },
-    { id: 'ai-foundations', moduleId: 'ai-foundations', title: 'AI Foundations 101', icon: '🧠', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', durationMinutes: 10, type: 'video', lessonPath: 'tutorials/ai-foundations/ai-foundations.html', free: true },
-    { id: 'retro-game', moduleId: 'retro-game', title: 'Retro Game', icon: '🎮', iconBg: 'rgba(255,59,48,0.12)', level: 'beginner', durationMinutes: 12, type: 'video', lessonPath: 'tutorials/retro-game/retro-game.html' },
-    { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', durationMinutes: 11, type: 'video', lessonPath: 'tutorials/GitHub/GitHub.html' },
-    { id: 'opencode', moduleId: 'opencode', title: 'Install OpenCode', icon: '🦊', iconBg: 'rgba(48,209,88,0.12)', level: 'beginner', durationMinutes: 8, type: 'guide', lessonPath: 'tutorials/opencode/opencode.html' },
-    { id: 'ai-interviews-you', moduleId: 'ai-interviews-you', title: 'AI Interviews You', icon: '🎤', iconBg: 'rgba(175,82,222,0.12)', level: 'beginner', durationMinutes: 15, type: 'video', lessonPath: 'tutorials/ai-interviews-you/ai-interviews-you.html' },
-    { id: 'five-innovators', moduleId: 'five-innovators', title: 'The Five Innovators', icon: '🐙', iconBg: 'rgba(191,90,242,0.12)', level: 'beginner', durationMinutes: 24, type: 'video', lessonPath: 'tutorials/five-innovators/five-innovators.html' },
-    { id: 'your-ai-workspace', moduleId: 'your-ai-workspace', title: 'Your AI Workspace', icon: '🗂️', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', durationMinutes: 7, type: 'video', lessonPath: 'tutorials/your-ai-workspace/your-ai-workspace.html' },
-    { id: 'your-ai-team', moduleId: 'your-ai-team', title: 'Your AI Team', icon: '👥', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', durationMinutes: 19, type: 'video', lessonPath: 'tutorials/your-ai-team/your-ai-team.html' },
-    { id: 'your-first-skill', moduleId: 'your-first-skill', title: 'Your First Skill', icon: '🧰', iconBg: 'rgba(255,159,10,0.12)', level: 'beginner', durationMinutes: 17, type: 'video', lessonPath: 'tutorials/your-first-skill/your-first-skill.html' },
-    { id: 'thinking-partner', moduleId: 'thinking-partner', title: 'Thinking Partner', icon: '🧭', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', durationMinutes: 12, type: 'video', lessonPath: 'tutorials/thinking-partner/thinking-partner.html' },
-    { id: 'eu-ai-act', moduleId: 'eu-ai-act', title: 'The EU AI Act', icon: '⚖️', iconBg: 'rgba(255,159,10,0.12)', level: 'beginner', durationMinutes: 8, type: 'video', lessonPath: 'tutorials/eu-ai-act/eu-ai-act.html' },
-    { id: 'ai-on-terminal', moduleId: 'ai-on-terminal', title: 'AI on the Terminal', icon: '⌨️', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', durationMinutes: 25, type: 'video', pending: true }
+    // ----- Level 1: Foundations -----
+    { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', track: 1, durationMinutes: 7, type: 'video', lessonPath: 'tutorials/hello-world/hello-world.html', free: true },
+    { id: 'hello-world-2', moduleId: 'hello-world', title: 'Hello World 2', icon: '🔄', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', track: 1, durationMinutes: 9, type: 'video', lessonPath: 'tutorials/hello-world-2/hello-world-2.html', free: true },
+    { id: 'ai-foundations', moduleId: 'ai-foundations', title: 'AI Foundations 101', icon: '🧠', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 1, durationMinutes: 10, type: 'video', lessonPath: 'tutorials/ai-foundations/ai-foundations.html', free: true },
+    { id: 'retro-game', moduleId: 'retro-game', title: 'Retro Game', icon: '🎮', iconBg: 'rgba(255,59,48,0.12)', level: 'beginner', track: 1, durationMinutes: 12, type: 'video', lessonPath: 'tutorials/retro-game/retro-game.html' },
+    { id: 'deploy-github', moduleId: 'deploy-github', title: 'Deploy to GitHub', icon: '🚀', iconBg: 'rgba(88,86,214,0.12)', level: 'beginner', track: 1, durationMinutes: 11, type: 'video', lessonPath: 'tutorials/GitHub/GitHub.html' },
+    { id: 'ai-interviews-you', moduleId: 'ai-interviews-you', title: 'AI Interviews You', icon: '🎤', iconBg: 'rgba(175,82,222,0.12)', level: 'beginner', track: 1, durationMinutes: 15, type: 'video', lessonPath: 'tutorials/ai-interviews-you/ai-interviews-you.html' },
+    { id: 'five-innovators', moduleId: 'five-innovators', title: 'The Five Innovators', icon: '🐙', iconBg: 'rgba(191,90,242,0.12)', level: 'beginner', track: 1, durationMinutes: 24, type: 'video', lessonPath: 'tutorials/five-innovators/five-innovators.html' },
+    { id: 'thinking-partner', moduleId: 'thinking-partner', title: 'Thinking Partner', icon: '🧭', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 1, durationMinutes: 12, type: 'video', lessonPath: 'tutorials/thinking-partner/thinking-partner.html' },
+    { id: 'eu-ai-act', moduleId: 'eu-ai-act', title: 'The EU AI Act', icon: '⚖️', iconBg: 'rgba(255,159,10,0.12)', level: 'beginner', track: 1, durationMinutes: 8, type: 'video', lessonPath: 'tutorials/eu-ai-act/eu-ai-act.html' },
+    // ----- Level 2: AI on the Terminal (optional) -----
+    { id: 'opencode', moduleId: 'opencode', title: 'Install OpenCode', icon: '🦊', iconBg: 'rgba(48,209,88,0.12)', level: 'beginner', track: 2, durationMinutes: 8, type: 'guide', lessonPath: 'tutorials/opencode/opencode.html' },
+    { id: 'your-ai-workspace', moduleId: 'your-ai-workspace', title: 'Your AI Workspace', icon: '🗂️', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 2, durationMinutes: 7, type: 'video', lessonPath: 'tutorials/your-ai-workspace/your-ai-workspace.html' },
+    { id: 'your-ai-team', moduleId: 'your-ai-team', title: 'Your AI Team', icon: '👥', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 2, durationMinutes: 19, type: 'video', lessonPath: 'tutorials/your-ai-team/your-ai-team.html' },
+    { id: 'your-first-skill', moduleId: 'your-first-skill', title: 'Your First Skill', icon: '🧰', iconBg: 'rgba(255,159,10,0.12)', level: 'beginner', track: 2, durationMinutes: 17, type: 'video', lessonPath: 'tutorials/your-first-skill/your-first-skill.html' },
+    { id: 'ai-on-terminal', moduleId: 'ai-on-terminal', title: 'AI on the Terminal', icon: '⌨️', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', track: 2, durationMinutes: 25, type: 'video', pending: true }
   ];
 
   window.lmsDashboard = function() {
@@ -4768,11 +4830,20 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         return new Date() >= new Date('2026-06-17T00:00:00');
       },
 
-      // Every real (non-pending) tutorial is marked complete.
+      // Level 1 tutorials (Foundations) — the ones required for the certificate.
+      get l1Real() {
+        return this.tutorials.filter(function(t) { return t.track === 1 && !t.pending; });
+      },
+      get l1Done() {
+        var done = this.progress;
+        return this.l1Real.filter(function(t) { return !!done[t.id]; }).length;
+      },
+      // The cert is for Level 1: every Level 1 tutorial marked complete.
+      // Level 2 (the terminal track) is optional and never gates the cert.
       get allComplete() {
         var done = this.progress;
-        var real = this.tutorials.filter(function(t) { return !t.pending; });
-        return real.length > 0 && real.every(function(t) { return !!done[t.id]; });
+        var l1 = this.l1Real;
+        return l1.length > 0 && l1.every(function(t) { return !!done[t.id]; });
       },
 
       get _apiBase() {
@@ -4859,7 +4930,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   window.certNotice = function() {
     return {
       steps: [
-        'You submit all your tutorial work and pay <strong>€49</strong>. Victor reviews everything internally.',
+        'You submit all your <strong>Level 1</strong> tutorial work and pay <strong>€49</strong>. Victor reviews everything internally.',
         'If it isn’t a pass yet, you get a <strong>second attempt free</strong> — revise and resubmit at no cost.',
         'If the second attempt doesn’t pass, the third and final attempt is <strong>half price (€24.50)</strong>.',
         'Any attempt after that is <strong>full price (€49)</strong>.'
