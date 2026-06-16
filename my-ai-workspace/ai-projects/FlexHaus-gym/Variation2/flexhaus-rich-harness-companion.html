@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlexHaus Gym: Rich Harness (context.md)</title>
+<style>
+  :root{
+    --base:#f7f8fa; --surface:#ffffff; --surface-alt:#fbfcfd;
+    --hair:rgba(15,23,42,0.08); --hair-strong:rgba(15,23,42,0.14);
+    --ink:#0b1220; --ink-2:#2a3142; --ink-3:#5a6273; --ink-4:#8a91a3;
+    --lapis:#1d4d8c; --lapis-deep:#173f73; --lapis-soft:rgba(29,77,140,0.08);
+    --gold:#a88742; --gold-soft:rgba(168,135,66,0.16);
+    --y:#d6a915; --r:#d9663a; --b:#1d4d8c; --g:#2a9d8f; --p:#7a4fb0;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--base);color:var(--ink-2);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  #progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--lapis);
+    box-shadow:0 0 8px var(--lapis);z-index:100;transition:width .1s ease-out}
+  .nav{position:sticky;top:0;z-index:50;height:60px;display:flex;align-items:center;gap:12px;
+    padding:0 24px;background:rgba(247,248,250,.8);backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid var(--hair)}
+  .nav .mark{width:26px;height:26px;border-radius:7px;background:var(--lapis);
+    border:1.5px solid var(--gold);flex:0 0 auto}
+  .nav b{color:var(--ink);font-weight:650;font-size:15px}
+  .nav .tag{margin-left:auto;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--lapis);background:var(--lapis-soft);padding:4px 10px;border-radius:999px;font-weight:600}
+  .wrap{max-width:880px;margin:0 auto;padding:44px 24px 120px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 8px}
+  h1{font-size:34px;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin:0 0 10px;font-weight:720}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--lapis);
+    margin:54px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--hair);font-weight:700;
+    display:flex;align-items:baseline;gap:10px}
+  h2 .n{color:var(--ink-4);font-weight:600}
+  h3{font-size:18px;color:var(--ink);margin:30px 0 10px;font-weight:650;letter-spacing:-.01em}
+  p{margin:0 0 14px}
+  .lede{font-size:18px;color:var(--ink-2);line-height:1.6}
+  .callout{background:var(--surface);border:1px solid var(--hair);border-left:3px solid var(--lapis);
+    border-radius:10px;padding:16px 20px;margin:18px 0;font-size:15px;color:var(--ink-3)}
+  .callout.gold{border-left-color:var(--gold)}
+  strong{color:var(--ink);font-weight:650}
+  ul{margin:0 0 16px;padding-left:22px}
+  li{margin:6px 0}
+  blockquote{margin:10px 0;padding:8px 16px;border-left:2px solid var(--hair-strong);
+    color:var(--ink-3);font-style:italic}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;
+    background:var(--surface);border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--hair)}
+  th{background:var(--surface-alt);color:var(--ink);font-weight:650;font-size:12px;
+    letter-spacing:.03em;text-transform:uppercase}
+  td{color:var(--ink-2)}
+  tr:last-child td{border-bottom:none}
+  tr.bad td{background:rgba(217,73,58,.07)}
+  .num{font-variant-numeric:tabular-nums}
+  .agent{background:var(--surface);border:1px solid var(--hair);border-radius:12px;
+    padding:18px 20px;margin:14px 0;position:relative}
+  .agent::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:3px}
+  .agent.y::before{background:var(--y)} .agent.r::before{background:var(--r)}
+  .agent.b::before{background:var(--b)} .agent.g::before{background:var(--g)} .agent.p::before{background:var(--p)}
+  .agent h3{margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+  .dot.y{background:var(--y)}.dot.r{background:var(--r)}.dot.b{background:var(--b)}.dot.g{background:var(--g)}.dot.p{background:var(--p)}
+  .agent .spec{font-size:13px;color:var(--ink-3);margin:0 0 12px}
+  .contract{font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;
+    background:var(--surface-alt);border:1px solid var(--hair);border-radius:8px;padding:12px 14px;color:var(--ink-2)}
+  .contract b{color:var(--lapis-deep)}
+  .pill{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    padding:3px 9px;border-radius:999px;background:var(--lapis-soft);color:var(--lapis);margin-right:6px}
+  .pill.gold{background:var(--gold-soft);color:var(--gold)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:28px;position:relative}
+  .check li::before{content:"☐";position:absolute;left:0;color:var(--lapis);font-size:16px}
+  ol.scenes{padding-left:0;counter-reset:s;list-style:none}
+  ol.scenes li{position:relative;padding:10px 0 10px 44px;border-bottom:1px solid var(--hair);counter-increment:s}
+  ol.scenes li:last-child{border-bottom:none}
+  ol.scenes li::before{content:counter(s);position:absolute;left:0;top:10px;width:28px;height:28px;
+    border-radius:50%;background:var(--lapis);color:#fff;font-weight:700;font-size:13px;
+    display:flex;align-items:center;justify-content:center}
+  .swatches{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 16px}
+  .sw{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-3);
+    background:var(--surface);border:1px solid var(--hair);border-radius:8px;padding:6px 10px}
+  .sw i{width:16px;height:16px;border-radius:4px;border:1px solid var(--hair-strong);display:block}
+  .foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--hair);color:var(--ink-4);font-size:13px}
+  @media(max-width:600px){.wrap{padding:28px 16px 80px}h1{font-size:27px}table{font-size:12.5px}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<nav class="nav">
+  <span class="mark"></span>
+  <b>FlexHaus Gym: Rich Harness</b>
+  <span class="tag">Variation 2 · context.md</span>
+</nav>
+
+<div class="wrap">
+  <p class="eyebrow">Session 5 · Individual exercise · The harness experiment</p>
+  <h1>FlexHaus Gym member-retention campaign</h1>
+  <p class="lede">The full operating brief for an Octopus pipeline: backstory, data, specialist agents, brand, and artifact spec, in one file. This is the <strong>harness</strong>. Its twin is an empty brief.</p>
+
+  <div class="callout gold"><strong>What this file is.</strong> Read it top to bottom before delegating a single task. Everything needed to do world-class work is below. Do not invent facts that contradict it; if a number you need is missing, mark it <code>[ASSUMPTION]</code>. Every figure here is ground truth for this exercise (synthetic, generated for teaching).</div>
+
+  <h2><span class="n">0</span> Mission</h2>
+  <p>Stop the bleed: win back the <strong>disengaged-but-still-paying</strong> members who have quietly stopped coming before they cancel, by shipping a launch-ready retention campaign whose centrepiece is a <strong>three.js "spectacular" comeback-booking page</strong> so frictionless that a member who has not shown up in weeks books their next class in one tap, plus the win-back copy that drives them there. Budget <strong>€2,000</strong>. Window <strong>one month</strong>.</p>
+  <div class="callout"><strong>Definition of done:</strong> a deployed GitHub Pages URL (the booking/win-back page), the win-back message sequence, and a one-page diagnosis that names the at-risk segment and sizes the revenue at stake. Marks are for the <em>catch and the judgement</em>, not for a pretty page alone.</div>
+
+  <h2><span class="n">1</span> Backstory</h2>
+  <p>FlexHaus opened three years ago in a converted print-works: exposed brick, one big room with a rig, two studios, good coffee, and a wall that reads <em>"Show up for yourself."</em> It is a single-location boutique gym, owner-operated by <strong>Dervla Quinn</strong>, a former physio who built the place on community rather than equipment. For the first two years the energy carried it: classes sold out, the 6pm HIIT had a waitlist, members knew each other's names.</p>
+  <p>Now FlexHaus has <strong>about 600 active members</strong> and a quiet problem that does not show up at the front desk. People are still <em>paying</em>: the direct debits go through every month. They have just stopped <em>coming</em>. Monthly churn sits near <strong>9%</strong>, so Dervla loses and must replace more than half her membership every year just to stand still. Worse, <strong>about 40% of members never book a second class</strong> after their first: they join on a January resolution or an Instagram ad, take one class, and are never seen again, paying out of guilt for a few months before they cancel. Attendance is patchy and the studios that used to be full now have gaps.</p>
+  <p>Dervla has tried the obvious things: a louder Instagram, a "refer a friend" poster, a sad email blast nobody opened. What she has never done is use the <strong>data the gym already has</strong>. Every booking, no-show and cancellation has been logged for 18 months. She just has not looked, because she is teaching four classes a day. She has freed up <strong>€2,000</strong> and <strong>one month</strong>. She does not want more members at the top of the funnel; she wants to keep the ones she already pays to acquire.</p>
+  <h3>Voice of the member (verbatim, 35-person lapsed/at-risk survey)</h3>
+  <blockquote>"I still pay for it. I just… haven't been in like six weeks. I keep meaning to." (F, 29, Standard)</blockquote>
+  <blockquote>"The first class was hard and I felt out of place. I never went back." (M, 34, cancelled)</blockquote>
+  <blockquote>"I don't know the timetable. By the time I check, the class I want is full." (F, 41, Off-peak)</blockquote>
+  <blockquote>"Honestly I forgot I was a member until the payment came out." (M, 26, cancelled)</blockquote>
+  <blockquote>"If someone had just texted me 'we saved you a spot Tuesday', I'd have gone." (F, 38, at-risk)</blockquote>
+
+  <h2><span class="n">2</span> The gym, in numbers <span style="font-size:11px;color:var(--ink-4);text-transform:none;letter-spacing:0">(synthetic, internally consistent)</span></h2>
+  <div class="callout"><strong>The tables below are summaries. The raw evidence is the file <code>flexhaus_bookings.csv</code></strong> (≈45,300 booking rows / ≈1,560 distinct members, 23 fields, 18 months). It is the gym's <strong>full class-bookings export</strong>, one row per booking, member attributes denormalised onto every row. There is no separate member table: <strong>you must <code>GROUP BY member_id</code> to rebuild the member panel</strong> (tenure, frequency, second-class behaviour, status) before you can model churn. That reconstruction is the first real task.</div>
+
+  <h3>2.1 The membership base (derived from the export)</h3>
+  <table>
+    <thead><tr><th>Metric</th><th>Value</th><th>So what</th></tr></thead>
+    <tbody>
+      <tr><td>Currently active members</td><td class="num">~637</td><td>the base Dervla is trying to hold</td></tr>
+      <tr><td>Avg monthly fee (active)</td><td class="num">€45.26</td><td>blended across 5 plans</td></tr>
+      <tr><td>Monthly recurring revenue</td><td class="num">~€30,800</td><td>every churned member is ~€45/mo gone</td></tr>
+      <tr><td>Avg monthly churn (18-mo)</td><td class="num">8.3%</td><td>≈9% headline; &gt;50% of the base per year</td></tr>
+      <tr class="bad"><td>Members who never book a 2nd class</td><td class="num">42%</td><td>the single biggest leak</td></tr>
+      <tr><td>No-show rate (all bookings)</td><td class="num">~7%</td><td>but concentrated in the disengaged</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 The "second-class cliff" (the core problem)</h3>
+  <table>
+    <thead><tr><th>Lifetime classes booked</th><th class="num">Share of members</th><th class="num">Cancelled to date</th></tr></thead>
+    <tbody>
+      <tr class="bad"><td>1 (one-and-done)</td><td class="num">~42%</td><td class="num">~75%</td></tr>
+      <tr><td>2–4 (sporadic)</td><td class="num">~27%</td><td class="num">high</td></tr>
+      <tr><td>5–20 (regular)</td><td class="num">~20%</td><td class="num">~38%</td></tr>
+      <tr><td>20+ (devotee)</td><td class="num">~8%</td><td class="num">lowest</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">Members who book <strong>only one class churn at roughly twice the rate</strong> of members who book five or more (~75% vs ~38% cancelled). The fight is not at acquisition; it is at the <strong>second visit</strong>. Reactivate a one-and-done before they cancel and you change the unit economics of the whole gym.</div>
+
+  <h3>2.3 Plans, classes, channels</h3>
+  <table>
+    <thead><tr><th>Plan</th><th class="num">Monthly fee</th><th class="num">~Share</th></tr></thead>
+    <tbody>
+      <tr><td>Standard</td><td class="num">€49</td><td class="num">40%</td></tr>
+      <tr><td>Off-peak</td><td class="num">€29</td><td class="num">18%</td></tr>
+      <tr><td>Premium</td><td class="num">€79</td><td class="num">16%</td></tr>
+      <tr><td>Student</td><td class="num">€25</td><td class="num">14%</td></tr>
+      <tr><td>Annual (monthly equiv.)</td><td class="num">€45</td><td class="num">12%</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><strong>Class mix (by bookings):</strong> Spin ~20%, HIIT ~19%, Strength ~17%, Yoga ~15%, Pilates ~11%, Boxing ~10%, Mobility ~8%.</li>
+    <li><strong>Peak demand:</strong> weekday 17:00–20:00 and weekend mornings; off-peak capacity sits empty.</li>
+    <li><strong>Acquisition:</strong> Instagram ~30%, friend referral ~24%, walk-in ~22%, Google ~16%, class-pass promo ~8%.</li>
+  </ul>
+
+  <h3>2.4 The at-risk segment (this is who the campaign is for)</h3>
+  <div class="callout gold">A member is <strong>at-risk and reachable</strong> if they are <em>still active (paying)</em> but disengaged: one or zero bookings recently, or never past the second class, or no visit in 30+ days. They have not cancelled yet, so a single good nudge can still land. This segment is large, drives most forward churn, and is sitting in the CSV waiting to be defined precisely. <strong>Naming and sizing it is Tara's job.</strong></div>
+
+  <h3>2.5 Constraints (hard)</h3>
+  <ul>
+    <li>Budget <strong>€2,000 all-in</strong>. The page should cost ~€0 (GitHub Pages + free booking/lead capture).</li>
+    <li><strong>One month</strong> to launch and run.</li>
+    <li><strong>GDPR:</strong> members consented to service comms; a win-back message still needs a clear purpose and easy opt-out. No dark patterns.</li>
+    <li><strong>Tone discipline:</strong> these people feel guilty already. Shame does not sell a comeback. Warmth and zero-friction do.</li>
+    <li>Accessibility non-negotiable: works for screen-reader and keyboard-only users; degrades gracefully where WebGL is unavailable.</li>
+  </ul>
+
+  <h3>2.6 The raw data: bookings export (<code>flexhaus_bookings.csv</code>)</h3>
+  <p>One row per <strong>class booking</strong>; group by <code>member_id</code> to rebuild the member. ~45,300 rows, 18 months, the full export (not a sample). <code>member_status</code> / <code>cancel_date</code> are the churn labels; <code>is_first_class</code> / <code>is_second_class</code> flag the cliff; <code>booked_status</code> carries attendance.</p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>booking_id</code></td><td>string</td><td>one class booking</td></tr>
+      <tr><td><code>member_id</code></td><td>string</td><td>group by this to rebuild the member panel</td></tr>
+      <tr><td><code>join_date</code></td><td>date</td><td>member tenure starts here</td></tr>
+      <tr><td><code>member_status</code></td><td>string</td><td>active · cancelled · frozen (the churn label)</td></tr>
+      <tr><td><code>cancel_date</code></td><td>date</td><td>blank if still active</td></tr>
+      <tr><td><code>plan_type</code> / <code>monthly_fee_eur</code></td><td>string / float</td><td>Standard · Off-peak · Premium · Student · Annual</td></tr>
+      <tr><td><code>age_band</code> / <code>gender</code></td><td>string</td><td>Under 25 … 55+ ; F/M/Other</td></tr>
+      <tr><td><code>referral_source</code></td><td>string</td><td>how they were acquired</td></tr>
+      <tr><td><code>home_distance_km</code></td><td>float</td><td>distance to the gym</td></tr>
+      <tr><td><code>booking_date</code> / <code>booking_time</code></td><td>date / time</td><td>when the class is</td></tr>
+      <tr><td><code>day_of_week</code> / <code>is_weekend</code></td><td>string / Y\|N</td><td>demand patterns</td></tr>
+      <tr><td><code>class_type</code></td><td>string</td><td>Spin · HIIT · Strength · Yoga · Pilates · Boxing · Mobility</td></tr>
+      <tr><td><code>instructor</code> / <code>room</code></td><td>string</td><td>who taught · which studio</td></tr>
+      <tr><td><code>booked_status</code></td><td>string</td><td>attended · no_show · late_cancel</td></tr>
+      <tr><td><code>is_first_class</code> / <code>is_second_class</code></td><td>Y\|N</td><td>the member's 1st / 2nd ever booking</td></tr>
+      <tr><td><code>waitlisted</code> / <code>pt_session</code></td><td>Y\|N</td><td>waitlisted · personal-training session</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><strong>Five analyses Tara should actually run (not optional):</strong>
+    <ol style="margin:8px 0 0;padding-left:20px">
+      <li>Rebuild the member panel (group by <code>member_id</code>): tenure, total bookings, last visit, status. Everything depends on this.</li>
+      <li>Churn curve by tenure month and by lifetime-bookings bucket → prove the second-class cliff and quantify the ~2x lift.</li>
+      <li>Define + size the at-risk segment (active + disengaged) → headcount, €/month, €/year at stake.</li>
+      <li>No-show and class-time patterns by segment → which class/time is the easiest re-entry point.</li>
+      <li>Among members who <em>did</em> book a second class, what predicted it? → design the nudge around it.</li>
+    </ol>
+  </div>
+  <p>The hero and the win-back message may each feature <strong>one</strong> headline stat, but only if computed from this CSV and cited (e.g. "members who skip the second class are 2x more likely to quit"). Round honestly; never inflate.</p>
+
+  <h2><span class="n">3</span> Brand direction <span style="font-size:11px;color:var(--ink-4);text-transform:none;letter-spacing:0">(so Design and Maker do not guess)</span></h2>
+  <ul>
+    <li><strong>Personality:</strong> boutique, human, high-energy but never bro-y or shaming. The gym that <em>remembers your name and saved you a spot</em>, not the one that screams "NO EXCUSES."</li>
+  </ul>
+  <div class="swatches">
+    <span class="sw"><i style="background:#0E1116"></i>Carbon #0E1116</span>
+    <span class="sw"><i style="background:#F5F5F2"></i>Chalk #F5F5F2</span>
+    <span class="sw"><i style="background:#C6F24E"></i>Volt #C6F24E</span>
+    <span class="sw"><i style="background:#FF5A3C"></i>Ember #FF5A3C</span>
+  </div>
+  <ul>
+    <li><strong>Type:</strong> a bold condensed display face (<em>Anton</em>, <em>Archivo Expanded</em>) for big motivating numbers; a clean humanist sans (<em>Inter</em>) for body. Big, confident, phone-legible.</li>
+    <li><strong>Tone words:</strong> warm, direct, momentum, belonging. "Your spot's still here." Never "You've been slacking."</li>
+  </ul>
+  <div class="callout gold"><strong>The hook idea (the campaign spine):</strong> <strong>"The Comeback."</strong> Reframe the lapse as a return, not a failure. The centrepiece is a one-tap <strong>"Book your comeback class"</strong> flow that pre-selects the member's favourite class and the next easy off-peak slot, with a human line: <em>we saved you a spot.</em> This single idea threads through page, message, and follow-up.</div>
+
+  <h2><span class="n">4</span> Your Octopus crew: SPECIALISTS, not generalists</h2>
+  <p>You are the <strong>🟣 Purple Manager (orchestrator)</strong>. Do <strong>not</strong> spin up generic agents. Instantiate these five named specialists, hand each its contract, hold the quality gate. Pipeline: <span class="pill">Yellow</span>→<span class="pill">Red-Orange ∥ Green</span>→<span class="pill">Blue</span>→<span class="pill">Yellow cold verify</span>→<span class="pill gold">you · STOP gate</span></p>
+
+  <div class="agent y">
+    <h3><span class="dot y"></span>YELLOW: "Tara," membership retention &amp; churn analyst</h3>
+    <p class="spec">Specialism: survival analysis and cohort retention for subscription fitness; rebuilding member panels from event logs. Not a generic researcher.</p>
+    <div class="contract">
+      <b>ROLE:</b>     Rebuild the member panel from flexhaus_bookings.csv (§2.6), then name and size the at-risk segment and the second-class cliff.<br>
+      <b>INPUT:</b>    flexhaus_bookings.csv (raw evidence), §1 voice-of-member, §2 summaries to sanity-check against, §2.4 at-risk definition.<br>
+      <b>OUTPUT:</b>   diagnosis.md: at-risk segment defined with a precise rule, headcount + €/month + €/year at stake (maths shown), the ~2x churn lift evidenced, the ONE metric to move. Run the five analyses in §2.6.<br>
+      <b>SCOPE:</b>    No solutions, no copy. Diagnosis only. Every number computed from the CSV (state the query): none invented.<br>
+      <b>ESCALATE:</b> If the data cannot support a claim, say so and propose what to assume.
+    </div>
+  </div>
+  <div class="agent r">
+    <h3><span class="dot r"></span>RED-ORANGE: "Mateo," conversion-led booking-flow + WebGL designer</h3>
+    <p class="spec">Specialism: high-craft three.js/WebGL pages whose 3D serves a one-tap booking conversion. Art director + UX, not a generic designer.</p>
+    <div class="contract">
+      <b>ROLE:</b>     Design the comeback-booking page experience and the one-tap "book your comeback class" moment per §3 and §5.<br>
+      <b>INPUT:</b>    Tara's diagnosis, the brand (§3), the three.js spec (§5).<br>
+      <b>OUTPUT:</b>   design-spec.md: section wireframe, 3D scene concept, scroll choreography, single primary CTA (book a class), reduced-motion + no-WebGL fallback, accessibility plan.<br>
+      <b>SCOPE:</b>    No code. Design intent, hierarchy, motion, states (default/hover/focus/success/error).<br>
+      <b>ESCALATE:</b> If a 3D idea hurts load time, mobile performance, or a11y, flag the trade-off and offer a lighter alternative.
+    </div>
+  </div>
+  <div class="agent b">
+    <h3><span class="dot b"></span>BLUE: "Kojo," three.js + static-deploy front-end engineer</h3>
+    <p class="spec">Specialism: performant vanilla three.js (r160+) / WebGL on mobile, zero-cost GitHub Pages deploy. Not a generic coder.</p>
+    <div class="contract">
+      <b>ROLE:</b>     Build the real, deployable comeback-booking page from Mateo's spec. It must actually run on a phone.<br>
+      <b>INPUT:</b>    design-spec.md, brand tokens (§3), §5 technical requirements.<br>
+      <b>OUTPUT:</b>   /site (index.html + assets), a working booking/lead-capture form (free tier or mailto fallback), a deployed GitHub Pages URL, README with run + deploy steps.<br>
+      <b>SCOPE:</b>    Front-end only. No backend FlexHaus does not have. Must hit the §5 mobile-performance + a11y bars.<br>
+      <b>ESCALATE:</b> If the 3D scene blows the budget on a mid-range phone, degrade it and say what you cut.
+    </div>
+  </div>
+  <div class="agent g">
+    <h3><span class="dot g"></span>GREEN: "Róisín," fitness lifecycle + win-back copywriter</h3>
+    <p class="spec">Specialism: re-engagement messaging for subscription fitness; warm, momentum-driven, never shaming. Not a generic marketer.</p>
+    <div class="contract">
+      <b>ROLE:</b>     Write the win-back message sequence that drives at-risk members to the comeback page.<br>
+      <b>INPUT:</b>    Tara's diagnosis, brand voice (§3), the "Comeback / we saved you a spot" hook.<br>
+      <b>OUTPUT:</b>   marketing.md: a 3-touch win-back sequence (SMS + email + final nudge), each with opening + single CTA + GDPR-clean opt-out, plus 2 Instagram posts; each tagged with its target metric.<br>
+      <b>SCOPE:</b>    Copy + channel strategy only. No invented stats; any number comes from §2 / the CSV. No shame, no false urgency.<br>
+      <b>ESCALATE:</b> If a claim needs proof FlexHaus does not have, soften it or drop it.
+    </div>
+  </div>
+  <div class="agent p">
+    <h3><span class="dot p"></span>PURPLE: you, the orchestrator + quality gate</h3>
+    <div class="contract">
+      <b>ROLE:</b>     Sequence the crew, enforce handoffs, run Cold Verify, STOP before publishing.<br>
+      <b>DO:</b>       After Blue ships, re-task Yellow as a COLD VERIFIER (§7) blind to the build reasoning. Only you decide it is done.
+    </div>
+  </div>
+
+  <h2><span class="n">5</span> The artifact: a three.js "spectacular" comeback-booking page <span class="pill gold" style="vertical-align:middle">mandatory</span></h2>
+  <p>This is Variation 2's defining instruction. The page is <strong>not</strong> a flat form. It is a short, kinetic, scroll-driven WebGL experience that turns a guilty lapse into an easy return and ends in a one-tap booking.</p>
+  <div class="callout"><strong>Concept: "The Comeback."</strong> On load, a slow pulse of light travels along a 3D line in the dark (a heartbeat at rest). As the visitor scrolls, the pulse quickens and the camera moves through a stylised, volumetric-lit FlexHaus space (the rig, the studio, motes of chalk-dust catching light), energy building from still to sprint. Big warm line: <em>"Your spot's still here."</em> It ends in a single pool of Volt-green light where the <strong>comeback class</strong> card hovers: the member's favourite class and the next easy off-peak slot pre-selected, one tap to book. On success the card pulses and the line of light races to full.</div>
+  <h3>Required scenes (scroll-driven)</h3>
+  <ol class="scenes">
+    <li><strong>The resting pulse → headline</strong> (hero). A slow heartbeat line in the dark. Headline: <em>"Your spot's still here."</em> Sub: the no-shame promise. One CTA: <em>Book your comeback class</em>.</li>
+    <li><strong>Momentum builds</strong>: fly-through of the stylised gym space (rig, studio, chalk-dust GPU particles), pulse accelerating, 2-3 lines that reframe the lapse as a return.</li>
+    <li><strong>The proof</strong>: three "why now" beats (one class to restart, your favourite is on Tuesday, we held the spot) rising out of the dark; optionally one honest CSV-computed stat.</li>
+    <li><strong>The comeback card</strong>: Volt-green pool of light, the booking card with class + slot pre-filled, the actual booking/lead-capture form. Success: the card pulses, the heartbeat line races to full.</li>
+  </ol>
+  <h3>Technical requirements (Blue must meet all)</h3>
+  <ul>
+    <li><strong>three.js r160+</strong>, vanilla; ES modules via CDN import map is fine for a static GitHub Pages deploy.</li>
+    <li><strong>GPU/points particles</strong> for chalk-dust and the pulse; <strong>postprocessing bloom</strong> for the Volt-green glow; <strong>InstancedMesh</strong> for repeating geometry. Keep draw calls low.</li>
+    <li><strong>Scroll choreography:</strong> camera + pulse speed driven by scroll progress (lerp/damp). No janky scrubbing.</li>
+    <li><strong>Mobile-first performance:</strong> this audience is on a phone. Interactive &lt; 2.5s on a mid-range phone; 60fps target, never below 30fps; lean JS payload.</li>
+    <li><strong><code>prefers-reduced-motion</code>:</strong> serve a still, strong hero and a normal scrolling page. Never trap a motion-sensitive user.</li>
+    <li><strong>No-WebGL fallback:</strong> detect failure, render a styled static hero + the booking form. Booking must work with zero 3D.</li>
+    <li><strong>Accessibility:</strong> keyboard-reachable form, visible focus rings, AA contrast (mind Volt-green on Carbon and on Chalk), real <code>&lt;label&gt;</code>s, alt text; canvas <code>aria-hidden</code> with real content in the DOM.</li>
+    <li><strong>The form:</strong> captures the booking intent (class + slot + contact), plain-English consent/opt-out line, no pre-tick, success + error states; wired to a free-tier provider or documented <code>mailto</code>/Formspree fallback so it genuinely captures.</li>
+    <li><strong>Deploy:</strong> GitHub Pages. Hand back the live URL.</li>
+  </ul>
+  <div class="callout gold">If any 3D ambition threatens the mobile-performance or accessibility bars, <strong>cut the ambition, not the bars.</strong> A fast, accessible, slightly-less-lavish page that books a class beats a gorgeous one that drops on a phone.</div>
+
+  <h2><span class="n">6</span> Deliverables checklist</h2>
+  <ul class="check">
+    <li><code>diagnosis.md</code>: at-risk segment defined + sized (headcount, €/month, €/year), the cliff and ~2x lift evidenced from <code>flexhaus_bookings.csv</code>, the one metric.</li>
+    <li><code>design-spec.md</code>: sections, 3D concept, scroll choreography, states, fallback, a11y plan.</li>
+    <li><code>/site</code> + <strong>live GitHub Pages URL</strong>: the three.js comeback-booking page, form working, fallbacks working, fast on a phone.</li>
+    <li><code>marketing.md</code>: 3-touch win-back sequence + 2 Instagram posts, GDPR-clean, warm not shaming, no invented stats.</li>
+    <li><code>cold-verify.md</code>: the §7 report.</li>
+  </ul>
+
+  <h2><span class="n">7</span> Cold Verify + STOP gate <span style="font-size:11px;color:var(--ink-4);text-transform:none;letter-spacing:0">(do not skip)</span></h2>
+  <p>Before calling this done, re-task <strong>Yellow as a fresh cold verifier</strong>, blind to how the work was made, against these frozen criteria. Score each pass/fail with evidence:</p>
+  <ul>
+    <li><strong>Diagnosis is data-bound:</strong> the member panel was rebuilt from the CSV; the at-risk segment has a precise rule, a headcount and a €/year figure with visible maths; the ~2x cliff is shown; the query reconciles with §2.</li>
+    <li><strong>One metric, not five:</strong> a single primary metric (comeback bookings, or 30-day churn of the at-risk cohort) is named and everything serves it.</li>
+    <li><strong>The page runs on a phone:</strong> the URL loads on mobile; the 3D renders; the booking form captures; reduced-motion and no-WebGL fallbacks both work.</li>
+    <li><strong>On-brand, on-voice:</strong> page and messages share the "Comeback / we saved you a spot" spine and the warm-not-shaming voice. None generic enough to belong to any other gym.</li>
+    <li><strong>GDPR-clean and kind:</strong> clear opt-out, no pre-tick, no shame, no false urgency.</li>
+    <li><strong>No hallucinated facts:</strong> nothing claims a number not computed from the CSV (or marked <code>[ASSUMPTION]</code>).</li>
+  </ul>
+  <div class="callout gold"><strong>Catch the octopus lying.</strong> Find and screenshot ONE moment a specialist got something wrong (a hallucinated stat, a dropped handoff, an off-brief or shaming line, a broken 3D fallback on mobile). Name it in one line. That catch is the point of the exercise. Only after the cold verify and the catch do you, the Purple Manager, lift the STOP gate and ship.</div>
+
+  <h2><span class="n">8</span> How this will be judged (and why this file exists)</h2>
+  <p>This is the <strong>rich harness</strong>. Its twin is an empty brief. When the two run side by side, the difference between them is the entire lesson: <em>the model did not get smarter, the context did.</em> A vague ask yields a generic "join now" page and invented numbers. This file yields a member panel rebuilt from real data, a named and sized at-risk segment, a branded one-tap comeback experience, warm win-back copy, and a verifier that catches the lie. The harness is the work.</p>
+
+  <p class="foot">FlexHaus Gym · Session 5 individual exercise · Variation 2 (rich harness). Companion control: <code>../variation-1-null/context.md</code>. All figures synthetic, generated for teaching.</p>
+</div>
+
+<script>
+  const bar=document.getElementById('progress');
+  addEventListener('scroll',()=>{const h=document.documentElement;
+    const p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;bar.style.width=p+'%';},{passive:true});
+</script>
+</body>
+</html>

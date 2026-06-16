@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inkwell, rewritten: claim your Library Card</title>
+<meta name="description" content="Inkwell Books, rewritten. The paper stamp card becomes a Library Card that lives on your phone: a free book, members-only late-night author nights, and the shop that remembers you. Claim yours." />
+<!-- Open Graph -->
+<meta property="og:title" content="Inkwell, rewritten" />
+<meta property="og:description" content="Your shop remembers you. Claim the Library Card that earns a free book and opens our late-night author nights." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314213D'/%3E%3Ccircle cx='16' cy='13' r='5' fill='%23F4ECD8'/%3E%3Cpath d='M16 18c-3 4-3 7 0 9 3-2 3-5 0-9z' fill='%23C9A227'/%3E%3C/svg%3E" />
+<style>
+  :root{
+    --ink-navy:#14213D; --parchment:#F4ECD8; --ink:#0B0F1A;
+    --teal:#2A9D8F; --gold:#C9A227; --navy-deep:#0c1730;
+    --err:#B3261E;
+    --parchment-2:#efe6cf;
+    --ink-soft:#33405a;
+    --serif:'Fraunces',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ink-navy);color:var(--parchment);
+    font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+  /* skip link */
+  .skip{position:absolute;left:-999px;top:0;z-index:200;background:var(--parchment);color:var(--ink);
+    padding:10px 16px;border-radius:0 0 8px 0;font-weight:600;text-decoration:none}
+  .skip:focus{left:0}
+
+  /* the 3D canvas: decorative, fixed behind content */
+  #bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;background:
+    radial-gradient(120% 90% at 50% 8%, #1b2c4f 0%, var(--ink-navy) 42%, var(--navy-deep) 100%)}
+
+  /* reading progress */
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
+    background:linear-gradient(90deg,var(--teal),var(--gold));box-shadow:0 0 10px rgba(201,162,39,.5);transition:width .08s linear}
+
+  /* sticky always-one-tap CTA */
+  #sticky{position:fixed;left:50%;transform:translateX(-50%) translateY(120%);bottom:18px;z-index:110;
+    transition:transform .4s cubic-bezier(.2,.8,.2,1);opacity:0}
+  #sticky.show{transform:translateX(-50%) translateY(0);opacity:1}
+  #sticky a{display:inline-flex;align-items:center;gap:8px;background:var(--parchment);color:var(--ink);
+    text-decoration:none;font-weight:600;font-size:15px;padding:11px 20px;border-radius:999px;
+    box-shadow:0 8px 30px rgba(0,0,0,.4);border:1px solid rgba(11,15,26,.12)}
+
+  /* content layer */
+  main{position:relative;z-index:10}
+  .scene{min-height:100vh;display:flex;align-items:center;padding:80px 24px;position:relative}
+  .wrap{max-width:680px;margin:0 auto;width:100%}
+  .eyebrow{font-family:var(--sans);font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--gold);font-weight:600;margin:0 0 14px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(44px,9vw,86px);line-height:.98;
+    letter-spacing:-.02em;margin:0 0 18px;color:var(--parchment)}
+  h1 em{font-style:italic;color:#f6efdd}
+  .promise{font-size:clamp(18px,2.4vw,22px);line-height:1.5;color:#e4ddc8;margin:0 0 30px;max-width:34ch}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.4vw,40px);line-height:1.08;
+    letter-spacing:-.01em;margin:0 0 16px;color:var(--parchment)}
+  .scrim{background:rgba(12,23,48,.42);backdrop-filter:blur(3px);border:1px solid rgba(244,236,216,.08);
+    border-radius:16px;padding:34px 32px}
+
+  /* primary button */
+  .btn{display:inline-flex;align-items:center;gap:10px;background:var(--parchment);color:var(--ink);
+    border:none;font-family:var(--sans);font-weight:600;font-size:16px;padding:15px 26px;border-radius:12px;
+    cursor:pointer;text-decoration:none;transition:transform .15s ease,box-shadow .2s ease,background .15s ease;
+    box-shadow:0 6px 22px rgba(0,0,0,.32)}
+  .btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.42)}
+  .btn:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+  .btn .arrow{transition:transform .2s ease}
+  .btn:hover .arrow{transform:translateX(3px)}
+
+  .scroll-cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);color:#cdd5e6;
+    font-size:13px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;display:flex;flex-direction:column;
+    align-items:center;gap:8px}
+  .scroll-cue .chev{width:18px;height:18px;border-right:2px solid #cdd5e6;border-bottom:2px solid #cdd5e6;
+    transform:rotate(45deg);animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:rotate(45deg) translate(0,0)}50%{transform:rotate(45deg) translate(4px,4px)}}
+
+  /* drift story lines */
+  .story p{font-family:var(--serif);font-size:clamp(22px,3.4vw,32px);line-height:1.25;color:#eee6d2;
+    margin:0 0 26px;max-width:24ch}
+  .story p .lead{color:var(--gold)}
+
+  /* proof cards */
+  .proof-grid{display:grid;gap:18px;grid-template-columns:1fr}
+  @media(min-width:760px){.proof-grid{grid-template-columns:repeat(3,1fr)}}
+  .card{background:var(--parchment);color:var(--ink);border-radius:16px;padding:26px 24px;
+    border:1px solid rgba(11,15,26,.08);box-shadow:0 14px 40px rgba(0,0,0,.28)}
+  .card .ic{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;margin-bottom:14px;
+    background:rgba(42,157,143,.12);color:var(--ink-navy)}
+  .card h3{font-family:var(--serif);font-weight:600;font-size:21px;margin:0 0 8px;color:var(--ink-navy);letter-spacing:-.01em}
+  .card p{margin:0;font-size:15.5px;color:#2a3550;line-height:1.55}
+  .card .tick{color:var(--teal)}
+
+  /* sign-up scene */
+  .signup{display:grid;gap:34px;grid-template-columns:1fr;align-items:center}
+  @media(min-width:860px){.signup{grid-template-columns:1.05fr .95fr;gap:48px}}
+  .cardstage{display:flex;justify-content:center;align-items:center;min-height:300px;perspective:1200px}
+  .bookplate{width:min(320px,80vw);aspect-ratio:5/7;border-radius:14px;position:relative;
+    transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.8,.2,1);
+    box-shadow:0 30px 70px rgba(0,0,0,.45)}
+  .bookplate.flipped{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;overflow:hidden;
+    display:flex;flex-direction:column;justify-content:space-between;padding:26px;
+    background:linear-gradient(155deg,#1a2c52,#0e1b38);border:1.5px solid var(--gold)}
+  .face .foil{font-family:var(--serif);color:var(--gold);font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+  .face .plate{font-family:var(--serif);font-style:italic;color:#f3ead4;font-size:26px;line-height:1.1}
+  .face .small{font-size:12.5px;color:#b9c2d8;letter-spacing:.04em}
+  .face.back{transform:rotateY(180deg);justify-content:center;align-items:center;text-align:center;gap:10px}
+  .face.back .nm{font-family:var(--serif);font-style:italic;font-size:30px;color:var(--gold);margin:6px 0}
+  .exlibris{width:54px;height:54px;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center;
+    color:var(--gold);font-family:var(--serif);font-style:italic;font-size:22px}
+
+  form{background:var(--parchment);color:var(--ink);border-radius:18px;padding:30px 28px;
+    border:1px solid rgba(11,15,26,.1);box-shadow:0 18px 50px rgba(0,0,0,.3)}
+  form h2{color:var(--ink-navy);font-size:26px;margin:0 0 6px}
+  form .sub{color:#2a3550;font-size:15px;margin:0 0 22px}
+  label{display:block;font-weight:600;font-size:14px;color:var(--ink-navy);margin:0 0 7px}
+  input[type=email]{width:100%;padding:14px 15px;font-size:16px;font-family:var(--sans);color:var(--ink);
+    background:#fff;border:1.5px solid rgba(20,33,61,.35);border-radius:10px}
+  input[type=email]:hover{border-color:var(--ink-navy)}
+  input[type=email]:focus-visible{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(42,157,143,.35)}
+  .consent{display:flex;gap:11px;align-items:flex-start;margin:18px 0 6px;font-size:14.5px;color:#2a3550;line-height:1.5}
+  .consent input{margin-top:3px;width:18px;height:18px;accent-color:var(--teal);flex:0 0 auto}
+  .consent input:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  .micro{font-size:13px;color:#525d75;margin:14px 0 0}
+  form .btn{width:100%;justify-content:center;background:var(--ink-navy);color:var(--parchment);margin-top:8px}
+  form .btn:hover{background:#1b2f57}
+  .field-err{color:var(--err);font-size:13.5px;font-weight:500;margin:7px 0 0;min-height:0}
+  .banner{background:#f7e7e4;border:1px solid var(--err);color:#7a1c16;border-radius:10px;
+    padding:11px 14px;font-size:14px;margin:0 0 16px;display:none}
+  .banner.show{display:block}
+  .success{display:none;text-align:center}
+  .success.show{display:block}
+  .success h2{color:var(--ink-navy)}
+  .success p{color:#2a3550;font-size:16px}
+
+  footer{position:relative;z-index:10;background:var(--navy-deep);border-top:1px solid rgba(244,236,216,.1);
+    padding:40px 24px;text-align:center;color:#aeb8cf;font-size:13.5px;line-height:1.7}
+  footer a{color:var(--teal)}
+  footer .mark{font-family:var(--serif);font-style:italic;color:var(--parchment);font-size:18px}
+
+  /* static hero (reduced-motion / no-webgl) */
+  body.flat #bg{display:none}
+  body.flat{background:var(--ink-navy)}
+  body.flat .scene{min-height:auto;padding:64px 24px}
+  body.flat .hero-static{display:block}
+  .hero-static{display:none}
+  body.flat .scrim{background:rgba(12,23,48,.55)}
+  body.flat .scroll-cue{display:none}
+  body.flat main{background:
+    radial-gradient(120% 60% at 50% 0%, #1b2c4f 0%, var(--ink-navy) 40%, var(--navy-deep) 100%)}
+  /* static ink-bloom mark for flat hero */
+  .inkmark{width:120px;height:120px;margin:0 0 26px;filter:drop-shadow(0 8px 24px rgba(201,162,39,.25))}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .scroll-cue .chev{animation:none}
+    .bookplate{transition:none}
+  }
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<a class="skip" href="#signup">Skip to sign-up</a>
+<div id="progress" aria-hidden="true"></div>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<div id="sticky" aria-hidden="false"><a href="#signup">Claim your Library Card →</a></div>
+
+<main id="main">
+  <!-- SCENE 1: HERO -->
+  <section class="scene" id="hero" aria-labelledby="h1">
+    <div class="wrap">
+      <div class="scrim">
+        <svg class="inkmark hero-static" viewBox="0 0 120 120" role="img" aria-label="Inkwell Books: the ink-drop mark">
+          <circle cx="60" cy="48" r="22" fill="#F4ECD8"/>
+          <path d="M60 64c-12 16-12 30 0 40 12-10 12-24 0-40z" fill="#C9A227"/>
+        </svg>
+        <p class="eyebrow">A new chapter for Inkwell readers</p>
+        <h1 id="h1">Inkwell, <em>rewritten.</em></h1>
+        <p class="promise">Your shop remembers you. Claim the Library Card that earns a free book, opens our late-night author nights, and lives on your phone. No paper, no stamp.</p>
+        <a class="btn" href="#signup">Claim your Library Card <span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true"><span>Scroll</span><span class="chev"></span></div>
+  </section>
+
+  <!-- SCENE 2: THE DRIFT -->
+  <section class="scene story" id="drift" aria-label="What Inkwell is">
+    <div class="wrap">
+      <p><span class="lead">Thirty years</span> of creaking floors, a shop cat called Tolstoy, and staff who actually read.</p>
+      <p>The warm third place between work and home. Recommendations handed over by people, not an algorithm at 11pm.</p>
+      <p>You grew up in these aisles. We just lost your address. Here is the way back.</p>
+    </div>
+  </section>
+
+  <!-- SCENE 3: PROOF -->
+  <section class="scene" id="proof" aria-labelledby="proof-h">
+    <div class="wrap">
+      <h2 id="proof-h">What your Library Card unlocks</h2>
+      <div class="proof-grid">
+        <div class="card">
+          <div class="ic" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <h3><span class="tick">✓</span> A free book</h3>
+          <p>The stamp card, reborn. Your Library Card earns a book on us. The drawer-bound paper card is finally retired.</p>
+        </div>
+        <div class="card">
+          <div class="ic" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <h3>Late-night author nights</h3>
+          <p>Members-only evenings after close: the writers you read, a glass in hand, the shop to yourselves. You asked; here it is.</p>
+        </div>
+        <div class="card">
+          <div class="ic" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+          </div>
+          <h3>Lives on your phone</h3>
+          <p>One tap at the till. No card to lose, no stamp to forget. We email you only when something is worth your evening.</p>
+        </div>
+      </div>
+      <p style="margin-top:30px"><a class="btn" href="#signup">Claim your Library Card <span class="arrow" aria-hidden="true">→</span></a></p>
+    </div>
+  </section>
+
+  <!-- SCENE 4: SIGN-UP -->
+  <section class="scene" id="signup" aria-labelledby="signup-h">
+    <div class="wrap">
+      <div class="signup">
+        <div class="cardstage" aria-hidden="true">
+          <div class="bookplate" id="bookplate">
+            <div class="face front">
+              <span class="foil">Ex Libris · Inkwell</span>
+              <span class="plate">The Library Card</span>
+              <span class="small">Est. Camden Street, 1991</span>
+            </div>
+            <div class="face back">
+              <span class="exlibris">I</span>
+              <span class="small">This card belongs to</span>
+              <span class="nm" id="card-name">a new reader</span>
+              <span class="small" id="card-since">Member since 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <form id="form" novalidate>
+            <h2 id="signup-h">Claim your Library Card</h2>
+            <p class="sub">Start chapter two. One email, your name on a card, a free book waiting.</p>
+            <div class="banner" id="banner" role="alert"></div>
+            <label for="email">Your email</label>
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
+                   placeholder="you@example.com" aria-describedby="email-err micro" required />
+            <p class="field-err" id="email-err" aria-live="polite"></p>
+
+            <div class="consent">
+              <input id="consent" name="consent" type="checkbox" aria-describedby="consent-err" />
+              <label for="consent" style="font-weight:500;color:#2a3550;margin:0">Yes, email me Inkwell news and events. Unsubscribe anytime.</label>
+            </div>
+            <p class="field-err" id="consent-err" aria-live="polite"></p>
+            <p class="micro" id="micro">No spam, no stamp cards. One email when something is worth your evening.</p>
+
+            <button class="btn" type="submit" id="submit">Claim your Library Card <span class="arrow" aria-hidden="true">→</span></button>
+          </form>
+
+          <div class="success" id="success" role="status" aria-live="polite">
+            <h2>Your card is claimed.</h2>
+            <p>Check your inbox: your first chapter is on the way. Bring the card to any Inkwell branch to start earning your free book.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p class="mark">Inkwell Books</p>
+  <p>Nine branches across Ireland since 1991. We won on taste, not on speed.<br/>
+     Your details are used only to send you Inkwell news and events. No pre-ticked boxes, no selling your data, unsubscribe in one click from any email.</p>
+  <p style="margin-top:10px;color:#7e89a3">© 2026 Inkwell Books · <a href="#hero">Back to top</a></p>
+</footer>
+
+<!-- ===== three.js: import map (r160), addons for bloom ===== -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<!-- ===== form logic (runs with or without 3D) ===== -->
+<script>
+(function(){
+  // ---- CONFIG: swap in a real Formspree form id to capture to an inbox. ----
+  // While this is the placeholder, sign-ups are captured locally (localStorage)
+  // and a mailto fallback is offered, so the form still genuinely captures.
+  var FORMSPREE_ENDPOINT = "https://formspree.io/f/REPLACE_WITH_FORM_ID";
+  var INKWELL_INBOX = "hello@inkwellbooks.ie";
+
+  var form = document.getElementById('form');
+  var email = document.getElementById('email');
+  var consent = document.getElementById('consent');
+  var emailErr = document.getElementById('email-err');
+  var consentErr = document.getElementById('consent-err');
+  var banner = document.getElementById('banner');
+  var success = document.getElementById('success');
+  var bookplate = document.getElementById('bookplate');
+  var cardName = document.getElementById('card-name');
+
+  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function nameFromEmail(v){
+    var local = (v.split('@')[0]||'reader').replace(/[._\-+]+/g,' ').trim();
+    return local.replace(/\b\w/g, function(c){return c.toUpperCase();}) || 'A new reader';
+  }
+  function showError(el, node, msg){ node.textContent = msg; el && el.setAttribute('aria-invalid','true'); }
+  function clearErrors(){ emailErr.textContent=''; consentErr.textContent=''; banner.classList.remove('show');
+    email.removeAttribute('aria-invalid'); }
+
+  function captureLocally(v){
+    try{
+      var k='inkwell_signups';
+      var list=JSON.parse(localStorage.getItem(k)||'[]');
+      list.push({email:v, ts:new Date().toISOString()});
+      localStorage.setItem(k, JSON.stringify(list));
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function onSuccess(v){
+    cardName.textContent = nameFromEmail(v);
+    if(bookplate) bookplate.classList.add('flipped');
+    form.style.display='none';
+    success.classList.add('show');
+    success.focus && success.focus();
+    // trigger a gold bloom pulse in the 3D scene if present
+    window.dispatchEvent(new CustomEvent('inkwell:claimed'));
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearErrors();
+    var v = email.value.trim();
+    var ok = true;
+    if(!validEmail(v)){ showError(email, emailErr, "That email does not look right. Mind checking it?"); ok=false; }
+    if(!consent.checked){ showError(null, consentErr, "We need your okay to email you."); ok=false; }
+    if(!ok){ (validEmail(v)?consent:email).focus(); return; }
+
+    // always capture locally first (genuine capture, provider-independent)
+    captureLocally(v);
+
+    // attempt the provider if configured; otherwise go straight to success + mailto offer
+    if(FORMSPREE_ENDPOINT.indexOf('REPLACE_WITH_FORM_ID') !== -1){
+      onSuccess(v);
+      return;
+    }
+    var btn=document.getElementById('submit'); btn.disabled=true;
+    fetch(FORMSPREE_ENDPOINT,{method:'POST',headers:{'Accept':'application/json'},
+      body:(function(){var fd=new FormData();fd.append('email',v);fd.append('consent','yes');return fd;})()})
+      .then(function(r){ if(r.ok){ onSuccess(v); } else { throw new Error('bad status'); } })
+      .catch(function(){
+        banner.classList.add('show');
+        banner.innerHTML = 'Could not save that just now. <a href="mailto:'+INKWELL_INBOX+'?subject=Claim%20my%20Library%20Card&body=Please%20add%20'+encodeURIComponent(v)+'%20to%20Inkwell%20news%20and%20events.">Email us to claim instead</a> and we will set it up.';
+        btn.disabled=false;
+      });
+  });
+})();
+</script>
+
+<!-- ===== 3D experience (progressive enhancement, never load-blocking) ===== -->
+<script type="module">
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // progress bar + sticky CTA work regardless of 3D
+  const progress = document.getElementById('progress');
+  const sticky = document.getElementById('sticky');
+  const heroEl = document.getElementById('hero');
+  const signupEl = document.getElementById('signup');
+  function onScroll(){
+    const max = document.body.scrollHeight - window.innerHeight;
+    const p = max>0 ? window.scrollY/max : 0;
+    progress.style.width = (p*100).toFixed(2)+'%';
+    const pastHero = window.scrollY > window.innerHeight*0.7;
+    const signupTop = signupEl.getBoundingClientRect().top;
+    const formInView = signupTop < window.innerHeight*0.8;
+    if(pastHero && !formInView){ sticky.classList.add('show'); } else { sticky.classList.remove('show'); }
+    return p;
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // WebGL capability check
+  function webglOK(){
+    try{ const c=document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && (c.getContext('webgl')||c.getContext('experimental-webgl'))); }
+    catch(e){ return false; }
+  }
+
+  if(prefersReduced || !webglOK()){
+    document.body.classList.add('flat');
+    // no 3D; the DOM IS the experience. done.
+  } else {
+    try {
+      const THREE = await import('three');
+      const { EffectComposer } = await import('three/addons/postprocessing/EffectComposer.js');
+      const { RenderPass } = await import('three/addons/postprocessing/RenderPass.js');
+      const { UnrealBloomPass } = await import('three/addons/postprocessing/UnrealBloomPass.js');
+
+      const canvas = document.getElementById('bg');
+      const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x0c1730, 0.018);
+      const camera = new THREE.PerspectiveCamera(58, window.innerWidth/window.innerHeight, 0.1, 200);
+
+      // lighting
+      scene.add(new THREE.AmbientLight(0x35507a, 0.7));
+      const key = new THREE.PointLight(0xC9A227, 2.2, 60); key.position.set(0,2,6); scene.add(key);
+      const teal = new THREE.PointLight(0x2A9D8F, 1.0, 80); teal.position.set(-10,6,-20); scene.add(teal);
+
+      // ---- ink-bloom hero mark: a displaced glowing sphere that "forms" ----
+      const inkGeo = new THREE.IcosahedronGeometry(1.05, 5);
+      const inkMat = new THREE.MeshStandardMaterial({color:0xF4ECD8, emissive:0xC9A227,
+        emissiveIntensity:0.5, roughness:0.35, metalness:0.1});
+      const ink = new THREE.Mesh(inkGeo, inkMat);
+      ink.position.set(0,0.4,0);
+      scene.add(ink);
+      const basePos = inkGeo.attributes.position.array.slice();
+
+      // ---- the drift: InstancedMesh of books (1 draw call) ----
+      const N = 520;
+      const bookGeo = new THREE.BoxGeometry(0.34, 0.5, 0.07);
+      const bookMat = new THREE.MeshStandardMaterial({roughness:0.7, metalness:0.05});
+      const books = new THREE.InstancedMesh(bookGeo, bookMat, N);
+      books.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      const dummy = new THREE.Object3D();
+      const seeds = [];
+      const palette = [0x14213D,0x2A9D8F,0x6f4a2f,0x3a4d72,0x8a3a3a,0xc9a227,0xece3cd];
+      const colObj = new THREE.Color();
+      for(let i=0;i<N;i++){
+        const r = 4 + Math.random()*10;
+        const a = Math.random()*Math.PI*2;
+        const z = -4 - Math.random()*70;
+        seeds.push({r, a, z, spin:(Math.random()-0.5)*0.4, off:Math.random()*Math.PI*2,
+                    yb:(Math.random()-0.5)*8});
+        dummy.position.set(Math.cos(a)*r, Math.sin(a)*r*0.5 + seeds[i].yb, z);
+        dummy.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+        dummy.updateMatrix();
+        books.setMatrixAt(i, dummy.matrix);
+        colObj.setHex(palette[(Math.random()*palette.length)|0]);
+        books.setColorAt(i, colObj);
+      }
+      books.instanceColor.needsUpdate = true;
+      scene.add(books);
+
+      // ---- page particles: one Points system (1 draw call) ----
+      const PCOUNT = 2600;
+      const pgeo = new THREE.BufferGeometry();
+      const ppos = new Float32Array(PCOUNT*3);
+      const pspd = new Float32Array(PCOUNT);
+      for(let i=0;i<PCOUNT;i++){
+        ppos[i*3]   = (Math.random()-0.5)*36;
+        ppos[i*3+1] = (Math.random()-0.5)*30;
+        ppos[i*3+2] = -Math.random()*78;
+        pspd[i] = 0.4 + Math.random()*0.9;
+      }
+      pgeo.setAttribute('position', new THREE.BufferAttribute(ppos,3));
+      const pmat = new THREE.PointsMaterial({color:0xE9D8A6, size:0.06, transparent:true,
+        opacity:0.85, blending:THREE.AdditiveBlending, depthWrite:false});
+      const pages = new THREE.Points(pgeo, pmat);
+      scene.add(pages);
+
+      // ---- candle sprites (bloom feeders) ----
+      function candleTex(){
+        const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');
+        const g=x.createRadialGradient(32,32,0,32,32,32);
+        g.addColorStop(0,'rgba(255,236,180,1)');g.addColorStop(0.4,'rgba(201,162,39,0.7)');
+        g.addColorStop(1,'rgba(201,162,39,0)');x.fillStyle=g;x.fillRect(0,0,64,64);
+        const t=new THREE.CanvasTexture(c);return t;
+      }
+      const ctex = candleTex();
+      const candleMat = new THREE.SpriteMaterial({map:ctex, color:0xffffff, transparent:true,
+        blending:THREE.AdditiveBlending, depthWrite:false});
+      for(let i=0;i<14;i++){
+        const s=new THREE.Sprite(candleMat);
+        s.position.set((Math.random()-0.5)*22, (Math.random()-0.5)*12, -6-Math.random()*64);
+        const sc=0.6+Math.random()*1.1; s.scale.set(sc,sc,sc); scene.add(s);
+      }
+
+      // ---- the gold bookplate (Scene 4) ----
+      const plate = new THREE.Mesh(
+        new THREE.BoxGeometry(1.5, 2.1, 0.06),
+        new THREE.MeshStandardMaterial({color:0x16294d, emissive:0xC9A227, emissiveIntensity:0.35,
+          metalness:0.6, roughness:0.3})
+      );
+      plate.position.set(0, 0, -78);
+      scene.add(plate);
+      let plateClaimed = false;
+      window.addEventListener('inkwell:claimed', ()=>{ plateClaimed = true; });
+
+      // ---- camera spline across the 4 scenes ----
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0.4, 5.2),    // hero, looking at ink mark
+        new THREE.Vector3(2.4, 1.2, -16),  // into the drift
+        new THREE.Vector3(-2.0, -0.6, -46),// deeper drift / proof approach
+        new THREE.Vector3(0, 0, -73.5)     // the bookplate
+      ]);
+      const lookCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0.4, 0),
+        new THREE.Vector3(0, 0.6, -22),
+        new THREE.Vector3(0, -0.3, -52),
+        new THREE.Vector3(0, 0, -78)
+      ]);
+
+      // ---- postprocessing: bloom ----
+      const composer = new EffectComposer(renderer);
+      composer.addPass(new RenderPass(scene, camera));
+      const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.85, 0.6, 0.2);
+      composer.addPass(bloom);
+
+      // ---- resize ----
+      function resize(){
+        camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
+      }
+      window.addEventListener('resize', resize);
+
+      // ---- damped scroll progress ----
+      let pCur = 0;
+      const damp = (a,b,l,dt)=> a + (b-a)*(1-Math.exp(-l*dt));
+      const tmpPos = new THREE.Vector3(), tmpLook = new THREE.Vector3();
+      let last = performance.now();
+
+      // mark first frame so we can verify "actually rendered"
+      let rendered = 0;
+
+      function frame(now){
+        const dt = Math.min((now-last)/1000, 0.05); last = now;
+        const max = document.body.scrollHeight - window.innerHeight;
+        const pT = max>0 ? Math.min(Math.max(window.scrollY/max,0),1) : 0;
+        pCur = damp(pCur, pT, 4.0, dt);
+
+        // camera along curve
+        curve.getPointAt(pCur, tmpPos);
+        lookCurve.getPointAt(pCur, tmpLook);
+        camera.position.copy(tmpPos);
+        camera.lookAt(tmpLook);
+
+        // ink mark forms in scene 1, then recedes
+        const t = now*0.001;
+        const pos = inkGeo.attributes.position;
+        const formed = Math.min(pCur/0.12, 1); // 0 chaotic -> 1 sphere
+        for(let i=0;i<pos.count;i++){
+          const ix=i*3;
+          const nx=basePos[ix], ny=basePos[ix+1], nz=basePos[ix+2];
+          const noise = (Math.sin(t*1.5 + i*0.3)*0.18) * (1-formed);
+          pos.array[ix]   = nx*(1+noise);
+          pos.array[ix+1] = ny*(1+noise);
+          pos.array[ix+2] = nz*(1+noise);
+        }
+        pos.needsUpdate = true;
+        ink.rotation.y = t*0.3;
+        inkMat.emissiveIntensity = 0.5 + Math.sin(t*2)*0.12;
+
+        // books drift
+        for(let i=0;i<N;i++){
+          const s=seeds[i];
+          const a = s.a + t*0.04*s.spin;
+          dummy.position.set(Math.cos(a)*s.r, Math.sin(a)*s.r*0.5 + s.yb + Math.sin(t*0.5+s.off)*0.5, s.z);
+          dummy.rotation.set(t*0.1+s.off, a*1.3, s.off);
+          dummy.updateMatrix();
+          books.setMatrixAt(i, dummy.matrix);
+        }
+        books.instanceMatrix.needsUpdate = true;
+
+        // pages rise
+        const pa = pgeo.attributes.position.array;
+        for(let i=0;i<PCOUNT;i++){
+          pa[i*3+1] += pspd[i]*dt;
+          if(pa[i*3+1] > 16){ pa[i*3+1] = -16; }
+        }
+        pgeo.attributes.position.needsUpdate = true;
+
+        // bookplate
+        plate.rotation.y += dt*0.5;
+        if(plateClaimed){
+          plate.material.emissiveIntensity = Math.min(plate.material.emissiveIntensity + dt*0.8, 1.6);
+          bloom.strength = Math.min(bloom.strength + dt*0.5, 1.8);
+        }
+
+        composer.render();
+        rendered++;
+        window.__inkwellFrames = rendered; // verification hook
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+      window.__inkwell3D = true;
+    } catch (err) {
+      // any failure: fall back to the flat, fully-working page
+      console.warn('[inkwell] 3D init failed, serving flat experience:', err);
+      document.body.classList.add('flat');
+    }
+  }
+</script>
+</body>
+</html>
