@@ -2863,6 +2863,18 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
   .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
 
+  /* The Harness lesson: download pack */
+  .hx-dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin: 0.75rem 0 0.25rem; }
+  .hx-dl { display: flex; align-items: center; gap: 0.55rem; padding: 0.7rem 0.9rem; border-radius: 0.6rem; text-decoration: none; border: 1px solid var(--cg-border); background: rgba(0,0,0,0.25); color: var(--cg-text-secondary); font-size: 0.85rem; transition: all 0.18s; }
+  .hx-dl:hover { border-color: var(--cg-cyan); background: rgba(0,102,255,0.12); transform: translateY(-1px); text-decoration: none; }
+  .hx-dl b { color: var(--cg-text-primary); font-weight: 600; }
+  .hx-dl.rich { border-color: rgba(34,197,94,0.4); }
+  .hx-dl.null { border-color: rgba(115,115,115,0.4); }
+  .hx-dl svg { flex: 0 0 auto; opacity: 0.8; }
+  .cg-lesson.light-mode .hx-dl { background: #f8f9fa; border-color: #dadce0; color: #5f6368; }
+  .cg-lesson.light-mode .hx-dl:hover { border-color: #1a73e8; background: #e8f0fe; }
+  @media (max-width: 768px) { .hx-dl-grid { grid-template-columns: 1fr; } }
+
   @media (max-width: 540px) {
     .cg-submit-row { flex-direction: column; }
     .cg-submit-btn { width: 100%; }
@@ -4827,6 +4839,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     { id: 'your-ai-workspace', moduleId: 'your-ai-workspace', title: 'Your AI Workspace', icon: '🗂️', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 2, durationMinutes: 7, type: 'video', lessonPath: 'tutorials/your-ai-workspace/your-ai-workspace.html' },
     { id: 'your-ai-team', moduleId: 'your-ai-team', title: 'Your AI Team', icon: '👥', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 2, durationMinutes: 19, type: 'video', lessonPath: 'tutorials/your-ai-team/your-ai-team.html' },
     { id: 'your-first-skill', moduleId: 'your-first-skill', title: 'Your First Skill', icon: '🧰', iconBg: 'rgba(255,159,10,0.12)', level: 'beginner', track: 2, durationMinutes: 17, type: 'video', lessonPath: 'tutorials/your-first-skill/your-first-skill.html' },
+    { id: 'the-harness', moduleId: 'the-harness', title: 'The Harness', icon: '🐎', iconBg: 'rgba(255,159,10,0.12)', level: 'intermediate', track: 2, durationMinutes: 20, type: 'video', lessonPath: 'tutorials/the-harness/the-harness.html' },
     { id: 'ai-on-terminal', moduleId: 'ai-on-terminal', title: 'AI on the Terminal', icon: '⌨️', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', track: 2, durationMinutes: 25, type: 'video', pending: true }
   ];
 

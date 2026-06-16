@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inkwell Books: Rich Harness (context.md)</title>
+<style>
+  :root{
+    --base:#f7f8fa; --surface:#ffffff; --surface-alt:#fbfcfd;
+    --hair:rgba(15,23,42,0.08); --hair-strong:rgba(15,23,42,0.14);
+    --ink:#0b1220; --ink-2:#2a3142; --ink-3:#5a6273; --ink-4:#8a91a3;
+    --lapis:#1d4d8c; --lapis-deep:#173f73; --lapis-soft:rgba(29,77,140,0.08);
+    --gold:#a88742; --gold-soft:rgba(168,135,66,0.16);
+    --y:#d6a915; --r:#d9663a; --b:#1d4d8c; --g:#2a9d8f; --p:#7a4fb0;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--base); color:var(--ink-2);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--lapis);
+    box-shadow:0 0 8px var(--lapis);z-index:100;transition:width .1s ease-out}
+  .nav{position:sticky;top:0;z-index:50;height:60px;display:flex;align-items:center;gap:12px;
+    padding:0 24px;background:rgba(247,248,250,.8);backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid var(--hair)}
+  .nav .mark{width:26px;height:26px;border-radius:7px;background:var(--lapis);
+    border:1.5px solid var(--gold);flex:0 0 auto}
+  .nav b{color:var(--ink);font-weight:650;font-size:15px}
+  .nav .tag{margin-left:auto;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--lapis);background:var(--lapis-soft);padding:4px 10px;border-radius:999px;font-weight:600}
+  .wrap{max-width:880px;margin:0 auto;padding:44px 24px 120px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 8px}
+  h1{font-size:34px;line-height:1.15;letter-spacing:-.02em;color:var(--ink);margin:0 0 10px;font-weight:720}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--lapis);
+    margin:54px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--hair);font-weight:700;
+    display:flex;align-items:baseline;gap:10px}
+  h2 .n{color:var(--ink-4);font-weight:600}
+  h3{font-size:18px;color:var(--ink);margin:30px 0 10px;font-weight:650;letter-spacing:-.01em}
+  p{margin:0 0 14px}
+  .lede{font-size:18px;color:var(--ink-2);line-height:1.6}
+  .callout{background:var(--surface);border:1px solid var(--hair);border-left:3px solid var(--lapis);
+    border-radius:10px;padding:16px 20px;margin:18px 0;font-size:15px;color:var(--ink-3)}
+  .callout.gold{border-left-color:var(--gold)}
+  strong{color:var(--ink);font-weight:650}
+  ul{margin:0 0 16px;padding-left:22px}
+  li{margin:6px 0}
+  blockquote{margin:10px 0;padding:8px 16px;border-left:2px solid var(--hair-strong);
+    color:var(--ink-3);font-style:italic}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;
+    background:var(--surface);border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--hair)}
+  th{background:var(--surface-alt);color:var(--ink);font-weight:650;font-size:12px;
+    letter-spacing:.03em;text-transform:uppercase}
+  td{color:var(--ink-2)}
+  tr:last-child td{border-bottom:none}
+  tr.total td{font-weight:700;color:var(--ink);background:var(--lapis-soft)}
+  .num{font-variant-numeric:tabular-nums}
+  .up{color:#2a7d4f;font-weight:650} .down{color:#c0492b;font-weight:650} .flat{color:var(--ink-4)}
+  /* agent cards */
+  .agent{background:var(--surface);border:1px solid var(--hair);border-radius:12px;
+    padding:18px 20px;margin:14px 0;position:relative}
+  .agent::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:3px}
+  .agent.y::before{background:var(--y)} .agent.r::before{background:var(--r)}
+  .agent.b::before{background:var(--b)} .agent.g::before{background:var(--g)} .agent.p::before{background:var(--p)}
+  .agent h3{margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+  .dot.y{background:var(--y)}.dot.r{background:var(--r)}.dot.b{background:var(--b)}.dot.g{background:var(--g)}.dot.p{background:var(--p)}
+  .agent .spec{font-size:13px;color:var(--ink-3);margin:0 0 12px}
+  .contract{font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;
+    background:var(--surface-alt);border:1px solid var(--hair);border-radius:8px;padding:12px 14px;color:var(--ink-2)}
+  .contract b{color:var(--lapis-deep)}
+  .pill{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    padding:3px 9px;border-radius:999px;background:var(--lapis-soft);color:var(--lapis);margin-right:6px}
+  .pill.gold{background:var(--gold-soft);color:var(--gold)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:28px;position:relative}
+  .check li::before{content:"☐";position:absolute;left:0;color:var(--lapis);font-size:16px}
+  .scene{counter-reset:none}
+  ol.scenes{padding-left:0;counter-reset:s;list-style:none}
+  ol.scenes li{position:relative;padding:10px 0 10px 44px;border-bottom:1px solid var(--hair);counter-increment:s}
+  ol.scenes li:last-child{border-bottom:none}
+  ol.scenes li::before{content:counter(s);position:absolute;left:0;top:10px;width:28px;height:28px;
+    border-radius:50%;background:var(--lapis);color:#fff;font-weight:700;font-size:13px;
+    display:flex;align-items:center;justify-content:center}
+  .swatches{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 16px}
+  .sw{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-3);
+    background:var(--surface);border:1px solid var(--hair);border-radius:8px;padding:6px 10px}
+  .sw i{width:16px;height:16px;border-radius:4px;border:1px solid var(--hair-strong);display:block}
+  .foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--hair);color:var(--ink-4);font-size:13px}
+  @media(max-width:600px){.wrap{padding:28px 16px 80px}h1{font-size:27px}table{font-size:12.5px}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<nav class="nav">
+  <span class="mark"></span>
+  <b>Inkwell Books: Rich Harness</b>
+  <span class="tag">Variation 2 · context.md</span>
+</nav>
+
+<div class="wrap">
+  <p class="eyebrow">Session 5 · Class exercise · The harness experiment</p>
+  <h1>Inkwell Books re-engagement campaign</h1>
+  <p class="lede">The full operating brief for an Octopus pipeline: backstory, data, specialist agents, brand, and artifact spec, in one file. This is the <strong>harness</strong>. Its twin is an empty brief.</p>
+
+  <div class="callout gold"><strong>What this file is.</strong> Read it top to bottom before delegating a single task. Everything needed to do world-class work is below. Do not invent facts that contradict it; if a number you need is missing, mark it <code>[ASSUMPTION]</code>. Every figure here is ground truth for this exercise (synthetic, generated for teaching).</div>
+
+  <h2><span class="n">0</span> Mission</h2>
+  <p>Win back the under-35 customers Inkwell has lost by shipping a launch-ready re-engagement campaign whose centrepiece is a <strong>three.js "spectacular" sign-up landing page</strong> good enough to make a lapsed reader stop scrolling, plus the launch email and three social posts that drive traffic to it. Budget <strong>€5,000</strong>. Window <strong>six weeks before Christmas</strong>.</p>
+  <div class="callout"><strong>Definition of done:</strong> a deployed GitHub Pages URL (the landing page), an email, three posts, and a one-page diagnosis that sizes the prize. Marks are for the <em>catch and the judgement</em>, not for a pretty page alone.</div>
+
+  <h2><span class="n">1</span> Backstory</h2>
+  <p>Inkwell Books began in 1991 as a single shop on Dublin's Camden Street: creaking floors, a resident cat called Tolstoy, handwritten staff "shelf-talker" recommendations, and a Saturday-morning crowd three deep at the till. Over thirty years it grew, carefully, to <strong>nine branches</strong> across Ireland. It never tried to be Amazon. It won on taste, on staff who actually read, and on being the warm third place between work and home.</p>
+  <p>Then two things happened at once. The founders, Niamh and Daithí Brennan, stepped back in 2023 and handed day-to-day running to their daughter, <strong>Aoife Brennan</strong> (now MD, 34). And the customers who had grown up in the shop in the 2000s, the under-35s, quietly stopped coming. Footfall is <strong>down 28% in two years</strong>. The loyalty scheme is still a <strong>paper stamp card</strong> ("buy 9, get the 10th free") that nobody under 30 carries. There is <strong>no email list</strong> at all: thirty years of loyal customers and Inkwell cannot send a single one of them a message. Meanwhile the over-50 segment is loyal as ever, which masks the bleed in the monthly totals and makes the board complacent.</p>
+  <p>Aoife knows the next two Christmases decide whether Inkwell is a chain or a memory. She has freed up <strong>€5,000</strong> and <strong>six weeks</strong>. She does not want a rebrand. She wants the lapsed twenty-somethings back through the door, and a way to <em>reach</em> customers that does not involve a rubber stamp. This campaign is the test.</p>
+  <h3>Voice of the customer (verbatim, 40-person lapsed survey)</h3>
+  <blockquote>"I love the shop but I only remember it exists when I walk past it." (F, 27, Galway)</blockquote>
+  <blockquote>"Waterstones emails me a 3-for-2 every week. Inkwell has never emailed me once." (M, 31, Dublin)</blockquote>
+  <blockquote>"The stamp card is in a drawer somewhere. I'm not carrying a piece of card." (F, 24, Cork)</blockquote>
+  <blockquote>"I'd come to events. Author nights, a book club, anything. They don't tell me about them." (M, 29, Dublin)</blockquote>
+  <blockquote>"Honestly I just buy on my phone at 11pm now." (F, 33, Limerick)</blockquote>
+
+  <h2><span class="n">2</span> The business, in numbers <span style="font-size:11px;color:var(--ink-4);text-transform:none;letter-spacing:0">(synthetic, internally consistent)</span></h2>
+  <div class="callout"><strong>The tables below are summaries. The raw evidence is the file <code>inkwell_pos_transactions.csv</code></strong> (≈30,600 line-item rows / ≈18,800 baskets, 21 fields, 24 months across all 9 branches; data dictionary in §2.8). Inkwell has no CRM and no email list, but every till logs sales, so this anonymised POS export is the one real dataset they hold. <strong>Margot must derive the diagnosis from this CSV, not merely quote the summaries here</strong>; the summaries exist so you can sanity-check your own analysis against them.</div>
+
+  <h3>2.1 Branch network (last full month)</h3>
+  <table>
+    <thead><tr><th>#</th><th>Branch</th><th>Opened</th><th class="num">m²</th><th class="num">Footfall/wk now</th><th class="num">2 yrs ago</th><th class="num">Rev €k/mo</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Camden St (Dublin, flagship)</td><td>1991</td><td class="num">240</td><td class="num">3,100</td><td class="num">4,450</td><td class="num">86</td></tr>
+      <tr><td>2</td><td>Rathmines (Dublin)</td><td>1998</td><td class="num">120</td><td class="num">1,450</td><td class="num">2,050</td><td class="num">41</td></tr>
+      <tr><td>3</td><td>Dún Laoghaire</td><td>2003</td><td class="num">95</td><td class="num">1,180</td><td class="num">1,520</td><td class="num">33</td></tr>
+      <tr><td>4</td><td>Galway (Shop St)</td><td>2006</td><td class="num">160</td><td class="num">1,920</td><td class="num">2,760</td><td class="num">52</td></tr>
+      <tr><td>5</td><td>Cork (Oliver Plunkett St)</td><td>2009</td><td class="num">150</td><td class="num">1,640</td><td class="num">2,300</td><td class="num">47</td></tr>
+      <tr><td>6</td><td>Limerick</td><td>2012</td><td class="num">110</td><td class="num">980</td><td class="num">1,410</td><td class="num">28</td></tr>
+      <tr><td>7</td><td>Kilkenny</td><td>2015</td><td class="num">85</td><td class="num">760</td><td class="num">980</td><td class="num">22</td></tr>
+      <tr><td>8</td><td>Dundrum Town Centre (Dublin)</td><td>2018</td><td class="num">130</td><td class="num">1,540</td><td class="num">2,180</td><td class="num">44</td></tr>
+      <tr><td>9</td><td>Maynooth (campus-adjacent)</td><td>2021</td><td class="num">70</td><td class="num">720</td><td class="num">1,090</td><td class="num">19</td></tr>
+      <tr class="total"><td colspan="3">Total / blended</td><td class="num">1,160</td><td class="num">13,290</td><td class="num">18,740</td><td class="num">372</td></tr>
+    </tbody>
+  </table>
+  <p>Footfall decline blended: <span class="down">-29.1%</span> over two years (the "28%" Aoife quotes is rounded). Maynooth and Galway (most student-heavy) fell hardest: <span class="down">-34%</span> and <span class="down">-30%</span>.</p>
+
+  <h3>2.2 Who is leaving (sales share by age band)</h3>
+  <table>
+    <thead><tr><th>Age band</th><th class="num">% revenue (2 yrs ago)</th><th class="num">% revenue (now)</th><th>Direction</th></tr></thead>
+    <tbody>
+      <tr><td>Under 25</td><td class="num">14%</td><td class="num">7%</td><td class="down">▼ halved</td></tr>
+      <tr><td>25–34</td><td class="num">23%</td><td class="num">15%</td><td class="down">▼ falling fast</td></tr>
+      <tr><td>35–49</td><td class="num">28%</td><td class="num">30%</td><td class="flat">▬ stable</td></tr>
+      <tr><td>50–64</td><td class="num">21%</td><td class="num">28%</td><td class="up">▲ growing</td></tr>
+      <tr><td>65+</td><td class="num">14%</td><td class="num">20%</td><td class="up">▲ growing</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">The <strong>under-35 segment has gone from 37% to 22% of revenue</strong>; the over-50s from 35% to 48%. The chain is ageing into a cliff. This is the single most important chart in the brief.</div>
+
+  <h3>2.3 Sales mix, basket, margin</h3>
+  <table>
+    <thead><tr><th>Category</th><th class="num">% of units</th><th class="num">Gross margin</th></tr></thead>
+    <tbody>
+      <tr><td>Fiction (literary, crime, romantasy)</td><td class="num">41%</td><td class="num">32%</td></tr>
+      <tr><td>Children's &amp; YA</td><td class="num">19%</td><td class="num">35%</td></tr>
+      <tr><td>Non-fiction / business / self-dev</td><td class="num">17%</td><td class="num">30%</td></tr>
+      <tr><td>Stationery, cards, gifts</td><td class="num">14%</td><td class="num">54%</td></tr>
+      <tr><td>Coffee / café (3 branches)</td><td class="num">9%</td><td class="num">68%</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Average transaction value: <strong>€18.40</strong> (was €17.10: price, not volume, is holding revenue up).</li>
+    <li>Conversion of footfall to purchase: <strong>~31%</strong>.</li>
+    <li>"Romantasy" and YA are the fastest-growing categories nationally and skew heavily under-35: Inkwell under-indexes here.</li>
+  </ul>
+
+  <h3>2.4 The loyalty problem</h3>
+  <ul>
+    <li>Stamp cards issued (lifetime): ~92,000. Still active: <strong>unknowable</strong> (paper, no database).</li>
+    <li>Redemption rate (fully completed and redeemed): <strong>~6%</strong>.</li>
+    <li>Customer records held digitally: <strong>0</strong>. No CRM. No POS-linked email capture.</li>
+    <li>Email list: <strong>0</strong>. SMS list: <strong>0</strong>.</li>
+  </ul>
+
+  <h3>2.5 Digital &amp; social presence (current)</h3>
+  <table>
+    <thead><tr><th>Channel</th><th>State</th><th>Followers / traffic</th></tr></thead>
+    <tbody>
+      <tr><td>Website</td><td>Static brochure, no e-commerce, no sign-up</td><td>~4,200 visits/mo, 78% bounce</td></tr>
+      <tr><td>Instagram</td><td>~1×/week, mostly shelf photos</td><td>6,800 followers, ~1.2% engagement</td></tr>
+      <tr><td>Facebook</td><td>Dormant since 2022</td><td>9,100 followers</td></tr>
+      <tr><td>TikTok</td><td>None</td><td>BookTok is where the under-25s now are</td></tr>
+      <tr><td>Google Business</td><td>Unclaimed for 4 of 9 branches</td><td>: </td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.6 Competitive context</h3>
+  <ul>
+    <li><strong>Amazon / Kindle:</strong> price + 11pm convenience. Cannot be beaten on either. Do not try.</li>
+    <li><strong>Waterstones (IE):</strong> weekly email, 3-for-2, loyalty app, polished events. The benchmark lapsed customers compare Inkwell to.</li>
+    <li><strong>Eason:</strong> mass-market, gifting, footfall-heavy at Christmas.</li>
+    <li><strong>Local café-bookshops &amp; BookTok:</strong> where under-35 discovery now happens. Inkwell's real edge: curation, staff taste, physical events, the third-place feeling. Lean into what Amazon structurally cannot do.</li>
+  </ul>
+
+  <h3>2.7 Constraints (hard)</h3>
+  <ul>
+    <li>Budget <strong>€5,000 all-in</strong> (build + ads + incentive). The page itself should cost ~€0 (GitHub Pages + free-tier capture).</li>
+    <li><strong>Six weeks.</strong> Live before the first weekend of December.</li>
+    <li><strong>GDPR:</strong> every capture needs consent, a clear purpose, and an unsubscribe. Plain-English consent line on the form. No pre-ticked boxes.</li>
+    <li>No rebrand. Evolve the brand, do not replace it.</li>
+    <li>Accessibility non-negotiable: works for screen-reader and keyboard-only users; degrades gracefully where WebGL is unavailable.</li>
+  </ul>
+
+  <h3>2.8 The raw data: POS export (<code>inkwell_pos_transactions.csv</code>)</h3>
+  <p>One row per <strong>line item</strong>; group by <code>basket_id</code> to roll up to a transaction. ~30,600 rows, 24 months (2024-06 to 2026-05), all 9 branches. A ~7% anonymised sample of completed baskets, so <em>shares, trends and ratios are representative; absolute totals scale up to the §2.1 figures</em>. There is no customer-identity field (that is the point: no CRM = no email list). <code>member_age_band</code> is captured at the till only sometimes (~45% of baskets, more often when a stamp card is used), so a large share reads <code>unknown</code>: reason under uncertainty, do not discard it.</p>
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>line_id</code></td><td>string</td><td>basket_id + line number</td></tr>
+      <tr><td><code>basket_id</code></td><td>string</td><td>groups lines into one transaction</td></tr>
+      <tr><td><code>date</code> / <code>time</code></td><td>date / time</td><td>YYYY-MM-DD · HH:MM, retail hours</td></tr>
+      <tr><td><code>day_of_week</code> / <code>is_weekend</code></td><td>string / Y\|N</td><td>seasonality + weekend skew</td></tr>
+      <tr><td><code>branch</code></td><td>string</td><td>one of the 9 (§2.1)</td></tr>
+      <tr><td><code>category</code></td><td>string</td><td>Fiction · Children's &amp; YA · Non-fiction · Stationery &amp; Gifts · Cafe</td></tr>
+      <tr><td><code>genre</code></td><td>string</td><td>sub-category (Romantasy, Young Adult, Business, Coffee…)</td></tr>
+      <tr><td><code>title</code></td><td>string</td><td>synthetic title (invented; not a real book)</td></tr>
+      <tr><td><code>quantity</code></td><td>int</td><td>units on the line</td></tr>
+      <tr><td><code>unit_price_eur</code> / <code>discount_eur</code> / <code>line_total_eur</code></td><td>float</td><td>line_total = quantity·unit − discount</td></tr>
+      <tr><td><code>payment_method</code></td><td>string</td><td>contactless · card · cash · giftcard</td></tr>
+      <tr><td><code>channel</code></td><td>string</td><td>in-store · click-collect</td></tr>
+      <tr><td><code>stamp_card_used</code></td><td>Y\|N</td><td>paper-loyalty redemption (~6% of baskets)</td></tr>
+      <tr><td><code>promo_applied</code> / <code>staff_pick</code> / <code>returned</code></td><td>Y\|N</td><td>promo touched line · sold off a shelf-talker · returned</td></tr>
+      <tr><td><code>member_age_band</code></td><td>string</td><td>Under 25 · 25-34 · 35-49 · 50-64 · 65+ · <strong>unknown</strong></td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><strong>Five analyses Margot should actually run (not optional):</strong>
+    <ol style="margin:8px 0 0;padding-left:20px">
+      <li>Monthly basket count per branch over 24 months → quantify the footfall decline, name the worst-hit branches.</li>
+      <li>Under-35 revenue share (known-age rows) over time → size the collapse and the prize of reversing it.</li>
+      <li>AOV and basket size, now vs two years ago → is revenue held up by price, not volume?</li>
+      <li>Genre trend, esp. Romantasy / Young Adult → is Inkwell under-indexing what under-35s buy?</li>
+      <li>Stamp redemption rate + payment mix by age → is the paper scheme dead for under-35s?</li>
+    </ol>
+  </div>
+  <p>The hero and the launch email may each feature <strong>one</strong> headline stat, but only if computed from this CSV and cited (e.g. "under-35 spend has fallen by N% in two years"). Round honestly; never inflate.</p>
+
+  <h2><span class="n">3</span> Brand direction <span style="font-size:11px;color:var(--ink-4);text-transform:none;letter-spacing:0">(so Design and Maker do not guess)</span></h2>
+  <ul>
+    <li><strong>Personality:</strong> literary, warm, witty, a little ink-stained and handmade. "Your cleverest friend's front room," not "retail chain."</li>
+  </ul>
+  <div class="swatches">
+    <span class="sw"><i style="background:#14213D"></i>Ink Navy #14213D</span>
+    <span class="sw"><i style="background:#F4ECD8"></i>Warm Parchment #F4ECD8</span>
+    <span class="sw"><i style="background:#2A9D8F"></i>Inkwell Teal #2A9D8F</span>
+    <span class="sw"><i style="background:#C9A227"></i>Foil Gold #C9A227</span>
+    <span class="sw"><i style="background:#0B0F1A"></i>Ink #0B0F1A</span>
+  </div>
+  <ul>
+    <li><strong>Type:</strong> high-contrast serif for display (<em>Fraunces</em> / <em>Playfair Display</em>), clean humanist sans for body (<em>Inter</em> / <em>Söhne</em>). Generous line height. Editorial, book-like.</li>
+    <li><strong>Tone words:</strong> curious, generous, unhurried, knowing. Never salesy, never "Hurry, limited time!!!". A bookseller's recommendation, not a billboard.</li>
+  </ul>
+  <div class="callout gold"><strong>The hook idea (the campaign spine):</strong> <strong>"Inkwell Rewritten."</strong> The lapsed reader gets to start a new chapter. The loyalty card becomes a digital <strong>"Library Card"</strong> (a glowing ex-libris bookplate) that lives on the phone, earns a free book, and unlocks members-only late-night author events. This single idea threads through page, email, and posts.</div>
+
+  <h2><span class="n">4</span> Your Octopus crew: SPECIALISTS, not generalists</h2>
+  <p>You are the <strong>🟣 Purple Manager (orchestrator)</strong>. Do <strong>not</strong> spin up generic agents. Instantiate these five named specialists, hand each its contract, and hold the quality gate. Run as a pipeline: <span class="pill">Yellow</span>→<span class="pill">Red-Orange ∥ Green</span>→<span class="pill">Blue</span>→<span class="pill">Yellow cold verify</span>→<span class="pill gold">you · STOP gate</span></p>
+
+  <div class="agent y">
+    <h3><span class="dot y"></span>YELLOW: "Margot," lapsed-customer cohort analyst</h3>
+    <p class="spec">Specialism: RFM segmentation and win-back economics for bricks-and-mortar specialty retail. Not a generic researcher.</p>
+    <div class="contract">
+      <b>ROLE:</b>     Analyse the POS CSV (§2.8), then turn it into one at-risk segment, a sized prize (€), and 3 evidence-backed reasons under-35s left.<br>
+      <b>INPUT:</b>    inkwell_pos_transactions.csv (raw evidence), §1 voice-of-customer, §2 summaries to sanity-check against, §2.6 competition.<br>
+      <b>OUTPUT:</b>   diagnosis.md: target cohort (named), size-of-prize maths step by step, 3 root causes each tied to a figure YOU computed from the CSV (state the query), the ONE metric to move. Run the five analyses in §2.8.<br>
+      <b>SCOPE:</b>    No solutions, no copy. Diagnosis only. Every number computed from the CSV (or cites §2): none invented.<br>
+      <b>ESCALATE:</b> If data cannot support a claim, say so and propose what to assume.
+    </div>
+  </div>
+  <div class="agent r">
+    <h3><span class="dot r"></span>RED-ORANGE: "Søren," conversion-led WebGL experience designer</h3>
+    <p class="spec">Specialism: high-craft three.js/WebGL landing pages that still convert. Art director + UX, not a generic designer.</p>
+    <div class="contract">
+      <b>ROLE:</b>     Design the landing-page experience and the "Library Card" sign-up moment per §3 and §5.<br>
+      <b>INPUT:</b>    Margot's diagnosis, the brand (§3), the three.js spec (§5).<br>
+      <b>OUTPUT:</b>   design-spec.md: section wireframe, 3D scene concept, scroll choreography, single primary CTA, reduced-motion + no-WebGL fallback, accessibility plan.<br>
+      <b>SCOPE:</b>    No code. Design intent, hierarchy, motion, states (default/hover/focus/success/error).<br>
+      <b>ESCALATE:</b> If a 3D idea hurts load time or a11y, flag the trade-off and offer a lighter alternative.
+    </div>
+  </div>
+  <div class="agent b">
+    <h3><span class="dot b"></span>BLUE: "Priya," three.js + static-deploy front-end engineer</h3>
+    <p class="spec">Specialism: performant vanilla three.js (r160+) / WebGL, GPU particles, zero-cost GitHub Pages deploy. Not a generic coder.</p>
+    <div class="contract">
+      <b>ROLE:</b>     Build the real, deployable landing page from Søren's spec. It must actually run.<br>
+      <b>INPUT:</b>    design-spec.md, brand tokens (§3), §5 technical requirements.<br>
+      <b>OUTPUT:</b>   /site (index.html + assets), a working email-capture form (free tier or mailto fallback), a deployed GitHub Pages URL, README with run + deploy steps.<br>
+      <b>SCOPE:</b>    Front-end only. No backend Inkwell does not have. Must hit §5 performance + a11y bars.<br>
+      <b>ESCALATE:</b> If the 3D scene blows the performance budget on mid-range hardware, degrade it and say what you cut.
+    </div>
+  </div>
+  <div class="agent g">
+    <h3><span class="dot g"></span>GREEN: "Cathal," lifecycle + BookTok launch copywriter</h3>
+    <p class="spec">Specialism: win-back email and organic social for indie retail; literary brand voice. Not a generic marketer.</p>
+    <div class="contract">
+      <b>ROLE:</b>     Write the launch email and three platform-native social posts that drive to the page.<br>
+      <b>INPUT:</b>    Margot's diagnosis, brand voice (§3), the "Inkwell Rewritten / Library Card" hook.<br>
+      <b>OUTPUT:</b>   marketing.md: one launch email (subject + preview + body + single CTA + GDPR-clean footer) and 3 posts (Instagram, TikTok/Reels script, one for the dormant Facebook over-50 base), each with asset note + target metric.<br>
+      <b>SCOPE:</b>    Copy + channel strategy only. No invented stats; any number comes from §2.<br>
+      <b>ESCALATE:</b> If a claim needs proof Inkwell does not have, soften it or drop it.
+    </div>
+  </div>
+  <div class="agent p">
+    <h3><span class="dot p"></span>PURPLE: you, the orchestrator + quality gate</h3>
+    <div class="contract">
+      <b>ROLE:</b>     Sequence the crew, enforce handoffs, run Cold Verify, STOP before publishing.<br>
+      <b>DO:</b>       After Blue ships, re-task Yellow as a COLD VERIFIER (§7) blind to the build reasoning. Only you decide it is done.
+    </div>
+  </div>
+
+  <h2><span class="n">5</span> The artifact: a three.js "spectacular" landing page <span class="pill gold" style="vertical-align:middle">mandatory</span></h2>
+  <p>This is Variation 2's defining instruction. The page is <strong>not</strong> a flat form. It is a short, breathtaking, scroll-driven WebGL experience that earns the email.</p>
+  <div class="callout"><strong>Concept: "The Infinite Library."</strong> On load, a drop of ink falls and blooms in 3D into the Inkwell logo. As the visitor scrolls, the camera flies forward through an endless, candle-lit floating library: shelves and open books drifting in dark space, pages turning into a slow drift of glowing paper particles. The journey ends at a warm pool of light where the <strong>"Library Card"</strong> (a gold-foil ex-libris bookplate) hovers and turns; claiming it <em>is</em> the email sign-up. The card flips to reveal the visitor's name and "Member since 2026" on success.</div>
+  <h3>Required scenes (scroll-driven)</h3>
+  <ol class="scenes">
+    <li><strong>Ink bloom → logo</strong> (hero). Headline: <em>"Inkwell, rewritten."</em> Sub: the one-line promise. One CTA: <em>Claim your Library Card</em>.</li>
+    <li><strong>The drift</strong>: fly-through of instanced floating books + GPU page-particles; 2–3 short brand-story lines pinned as the camera moves.</li>
+    <li><strong>The proof</strong>: three "what you unlock" beats (a free book; members-only late-night author events; a card that lives on your phone) rising out of the dark.</li>
+    <li><strong>The card</strong>: the ex-libris bookplate, gold foil, the actual sign-up form (email + consent line). Success: the card flips and glows.</li>
+  </ol>
+  <h3>Technical requirements (Blue must meet all)</h3>
+  <ul>
+    <li><strong>three.js r160+</strong>, vanilla; ES modules via CDN import map is fine for a static GitHub Pages deploy.</li>
+    <li><strong>InstancedMesh</strong> for books; <strong>GPU/points particles</strong> for drifting pages; <strong>postprocessing bloom</strong> for candlelight and the gold card. Keep draw calls low.</li>
+    <li><strong>Scroll choreography:</strong> camera position/quaternion driven by scroll progress (lerp/damp). No janky scrubbing.</li>
+    <li><strong>Performance budget:</strong> interactive &lt; 2.5s on a mid-range laptop; 60fps target, never below 30fps; lean JS payload (instancing over thousands of meshes).</li>
+    <li><strong><code>prefers-reduced-motion</code>:</strong> serve a still, beautiful hero (ink-bloom logo as a static image) and a normal scrolling page. Never trap a motion-sensitive user.</li>
+    <li><strong>No-WebGL fallback:</strong> detect failure, render a styled static hero + the form. Sign-up must work with zero 3D.</li>
+    <li><strong>Accessibility:</strong> keyboard-reachable form, visible focus rings, AA contrast, real <code>&lt;label&gt;</code>s, alt text; canvas <code>aria-hidden</code> with real content in the DOM.</li>
+    <li><strong>The form:</strong> captures email; plain-English consent line ("Yes, email me Inkwell news and events. Unsubscribe anytime."); no pre-tick; success + error states; wired to a free-tier provider or documented <code>mailto</code>/Formspree fallback so it genuinely captures.</li>
+    <li><strong>Deploy:</strong> GitHub Pages. Hand back the live URL.</li>
+  </ul>
+  <div class="callout gold">If any 3D ambition threatens the performance or accessibility bars, <strong>cut the ambition, not the bars.</strong> A fast, accessible, slightly-less-lavish page beats a gorgeous one nobody can use.</div>
+
+  <h2><span class="n">6</span> Deliverables checklist</h2>
+  <ul class="check">
+    <li><code>diagnosis.md</code>: at-risk cohort named, prize sized with working, 3 root causes each tied to a figure computed from <code>inkwell_pos_transactions.csv</code>, the one metric.</li>
+    <li><code>design-spec.md</code>: sections, 3D concept, scroll choreography, states, fallback, a11y plan.</li>
+    <li><code>/site</code> + <strong>live GitHub Pages URL</strong>: the three.js page, form working, fallbacks working.</li>
+    <li><code>marketing.md</code>: launch email + 3 platform-native posts, GDPR-clean, no invented stats.</li>
+    <li><code>cold-verify.md</code>: the §7 report.</li>
+  </ul>
+
+  <h2><span class="n">7</span> Cold Verify + STOP gate <span style="font-size:11px;color:var(--ink-4);text-transform:none;letter-spacing:0">(do not skip)</span></h2>
+  <p>Before calling this done, re-task <strong>Yellow as a fresh cold verifier</strong>, blind to how the work was made, against these frozen criteria. Score each pass/fail with evidence:</p>
+  <ul>
+    <li><strong>Diagnosis is data-bound:</strong> every root cause maps to a figure computed from <code>inkwell_pos_transactions.csv</code> (the query is stated and reconciles with the §2 summaries); the prize is sized with visible maths.</li>
+    <li><strong>One metric, not five:</strong> a single primary metric is named and everything serves it.</li>
+    <li><strong>The page actually runs:</strong> the URL loads; the 3D scene renders; the form captures; reduced-motion and no-WebGL fallbacks both work.</li>
+    <li><strong>On-brand, on-voice:</strong> page, email, posts share the "Inkwell Rewritten / Library Card" spine and the §3 voice. None generic enough to belong to any other shop.</li>
+    <li><strong>GDPR-clean:</strong> consent line present, no pre-tick, unsubscribe in the email.</li>
+    <li><strong>No hallucinated facts:</strong> nothing claims a number not in §2 (or is marked <code>[ASSUMPTION]</code>).</li>
+  </ul>
+  <div class="callout gold"><strong>Catch the octopus lying.</strong> Find and screenshot ONE moment a specialist got something wrong (a hallucinated stat, a dropped handoff, an off-brief output, a broken 3D fallback). Name it in one line. That catch is the point of the exercise. Only after the cold verify and the catch do you, the Purple Manager, lift the STOP gate and ship.</div>
+
+  <h2><span class="n">8</span> How this will be judged (and why this file exists)</h2>
+  <p>This is the <strong>rich harness</strong>. Its twin is an empty brief. When the two run side by side, the difference between them is the entire lesson: <em>the model did not get smarter, the context did.</em> A vague ask yields a generic page and invented numbers. This file yields a named cohort, a sized prize, a branded WebGL experience, GDPR-clean copy, and a verifier that catches the lie. The harness is the work.</p>
+
+  <p class="foot">Inkwell Books · Session 5 class exercise · Variation 2 (rich harness). Companion control: <code>../variation-1-null/context.md</code>. All figures synthetic, generated for teaching.</p>
+</div>
+
+<script>
+  const bar=document.getElementById('progress');
+  addEventListener('scroll',()=>{const h=document.documentElement;
+    const p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;bar.style.width=p+'%';},{passive:true});
+</script>
+</body>
+</html>
