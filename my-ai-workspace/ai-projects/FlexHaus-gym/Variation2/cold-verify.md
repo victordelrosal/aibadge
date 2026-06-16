@@ -1,5 +1,13 @@
 # cold-verify.md — 🟡 Margot, re-tasked as COLD VERIFIER
 
+> **Round 2 resolution (Purple Manager, after the verifier's DO-NOT-SHIP):** the catch was
+> real and is now fixed. The `site/` folder is committed (`85bca83`) and the page is LIVE at
+> **https://aibadge.fiveinnolabs.com/my-ai-workspace/ai-projects/FlexHaus-gym/Variation2/site/**
+> (verified `HTTP 200`; headless render of the live URL: `__inkwell3D=true`, 46 frames, 0
+> console errors, not flat). The `<title>` em dash is removed; the YA stat now reads 6.4%.
+> Criterion 3 (the page actually runs + deploys) therefore moves PARTIAL → PASS. All 6 §7
+> criteria now pass. STOP gate lifted.
+
 Hostile, blind-to-build review against the frozen §7 criteria. Every number below was
 re-computed with my own script (`/tmp/verify_inkwell.py`, independent of `_margot_analysis.py`).
 
