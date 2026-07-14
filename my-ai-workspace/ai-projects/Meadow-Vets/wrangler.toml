@@ -1,0 +1,13 @@
+name = "meadow-vets"
+pages_build_output_dir = "public"
+compatibility_date = "2026-01-01"
+
+# Cloudflare Pages project. Deploy:  npx wrangler pages deploy
+# Static assets + Pages advanced-mode Worker live in ./public
+#   public/index.html   the chat page
+#   public/_worker.js   serves assets + POST /api/chat (Anthropic tool-use loop
+#                       with a live get_clinic_services tool that fetches the
+#                       clinic's Google Sheet as CSV)
+#
+# Secret (set once):
+#   printf '%s' 'sk-ant-...' | npx wrangler pages secret put ANTHROPIC_API_KEY --project-name=meadow-vets

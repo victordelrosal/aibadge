@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meadow Vet Care — Ask us anything</title>
+<meta name="description" content="Chat with Meadow Vet Care. Answers come live from the clinic's real services sheet: 90+ services for dogs, cats, rabbits, small mammals and birds.">
+<meta name="theme-color" content="#faf6ec">
+
+<!-- Social preview -->
+<meta property="og:title" content="Meadow Vet Care — Ask us anything">
+<meta property="og:description" content="A customer chatbot answering live from the clinic's real data. 90+ services for dogs, cats, rabbits, small mammals and birds.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://meadow-vets.pages.dev/">
+<meta property="og:image" content="https://meadow-vets.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://meadow-vets.pages.dev/og.png">
+
+<!-- Brand mark: meadow-green squircle, buttercup flower -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='8' y='8' width='84' height='84' rx='24' fill='%231e4d3b'/><g transform='translate(50 46)'><circle r='7' fill='%23eab948'/><g fill='%23fdf7e4'><ellipse cx='0' cy='-14' rx='6.5' ry='10'/><ellipse cx='13.3' cy='-4.3' rx='6.5' ry='10' transform='rotate(72)'/><ellipse cx='8.2' cy='11.3' rx='6.5' ry='10' transform='rotate(144)'/><ellipse cx='-8.2' cy='11.3' rx='6.5' ry='10' transform='rotate(216)'/><ellipse cx='-13.3' cy='-4.3' rx='6.5' ry='10' transform='rotate(288)'/></g></g><path d='M35 78 Q42 66 50 78 Q58 66 65 78' stroke='%2378a88a' stroke-width='4' fill='none' stroke-linecap='round'/></svg>">
+<link rel="apple-touch-icon" href="/icon-180.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,420;9..144,560;9..144,640&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --meadow: #1e4d3b;         /* deep meadow green */
+    --meadow-deep: #143528;
+    --meadow-soft: rgba(30, 77, 59, 0.08);
+    --buttercup: #d99a26;      /* the one accent */
+    --buttercup-soft: rgba(217, 154, 38, 0.16);
+    --cream: #faf6ec;          /* warm paper */
+    --cream-deep: #f2ebd9;
+    --card: #fffdf6;
+    --ink: #22301f;
+    --ink-2: #4c5c48;
+    --ink-3: #7d8a77;
+    --hairline: rgba(34, 48, 31, 0.12);
+    --display: "Fraunces", Georgia, serif;
+    --body: "Karla", -apple-system, system-ui, sans-serif;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--body);
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse 900px 480px at 78% -140px, rgba(217,154,38,0.14), transparent 65%),
+      radial-gradient(ellipse 1100px 620px at 12% 112%, rgba(30,77,59,0.10), transparent 60%),
+      var(--cream);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+
+  #seeds { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+  .skip {
+    position: absolute; left: -9999px; top: 8px;
+    background: var(--meadow); color: #fff; padding: 8px 14px; border-radius: 8px; z-index: 50;
+  }
+  .skip:focus { left: 8px; }
+
+  :focus-visible { outline: 2px solid var(--meadow); outline-offset: 2px; border-radius: 4px; }
+
+  /* ---------- header ---------- */
+  header {
+    position: relative; z-index: 2;
+    padding: clamp(20px, 4vh, 44px) 20px 0;
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+  }
+  .brandline { display: flex; align-items: center; gap: 12px; }
+  .mark { width: 44px; height: 44px; border-radius: 13px; background: var(--meadow); display: grid; place-items: center; flex: none; box-shadow: 0 6px 18px rgba(30,77,59,0.28); }
+  .mark svg { width: 28px; height: 28px; }
+  h1 {
+    font-family: var(--display);
+    font-weight: 560;
+    font-size: clamp(30px, 5.4vw, 46px);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--meadow-deep);
+  }
+  h1 em { font-style: italic; color: var(--buttercup); }
+  .sub {
+    font-size: 16px; color: var(--ink-2); max-width: 46ch; line-height: 1.5;
+  }
+  .livechip {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--meadow); text-decoration: none;
+    background: var(--card); border: 1px solid var(--hairline);
+    padding: 7px 14px; border-radius: 999px;
+    transition: border-color 180ms var(--ease), transform 180ms var(--ease);
+  }
+  .livechip:hover { border-color: var(--meadow); transform: translateY(-1px); }
+  .pulse { width: 8px; height: 8px; border-radius: 50%; background: #3f9d68; position: relative; }
+  .pulse::after {
+    content: ""; position: absolute; inset: -4px; border-radius: 50%;
+    border: 2px solid rgba(63,157,104,0.5); animation: pulse 2s ease-out infinite;
+  }
+  @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+  /* ---------- chat ---------- */
+  main {
+    position: relative; z-index: 2;
+    width: min(720px, calc(100% - 32px));
+    margin: clamp(16px, 3vh, 30px) auto 0;
+    flex: 1;
+    display: flex; flex-direction: column;
+  }
+  .panel {
+    flex: 1; display: flex; flex-direction: column;
+    background: var(--card);
+    border: 1px solid var(--hairline);
+    border-radius: 22px;
+    box-shadow: 0 24px 60px -28px rgba(30, 53, 40, 0.35);
+    overflow: hidden;
+    min-height: 420px;
+  }
+  #log {
+    flex: 1; overflow-y: auto;
+    padding: 26px 24px 12px;
+    display: flex; flex-direction: column; gap: 14px;
+    scroll-behavior: smooth;
+  }
+  .msg { max-width: 82%; line-height: 1.55; font-size: 15.5px; animation: rise 420ms var(--ease) both; white-space: pre-wrap; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .msg.user {
+    align-self: flex-end;
+    background: var(--meadow); color: #f4f8f2;
+    padding: 11px 16px; border-radius: 18px 18px 4px 18px;
+  }
+  .msg.bot {
+    align-self: flex-start;
+    background: var(--cream-deep);
+    padding: 12px 16px; border-radius: 18px 18px 18px 4px;
+  }
+  .msg.bot strong { color: var(--meadow-deep); }
+
+  .toolchip {
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 700; color: var(--meadow);
+    background: var(--buttercup-soft);
+    border: 1px dashed rgba(217,154,38,0.55);
+    padding: 6px 12px; border-radius: 999px;
+    animation: rise 420ms var(--ease) both;
+  }
+  .toolchip svg { width: 14px; height: 14px; flex: none; }
+
+  .typing { align-self: flex-start; display: inline-flex; gap: 5px; padding: 14px 16px; background: var(--cream-deep); border-radius: 18px 18px 18px 4px; }
+  .typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); animation: bob 1.2s ease-in-out infinite; }
+  .typing i:nth-child(2) { animation-delay: 0.15s; }
+  .typing i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bob { 0%, 60%, 100% { transform: none; opacity: 0.5; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+  /* ---------- suggestions + composer ---------- */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 24px 14px; }
+  .chip {
+    font-family: var(--body); font-size: 13.5px; font-weight: 500; color: var(--ink-2);
+    background: transparent; border: 1px solid var(--hairline); border-radius: 999px;
+    padding: 7px 14px; cursor: pointer;
+    transition: all 180ms var(--ease);
+  }
+  .chip:hover { border-color: var(--meadow); color: var(--meadow); background: var(--meadow-soft); transform: translateY(-1px); }
+
+  form {
+    display: flex; gap: 10px; align-items: flex-end;
+    padding: 14px 16px; border-top: 1px solid var(--hairline);
+    background: var(--card);
+  }
+  textarea {
+    flex: 1; resize: none; border: 1px solid var(--hairline); border-radius: 14px;
+    font-family: var(--body); font-size: 15.5px; line-height: 1.45; color: var(--ink);
+    padding: 11px 14px; background: var(--cream); max-height: 130px;
+  }
+  textarea:focus { outline: none; border-color: var(--meadow); box-shadow: 0 0 0 3px var(--meadow-soft); }
+  button.send {
+    flex: none; width: 46px; height: 46px; border: none; border-radius: 14px;
+    background: var(--meadow); color: #fff; cursor: pointer;
+    display: grid; place-items: center;
+    transition: background 180ms var(--ease), transform 180ms var(--ease);
+  }
+  button.send:hover { background: var(--meadow-deep); transform: translateY(-1px); }
+  button.send:disabled { opacity: 0.5; cursor: default; transform: none; }
+  button.send svg { width: 20px; height: 20px; }
+
+  footer {
+    position: relative; z-index: 2;
+    text-align: center; font-size: 12.5px; color: var(--ink-3);
+    padding: 16px 20px calc(18px + env(safe-area-inset-bottom));
+    line-height: 1.6;
+  }
+  footer a { color: var(--meadow); }
+
+  .reveal { animation: rise 600ms var(--ease) both; }
+  .reveal:nth-child(2) { animation-delay: 90ms; }
+  .reveal:nth-child(3) { animation-delay: 170ms; }
+
+  @media (max-width: 560px) {
+    .msg { max-width: 92%; }
+    #log { padding: 20px 14px 8px; }
+    .chips { padding: 6px 14px 12px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    #log { scroll-behavior: auto; }
+    #seeds { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#composer">Skip to the chat box</a>
+<canvas id="seeds" aria-hidden="true"></canvas>
+
+<header>
+  <div class="brandline reveal">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><g transform="translate(50 46)"><circle r="8" fill="#eab948"/><g fill="#fdf7e4"><ellipse cx="0" cy="-15" rx="7" ry="11"/><ellipse cx="14.3" cy="-4.6" rx="7" ry="11" transform="rotate(72)"/><ellipse cx="8.8" cy="12.1" rx="7" ry="11" transform="rotate(144)"/><ellipse cx="-8.8" cy="12.1" rx="7" ry="11" transform="rotate(216)"/><ellipse cx="-14.3" cy="-4.6" rx="7" ry="11" transform="rotate(288)"/></g></g><path d="M33 80 Q42 66 50 80 Q58 66 67 80" stroke="#78a88a" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+    </div>
+    <h1>Meadow <em>Vet</em> Care</h1>
+  </div>
+  <p class="sub reveal">Ask about our services for dogs, cats, rabbits, small mammals and birds. Answers come straight from the clinic's live data.</p>
+  <a class="livechip reveal" href="https://docs.google.com/spreadsheets/d/1JhSODtviGHzXru6Eb5MhfXfVIF5vtJk3pclzzv7j2l4/edit" target="_blank" rel="noopener">
+    <span class="pulse" aria-hidden="true"></span> Live · clinic services sheet
+  </a>
+</header>
+
+<main>
+  <div class="panel">
+    <div id="log" aria-live="polite" aria-label="Conversation"></div>
+    <div class="chips" id="chips">
+      <button class="chip" type="button">What dog services do you offer?</button>
+      <button class="chip" type="button">Are there any offers on microchipping?</button>
+      <button class="chip" type="button">Do you have telehealth services?</button>
+      <button class="chip" type="button">How much is a cat vaccination?</button>
+    </div>
+    <form id="composer" autocomplete="off">
+      <textarea id="input" rows="1" placeholder="Type your question…" aria-label="Your question"></textarea>
+      <button class="send" type="submit" aria-label="Send" id="sendBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+      </button>
+    </form>
+  </div>
+</main>
+
+<footer>
+  Class demo · the assistant reads the clinic's <a href="https://docs.google.com/spreadsheets/d/1JhSODtviGHzXru6Eb5MhfXfVIF5vtJk3pclzzv7j2l4/edit" target="_blank" rel="noopener">live Google Sheet</a> through a tool, then replies in natural language.<br>
+  It can't give medical advice. For emergencies, ring the clinic straight away.
+</footer>
+
+<script>
+(() => {
+  const log = document.getElementById("log");
+  const form = document.getElementById("composer");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("sendBtn");
+  const chips = document.getElementById("chips");
+  const history = []; // {role, content} — text turns only; tool rounds live server-side
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function scrollDown() { log.scrollTop = log.scrollHeight; }
+
+  // Minimal safe formatting: **bold** and bullet lines, nothing else.
+  function renderBot(text) {
+    const div = el("div", "msg bot");
+    const frag = document.createDocumentFragment();
+    text.split(/(\*\*[^*]+\*\*)/g).forEach((part) => {
+      if (/^\*\*[^*]+\*\*$/.test(part)) {
+        const b = document.createElement("strong");
+        b.textContent = part.slice(2, -2);
+        frag.appendChild(b);
+      } else if (part) {
+        frag.appendChild(document.createTextNode(part));
+      }
+    });
+    div.appendChild(frag);
+    return div;
+  }
+
+  function addToolChip(tc) {
+    const chip = el("div", "toolchip");
+    chip.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"></polyline></svg>';
+    const filters = [tc.input && tc.input.species, tc.input && tc.input.category].filter(Boolean).join(", ");
+    chip.appendChild(
+      document.createTextNode(
+        tc.error
+          ? "Tried the live clinic sheet — it didn't answer"
+          : "Checked the live clinic sheet · " + tc.rows + " rows" + (filters ? " (" + filters + ")" : "")
+      )
+    );
+    log.appendChild(chip);
+  }
+
+  function setBusy(b) {
+    sendBtn.disabled = b;
+    input.disabled = b;
+  }
+
+  async function send(text) {
+    text = text.trim();
+    if (!text || sendBtn.disabled) return;
+    log.appendChild(el("div", "msg user", text));
+    history.push({ role: "user", content: text });
+    input.value = "";
+    input.style.height = "auto";
+    scrollDown();
+
+    const typing = el("div", "typing");
+    typing.append(el("i"), el("i"), el("i"));
+    const note = el("div", "toolchip", "Checking the live clinic sheet…");
+    log.appendChild(note);
+    log.appendChild(typing);
+    scrollDown();
+    setBusy(true);
+
+    try {
+      const resp = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ messages: history }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      typing.remove();
+      note.remove();
+      if (!resp.ok || data.error) {
+        log.appendChild(el("div", "msg bot", data.error || "Something went wrong. Try again."));
+      } else {
+        (data.toolCalls || []).forEach(addToolChip);
+        log.appendChild(renderBot(data.reply));
+        history.push({ role: "assistant", content: data.reply });
+      }
+    } catch {
+      typing.remove();
+      note.remove();
+      log.appendChild(el("div", "msg bot", "Couldn't reach the clinic just now. Try again in a moment."));
+    }
+    setBusy(false);
+    scrollDown();
+    input.focus();
+  }
+
+  form.addEventListener("submit", (e) => { e.preventDefault(); send(input.value); });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input.value); }
+  });
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 130) + "px";
+  });
+  chips.addEventListener("click", (e) => {
+    const b = e.target.closest(".chip");
+    if (b) send(b.textContent);
+  });
+
+  // Welcome
+  const hello = renderBot(
+    "Hello! Welcome to **Meadow Vet Care**. I can tell you about our 90+ services, prices, special offers and appointment availability, all straight from the clinic's live sheet. What would you like to know?"
+  );
+  log.appendChild(hello);
+
+  // ---------- drifting dandelion seeds ----------
+  const canvas = document.getElementById("seeds");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduced && canvas) {
+    const ctx = canvas.getContext("2d");
+    let w, h, seeds;
+    function resize() {
+      w = canvas.width = innerWidth * devicePixelRatio;
+      h = canvas.height = innerHeight * devicePixelRatio;
+      canvas.style.width = innerWidth + "px";
+      canvas.style.height = innerHeight + "px";
+    }
+    function mkSeed() {
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: (1 + Math.random() * 1.8) * devicePixelRatio,
+        vx: (0.08 + Math.random() * 0.18) * devicePixelRatio,
+        vy: (-0.05 - Math.random() * 0.12) * devicePixelRatio,
+        ph: Math.random() * Math.PI * 2,
+        o: 0.12 + Math.random() * 0.2,
+      };
+    }
+    resize();
+    seeds = Array.from({ length: 26 }, mkSeed);
+    addEventListener("resize", resize);
+    let last = 0;
+    function tick(t) {
+      if (document.hidden) { requestAnimationFrame(tick); return; }
+      if (t - last > 33) { // ~30fps is plenty
+        last = t;
+        ctx.clearRect(0, 0, w, h);
+        for (const s of seeds) {
+          s.ph += 0.012;
+          s.x += s.vx + Math.sin(s.ph) * 0.25 * devicePixelRatio;
+          s.y += s.vy;
+          if (s.x > w + 20 || s.y < -20) { Object.assign(s, mkSeed(), { x: -10, y: h * (0.3 + Math.random() * 0.7) }); }
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(30, 77, 59, " + s.o + ")";
+          ctx.fill();
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  input.focus();
+})();
+</script>
+</body>
+</html>
