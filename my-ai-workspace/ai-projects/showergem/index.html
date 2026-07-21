@@ -108,6 +108,13 @@ function addMsg(role, text) {
   return div;
 }
 
+function row(text) {
+  const d = document.createElement("div");
+  d.className = "row";
+  d.textContent = text;
+  return d;
+}
+
 function addOrderCard(o) {
   const div = document.createElement("div");
   div.className = "order-card";
@@ -115,14 +122,24 @@ function addOrderCard(o) {
     /cancel|delay/i.test(o.status) ? "#fdeceb" : "#eaf1fb";
   const statusText = /delivered|refunded/i.test(o.status) ? "#186b34" :
     /cancel|delay/i.test(o.status) ? "#a3271b" : "#0a4f9c";
-  div.innerHTML = `
-    <div class="oid">${o.order_id}</div>
-    <div class="status" style="background:${statusColor};color:${statusText}">${o.status}</div>
-    <div class="row">${o.product}${o.quantity > 1 ? " x" + o.quantity : ""} · €${o.total_eur}</div>
-    ${o.carrier ? `<div class="row">${o.carrier}${o.tracking_number ? " · " + o.tracking_number : ""}</div>` : ""}
-    ${o.est_delivery ? `<div class="row">Estimated delivery: ${o.est_delivery}</div>` : ""}
-    ${o.delivered_date ? `<div class="row">Delivered: ${o.delivered_date}</div>` : ""}
-  `;
+
+  const oid = document.createElement("div");
+  oid.className = "oid";
+  oid.textContent = o.order_id;
+  div.appendChild(oid);
+
+  const status = document.createElement("div");
+  status.className = "status";
+  status.style.backgroundColor = statusColor;
+  status.style.color = statusText;
+  status.textContent = o.status;
+  div.appendChild(status);
+
+  div.appendChild(row(`${o.product}${o.quantity > 1 ? " x" + o.quantity : ""} · €${o.total_eur}`));
+  if (o.carrier) div.appendChild(row(`${o.carrier}${o.tracking_number ? " · " + o.tracking_number : ""}`));
+  if (o.est_delivery) div.appendChild(row(`Estimated delivery: ${o.est_delivery}`));
+  if (o.delivered_date) div.appendChild(row(`Delivered: ${o.delivered_date}`));
+
   thread.appendChild(div);
   thread.scrollTop = thread.scrollHeight;
   window.scrollTo(0, document.body.scrollHeight);

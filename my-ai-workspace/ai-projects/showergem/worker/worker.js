@@ -18,10 +18,12 @@ const BRAND = "ShowerGem";
 const ALLOW = [
   "https://showergem.ie",
   "https://aibadge.fiveinnolabs.com",
-  "http://localhost",
-  "http://127.0.0.1",
   "null"
 ];
+// Local dev origins vary by port, so these get a real anchored regex instead of a
+// substring/prefix check (unanchored startsWith() would let "http://localhost.evil.com"
+// or "http://127.0.0.1.evil.com" spoof through - flagged by security review 2026-07-21).
+const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
 // ---------------------------------------------------------------------------
 // Live data: fetch + parse the orders sheet. Cached ~60s at the module level so a
@@ -204,7 +206,7 @@ OUT OF SCOPE / DO NOT ANSWER WITH CONFIDENCE: the "No-Bristle Toilet Brush" prod
 // Chat: Claude tool-use loop (same shape as meadow-vet-bot)
 // ---------------------------------------------------------------------------
 function cors(origin) {
-  const ok = origin && ALLOW.some(a => origin === a || origin.startsWith(a));
+  const ok = origin && (ALLOW.includes(origin) || LOCAL_ORIGIN.test(origin));
   return {
     "Access-Control-Allow-Origin": ok ? origin : ALLOW[0],
     "Access-Control-Allow-Methods": "POST, OPTIONS",
