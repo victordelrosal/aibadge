@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rockwell Site Surveys — Booking Assistant</title>
+<meta name="description" content="Ask Rockwell's AI assistant about survey fees, regions, availability and recent seismic activity near your site. Live catalogue, live USGS data.">
+<meta name="theme-color" content="#16212c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2316212c'/%3E%3Cpath d='M20 46V18h13c6 0 10 3.6 10 9.2 0 4.2-2.3 7.2-6 8.4L45 46h-7.6l-6.8-9.4H27V46z' fill='%23f0b429'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2316212c'/%3E%3Cpath d='M20 46V18h13c6 0 10 3.6 10 9.2 0 4.2-2.3 7.2-6 8.4L45 46h-7.6l-6.8-9.4H27V46z' fill='%23f0b429'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Rockwell Site Surveys — Booking Assistant">
+<meta property="og:description" content="Live services catalogue, live USGS seismic data, one AI assistant. Teaching demo.">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{
+    --ink:#16212c; --ink-2:#33475b; --sub:#6b7c8d; --line:#dfe6ed;
+    --bg:#f2f5f8; --card:#ffffff; --amber:#b57d05; --amber-soft:#fdf3dc;
+    --bot:#ffffff; --user:#16212c; --alert:#a3271b; --alert-bg:#fdecea; --ok:#186b34; --ok-bg:#e8f6ec;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#e8eef4; --ink-2:#b9c7d4; --sub:#8b9bab; --line:#26333f;
+      --bg:#0f171e; --card:#18232e; --amber:#f0b429; --amber-soft:#2b2415;
+      --bot:#18232e; --user:#f0b429; --alert:#f2907f; --alert-bg:#331e1a; --ok:#7fd39b; --ok-bg:#152a1d;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,sans-serif;
+    background:var(--bg); color:var(--ink); min-height:100vh; display:flex; flex-direction:column;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:48px 48px; background-position:-1px -1px;
+  }
+  header{
+    padding:14px 20px; background:color-mix(in srgb, var(--card) 82%, transparent);
+    backdrop-filter:saturate(180%) blur(20px); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:5;
+  }
+  .mark{
+    width:38px; height:38px; border-radius:11px; background:var(--ink); color:var(--amber);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:19px; flex-shrink:0;
+    letter-spacing:-.5px;
+  }
+  @media (prefers-color-scheme: dark){ .mark{ background:#0b1219; } }
+  header h1{font-size:15.5px; margin:0; letter-spacing:-.2px}
+  header p{font-size:12.5px; color:var(--sub); margin:2px 0 0}
+  .demo{
+    max-width:760px; width:100%; margin:16px auto 0; padding:9px 14px; font-size:12.5px; color:var(--ink-2);
+    background:var(--amber-soft); border:1px solid var(--line); border-left:3px solid var(--amber); border-radius:8px;
+  }
+  main{flex:1; max-width:760px; width:100%; margin:0 auto; padding:14px 16px 150px; display:flex; flex-direction:column; gap:12px}
+  .msg{max-width:82%; padding:12px 15px; border-radius:14px; line-height:1.55; font-size:14.5px; white-space:pre-wrap; border:1px solid var(--line)}
+  .msg.bot{background:var(--bot); align-self:flex-start; border-bottom-left-radius:4px}
+  .msg.user{background:var(--user); color:var(--card); align-self:flex-end; border-bottom-right-radius:4px; border-color:transparent}
+  @media (prefers-color-scheme: dark){ .msg.user{ color:#0f171e; } }
+  .typing{color:var(--sub); font-style:italic}
+  .cards{display:flex; flex-direction:column; gap:8px; align-self:flex-start; width:100%; max-width:92%}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+    font-size:13.5px; display:grid; gap:5px; position:relative;
+  }
+  .card::before{content:""; position:absolute; top:8px; left:8px; width:9px; height:9px; border-top:1.5px solid var(--amber); border-left:1.5px solid var(--amber); opacity:.7}
+  .card .name{font-weight:700; font-size:14.5px; letter-spacing:-.2px}
+  .card .meta{color:var(--sub)}
+  .fee{font-weight:700; color:var(--ink); font-size:15px}
+  .pill{display:inline-block; padding:2px 9px; border-radius:999px; font-size:11.5px; font-weight:600; width:max-content}
+  .pill.ok{background:var(--ok-bg); color:var(--ok)}
+  .pill.none{background:var(--alert-bg); color:var(--alert)}
+  .pill.flag{background:var(--alert-bg); color:var(--alert)}
+  .offer{color:var(--amber); font-weight:600}
+  .suggestions{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{
+    background:var(--card); border:1px solid var(--line); border-radius:999px; padding:7px 13px;
+    font-size:13px; cursor:pointer; color:var(--ink-2); transition:border-color .15s, color .15s;
+  }
+  .chip:hover{border-color:var(--amber); color:var(--ink)}
+  form{
+    position:fixed; bottom:0; left:0; right:0; background:color-mix(in srgb, var(--card) 92%, transparent);
+    backdrop-filter:saturate(180%) blur(20px); border-top:1px solid var(--line);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+  .form-inner{max-width:760px; margin:0 auto; display:flex; gap:10px}
+  input[type=text]{
+    flex:1; padding:12px 16px; border-radius:24px; border:1px solid var(--line); font-size:15px;
+    outline:none; background:var(--bg); color:var(--ink);
+  }
+  input[type=text]:focus{border-color:var(--amber)}
+  button.send{
+    background:var(--ink); color:var(--card); border:none; border-radius:24px; padding:0 20px;
+    font-weight:600; font-size:14px; cursor:pointer;
+  }
+  @media (prefers-color-scheme: dark){ button.send{ background:var(--amber); color:#0f171e; } }
+  button.send:disabled{opacity:.45; cursor:default}
+  footer{max-width:760px; margin:0 auto; padding:0 16px; font-size:11.5px; color:var(--sub)}
+</style>
+</head>
+<body>
+<header>
+  <div class="mark">R</div>
+  <div>
+    <h1>Rockwell Site Surveys</h1>
+    <p>Fees, regions, availability &amp; seismic checks</p>
+  </div>
+</header>
+
+<div class="demo">Teaching demo. Rockwell is a fictional Irish engineering practice; the services catalogue is synthetic data read live from a Google Sheet. Seismic results are real, from the public USGS earthquake catalogue.</div>
+
+<main id="thread">
+  <div class="msg bot">Hello. I'm Rockwell's booking assistant. Ask me what a survey costs, where we work, what's available this week, or whether there's been seismic activity near your site.</div>
+  <div class="suggestions" id="starters">
+    <div class="chip" data-q="What does a residential structural survey cost, and is there availability?">Residential structural survey?</div>
+    <div class="chip" data-q="Has there been any recent seismic activity near our site in Dublin?">Seismic activity near Dublin?</div>
+    <div class="chip" data-q="What geotechnical surveys do you offer in Kildare?">Geotechnical in Kildare?</div>
+    <div class="chip" data-q="How much is the coastal erosion monitoring survey in Clare?">Coastal erosion in Clare?</div>
+  </div>
+</main>
+
+<form id="chatForm">
+  <div class="form-inner">
+    <input type="text" id="input" placeholder="Ask about a survey..." autocomplete="off">
+    <button class="send" type="submit" id="sendBtn">Send</button>
+  </div>
+</form>
+
+<script>
+const API = "/api/chat";
+const thread = document.getElementById("thread");
+const form = document.getElementById("chatForm");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
+const starters = document.getElementById("starters");
+let history = [];
+
+function scroll(){ window.scrollTo(0, document.body.scrollHeight); }
+
+function addMsg(role, text){
+  const div = document.createElement("div");
+  div.className = "msg " + (role === "user" ? "user" : "bot");
+  div.textContent = text;              // textContent, never innerHTML: the reply is model output
+  thread.appendChild(div); scroll();
+  return div;
+}
+
+function el(tag, cls, text){
+  const d = document.createElement(tag);
+  if (cls) d.className = cls;
+  if (text != null) d.textContent = text;
+  return d;
+}
+
+function money(n){ return "€" + Number(n).toLocaleString("en-IE"); }
+
+function addServiceCards(list){
+  const wrap = el("div","cards");
+  list.forEach(s => {
+    const c = el("div","card");
+    c.appendChild(el("div","name", s.service_name));
+    // A fee that failed the server-side sanity check is never shown as a price.
+    if (s.fee_looks_wrong) c.appendChild(el("div","pill flag","Listed fee looks wrong — being confirmed"));
+    else if (s.fee_eur != null) c.appendChild(el("div","fee", money(s.fee_eur)));
+    c.appendChild(el("div","meta", [s.category, s.region, s.duration_days ? s.duration_days + " day" + (s.duration_days > 1 ? "s" : "") : null].filter(Boolean).join("  ·  ")));
+    c.appendChild(el("div", "pill " + (s.bookable_this_week ? "ok" : "none"),
+      s.bookable_this_week ? s.slots_this_week + " slot" + (s.slots_this_week > 1 ? "s" : "") + " left this week" : "No slots this week"));
+    c.appendChild(el("div","meta", s.availability));
+    if (s.special_offer) c.appendChild(el("div","offer", s.special_offer));
+    wrap.appendChild(c);
+  });
+  thread.appendChild(wrap); scroll();
+}
+
+function addSeismicCard(s){
+  const wrap = el("div","cards");
+  const c = el("div","card");
+  c.appendChild(el("div","name","USGS seismic check — " + (s.searched?.near || "site")));
+  c.appendChild(el("div","meta", "Within " + s.searched?.radius_km + " km, since " + s.searched?.since + ", M" + s.searched?.min_magnitude + "+"));
+  if (!s.event_count) {
+    c.appendChild(el("div","pill ok","No recorded events"));
+  } else {
+    c.appendChild(el("div","pill none", s.event_count + " recorded event" + (s.event_count > 1 ? "s" : "")));
+    s.events.slice(0,3).forEach(e => c.appendChild(el("div","meta","M" + e.magnitude + "  ·  " + e.date + "  ·  " + e.place)));
+  }
+  c.appendChild(el("div","meta","Source: earthquake.usgs.gov, live"));
+  wrap.appendChild(c);
+  thread.appendChild(wrap); scroll();
+}
+
+async function send(text){
+  if (!text.trim()) return;
+  if (starters.parentNode) starters.remove();
+  addMsg("user", text);
+  history.push({ role:"user", content:text });
+  input.value = "";
+  sendBtn.disabled = true;
+  const typing = addMsg("bot","Checking the live catalogue...");
+  typing.classList.add("typing");
+
+  try {
+    const r = await fetch(API, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ messages: history })
+    });
+    const data = await r.json();
+    typing.remove();
+    if (data.error) {
+      addMsg("bot","Sorry, something went wrong on my end. Please try again, or email bookings@rockwellsurveys.ie.");
+    } else {
+      addMsg("bot", data.reply);
+      history.push({ role:"assistant", content:data.reply });
+      if (Array.isArray(data.services) && data.services.length) addServiceCards(data.services);
+      if (data.seismic) addSeismicCard(data.seismic);
+    }
+  } catch (e) {
+    typing.remove();
+    addMsg("bot","Sorry, I couldn't reach the server. Please check your connection and try again.");
+  }
+  sendBtn.disabled = false;
+  input.focus();
+}
+
+form.addEventListener("submit", e => { e.preventDefault(); send(input.value); });
+starters.addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (chip) send(chip.dataset.q);
+});
+</script>
+</body>
+</html>

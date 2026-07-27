@@ -1,0 +1,13 @@
+name = "rockwell-surveys-bot"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+workers_dev = true
+
+# The chat page ships with the Worker, so the browser calls /api/chat same-origin
+# and there is no CORS surface for the class demo to trip over.
+[assets]
+directory = "../public"
+binding = "ASSETS"
+# "none" turns off the /index.html -> / redirect, so the Worker can map "/" to the
+# asset itself without bouncing between the two.
+html_handling = "none"
