@@ -52,3 +52,29 @@ binding, so there is no separate hosting step.
 - "Emergency structural callout in Dublin this week?" → 0 slots, no false booking promise.
 - "Recent seismic activity near Dublin?" → 20 real USGS events, M2.2–4.3, all UK, correctly
   summarised with the low-seismicity caveat and no design opinion.
+
+## MCP surface
+
+The same two live tools are exposed over MCP (stateless Streamable HTTP, no auth):
+
+```
+https://rockwell-surveys-bot.victordelrosal.workers.dev/mcp
+```
+
+Register it in any MCP client:
+
+```bash
+claude mcp add --transport http rockwell-surveys \
+  https://rockwell-surveys-bot.victordelrosal.workers.dev/mcp
+```
+
+`.mcp.json` in this folder registers it at project scope, so anyone who opens this
+directory in Claude Code is offered the same server (approval prompt on first run).
+
+Tools: `search_services`, `check_seismic_activity` — identical definitions to the ones
+the chatbot uses, hitting the same live sheet. Verified 2026-07-27: `initialize`,
+`tools/list`, and `tools/call search_services {region:"Clare"}` → RS029, fee flagged.
+
+Note: MCP is how *clients* (Claude Code, Claude Desktop, the Inspector) reach the
+catalogue. The deployed chatbot does not go through MCP — it calls the same functions
+in-process, which is one less hop and one less failure mode.

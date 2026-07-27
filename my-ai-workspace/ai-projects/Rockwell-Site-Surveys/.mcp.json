@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "rockwell-surveys": {
+      "type": "http",
+      "url": "https://rockwell-surveys-bot.victordelrosal.workers.dev/mcp"
+    }
+  }
+}
