@@ -301,9 +301,14 @@ $('bulkSend').onclick=async()=>{
          r.status='sent'; sent++; }
     catch(e){ r.status='send failed: '+e.message; failed++; }
     bulkRender();
-    /* a short gap between messages: 36 near-identical emails into one domain in a
-       burst is exactly what an institutional filter is tuned to catch */
-    await new Promise(res=>setTimeout(res,2500));
+    /* Randomised 5-15s gap between messages. A burst of near-identical mail into
+       one institutional domain is what a filter is tuned to catch, and a FIXED
+       interval is itself a machine signature. Skipped after the last one. */
+    if(r!==targets.slice(0,n)[n-1]){
+      const wait=5000+Math.floor(Math.random()*10000);
+      $('bulkProgress').textContent=(sent+failed)+' of '+n+' · next in '+Math.round(wait/1000)+'s';
+      await new Promise(res=>setTimeout(res,wait));
+    }
   }
   $('bulkSend').disabled=false; $('bulkValidate').disabled=false; $('bulkProgress').textContent='';
   bulkMsg(failed?'err':'ok', sent+' sent'+(failed?', '+failed+' failed':'. Done.'));
@@ -451,6 +456,15 @@ $('bulkRun').onclick=async()=>{
       else { r.status='error: '+e.message; failed++; }
     }
     bulkRender();
+    /* When this loop is also sending, pace it deliberately rather than trusting
+       however long a render happens to take. Randomised 5-15s: a burst into one
+       institutional domain is what a filter catches, and a fixed interval is
+       itself a machine signature. No wait when nothing is being emailed. */
+    if(withEmail && (done+failed) < ready.length){
+      const wait=5000+Math.floor(Math.random()*10000);
+      $('bulkProgress').textContent=(done+failed)+' of '+ready.length+' &middot; next in '+Math.round(wait/1000)+'s';
+      await new Promise(res=>setTimeout(res,wait));
+    }
   }
   BULK_RUNNING=false;
   $('bulkValidate').disabled=false; $('bulkStop').disabled=true; $('bulkProgress').textContent='';
