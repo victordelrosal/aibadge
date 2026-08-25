@@ -279,10 +279,13 @@ ${FONTS}<style>${HEAD_STYLE}
     bad:'<svg viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="#ff7a7a" stroke-width="2.5" stroke-linecap="round"/></svg>',
     warn:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="#ffb45f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
+  // Defence in depth: UCID_RE already constrains this to [a-z0-9], but every other
+  // interpolation on this page is escaped, so this one is a real JS literal too.
+  const CRED_ID = ${JSON.stringify(rec.ucid)};
   function set(kind,txt){S.className='status '+kind;T.textContent=txt;I.innerHTML=ICONS[kind]||'';}
   (async()=>{
     try{
-      const r=await fetch('/api/verify/${rec.ucid}').then(x=>x.json());
+      const r=await fetch('/api/verify/'+encodeURIComponent(CRED_ID)).then(x=>x.json());
       if(!r||!r.found){set('bad','Credential not found');return;}
       if(r.status==='revoked'){set('warn','This credential has been revoked');return;}
       const pub=multikeyToPublicKey(r.publicKeyMultikey);
@@ -300,7 +303,7 @@ ${FONTS}<style>${HEAD_STYLE}
   document.querySelectorAll('[data-track]').forEach(function(el){
     el.addEventListener('click',function(){
       try{
-        var b=JSON.stringify({ucid:'${rec.ucid}',event:el.getAttribute('data-track')});
+        var b=JSON.stringify({ucid:CRED_ID,event:el.getAttribute('data-track')});
         if(navigator.sendBeacon){navigator.sendBeacon('/api/track',new Blob([b],{type:'application/json'}));}
         else{fetch('/api/track',{method:'POST',body:b,headers:{'Content-Type':'application/json'},keepalive:true}).catch(function(){});}
       }catch(e){}

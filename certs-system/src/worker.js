@@ -96,7 +96,12 @@ async function route(request, env, ctx) {
   const beacon = path.match(/^\/e\/o\/([a-z][0-9][a-z][0-9]{2})\.png$/);
   if (beacon) {
     track(env, ctx, request, beacon[1], "open", "email");
-    return serveR2(env, `${beacon[1]}/badge.png`, "image/png", request);
+    const img = await serveR2(env, `${beacon[1]}/badge.png`, "image/png", request);
+    // No caching on the beacon specifically: a cached response never reaches the
+    // worker, so a second open inside the cache window would be invisible.
+    const h = new Headers(img.headers);
+    h.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    return new Response(img.body, { status: img.status, headers: h });
   }
   // Tracked click-through for the two links in the email.
   const click = path.match(/^\/e\/c\/([a-z][0-9][a-z][0-9]{2})\/(verify|linkedin)$/);
@@ -286,6 +291,10 @@ async function apiList(request, env) {
 // trace, and only for a credential that actually exists. Everything else the system
 // records is recorded server-side, so a stranger cannot forge a download count.
 async function apiTrack(request, env, ctx) {
+  // Cap before parsing: this endpoint is public and unauthenticated, so an
+  // unbounded body is a free way to spend our CPU and D1 writes.
+  const len = Number(request.headers.get("Content-Length") || 0);
+  if (len > 512) return json({ error: "bad request" }, 400, cors());
   const body = await request.json().catch(() => null);
   const code = String((body && body.ucid) || "").toLowerCase();
   const event = String((body && body.event) || "");
@@ -319,7 +328,7 @@ async function apiStats(request, env) {
       return { ...meta[r.ucid], ucid: r.ucid, events: (s && s.events) || {}, lastTs: (s && s.lastTs) || null };
     })
     .sort((a, b) => (b.issuedDate || "").localeCompare(a.issuedDate || ""));
-  return json({ credentials, totals: stats.totals, proxyOpens: stats.proxyOpens, recent: stats.recent, events: stats.events }, 200, cors());
+  return json({ credentials, totals: stats.totals, proxyOpens: stats.proxyOpens, events: stats.events, error: stats.error || null }, 200, cors());
 }
 
 async function apiPreview(request, env) {

@@ -55,15 +55,11 @@ export const ISSUER_EMAIL = "victordelrosal@gmail.com";
 
 // Returns the principal if the bearer token is a verified issuer, else null.
 export async function requireIssuer(request, env) {
-  // ALPHA TEST HOOK (removed before production cutover): a one-off shared secret
-  // lets automated QA exercise the issuer pipeline without a Google login. Only
-  // active while env.TEST_ISSUE_SECRET is set; delete that secret to disable.
-  if (env.TEST_ISSUE_SECRET) {
-    const t = request.headers.get("X-Test-Issue") || "";
-    if (t && t === env.TEST_ISSUE_SECRET) {
-      return { uid: "test-harness", email: ISSUER_EMAIL, emailVerified: true, name: "Test Harness", test: true };
-    }
-  }
+  // The alpha test hook that allowed a shared-secret bypass of Google sign-in was
+  // REMOVED 2026-08-25. It was one `wrangler secret put` away from granting issue,
+  // revoke, delete and /api/stats, and /api/stats now returns every recipient's
+  // name and email. Google sign-in as the issuer is the only way in. Do not
+  // reintroduce it: use the dashboard.
   const auth = request.headers.get("Authorization") || "";
   const m = auth.match(/^Bearer\s+(.+)$/i);
   if (!m) return null;
