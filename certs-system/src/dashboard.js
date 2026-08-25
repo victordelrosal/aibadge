@@ -278,7 +278,7 @@ async function loadList(){
 function sendOne(code,to){
   openModal('Email '+code+' to '+to+'?','This sends the graduation email with the certificate PDF and badge image attached. It can be sent again later if needed.',async()=>{
     closeModal();
-    try{ await api('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ucid:code})});
+    try{ await api('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ucid:code,force:true})});
          openInfo('Sent','The email is on its way to <b>'+esc(to)+'</b>.'); }
     catch(e){ openInfo('Not sent',esc(e.message)); }
   });
@@ -299,7 +299,7 @@ $('bulkSend').onclick=async()=>{
     $('bulkProgress').textContent=(sent+failed+1)+' of '+n;
     try{ await api('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ucid:r.code})});
          r.status='sent'; sent++; }
-    catch(e){ r.status='send failed: '+e.message; failed++; }
+    catch(e){ if(/already_emailed/.test(e.message)){ r.status='already sent'; } else { r.status='send failed: '+e.message; failed++; } }
     bulkRender();
     /* Randomised 5-15s gap between messages. A burst of near-identical mail into
        one institutional domain is what a filter is tuned to catch, and a FIXED
@@ -409,7 +409,7 @@ $('bulkValidate').onclick=async()=>{
     (r.credentials||[]).forEach(c=>{
       if(c.email&&c.status!=='revoked'){
         existing[c.email.toLowerCase()]=c.ucid;
-        if(c.emailedAt) mailed[c.email.toLowerCase()]=c.emailedAt;
+        if(c.emailedAt) mailed[c.email.toLowerCase()]={at:c.emailedAt,src:c.emailedSource};
       }
     });
   }catch(e){ bulkMsg('err','Could not read existing credentials: '+e.message); return; }
@@ -426,7 +426,8 @@ $('bulkValidate').onclick=async()=>{
     if(existing[r.email]){
       r.code=existing[r.email];
       /* Read from the server, so it survives a refresh or a different machine. */
-      r.status = mailed[r.email] ? ('already sent '+mailed[r.email].slice(0,10)) : 'issued, not yet emailed';
+      const m=mailed[r.email];
+      r.status = m ? ('already sent '+m.at.slice(11,16)+(m.src==='inferred'?' (detected)':'')) : 'issued, NOT emailed';
       dup++; return;
     }
     r.status='ready'; ok++;

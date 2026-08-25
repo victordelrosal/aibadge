@@ -102,6 +102,30 @@ export function track(env, ctx, request, ucid, event, channel = null) {
   }
 }
 
+// When an email was demonstrably delivered, per credential.
+//
+// `open`, `email_verify` and `email_linkedin` can ONLY originate from a message
+// that actually arrived somewhere: the beacon is the email's own image, and the
+// two click events are the email's own links. So the earliest such event is hard
+// evidence of delivery, and it recovers the send history for credentials issued
+// before emailedAt was being written.
+export async function emailEvidence(env) {
+  if (!env.STATS_DB) return {};
+  try {
+    const r = await env.STATS_DB.prepare(
+      `SELECT ucid, MIN(ts) AS first_ts
+         FROM events
+        WHERE event IN ('open','email_verify','email_linkedin')
+        GROUP BY ucid`
+    ).all();
+    const out = {};
+    for (const row of r.results || []) out[row.ucid] = row.first_ts;
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 // Per-credential aggregates plus totals, for the admin dashboard.
 // Both queries apply HUMAN_FILTER, so a tile can never disagree with its column.
 export async function readStats(env) {

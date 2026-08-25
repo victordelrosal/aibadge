@@ -16,7 +16,7 @@ import { sendBadgeEmail } from "./lib/email.js";
 import { getRecord, putRecord, listRecords, exists, putArtifact, getArtifact, artifactKeys, deleteRecord, deleteArtifact, findByEmail, indexEmail, unindexEmail } from "./lib/store.js";
 import { landingPage, credentialPage, fmtDate } from "./pages.js";
 import { dashboardPage } from "./dashboard.js";
-import { track, readStats, CLIENT_EVENTS } from "./lib/stats.js";
+import { track, readStats, emailEvidence, CLIENT_EVENTS } from "./lib/stats.js";
 
 const json = (obj, status = 200, extra = {}) =>
   new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json", ...extra } });
@@ -283,7 +283,7 @@ function cors() {
 async function apiList(request, env) {
   const principal = await requireIssuer(request, env);
   if (!principal) return json({ error: "unauthorised" }, 401);
-  const recs = await listRecords(env);
+  const [recs, evidence] = await Promise.all([listRecords(env), emailEvidence(env)]);
   return json({
     credentials: recs.map((r) => ({
       ucid: r.ucid,
@@ -292,7 +292,10 @@ async function apiList(request, env) {
       cohort: r.cohort || "",
       level: r.level || 1,
       issuedDate: r.issuedDate,
-      emailedAt: r.emailedAt || null,
+      // The stamp if we wrote one; otherwise the earliest proof of delivery from
+      // the engagement log, which covers everything sent before stamping existed.
+      emailedAt: r.emailedAt || evidence[r.ucid] || null,
+      emailedSource: r.emailedAt ? "recorded" : (evidence[r.ucid] ? "inferred" : null),
       emailCount: r.emailCount || 0,
       status: r.status || "issued",
       legacy: !!r.legacy,
@@ -488,6 +491,12 @@ async function apiSend(request, env) {
   if (!rec) return json({ error: "not found" }, 404);
   if (rec.status === "revoked") return json({ error: "revoked" }, 409);
   if (!rec.email) return json({ error: "no email on record" }, 400);
+  // Refuse an accidental second send. A deliberate resend (the per-row button,
+  // "I lost the email") passes force. Bulk never does, so a re-run is safe.
+  if (!body.force) {
+    const already = rec.emailedAt || (await emailEvidence(env))[code];
+    if (already) return json({ error: "already_emailed", ucid: code, emailedAt: already }, 409);
+  }
 
   const host = new URL(request.url).host;
   const [badgeObj, pdfObj] = await Promise.all([
