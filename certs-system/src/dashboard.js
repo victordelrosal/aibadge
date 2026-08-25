@@ -165,8 +165,13 @@ export function dashboardPage(cfg) {
   </div>
 
   <div class="panel" style="margin-top:22px">
-    <h2>Issued &amp; legacy credentials (<span id="count">…</span>)</h2>
-    <div style="overflow-x:auto"><table id="tbl"><thead><tr><th>Code</th><th>Name</th><th>Issued</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody id="tbody"></tbody></table></div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+      <h2 style="margin:0">Issued &amp; legacy credentials (<span id="count">…</span>)</h2>
+      <span style="flex:1"></span>
+      <span id="unsentMsg" style="font-size:13px;color:var(--muted)"></span>
+      <button class="btn primary" id="sendUnsent" style="padding:8px 14px;font-size:13px" disabled>Send to all not yet emailed</button>
+    </div>
+    <div style="overflow-x:auto"><table id="tbl"><thead><tr><th>Code</th><th>Name</th><th>Issued</th><th>Emailed</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody id="tbody"></tbody></table></div>
   </div>
 </div>
 
@@ -257,18 +262,25 @@ $('againBtn').onclick=()=>{
   $('previewBox').textContent='Fill the form and click Preview badge to render.';$('previewLinks').innerHTML='';
 };
 
+let UNSENT=[];
 async function loadList(){
   try{
     const r=await api('/api/list');
     $('count').textContent=r.credentials.length;
+    UNSENT=r.credentials.filter(c=>!c.legacy && c.status!=='revoked' && c.email && !c.emailedAt);
+    $('unsentMsg').textContent = UNSENT.length ? (UNSENT.length+' not yet emailed') : 'everyone has been emailed';
+    $('sendUnsent').disabled = UNSENT.length===0;
     $('tbody').innerHTML=r.credentials.map(c=>{
       const type=c.legacy?'<span class="pill legacy">'+(esc(c.source||'legacy'))+'</span>':'AI Badge';
       const st='<span class="pill '+(c.status==='revoked'?'revoked':(c.legacy?'legacy':'issued'))+'">'+(c.status==='revoked'?'revoked':(c.legacy?'legacy':'issued'))+'</span>';
-      const sendBtn=(c.legacy||c.status==='revoked'||!c.email)?'':'<button class="btn" data-send="'+esc(c.ucid)+'" data-to="'+esc(c.email)+'" style="padding:5px 10px;font-size:12px">Send</button>';
+      const sendBtn=(c.legacy||c.status==='revoked'||!c.email)?'':'<button class="btn'+(c.emailedAt?'':' primary')+'" data-send="'+esc(c.ucid)+'" data-to="'+esc(c.email)+'" style="padding:5px 10px;font-size:12px">'+(c.emailedAt?'Resend':'Send')+'</button>';
+      const mailed=c.legacy?'<span style="color:var(--muted2)">&mdash;</span>'
+        : c.emailedAt ? '<span style="color:var(--ok)">'+esc(c.emailedAt.slice(0,10)+' '+c.emailedAt.slice(11,16))+'</span>'+(c.emailedSource==='inferred'?'<span style="color:var(--muted2);font-size:11px"> detected</span>':'')
+        : '<span style="color:var(--gold);font-weight:600">not sent</span>';
       const revBtn=c.status==='revoked'?'':'<button class="btn danger" data-rev="'+esc(c.ucid)+'" style="padding:5px 10px;font-size:12px">Revoke</button>';
       const delBtn='<button class="btn" data-del="'+esc(c.ucid)+'" data-status="'+esc(c.status||'issued')+'" style="padding:5px 10px;font-size:12px;color:var(--muted2)">Delete</button>';
       const act='<div style="display:flex;gap:6px;justify-content:flex-end">'+sendBtn+revBtn+delBtn+'</div>';
-      return '<tr><td><a class="code" href="/'+esc(c.ucid)+'" target="_blank">'+esc(c.ucid)+'</a></td><td>'+esc(c.name)+'</td><td>'+esc(c.issuedDate||'')+'</td><td>'+type+'</td><td>'+st+'</td><td>'+act+'</td></tr>';
+      return '<tr><td><a class="code" href="/'+esc(c.ucid)+'" target="_blank">'+esc(c.ucid)+'</a></td><td>'+esc(c.name)+'</td><td>'+esc(c.issuedDate||'')+'</td><td>'+mailed+'</td><td>'+type+'</td><td>'+st+'</td><td>'+act+'</td></tr>';
     }).join('');
     $('tbody').querySelectorAll('[data-send]').forEach(b=>b.onclick=()=>sendOne(b.getAttribute('data-send'),b.getAttribute('data-to')));
     $('tbody').querySelectorAll('[data-rev]').forEach(b=>b.onclick=()=>revoke(b.getAttribute('data-rev')));
@@ -312,6 +324,35 @@ $('bulkSend').onclick=async()=>{
   }
   $('bulkSend').disabled=false; $('bulkValidate').disabled=false; $('bulkProgress').textContent='';
   bulkMsg(failed?'err':'ok', sent+' sent'+(failed?', '+failed+' failed':'. Done.'));
+};
+
+/* Send to everyone who holds a credential and has not been emailed. This reads
+   the server's own record, so it is correct after a refresh, on another machine,
+   or a week from now. No CSV required. */
+$('sendUnsent').onclick=async()=>{
+  if(!UNSENT.length) return;
+  const n=UNSENT.length;
+  if(!confirm('Email '+n+' recipient'+(n===1?'':'s')+' who have not yet received their badge?\\n\\nSent one at a time with a 5-15 second gap. This cannot be unsent.')) return;
+  const btn=$('sendUnsent'); btn.disabled=true;
+  let sent=0, failed=0, skipped=0;
+  const queue=UNSENT.slice();
+  for(let i=0;i<queue.length;i++){
+    const c=queue[i];
+    $('unsentMsg').textContent='sending '+(i+1)+' of '+n+' — '+c.name;
+    try{
+      await api('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ucid:c.ucid})});
+      sent++;
+    }catch(e){
+      if(/already_emailed/.test(e.message)) skipped++; else failed++;
+    }
+    if(i<queue.length-1){
+      const wait=5000+Math.floor(Math.random()*10000);
+      $('unsentMsg').textContent=(i+1)+' of '+n+' done — next in '+Math.round(wait/1000)+'s';
+      await new Promise(res=>setTimeout(res,wait));
+    }
+  }
+  $('unsentMsg').textContent=sent+' sent'+(skipped?', '+skipped+' already had one':'')+(failed?', '+failed+' failed':'');
+  loadList();
 };
 
 function revoke(code){
