@@ -133,6 +133,33 @@ export function dashboardPage(cfg) {
   </div>
 
   <div class="panel" style="margin-top:22px">
+    <h2>Bulk issue</h2>
+    <p style="color:var(--dim);font-size:13.5px;line-height:1.6;margin:0 0 12px">
+      One row per person: <code style="color:var(--gold)">name,email,cohort,level</code>. A header row is
+      detected and skipped. <b>Validate</b> checks every row and writes nothing.
+      Anyone who already holds a live credential is skipped automatically, so a run that
+      stops halfway can simply be run again.
+    </p>
+    <textarea id="bulkCsv" spellcheck="false" placeholder="Ada Lovelace,ada@example.com,NCI &middot; Customer Engagement &amp; AI (H9CEAI) 2026,2"
+      style="width:100%;min-height:130px;background:var(--ink2);color:var(--fg);border:1px solid var(--line);
+             border-radius:10px;padding:12px;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical"></textarea>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
+      <button class="btn" id="bulkValidate">Validate</button>
+      <button class="btn primary" id="bulkRun" disabled>Issue all</button>
+      <button class="btn" id="bulkStop" disabled>Stop</button>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--dim)">
+        <input type="checkbox" id="bulkEmail"> Email each recipient as it is issued
+      </label>
+      <span style="flex:1"></span>
+      <span id="bulkProgress" style="font-size:13px;color:var(--dim)"></span>
+    </div>
+    <div id="bulkMsg" class="msg" style="margin-top:10px"></div>
+    <div style="overflow-x:auto;margin-top:10px"><table id="bulkTbl"><thead><tr>
+      <th>#</th><th>Name</th><th>Email</th><th>Lvl</th><th>Status</th><th>Code</th></tr></thead>
+      <tbody id="bulkBody"></tbody></table></div>
+  </div>
+
+  <div class="panel" style="margin-top:22px">
     <h2>Issued &amp; legacy credentials (<span id="count">…</span>)</h2>
     <div style="overflow-x:auto"><table id="tbl"><thead><tr><th>Code</th><th>Name</th><th>Issued</th><th>Type</th><th>Status</th><th></th></tr></thead><tbody id="tbody"></tbody></table></div>
   </div>
@@ -270,6 +297,119 @@ function openInfo(title,body){
 }
 function closeModal(){$('modalRoot').innerHTML='';}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------------------------------------------------------------- bulk ---- */
+/* Sequential by design. Each issue signs a credential and renders three
+   artifacts through Browser Rendering, so running rows in parallel trades a
+   complete slow run for a half-finished fast one. */
+let BULK=[], BULK_STOP=false, BULK_RUNNING=false;
+
+/* Split a CSV line honouring double quotes, because cohort strings contain commas. */
+function csvSplit(line){
+  const out=[]; let cur='', q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){ if(q&&line[i+1]==='"'){cur+='"';i++;} else q=!q; }
+    else if(c===','&&!q){ out.push(cur); cur=''; }
+    else cur+=c;
+  }
+  out.push(cur);
+  return out.map(v=>v.trim());
+}
+
+function parseBulk(text){
+  const rows=[];
+  text.split(/\r?\n/).forEach(line=>{
+    if(!line.trim()) return;
+    const f=csvSplit(line);
+    if(/^name$/i.test(f[0]||'')) return;                 /* header */
+    rows.push({
+      name:(f[0]||'').normalize('NFC'),
+      email:(f[1]||'').toLowerCase(),
+      cohort:(f[2]||'').normalize('NFC'),
+      level:Number(f[3]||1)||1,
+      status:'', code:''
+    });
+  });
+  return rows;
+}
+
+function bulkRender(){
+  $('bulkBody').innerHTML = BULK.map((r,i)=>{
+    const cls = r.status==='issued' ? 'color:var(--ok)'
+              : r.status==='skipped' ? 'color:var(--gold)'
+              : /error|invalid|duplicate/.test(r.status) ? 'color:var(--err)' : 'color:var(--dim)';
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.email)+'</td><td>L'+r.level+
+           '</td><td style="'+cls+'">'+esc(r.status||'—')+'</td><td class="mono">'+
+           (r.code?'<a href="/'+r.code+'" target="_blank" style="color:var(--gold)">'+r.code+'</a>':'')+'</td></tr>';
+  }).join('');
+}
+
+function bulkMsg(kind,text){ const m=$('bulkMsg'); m.className='msg'+(kind?' '+kind:''); m.textContent=text; }
+
+/* Validate writes nothing. It parses, checks each field, and cross-references the
+   live credential list so duplicates are visible BEFORE anything is issued. */
+$('bulkValidate').onclick=async()=>{
+  BULK=parseBulk($('bulkCsv').value);
+  if(!BULK.length){ bulkMsg('err','No rows found.'); $('bulkRun').disabled=true; return; }
+  let existing={};
+  try{
+    const r=await api('/api/list');
+    (r.credentials||[]).forEach(c=>{ if(c.email&&c.status!=='revoked') existing[c.email.toLowerCase()]=c.ucid; });
+  }catch(e){ bulkMsg('err','Could not read existing credentials: '+e.message); return; }
+
+  const seen={}; let ok=0,dup=0,bad=0;
+  BULK.forEach(r=>{
+    if(!r.name||r.name.length<2){ r.status='invalid name'; bad++; return; }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.email)){ r.status='invalid email'; bad++; return; }
+    if(r.level!==1&&r.level!==2){ r.status='invalid level'; bad++; return; }
+    if(seen[r.email]){ r.status='duplicate in CSV'; bad++; return; }
+    seen[r.email]=1;
+    if(existing[r.email]){ r.status='already issued'; r.code=existing[r.email]; dup++; return; }
+    r.status='ready'; ok++;
+  });
+  bulkRender();
+  bulkMsg(bad?'err':'ok', ok+' ready · '+dup+' already issued (will be skipped) · '+bad+' need fixing');
+  $('bulkRun').disabled = ok===0 || bad>0;
+};
+
+$('bulkStop').onclick=()=>{ BULK_STOP=true; bulkMsg('','Stopping after the current row…'); };
+
+$('bulkRun').onclick=async()=>{
+  const ready=BULK.filter(r=>r.status==='ready');
+  if(!ready.length) return;
+  const withEmail=$('bulkEmail').checked;
+  if(!confirm('Issue '+ready.length+' credential'+(ready.length===1?'':'s')+
+              (withEmail?' AND email each recipient':' without sending any email')+'?\n\nThis cannot be undone in bulk.')) return;
+  BULK_STOP=false; BULK_RUNNING=true;
+  $('bulkRun').disabled=true; $('bulkValidate').disabled=true; $('bulkStop').disabled=false;
+  const today=new Date().toISOString().slice(0,10);
+  let done=0, failed=0;
+  for(const r of BULK){
+    if(BULK_STOP){ bulkMsg('','Stopped. '+done+' issued. Press Validate then Issue all to resume safely.'); break; }
+    if(r.status!=='ready') continue;
+    r.status='issuing…'; bulkRender();
+    $('bulkProgress').textContent=(done+failed+1)+' of '+ready.length;
+    try{
+      const res=await api('/api/issue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        name:r.name,email:r.email,cohort:r.cohort,level:r.level,
+        issuedDate:today,sendEmail:withEmail
+      })});
+      r.code=res.ucid; r.status=res.emailed?'issued + emailed':'issued'; done++;
+    }catch(e){
+      /* 409 is the duplicate guard doing its job, not a failure. */
+      if(/already_issued/.test(e.message)){ r.status='already issued'; }
+      else { r.status='error: '+e.message; failed++; }
+    }
+    bulkRender();
+  }
+  BULK_RUNNING=false;
+  $('bulkValidate').disabled=false; $('bulkStop').disabled=true; $('bulkProgress').textContent='';
+  if(!BULK_STOP) bulkMsg(failed?'err':'ok', done+' issued'+(failed?', '+failed+' failed — fix and press Validate again':'. Done.'));
+  loadList();
+};
+
+
 </script>
 </body></html>`;
 }

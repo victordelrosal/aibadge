@@ -13,7 +13,7 @@ import { buildCredential, buildLegacyCredential, ISSUER_PROFILE, ACHIEVEMENT, VE
 import { qrSvg } from "./lib/qr.js";
 import { renderArtifacts } from "./lib/render.js";
 import { sendBadgeEmail } from "./lib/email.js";
-import { getRecord, putRecord, listRecords, exists, putArtifact, getArtifact, artifactKeys, deleteRecord, deleteArtifact } from "./lib/store.js";
+import { getRecord, putRecord, listRecords, exists, putArtifact, getArtifact, artifactKeys, deleteRecord, deleteArtifact, findByEmail, indexEmail, unindexEmail } from "./lib/store.js";
 import { landingPage, credentialPage, fmtDate } from "./pages.js";
 import { dashboardPage } from "./dashboard.js";
 import { track, readStats, CLIENT_EVENTS } from "./lib/stats.js";
@@ -86,6 +86,7 @@ async function route(request, env, ctx) {
   if (path === "/api/preview" && method === "POST") return apiPreview(request, env);
   if (path === "/api/issue" && method === "POST") return apiIssue(request, env, ctx);
   if (path === "/api/rerender" && method === "POST") return apiRerender(request, env);
+  if (path === "/api/send" && method === "POST") return apiSend(request, env);
   if (path === "/api/revoke" && method === "POST") return apiRevoke(request, env);
   if (path === "/api/delete" && method === "POST") return apiDelete(request, env);
 
@@ -215,9 +216,17 @@ function renderData(rec, host, assets) {
   };
 }
 
+// Marksheets and rosters disagree about Unicode: the same Irish name arrives as
+// precomposed "Ó" (U+00D3) from one source and decomposed "O"+U+0301 from another.
+// Both look identical and sign to different bytes, so everything is normalised to
+// NFC before it is rendered or signed.
+function nfc(v) {
+  return String(v || "").normalize("NFC");
+}
+
 function validateInput(b) {
   if (!b || typeof b !== "object") return "invalid body";
-  const name = String(b.name || "").trim();
+  const name = nfc(b.name).trim();
   const email = String(b.email || "").trim();
   const issuedDate = String(b.issuedDate || "").trim();
   if (name.length < 2 || name.length > 80) return "name length";
@@ -279,6 +288,9 @@ async function apiList(request, env) {
     credentials: recs.map((r) => ({
       ucid: r.ucid,
       name: r.name,
+      email: r.email || null,
+      cohort: r.cohort || "",
+      level: r.level || 1,
       issuedDate: r.issuedDate,
       status: r.status || "issued",
       legacy: !!r.legacy,
@@ -342,8 +354,8 @@ async function apiPreview(request, env) {
   const ucid = await uniqueUcid(env);
   const rec = {
     ucid,
-    name: body.name.trim(),
-    cohort: (body.cohort || "").trim(),
+    name: nfc(body.name).trim(),
+    cohort: nfc(body.cohort).trim(),
     issuedDate: body.issuedDate,
     level: levelOf(body),
     legacy: false,
@@ -366,6 +378,20 @@ async function apiIssue(request, env, ctx) {
   if (err) return json({ error: err }, 400);
 
   const host = new URL(request.url).host;
+
+  // One live credential per person. This is what makes a 37-row bulk run safely
+  // resumable: re-running it cannot issue anybody twice.
+  if (!body.allowDuplicate) {
+    const existing = await findByEmail(env, body.email);
+    if (existing) {
+      return json(
+        { error: "already_issued", ucid: existing.ucid, name: existing.name,
+          issuedDate: existing.issuedDate, url: `https://${host}/${existing.ucid}` },
+        409
+      );
+    }
+  }
+
   // Issuer may target a specific code (re-create / vanity); otherwise allocate one.
   let ucid;
   if (body.ucid) {
@@ -376,9 +402,9 @@ async function apiIssue(request, env, ctx) {
   }
   const rec = {
     ucid,
-    name: body.name.trim(),
-    email: body.email.trim(),
-    cohort: (body.cohort || "").trim(),
+    name: nfc(body.name).trim(),
+    email: body.email.trim().toLowerCase(),
+    cohort: nfc(body.cohort).trim(),
     issuedDate: body.issuedDate,
     level: levelOf(body),
     status: "issued",
@@ -406,6 +432,7 @@ async function apiIssue(request, env, ctx) {
   await putArtifact(env, keys.og, og, "image/png");
   await putArtifact(env, keys.pdf, pdf, "application/pdf");
   await putRecord(env, rec);
+  await indexEmail(env, rec.email, ucid);
 
   // 4. email (optional)
   let emailed = false;
@@ -429,6 +456,46 @@ async function apiIssue(request, env, ctx) {
     }
   }
   return json({ ok: true, ucid, url: `https://${host}/${ucid}`, emailed });
+}
+
+// Send (or re-send) the graduation email for a credential that already exists.
+// This is what lets a bulk run mint everything first, verify it, and only then
+// email — and it doubles as the "I lost it, can you resend?" path.
+async function apiSend(request, env) {
+  const principal = await requireIssuer(request, env);
+  if (!principal) return json({ error: "unauthorised" }, 401);
+  const body = await request.json().catch(() => null);
+  const code = String((body && body.ucid) || "").toLowerCase();
+  if (!UCID_RE.test(code)) return json({ error: "invalid code" }, 400);
+  const rec = await getRecord(env, code);
+  if (!rec) return json({ error: "not found" }, 404);
+  if (rec.status === "revoked") return json({ error: "revoked" }, 409);
+  if (!rec.email) return json({ error: "no email on record" }, 400);
+
+  const host = new URL(request.url).host;
+  const [badgeObj, pdfObj] = await Promise.all([
+    getArtifact(env, artifactKeys(code).badge),
+    getArtifact(env, artifactKeys(code).pdf),
+  ]);
+  if (!badgeObj || !pdfObj) return json({ error: "artifacts missing" }, 409);
+
+  try {
+    await sendBadgeEmail(env, {
+      to: rec.email,
+      name: rec.name,
+      ucid: code,
+      verifyUrl: `https://${host}/${code}`,
+      badgeUrl: `https://${host}/${code}/badge.png`,
+      host,
+      badgeBytes: new Uint8Array(await badgeObj.arrayBuffer()),
+      pdfBytes: new Uint8Array(await pdfObj.arrayBuffer()),
+      issuedDisplay: fmtDate(rec.issuedDate),
+      level: rec.level || DEFAULT_LEVEL,
+    });
+  } catch (e) {
+    return json({ ok: false, ucid: code, emailed: false, error: String(e.message) }, 502);
+  }
+  return json({ ok: true, ucid: code, emailed: true, to: rec.email });
 }
 
 // Re-render badge.png + og.png for an existing record (e.g. after a template
@@ -462,6 +529,8 @@ async function apiRevoke(request, env) {
   rec.status = "revoked";
   rec.revokedAt = new Date().toISOString();
   await putRecord(env, rec);
+  // Free the address so a corrected credential can be issued to the same person.
+  await unindexEmail(env, rec.email);
   return json({ ok: true });
 }
 
@@ -487,6 +556,7 @@ async function apiDelete(request, env) {
     deleteArtifact(env, `${code}/legacy-original.pdf`),
   ]);
   await deleteRecord(env, code);
+  await unindexEmail(env, rec.email);
   return json({ ok: true, deleted: code });
 }
 
