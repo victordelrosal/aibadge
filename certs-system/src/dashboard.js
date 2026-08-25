@@ -151,7 +151,12 @@ export function dashboardPage(cfg) {
         <input type="checkbox" id="bulkEmail"> Email each recipient as it is issued
       </label>
       <span style="flex:1"></span>
-      <span id="bulkProgress" style="font-size:13px;color:var(--dim)"></span>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--muted)">
+        send <input type="number" id="bulkBatch" value="12" min="1" max="200"
+          style="width:62px;background:var(--surf);color:var(--ink);border:1px solid var(--hair);border-radius:8px;padding:6px 8px;font:13px ui-monospace,monospace"> at a time
+      </label>
+      <button class="btn" id="bulkSend">Send emails</button>
+      <span id="bulkProgress" style="font-size:13px;color:var(--muted)"></span>
     </div>
     <div id="bulkMsg" class="msg" style="margin-top:10px"></div>
     <div style="overflow-x:auto;margin-top:10px"><table id="bulkTbl"><thead><tr>
@@ -259,15 +264,51 @@ async function loadList(){
     $('tbody').innerHTML=r.credentials.map(c=>{
       const type=c.legacy?'<span class="pill legacy">'+(esc(c.source||'legacy'))+'</span>':'AI Badge';
       const st='<span class="pill '+(c.status==='revoked'?'revoked':(c.legacy?'legacy':'issued'))+'">'+(c.status==='revoked'?'revoked':(c.legacy?'legacy':'issued'))+'</span>';
+      const sendBtn=(c.legacy||c.status==='revoked'||!c.email)?'':'<button class="btn" data-send="'+esc(c.ucid)+'" data-to="'+esc(c.email)+'" style="padding:5px 10px;font-size:12px">Send</button>';
       const revBtn=c.status==='revoked'?'':'<button class="btn danger" data-rev="'+esc(c.ucid)+'" style="padding:5px 10px;font-size:12px">Revoke</button>';
       const delBtn='<button class="btn" data-del="'+esc(c.ucid)+'" data-status="'+esc(c.status||'issued')+'" style="padding:5px 10px;font-size:12px;color:var(--muted2)">Delete</button>';
-      const act='<div style="display:flex;gap:6px;justify-content:flex-end">'+revBtn+delBtn+'</div>';
+      const act='<div style="display:flex;gap:6px;justify-content:flex-end">'+sendBtn+revBtn+delBtn+'</div>';
       return '<tr><td><a class="code" href="/'+esc(c.ucid)+'" target="_blank">'+esc(c.ucid)+'</a></td><td>'+esc(c.name)+'</td><td>'+esc(c.issuedDate||'')+'</td><td>'+type+'</td><td>'+st+'</td><td>'+act+'</td></tr>';
     }).join('');
+    $('tbody').querySelectorAll('[data-send]').forEach(b=>b.onclick=()=>sendOne(b.getAttribute('data-send'),b.getAttribute('data-to')));
     $('tbody').querySelectorAll('[data-rev]').forEach(b=>b.onclick=()=>revoke(b.getAttribute('data-rev')));
     $('tbody').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>del(b.getAttribute('data-del'),b.getAttribute('data-status')));
   }catch(e){$('count').textContent='error';}
 }
+function sendOne(code,to){
+  openModal('Email '+code+' to '+to+'?','This sends the graduation email with the certificate PDF and badge image attached. It can be sent again later if needed.',async()=>{
+    closeModal();
+    try{ await api('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ucid:code})});
+         openInfo('Sent','The email is on its way to <b>'+esc(to)+'</b>.'); }
+    catch(e){ openInfo('Not sent',esc(e.message)); }
+  });
+}
+
+/* Send the emails for everything the current bulk list has a code for. This is
+   the second half of the mint-first sequence: mint with email off, look at real
+   credentials, then send in controlled batches. */
+$('bulkSend').onclick=async()=>{
+  const targets=BULK.filter(r=>r.code && !/^sent/.test(r.status));
+  if(!targets.length){ bulkMsg('','Nothing to send. Run Validate, then Issue all.'); return; }
+  const n=Math.min(targets.length, Number($('bulkBatch').value)||targets.length);
+  if(!confirm('Email '+n+' recipient'+(n===1?'':'s')+' now?\\n\\nThis cannot be unsent.')) return;
+  $('bulkSend').disabled=true; $('bulkValidate').disabled=true;
+  let sent=0, failed=0;
+  for(const r of targets.slice(0,n)){
+    r.status='sending…'; bulkRender();
+    $('bulkProgress').textContent=(sent+failed+1)+' of '+n;
+    try{ await api('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ucid:r.code})});
+         r.status='sent'; sent++; }
+    catch(e){ r.status='send failed: '+e.message; failed++; }
+    bulkRender();
+    /* a short gap between messages: 36 near-identical emails into one domain in a
+       burst is exactly what an institutional filter is tuned to catch */
+    await new Promise(res=>setTimeout(res,2500));
+  }
+  $('bulkSend').disabled=false; $('bulkValidate').disabled=false; $('bulkProgress').textContent='';
+  bulkMsg(failed?'err':'ok', sent+' sent'+(failed?', '+failed+' failed':'. Done.'));
+};
+
 function revoke(code){
   openModal('Revoke '+code+'?','The credential will show as revoked and fail verification. Artifacts remain but the badge is marked invalid.',async()=>{
     closeModal();try{await api('/api/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ucid:code})});loadList();}catch(e){alert(e.message);}
@@ -340,7 +381,7 @@ function parseBulk(text){
 
 function bulkRender(){
   $('bulkBody').innerHTML = BULK.map((r,i)=>{
-    const cls = /^issued/.test(r.status) ? 'color:var(--ok);font-weight:600'
+    const cls = /^issued|^sent/.test(r.status) ? 'color:var(--ok);font-weight:600'
               : /already issued/.test(r.status) ? 'color:var(--gold)'
               : /error|invalid|duplicate/.test(r.status) ? 'color:var(--bad);font-weight:600'
               : 'color:var(--muted)';
