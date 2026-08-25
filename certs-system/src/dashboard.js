@@ -141,7 +141,7 @@ export function dashboardPage(cfg) {
       stops halfway can simply be run again.
     </p>
     <textarea id="bulkCsv" spellcheck="false" placeholder="Ada Lovelace,ada@example.com,NCI &middot; Customer Engagement &amp; AI (H9CEAI) 2026,2"
-      style="width:100%;min-height:130px;background:var(--ink2);color:var(--fg);border:1px solid var(--line);
+      style="width:100%;min-height:130px;background:var(--surf);color:var(--ink);border:1px solid var(--hair);
              border-radius:10px;padding:12px;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical"></textarea>
     <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
       <button class="btn" id="bulkValidate">Validate</button>
@@ -319,15 +319,19 @@ function csvSplit(line){
 
 function parseBulk(text){
   const rows=[];
-  text.split(/\r?\n/).forEach(line=>{
+  text.split(/\\r?\\n/).forEach(line=>{
     if(!line.trim()) return;
     const f=csvSplit(line);
     if(/^name$/i.test(f[0]||'')) return;                 /* header */
+    const rawLevel=(f[3]||'').trim();
     rows.push({
       name:(f[0]||'').normalize('NFC'),
       email:(f[1]||'').toLowerCase(),
       cohort:(f[2]||'').normalize('NFC'),
-      level:Number(f[3]||1)||1,
+      /* No default. An absent or non-numeric level is an error, never a silent
+         Level 1 — that would publish a permanent downgrade nobody noticed. */
+      level: rawLevel==='' ? null : (/^\\d+$/.test(rawLevel) ? Number(rawLevel) : NaN),
+      fields: f.length,
       status:'', code:''
     });
   });
@@ -336,10 +340,11 @@ function parseBulk(text){
 
 function bulkRender(){
   $('bulkBody').innerHTML = BULK.map((r,i)=>{
-    const cls = r.status==='issued' ? 'color:var(--ok)'
-              : r.status==='skipped' ? 'color:var(--gold)'
-              : /error|invalid|duplicate/.test(r.status) ? 'color:var(--err)' : 'color:var(--dim)';
-    return '<tr><td>'+(i+1)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.email)+'</td><td>L'+r.level+
+    const cls = /^issued/.test(r.status) ? 'color:var(--ok);font-weight:600'
+              : /already issued/.test(r.status) ? 'color:var(--gold)'
+              : /error|invalid|duplicate/.test(r.status) ? 'color:var(--bad);font-weight:600'
+              : 'color:var(--muted)';
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.email)+'</td><td>'+(r.level==null||isNaN(r.level)?'—':'L'+r.level)+
            '</td><td style="'+cls+'">'+esc(r.status||'—')+'</td><td class="mono">'+
            (r.code?'<a href="/'+r.code+'" target="_blank" style="color:var(--gold)">'+r.code+'</a>':'')+'</td></tr>';
   }).join('');
@@ -360,8 +365,10 @@ $('bulkValidate').onclick=async()=>{
 
   const seen={}; let ok=0,dup=0,bad=0;
   BULK.forEach(r=>{
+    if(r.fields<4){ r.status='too few columns ('+r.fields+')'; bad++; return; }
     if(!r.name||r.name.length<2){ r.status='invalid name'; bad++; return; }
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.email)){ r.status='invalid email'; bad++; return; }
+    if(!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(r.email)){ r.status='invalid email'; bad++; return; }
+    if(r.level===null){ r.status='level missing'; bad++; return; }
     if(r.level!==1&&r.level!==2){ r.status='invalid level'; bad++; return; }
     if(seen[r.email]){ r.status='duplicate in CSV'; bad++; return; }
     seen[r.email]=1;
@@ -376,11 +383,12 @@ $('bulkValidate').onclick=async()=>{
 $('bulkStop').onclick=()=>{ BULK_STOP=true; bulkMsg('','Stopping after the current row…'); };
 
 $('bulkRun').onclick=async()=>{
+  if(BULK_RUNNING) return;                 /* a second click must not start a second loop */
   const ready=BULK.filter(r=>r.status==='ready');
   if(!ready.length) return;
   const withEmail=$('bulkEmail').checked;
   if(!confirm('Issue '+ready.length+' credential'+(ready.length===1?'':'s')+
-              (withEmail?' AND email each recipient':' without sending any email')+'?\n\nThis cannot be undone in bulk.')) return;
+              (withEmail?' AND email each recipient':' without sending any email')+'?\\n\\nThis cannot be undone in bulk.')) return;
   BULK_STOP=false; BULK_RUNNING=true;
   $('bulkRun').disabled=true; $('bulkValidate').disabled=true; $('bulkStop').disabled=false;
   const today=new Date().toISOString().slice(0,10);

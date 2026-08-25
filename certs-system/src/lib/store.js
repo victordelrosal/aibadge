@@ -34,8 +34,15 @@ export async function indexEmail(env, email, ucid) {
   await env.CERTS_KV.put(EMAIL_KEY(email), ucid);
 }
 
-export async function unindexEmail(env, email) {
+// Compare-and-delete. Revoking an OLD credential must never free the address of
+// the NEW one that replaced it, or the replacement becomes invisible to the
+// duplicate guard while staying live and public.
+export async function unindexEmail(env, email, ucid) {
   if (!email) return;
+  if (ucid) {
+    const current = await env.CERTS_KV.get(EMAIL_KEY(email));
+    if (current && current !== ucid) return;
+  }
   await env.CERTS_KV.delete(EMAIL_KEY(email));
 }
 

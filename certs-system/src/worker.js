@@ -232,7 +232,7 @@ function validateInput(b) {
   if (name.length < 2 || name.length > 80) return "name length";
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return "invalid email";
   if (!/^\d{4}-\d{2}-\d{2}$/.test(issuedDate)) return "invalid date";
-  if (b.level !== undefined && !ISSUABLE_LEVELS.includes(Number(b.level))) return "invalid level";
+  if (b.level !== undefined && b.level !== null && !ISSUABLE_LEVELS.includes(Number(b.level))) return "invalid level";
   return null;
 }
 
@@ -397,6 +397,13 @@ async function apiIssue(request, env, ctx) {
   if (body.ucid) {
     ucid = String(body.ucid).toLowerCase();
     if (!UCID_RE.test(ucid)) return json({ error: "invalid ucid" }, 400);
+    // Never overwrite an existing credential by targeting its code. Replacing a
+    // holder in place would leave the previous person's email index pointing at
+    // a record that is now somebody else.
+    const clash = await getRecord(env, ucid);
+    if (clash && !body.allowOverwrite) {
+      return json({ error: "ucid_taken", ucid, name: clash.name }, 409);
+    }
   } else {
     ucid = await uniqueUcid(env);
   }
@@ -431,8 +438,11 @@ async function apiIssue(request, env, ctx) {
   await putArtifact(env, keys.badge, badge, "image/png");
   await putArtifact(env, keys.og, og, "image/png");
   await putArtifact(env, keys.pdf, pdf, "application/pdf");
-  await putRecord(env, rec);
+  // Index first, record second. If the second write fails, the orphan index key
+  // resolves to null through findByEmail and is harmless. The reverse order would
+  // leave a live public credential invisible to the duplicate guard forever.
   await indexEmail(env, rec.email, ucid);
+  await putRecord(env, rec);
 
   // 4. email (optional)
   let emailed = false;
@@ -530,7 +540,7 @@ async function apiRevoke(request, env) {
   rec.revokedAt = new Date().toISOString();
   await putRecord(env, rec);
   // Free the address so a corrected credential can be issued to the same person.
-  await unindexEmail(env, rec.email);
+  await unindexEmail(env, rec.email, rec.ucid);
   return json({ ok: true });
 }
 
@@ -556,7 +566,7 @@ async function apiDelete(request, env) {
     deleteArtifact(env, `${code}/legacy-original.pdf`),
   ]);
   await deleteRecord(env, code);
-  await unindexEmail(env, rec.email);
+  await unindexEmail(env, rec.email, rec.ucid);
   return json({ ok: true, deleted: code });
 }
 
