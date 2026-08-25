@@ -3069,25 +3069,32 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <span x-text="credStats.proxyOpens || 0"></span>.
           </p>
 
+          <div class="amx-card-sub" style="display:flex;align-items:center;gap:14px;margin:0 0 10px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="checkbox" x-model="credOnlyActive"> only rows with activity
+            </label>
+            <span x-text="credRows.length + ' shown'"></span>
+            <span style="opacity:0.6;">click any column heading to sort</span>
+          </div>
           <div style="overflow-x:auto;">
             <table class="amx-table">
               <thead>
                 <tr>
-                  <th style="text-align:left;">Holder</th>
-                  <th>Code</th>
-                  <th>Lvl</th>
-                  <th title="Email rendered (inflated by privacy proxies)">Open</th>
-                  <th title="Clicked through from the email">Click</th>
-                  <th title="Loaded the credential page">Views</th>
-                  <th title="Downloaded the certificate PDF">PDF</th>
-                  <th title="Downloaded the badge image">PNG</th>
-                  <th title="Pressed Add to LinkedIn, Share or Copy link">Share</th>
-                  <th title="A crawler fetched the social preview, so a link was posted somewhere">Unfurl</th>
-                  <th>Last activity</th>
+                  <th style="text-align:left;cursor:pointer;" @click="credSort('name')" title="Sort by name"><span x-text="'Holder' + credArrow('name')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('ucid')"><span x-text="'Code' + credArrow('ucid')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('level')"><span x-text="'Lvl' + credArrow('level')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('open')" title="Email rendered — inflated by privacy proxies and mail scanners"><span x-text="'Open' + credArrow('open')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('click')" title="Clicked through from the email"><span x-text="'Click' + credArrow('click')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('view')" title="Loaded the credential page"><span x-text="'Views' + credArrow('view')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('pdf')" title="Downloaded the certificate PDF"><span x-text="'PDF' + credArrow('pdf')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('png')" title="Downloaded the badge image"><span x-text="'PNG' + credArrow('png')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('shareAll')" title="Pressed Add to LinkedIn, Share or Copy link"><span x-text="'Share' + credArrow('shareAll')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('preview')" title="A crawler fetched the social preview, so a link was posted somewhere"><span x-text="'Unfurl' + credArrow('preview')"></span></th>
+                  <th style="cursor:pointer;" @click="credSort('lastTs')"><span x-text="'Last activity' + credArrow('lastTs')"></span></th>
                 </tr>
               </thead>
               <tbody>
-                <template x-for="c in credStats.credentials" :key="c.ucid">
+                <template x-for="c in credRows" :key="c.ucid">
                   <tr>
                     <td style="text-align:left;">
                       <span x-text="c.name"></span>
@@ -4396,6 +4403,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       credStats: null,
       credLoading: false,
       credError: null,
+      credSortKey: 'lastTs',
+      credSortDir: 'desc',
+      credOnlyActive: false,
       search: '',
       cohortFilter: '',
       sortKey: 'lastSeen',
@@ -4699,6 +4709,40 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         }
       },
       credEv(c, k) { return (c.events && c.events[k]) || 0; },
+      // Click any column to sort by it. First click gives the most interesting
+      // end of that column (biggest number, most recent, A first for names).
+      credSort(key) {
+        if (this.credSortKey === key) { this.credSortDir = this.credSortDir === 'desc' ? 'asc' : 'desc'; }
+        else { this.credSortKey = key; this.credSortDir = (key === 'name') ? 'asc' : 'desc'; }
+      },
+      credArrow(key) {
+        if (this.credSortKey !== key) return '';
+        return this.credSortDir === 'desc' ? ' \u2193' : ' \u2191';
+      },
+      credValue(c, key) {
+        if (key === 'name') return (c.name || '').toLowerCase();
+        if (key === 'lastTs') return c.lastTs || '';
+        if (key === 'level') return c.level || 1;
+        if (key === 'ucid') return c.ucid || '';
+        if (key === 'click') return this.credEv(c,'email_verify') + this.credEv(c,'email_linkedin');
+        if (key === 'shareAll') return this.credEv(c,'linkedin') + this.credEv(c,'share') + this.credEv(c,'copy');
+        return this.credEv(c, key);
+      },
+      get credRows() {
+        if (!this.credStats) return [];
+        var self = this, k = this.credSortKey, dir = this.credSortDir === 'desc' ? -1 : 1;
+        var rows = this.credStats.credentials.slice();
+        if (this.credOnlyActive) {
+          var keys = ['open','email_verify','email_linkedin','view','pdf','png','linkedin','copy','share','preview'];
+          rows = rows.filter(function(c){ return keys.some(function(x){ return self.credEv(c,x) > 0; }); });
+        }
+        return rows.sort(function(a,b){
+          var va = self.credValue(a,k), vb = self.credValue(b,k);
+          if (va < vb) return -1*dir;
+          if (va > vb) return  1*dir;
+          return (a.name||'').localeCompare(b.name||'');
+        });
+      },
       credTotal(k) { return (this.credStats && this.credStats.totals && this.credStats.totals[k]) || 0; },
       get credIssued() { return this.credStats ? this.credStats.credentials.length : 0; },
       // "Engaged" = did something beyond the email rendering: clicked, viewed, downloaded
