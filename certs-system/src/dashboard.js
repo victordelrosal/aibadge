@@ -288,7 +288,7 @@ function sendOne(code,to){
    the second half of the mint-first sequence: mint with email off, look at real
    credentials, then send in controlled batches. */
 $('bulkSend').onclick=async()=>{
-  const targets=BULK.filter(r=>r.code && !/^sent/.test(r.status));
+  const targets=BULK.filter(r=>r.code && !/^sent|^already sent/.test(r.status));
   if(!targets.length){ bulkMsg('','Nothing to send. Run Validate, then Issue all.'); return; }
   const n=Math.min(targets.length, Number($('bulkBatch').value)||targets.length);
   if(!confirm('Email '+n+' recipient'+(n===1?'':'s')+' now?\\n\\nThis cannot be unsent.')) return;
@@ -403,10 +403,15 @@ function bulkMsg(kind,text){ const m=$('bulkMsg'); m.className='msg'+(kind?' '+k
 $('bulkValidate').onclick=async()=>{
   BULK=parseBulk($('bulkCsv').value);
   if(!BULK.length){ bulkMsg('err','No rows found.'); $('bulkRun').disabled=true; return; }
-  let existing={};
+  let existing={}, mailed={};
   try{
     const r=await api('/api/list');
-    (r.credentials||[]).forEach(c=>{ if(c.email&&c.status!=='revoked') existing[c.email.toLowerCase()]=c.ucid; });
+    (r.credentials||[]).forEach(c=>{
+      if(c.email&&c.status!=='revoked'){
+        existing[c.email.toLowerCase()]=c.ucid;
+        if(c.emailedAt) mailed[c.email.toLowerCase()]=c.emailedAt;
+      }
+    });
   }catch(e){ bulkMsg('err','Could not read existing credentials: '+e.message); return; }
 
   const seen={}; let ok=0,dup=0,bad=0;
@@ -418,11 +423,17 @@ $('bulkValidate').onclick=async()=>{
     if(r.level!==1&&r.level!==2){ r.status='invalid level'; bad++; return; }
     if(seen[r.email]){ r.status='duplicate in CSV'; bad++; return; }
     seen[r.email]=1;
-    if(existing[r.email]){ r.status='already issued'; r.code=existing[r.email]; dup++; return; }
+    if(existing[r.email]){
+      r.code=existing[r.email];
+      /* Read from the server, so it survives a refresh or a different machine. */
+      r.status = mailed[r.email] ? ('already sent '+mailed[r.email].slice(0,10)) : 'issued, not yet emailed';
+      dup++; return;
+    }
     r.status='ready'; ok++;
   });
   bulkRender();
-  bulkMsg(bad?'err':'ok', ok+' ready · '+dup+' already issued (will be skipped) · '+bad+' need fixing');
+  const unsent=BULK.filter(r=>r.code&&/not yet emailed/.test(r.status)).length;
+  bulkMsg(bad?'err':'ok', ok+' ready to issue · '+dup+' already issued'+(unsent?' ('+unsent+' of them not yet emailed)':'')+' · '+bad+' need fixing');
   $('bulkRun').disabled = ok===0 || bad>0;
 };
 

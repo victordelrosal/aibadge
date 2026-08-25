@@ -292,6 +292,8 @@ async function apiList(request, env) {
       cohort: r.cohort || "",
       level: r.level || 1,
       issuedDate: r.issuedDate,
+      emailedAt: r.emailedAt || null,
+      emailCount: r.emailCount || 0,
       status: r.status || "issued",
       legacy: !!r.legacy,
       source: r.source || null,
@@ -461,6 +463,11 @@ async function apiIssue(request, env, ctx) {
         level: rec.level || DEFAULT_LEVEL,
       });
       emailed = true;
+      // Stamp the record, not the browser tab. Who has been emailed must survive
+      // a refresh, a closed laptop and a different machine.
+      rec.emailedAt = new Date().toISOString();
+      rec.emailCount = (rec.emailCount || 0) + 1;
+      await putRecord(env, rec);
     } catch (e) {
       return json({ ok: true, ucid, url: `https://${host}/${ucid}`, emailed: false, emailError: String(e.message) });
     }
@@ -505,7 +512,10 @@ async function apiSend(request, env) {
   } catch (e) {
     return json({ ok: false, ucid: code, emailed: false, error: String(e.message) }, 502);
   }
-  return json({ ok: true, ucid: code, emailed: true, to: rec.email });
+  rec.emailedAt = new Date().toISOString();
+  rec.emailCount = (rec.emailCount || 0) + 1;
+  await putRecord(env, rec);
+  return json({ ok: true, ucid: code, emailed: true, to: rec.email, emailedAt: rec.emailedAt });
 }
 
 // Re-render badge.png + og.png for an existing record (e.g. after a template
