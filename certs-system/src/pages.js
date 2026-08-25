@@ -223,9 +223,9 @@ ${FONTS}<style>${HEAD_STYLE}
     <div class="actions">
       <a class="btn primary" href="/${rec.ucid}/credential.pdf">Download certificate (PDF)</a>
       <a class="btn" href="/${rec.ucid}/badge.png" download="AI-Badge-${rec.ucid}.png">Download image</a>
-      <a class="btn" href="${li}" target="_blank" rel="noopener">Add to LinkedIn</a>
-      <button class="btn" id="copyBtn">Copy link</button>
-      <a class="btn" href="${liShare}" target="_blank" rel="noopener">Share</a>
+      <a class="btn" href="${li}" target="_blank" rel="noopener" data-track="linkedin">Add to LinkedIn</a>
+      <button class="btn" id="copyBtn" data-track="copy">Copy link</button>
+      <a class="btn" href="${liShare}" target="_blank" rel="noopener" data-track="share">Share</a>
     </div>
     <div class="verify-note">This page checks the credential's <b>Ed25519</b> signature live, in your browser, against the public key published by fiveinnolabs. Nothing is taken on trust.</div>
     ${lvl ? `<div class="competencies">
@@ -295,6 +295,17 @@ ${FONTS}<style>${HEAD_STYLE}
     }catch(e){ set('warn','Could not complete verification'); }
   })();
   const to=document.getElementById('toast');
+  // Record the three presses that leave no other trace. sendBeacon so the click is
+  // never delayed by the request, and a silent no-op if it fails.
+  document.querySelectorAll('[data-track]').forEach(function(el){
+    el.addEventListener('click',function(){
+      try{
+        var b=JSON.stringify({ucid:'${rec.ucid}',event:el.getAttribute('data-track')});
+        if(navigator.sendBeacon){navigator.sendBeacon('/api/track',new Blob([b],{type:'application/json'}));}
+        else{fetch('/api/track',{method:'POST',body:b,headers:{'Content-Type':'application/json'},keepalive:true}).catch(function(){});}
+      }catch(e){}
+    });
+  });
   document.getElementById('copyBtn').addEventListener('click',async()=>{
     try{await navigator.clipboard.writeText('${url}');to.classList.add('show');setTimeout(()=>to.classList.remove('show'),1600);}catch{}
   });

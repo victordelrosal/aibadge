@@ -27,7 +27,11 @@ export const ACHIEVEMENT = {
     "Awarded for demonstrated, applied mastery of human-centred artificial intelligence: using frontier AI tools to do real work with judgement, fluency and an evaluator's mindset.",
   criteria: {
     narrative:
-      "Recipients complete the AI Badge programme by fluently applying frontier AI tools to real-world work, demonstrating sound judgement, an evaluator's mindset, and responsible, human-centred practice.",
+      "The AI Badge is earned by demonstrated, applied capability, at the level stated on the credential. " +
+      "Level 1 (AI Builder) is earned by completing the AI Badge Foundations track: building and deploying working software from a plain-language brief, directing AI as a thinking partner, and applying AI responsibly under the EU AI Act's AI-literacy expectations. " +
+      "Level 2 (Agent Operator) is earned by one of two routes. Either the holder additionally completes the AI Badge Terminal track, running, extending and directing multi-agent systems on their own machine. " +
+      "Or the holder passes Customer Engagement and Artificial Intelligence (H9CEAI), a Level 9 postgraduate module at National College of Ireland, with a final module mark of 60% or above, having designed and deployed a five-agent organisation with live data connections, an unbroken handoff pipeline, and a regulatory analysis under the EU AI Act and GDPR. " +
+      "Both Level 2 routes are assessed against the same competencies, which are listed on each credential.",
   },
   image: {
     id: "https://certs.fiveinnolabs.com/assets/emblem.png",
@@ -84,10 +88,27 @@ export const LEVELS = {
       "Apply AI responsibly within the EU AI Act's AI-literacy expectations",
     ],
   },
+  2: {
+    level: "Level 2",
+    name: "Agent Operator",
+    designation: "Level 2 · Agent Operator",
+    competencies: [
+      "Design a team of specialised AI agents, each with its own system prompt, personality and domain expertise",
+      "Orchestrate handoffs between agents so each builds on the last, producing work no single agent could produce alone",
+      "Author a reusable skill that extends what an agent can do, triggered in plain language",
+      "Structure a persistent workspace so context, files and project memory survive between sessions",
+      "Operate frontier AI agents beyond a chat window, on their own machine or infrastructure",
+      "Connect an agent to a live external data source, queried at the moment of use",
+      "Build and deploy a working prototype to the public web from a plain-language brief",
+      "Apply the EU AI Act and GDPR to a deployed AI system, and judge its trustworthiness",
+    ],
+  },
 };
 
-// New AI Badges issued today are Level 1. (Level 2 — the terminal track —
-// will get its own designation and competencies when its certificate opens.)
+// Levels that may be issued. Level 2 (Agent Operator) builds on and includes
+// Level 1 (AI Builder); it is earned either through the Terminal track or
+// through an accredited Level 9 module assessed against the same competencies.
+export const ISSUABLE_LEVELS = [1, 2];
 export const DEFAULT_LEVEL = 1;
 
 // Build the unsigned credential. `data` = { ucid, name, email, issuedDate (YYYY-MM-DD),

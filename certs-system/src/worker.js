@@ -9,13 +9,14 @@ import {
   UCID_RE,
   multikeyToPublicKey,
 } from "./lib/crypto-core.js";
-import { buildCredential, buildLegacyCredential, ISSUER_PROFILE, ACHIEVEMENT, VERIFICATION_METHOD, LEVELS, DEFAULT_LEVEL } from "./lib/credential.js";
+import { buildCredential, buildLegacyCredential, ISSUER_PROFILE, ACHIEVEMENT, VERIFICATION_METHOD, LEVELS, DEFAULT_LEVEL, ISSUABLE_LEVELS } from "./lib/credential.js";
 import { qrSvg } from "./lib/qr.js";
 import { renderArtifacts } from "./lib/render.js";
 import { sendBadgeEmail } from "./lib/email.js";
 import { getRecord, putRecord, listRecords, exists, putArtifact, getArtifact, artifactKeys, deleteRecord, deleteArtifact } from "./lib/store.js";
 import { landingPage, credentialPage, fmtDate } from "./pages.js";
 import { dashboardPage } from "./dashboard.js";
+import { track, readStats, CLIENT_EVENTS } from "./lib/stats.js";
 
 const json = (obj, status = 200, extra = {}) =>
   new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json", ...extra } });
@@ -54,6 +55,7 @@ async function route(request, env, ctx) {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
         "Access-Control-Allow-Headers": "Authorization,Content-Type",
+        "Access-Control-Max-Age": "86400",
       },
     });
   }
@@ -87,12 +89,43 @@ async function route(request, env, ctx) {
   if (path === "/api/revoke" && method === "POST") return apiRevoke(request, env);
   if (path === "/api/delete" && method === "POST") return apiDelete(request, env);
 
+  // ---- engagement tracking -------------------------------------------------
+  // The graduation email's badge <img> points here. It records the open and then
+  // serves the real badge bytes, so the email looks identical and there is no
+  // second request and no double count against the png download.
+  const beacon = path.match(/^\/e\/o\/([a-z][0-9][a-z][0-9]{2})\.png$/);
+  if (beacon) {
+    track(env, ctx, request, beacon[1], "open", "email");
+    return serveR2(env, `${beacon[1]}/badge.png`, "image/png", request);
+  }
+  // Tracked click-through for the two links in the email.
+  const click = path.match(/^\/e\/c\/([a-z][0-9][a-z][0-9]{2})\/(verify|linkedin)$/);
+  if (click) {
+    const [, code, kind] = click;
+    track(env, ctx, request, code, kind === "verify" ? "email_verify" : "email_linkedin", "email");
+    const dest =
+      kind === "verify"
+        ? `https://${host}/${code}`
+        : "https://www.linkedin.com/feed/?shareActive=true&text=" +
+          encodeURIComponent(
+            `I've earned the AI Badge from fiveinnolabs, a verifiable credential for applied, human-centred AI. Verify it here: https://${host}/${code}`
+          );
+    return Response.redirect(dest, 302);
+  }
+  // On-page button presses that produce no fetch of their own.
+  if (path === "/api/track" && method === "POST") return apiTrack(request, env, ctx);
+  if (path === "/api/stats" && method === "GET") return apiStats(request, env);
+
   // ---- per-credential artifacts & page -------------------------------------
   // /<code>/badge.png etc.
   const art = path.match(/^\/([a-z][0-9][a-z][0-9]{2})\/(badge\.png|og\.png|credential\.pdf|credential\.json)$/);
   if (art) {
     const [, code, file] = art;
     const ct = file.endsWith(".png") ? "image/png" : file.endsWith(".pdf") ? "application/pdf" : "application/json";
+    // og.png is the social unfurl image, so it means "someone previewed a share",
+    // not "someone downloaded the badge". Counted separately on purpose.
+    const ev = { "credential.pdf": "pdf", "badge.png": "png", "og.png": "preview", "credential.json": "vc" }[file];
+    if (ev) track(env, ctx, request, code, ev, "direct");
     return serveR2(env, `${code}/${file}`, ct, request);
   }
   // legacy compatibility: /<code>.pdf -> the credential PDF
@@ -109,6 +142,7 @@ async function route(request, env, ctx) {
   if (codeMatch) {
     const rec = await getRecord(env, codeMatch[1]);
     if (!rec) return html(notFoundPage(host, codeMatch[1]), 404);
+    track(env, ctx, request, rec.ucid, "view", "page");
     return html(credentialPage(rec, host));
   }
 
@@ -184,7 +218,15 @@ function validateInput(b) {
   if (name.length < 2 || name.length > 80) return "name length";
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return "invalid email";
   if (!/^\d{4}-\d{2}-\d{2}$/.test(issuedDate)) return "invalid date";
+  if (b.level !== undefined && !ISSUABLE_LEVELS.includes(Number(b.level))) return "invalid level";
   return null;
+}
+
+// The tier being issued. Absent or unrecognised falls back to Level 1, which is
+// what every credential issued before Level 2 existed already carries.
+function levelOf(b) {
+  const n = Number(b && b.level);
+  return ISSUABLE_LEVELS.includes(n) ? n : DEFAULT_LEVEL;
 }
 
 async function uniqueUcid(env) {
@@ -218,7 +260,10 @@ async function apiVerify(env, code) {
   );
 }
 function cors() {
-  return { "Access-Control-Allow-Origin": "*" };
+  // "*" is correct here: every one of these responses is either public or already
+  // gated on a bearer token, and no cookies are involved. The admin dashboard on
+  // aibadge.fiveinnolabs.com relies on this to read /api/stats cross-origin.
+  return { "Access-Control-Allow-Origin": "*", "Vary": "Origin" };
 }
 
 async function apiList(request, env) {
@@ -237,6 +282,46 @@ async function apiList(request, env) {
   });
 }
 
+// Public, deliberately narrow: only the three on-page presses that leave no other
+// trace, and only for a credential that actually exists. Everything else the system
+// records is recorded server-side, so a stranger cannot forge a download count.
+async function apiTrack(request, env, ctx) {
+  const body = await request.json().catch(() => null);
+  const code = String((body && body.ucid) || "").toLowerCase();
+  const event = String((body && body.event) || "");
+  if (!UCID_RE.test(code) || !CLIENT_EVENTS.has(event)) return json({ error: "bad request" }, 400, cors());
+  if (!(await exists(env, code))) return json({ error: "unknown credential" }, 400, cors());
+  track(env, ctx, request, code, event, "page");
+  return new Response(null, { status: 204, headers: cors() });
+}
+
+// Issuer-only. Joins the D1 aggregates to the KV records so the dashboard can show
+// a name beside each code.
+async function apiStats(request, env) {
+  const principal = await requireIssuer(request, env);
+  if (!principal) return json({ error: "unauthorised" }, 401, cors());
+  const [stats, recs] = await Promise.all([readStats(env), listRecords(env)]);
+  const meta = {};
+  for (const r of recs) {
+    meta[r.ucid] = {
+      name: r.name,
+      email: r.email || null,
+      cohort: r.cohort || "",
+      level: r.level || 1,
+      issuedDate: r.issuedDate,
+      status: r.status || "issued",
+      legacy: !!r.legacy,
+    };
+  }
+  const credentials = recs
+    .map((r) => {
+      const s = stats.credentials.find((c) => c.ucid === r.ucid);
+      return { ...meta[r.ucid], ucid: r.ucid, events: (s && s.events) || {}, lastTs: (s && s.lastTs) || null };
+    })
+    .sort((a, b) => (b.issuedDate || "").localeCompare(a.issuedDate || ""));
+  return json({ credentials, totals: stats.totals, proxyOpens: stats.proxyOpens, recent: stats.recent, events: stats.events }, 200, cors());
+}
+
 async function apiPreview(request, env) {
   const principal = await requireIssuer(request, env);
   if (!principal) return json({ error: "unauthorised" }, 401);
@@ -251,6 +336,7 @@ async function apiPreview(request, env) {
     name: body.name.trim(),
     cohort: (body.cohort || "").trim(),
     issuedDate: body.issuedDate,
+    level: levelOf(body),
     legacy: false,
   };
   const assets = await loadAssets(env);
@@ -285,6 +371,7 @@ async function apiIssue(request, env, ctx) {
     email: body.email.trim(),
     cohort: (body.cohort || "").trim(),
     issuedDate: body.issuedDate,
+    level: levelOf(body),
     status: "issued",
     legacy: false,
     createdAt: new Date().toISOString(),
@@ -321,9 +408,11 @@ async function apiIssue(request, env, ctx) {
         ucid,
         verifyUrl: `https://${host}/${ucid}`,
         badgeUrl: `https://${host}/${ucid}/badge.png`,
+        host,
         badgeBytes: badge,
         pdfBytes: pdf,
         issuedDisplay: fmtDate(rec.issuedDate),
+        level: rec.level || DEFAULT_LEVEL,
       });
       emailed = true;
     } catch (e) {

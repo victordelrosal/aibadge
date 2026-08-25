@@ -1,6 +1,6 @@
 // email.js — send the graduation email from victor@fiveinnolabs.com via Resend,
 // with the credential PDF + LinkedIn-ready PNG attached.
-import { ALIGNED_WITH_LINE } from "./credential.js";
+import { ALIGNED_WITH_LINE, LEVELS, DEFAULT_LEVEL } from "./credential.js";
 
 function bytesToBase64(bytes) {
   let bin = "";
@@ -12,19 +12,28 @@ function bytesToBase64(bytes) {
 }
 
 export async function sendBadgeEmail(env, opts) {
-  const { to, name, ucid, verifyUrl, badgeUrl, badgeBytes, pdfBytes, issuedDisplay } = opts;
-  const linkedinShare =
-    "https://www.linkedin.com/feed/?shareActive=true&text=" +
-    encodeURIComponent(
-      `I've earned the AI Badge from fiveinnolabs — a verifiable credential for applied, human-centred AI. Verify it here: ${verifyUrl}`
-    );
-  const html = emailHtml({ name, ucid, verifyUrl, badgeUrl, linkedinShare, issuedDisplay });
+  const { to, name, ucid, verifyUrl, badgeUrl, badgeBytes, pdfBytes, issuedDisplay, level, host } = opts;
+  const lvl = LEVELS[level || DEFAULT_LEVEL] || LEVELS[DEFAULT_LEVEL];
+  // Tracked surfaces. The badge image doubles as the open beacon: it records the
+  // open and then serves the real badge bytes, so nothing about the email changes.
+  const h = host || "certs.fiveinnolabs.com";
+  const beaconUrl = `https://${h}/e/o/${ucid}.png`;
+  const trackedVerify = `https://${h}/e/c/${ucid}/verify`;
+  const trackedLinkedin = `https://${h}/e/c/${ucid}/linkedin`;
+  const html = emailHtml({
+    name, ucid, issuedDisplay,
+    verifyUrl,                      // shown as text, untracked, so the printed URL stays clean
+    verifyHref: trackedVerify,      // what the button actually points at
+    badgeUrl: beaconUrl,
+    linkedinShare: trackedLinkedin,
+    designation: lvl.designation, levelName: lvl.name,
+  });
 
   const payload = {
     from: env.FROM_EMAIL || "AI Badge <victor@fiveinnolabs.com>",
     to,
     reply_to: "victor@fiveinnolabs.com",
-    subject: `🎓 You've earned the AI Badge, ${firstName(name)} — your verifiable credential`,
+    subject: `🎓 Your AI Badge certificate is ready, ${firstName(name)} · ${lvl.designation}`,
     html,
     attachments: [
       { filename: `AI-Badge-${ucid}.pdf`, content: bytesToBase64(pdfBytes) },
@@ -49,7 +58,7 @@ function firstName(n) {
   return String(n || "").trim().split(/\s+/)[0] || "there";
 }
 
-function emailHtml({ name, ucid, verifyUrl, badgeUrl, linkedinShare, issuedDisplay }) {
+function emailHtml({ name, ucid, verifyUrl, verifyHref, badgeUrl, linkedinShare, issuedDisplay, designation, levelName }) {
   const gold = "#a88742",
     navy = "#173f73";
   return `<!doctype html><html><body style="margin:0;background:#f4f5f8;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1a2235">
@@ -61,8 +70,10 @@ function emailHtml({ name, ucid, verifyUrl, badgeUrl, linkedinShare, issuedDispl
           <div style="font-size:25px;font-weight:700;margin-top:6px;color:#fff">Congratulations, ${escapeHtml(firstName(name))}. 🎉</div>
         </td></tr>
         <tr><td style="padding:30px 32px 8px">
-          <p style="font-size:16px;line-height:1.6;margin:0 0 16px">You've earned <b>the AI Badge</b> — a verifiable credential recognising your applied mastery of human-centred AI. It's official, it's cryptographically signed, and it's yours to show off.</p>
-          <div style="text-align:center;margin:22px 0 6px">
+          <p style="font-size:16px;line-height:1.6;margin:0 0 16px">Your <b>AI Badge certificate has been generated</b>, and it is yours to keep. You have earned <b>${escapeHtml(designation)}</b>, a verifiable credential recognising your applied mastery of human-centred AI. It is official, it is cryptographically signed, and it is yours to show off.</p>
+          <p style="font-size:16px;line-height:1.6;margin:0 0 16px">Your certificate and badge image are attached to this email, and both are also available any time from your credential page below, where you can download them again, add the badge to LinkedIn, or share the link with an employer.</p>
+          <div style="text-align:center;margin:4px 0 10px"><span style="display:inline-block;background:#f3ecda;color:#8a6c2f;border-radius:999px;padding:7px 16px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">${escapeHtml(designation)}</span></div>
+          <div style="text-align:center;margin:14px 0 6px">
             <img src="${badgeUrl}" alt="The AI Badge — ${escapeHtml(name)}" width="380" style="width:380px;max-width:100%;border-radius:14px">
           </div>
         </td></tr>
@@ -76,13 +87,13 @@ function emailHtml({ name, ucid, verifyUrl, badgeUrl, linkedinShare, issuedDispl
         </td></tr>
         <tr><td align="center" style="padding:14px 32px 0;font-size:12px;color:#8a91a3;letter-spacing:.01em">${ALIGNED_WITH_LINE}</td></tr>
         <tr><td align="center" style="padding:18px 32px 6px">
-          <a href="${verifyUrl}" style="display:inline-block;background:${navy};color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:13px 26px;border-radius:999px">View &amp; verify your badge →</a>
+          <a href="${verifyHref}" style="display:inline-block;background:${navy};color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:13px 26px;border-radius:999px">View &amp; verify your badge →</a>
           <div style="margin-top:14px">
             <a href="${linkedinShare}" style="display:inline-block;color:${navy};text-decoration:none;font-weight:600;font-size:14px;padding:10px 20px;border:1px solid #d8dbe6;border-radius:999px">Share on LinkedIn</a>
           </div>
         </td></tr>
         <tr><td style="padding:18px 32px 6px">
-          <p style="font-size:14px;line-height:1.6;color:#5a6273;margin:0">Attached you'll find your <b>certificate (PDF)</b> and a <b>LinkedIn-ready image</b>. Anyone can confirm your badge is genuine at <a href="${verifyUrl}" style="color:${navy}">${escapeHtml(verifyUrl.replace("https://", ""))}</a> — the signature is checked live in their browser.</p>
+          <p style="font-size:14px;line-height:1.6;color:#5a6273;margin:0">Attached you'll find your <b>certificate (PDF)</b> and a <b>LinkedIn-ready image</b>. Anyone can confirm your badge is genuine at <a href="${verifyHref}" style="color:${navy}">${escapeHtml(verifyUrl.replace("https://", ""))}</a> — the signature is checked live in their browser.</p>
         </td></tr>
         <tr><td style="padding:18px 32px 30px">
           <p style="font-size:15px;line-height:1.6;margin:0">With pride,<br><b>Victor del Rosal</b><br><span style="color:#5a6273;font-size:13px">Founder, fiveinnolabs</span></p>

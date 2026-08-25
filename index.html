@@ -2994,6 +2994,81 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <button class="amx-btn" @click="loadUsers()">↻ Refresh</button>
     </div>
 
+    <!-- Credential engagement (certs.fiveinnolabs.com) -->
+    <div class="amx-card">
+      <div class="amx-card-head">
+        <h2 class="amx-card-title">Credential engagement</h2>
+        <span class="amx-card-sub">Issued AI Badges &middot; email, page and share activity</span>
+        <span style="flex:1;"></span>
+        <button class="amx-btn" x-show="credStats" @click="exportCredCsv()">&#8681; CSV</button>
+        <button class="amx-btn" @click="loadCredStats()" x-text="credStats ? '\u21bb Refresh' : 'Load engagement'"></button>
+      </div>
+
+      <div x-show="credLoading" class="amx-card-sub">Loading from certs.fiveinnolabs.com&hellip;</div>
+      <div x-show="credError" x-text="credError" style="color:#FF3B30;font-size:0.85rem;"></div>
+
+      <template x-if="credStats">
+        <div>
+          <div class="amx-kpis" style="margin-bottom:14px;">
+            <div class="amx-kpi"><div class="amx-kpi-val" x-text="credIssued"></div><div class="amx-kpi-lab">Issued</div></div>
+            <div class="amx-kpi"><div class="amx-kpi-val" style="color:#34C759;" x-text="credEngaged"></div><div class="amx-kpi-lab">Engaged</div></div>
+            <div class="amx-kpi"><div class="amx-kpi-val" x-text="credShared"></div><div class="amx-kpi-lab">Shared</div></div>
+            <div class="amx-kpi"><div class="amx-kpi-val" x-text="credTotal('view')"></div><div class="amx-kpi-lab">Page views</div></div>
+            <div class="amx-kpi"><div class="amx-kpi-val" x-text="credTotal('pdf')"></div><div class="amx-kpi-lab">PDF downloads</div></div>
+            <div class="amx-kpi"><div class="amx-kpi-val" x-text="credTotal('png')"></div><div class="amx-kpi-lab">Image downloads</div></div>
+            <div class="amx-kpi"><div class="amx-kpi-val" x-text="credTotal('preview')"></div><div class="amx-kpi-lab">Link previews</div></div>
+          </div>
+
+          <p class="amx-card-sub" style="margin:0 0 12px;line-height:1.5;">
+            <strong>Read opens with suspicion.</strong> Apple Mail and other privacy proxies fetch images
+            without the person opening anything, which inflates opens and can never be fully filtered.
+            Clicks, views and downloads are the honest signals. Known image-proxy fetches so far:
+            <span x-text="credStats.proxyOpens || 0"></span>.
+          </p>
+
+          <div style="overflow-x:auto;">
+            <table class="amx-table">
+              <thead>
+                <tr>
+                  <th style="text-align:left;">Holder</th>
+                  <th>Code</th>
+                  <th>Lvl</th>
+                  <th title="Email rendered (inflated by privacy proxies)">Open</th>
+                  <th title="Clicked through from the email">Click</th>
+                  <th title="Loaded the credential page">Views</th>
+                  <th title="Downloaded the certificate PDF">PDF</th>
+                  <th title="Downloaded the badge image">PNG</th>
+                  <th title="Pressed Add to LinkedIn, Share or Copy link">Share</th>
+                  <th title="A crawler fetched the social preview, so a link was posted somewhere">Unfurl</th>
+                  <th>Last activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="c in credStats.credentials" :key="c.ucid">
+                  <tr>
+                    <td style="text-align:left;">
+                      <span x-text="c.name"></span>
+                      <span class="amx-card-sub" x-show="c.cohort" x-text="' · ' + c.cohort"></span>
+                    </td>
+                    <td><a :href="'https://certs.fiveinnolabs.com/' + c.ucid" target="_blank" rel="noopener" style="font-family:ui-monospace,monospace;" x-text="c.ucid"></a></td>
+                    <td x-text="'L' + (c.level || 1)"></td>
+                    <td x-text="credEv(c,'open') || '·'"></td>
+                    <td x-text="(credEv(c,'email_verify') + credEv(c,'email_linkedin')) || '·'"></td>
+                    <td x-text="credEv(c,'view') || '·'"></td>
+                    <td x-text="credEv(c,'pdf') || '·'"></td>
+                    <td x-text="credEv(c,'png') || '·'"></td>
+                    <td x-text="(credEv(c,'linkedin') + credEv(c,'share') + credEv(c,'copy')) || '·'"></td>
+                    <td x-text="credEv(c,'preview') || '·'"></td>
+                    <td x-text="credWhen(c.lastTs)"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </template>
+    </div>
+
     <!-- Completion matrix -->
     <div class="amx-card" x-show="!loading && users.length > 0">
       <div class="amx-card-head">
@@ -4240,6 +4315,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       submissionFilter: '',
       completionsByUid: {},
       matrixLoading: false,
+      // Credential engagement, read live from the certs worker (Cloudflare D1).
+      credStats: null,
+      credLoading: false,
+      credError: null,
       search: '',
       cohortFilter: '',
       sortKey: 'lastSeen',
@@ -4520,6 +4599,67 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           var c = self.completionsByUid[u.id];
           return n + (c && c[tutId] && c[tutId].completed ? 1 : 0);
         }, 0);
+      },
+      // ---- Credential engagement -------------------------------------------
+      // certs.fiveinnolabs.com runs on the same Firebase project, so the ID token
+      // this dashboard already holds is a valid issuer token there.
+      async loadCredStats() {
+        this.credLoading = true; this.credError = null;
+        try {
+          var user = Alpine.store('auth').user;
+          if (!user) throw new Error('not signed in');
+          var token = await user.getIdToken();
+          var res = await fetch('https://certs.fiveinnolabs.com/api/stats', { headers: { Authorization: 'Bearer ' + token } });
+          if (res.status === 401) throw new Error('This account is not the credential issuer.');
+          if (!res.ok) throw new Error('certs API returned ' + res.status);
+          this.credStats = await res.json();
+        } catch (e) {
+          this.credError = e.message || String(e);
+        } finally {
+          this.credLoading = false;
+        }
+      },
+      credEv(c, k) { return (c.events && c.events[k]) || 0; },
+      credTotal(k) { return (this.credStats && this.credStats.totals && this.credStats.totals[k]) || 0; },
+      get credIssued() { return this.credStats ? this.credStats.credentials.length : 0; },
+      // "Engaged" = did something beyond the email rendering: clicked, viewed, downloaded
+      // or shared. Deliberately excludes `open`, which proxies inflate.
+      get credEngaged() {
+        if (!this.credStats) return 0;
+        var keys = ['email_verify','email_linkedin','view','pdf','png','linkedin','copy','share'];
+        return this.credStats.credentials.filter(function(c){
+          return keys.some(function(k){ return (c.events && c.events[k]) > 0; });
+        }).length;
+      },
+      get credShared() {
+        if (!this.credStats) return 0;
+        var keys = ['email_linkedin','linkedin','share','copy','preview'];
+        return this.credStats.credentials.filter(function(c){
+          return keys.some(function(k){ return (c.events && c.events[k]) > 0; });
+        }).length;
+      },
+      credWhen(ts) {
+        if (!ts) return '—';
+        var d = new Date(ts), diff = (Date.now() - d.getTime()) / 1000;
+        if (diff < 90) return 'now';
+        if (diff < 3600) return Math.round(diff/60) + 'm ago';
+        if (diff < 86400) return Math.round(diff/3600) + 'h ago';
+        return Math.round(diff/86400) + 'd ago';
+      },
+      exportCredCsv() {
+        if (!this.credStats) return;
+        var self = this;
+        var cols = ['open','email_verify','email_linkedin','view','pdf','png','linkedin','copy','share','preview','vc'];
+        var rows = [['Name','Credential','Level','Cohort','Issued','Status','Last activity'].concat(cols).join(',')];
+        this.credStats.credentials.forEach(function(c) {
+          rows.push(['"'+(c.name||'').replace(/"/g,'""')+'"', c.ucid, 'L'+(c.level||1),
+            '"'+(c.cohort||'').replace(/"/g,'""')+'"', c.issuedDate||'', c.status||'', c.lastTs||'']
+            .concat(cols.map(function(k){ return self.credEv(c,k); })).join(','));
+        });
+        var url = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
+        var a = document.createElement('a');
+        a.href = url; a.download = 'ai-badge-credential-engagement.csv'; a.click();
+        URL.revokeObjectURL(url);
       },
       exportCsv() {
         var self = this;

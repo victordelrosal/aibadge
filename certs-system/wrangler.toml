@@ -26,3 +26,9 @@ binding = "BROWSER"
 [[routes]]
 pattern = "certs.fiveinnolabs.com"
 custom_domain = true
+
+# Engagement analytics (D1). Insert-only event log; no raw IP is ever stored.
+[[d1_databases]]
+binding = "STATS_DB"
+database_name = "aibadge-certs-stats"
+database_id = "e182cd6e-7766-4aa1-b677-4be2f5e12d3f"

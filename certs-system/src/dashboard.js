@@ -96,6 +96,7 @@ export function dashboardPage(cfg) {
         <input type="email" id="email" placeholder="heather@example.com" autocomplete="off">
         <div class="row">
           <div><label>Cohort (optional)</label><input type="text" id="cohort" placeholder="2026"></div>
+          <div><label>Level</label><select id="level"><option value="1">Level 1 &middot; AI Builder</option><option value="2">Level 2 &middot; Agent Operator</option></select></div>
           <div><label>Date issued</label><input type="date" id="issuedDate"></div>
         </div>
         <label class="check"><input type="checkbox" id="sendEmail" checked><span>Email the recipient their badge from victor@fiveinnolabs.com</span></label>
@@ -179,7 +180,7 @@ async function api(path,opts={}){
 let PREVIEW_UCID=null;
 function payload(){
   return {name:$('name').value.trim(),email:$('email').value.trim(),
-    cohort:$('cohort').value.trim(),issuedDate:$('issuedDate').value,sendEmail:$('sendEmail').checked};
+    cohort:$('cohort').value.trim(),level:Number($('level').value)||1,issuedDate:$('issuedDate').value,sendEmail:$('sendEmail').checked};
 }
 function setStep(n){$('s1').className='step'+(n>=1?' on':'');$('s2').className='step'+(n>=2?' on':'');$('s3').className='step'+(n>=3?' on':'');}
 
@@ -196,7 +197,7 @@ $('previewBtn').onclick=async()=>{
     $('formMsg').textContent='';
     // go to confirm step
     $('form').classList.add('hidden');$('confirm').classList.remove('hidden');setStep(2);
-    $('confirmSummary').innerHTML='<b>'+esc(p.name)+'</b><br>'+esc(p.email)+'<br>Issued '+esc(p.issuedDate)+(p.cohort?(' · '+esc(p.cohort)):'')+'<br>Credential ID: <b style="font-family:monospace;color:var(--gold)">'+esc(PREVIEW_UCID||'—')+'</b><br>'+(p.sendEmail?'✉️ Will email recipient':'No email');
+    $('confirmSummary').innerHTML='<b>'+esc(p.name)+'</b><br>'+esc(p.email)+'<br>Issued '+esc(p.issuedDate)+(p.cohort?(' · '+esc(p.cohort)):'')+'<br><b style="color:var(--gold)">'+esc(p.level===2?'Level 2 · Agent Operator':'Level 1 · AI Builder')+'</b><br>Credential ID: <b style="font-family:monospace;color:var(--gold)">'+esc(PREVIEW_UCID||'—')+'</b><br>'+(p.sendEmail?'✉️ Will email recipient':'No email');
   }catch(e){$('previewBox').textContent='Preview failed';$('formMsg').className='msg err';$('formMsg').textContent=e.message;}
   finally{$('previewBtn').disabled=false;}
 };

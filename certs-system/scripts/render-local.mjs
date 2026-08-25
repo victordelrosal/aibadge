@@ -30,6 +30,8 @@ const logoDark = "data:image/png;base64," + readFileSync(join(root, "assets", "l
 
 const ucid = process.argv[3] || "a1b23";
 const name = process.argv[2] || "Heather O'Malley";
+const level = Number(process.argv[4]) || 1;
+const cohortArg = process.argv[5] || "";
 const verifyHost = "certs.fiveinnolabs.com";
 const verifyUrl = `https://${verifyHost}/${ucid}`;
 const d = {
@@ -41,9 +43,9 @@ const d = {
   emblemDataUri,
   logoWhite,
   logoDark,
-  cohort: "",
-  designation: LEVELS[1].designation,
-  competencies: LEVELS[1].competencies,
+  cohort: cohortArg,
+  designation: LEVELS[level].designation,
+  competencies: LEVELS[level].competencies,
   qr: qrSvg(verifyUrl, { size: 150, fg: "#0b1440", bg: "transparent", ecl: "M" }),
 };
 

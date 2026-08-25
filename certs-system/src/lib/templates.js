@@ -226,52 +226,54 @@ export function pdfHtml(d) {
     text-transform:uppercase;color:var(--muted);font-weight:600}
   .brand .dot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
   .title{text-align:center;font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;color:var(--navy);
-    font-size:34px;letter-spacing:.01em;margin-top:7px;line-height:1.05}
+    font-size:31px;letter-spacing:.01em;margin-top:6px;line-height:1.05}
   .title small{display:block;font-family:Inter;font-weight:600;font-size:12px;letter-spacing:.32em;
     text-transform:uppercase;color:var(--gold);margin-top:9px}
-  .rule{width:62mm;height:2px;margin:13px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+  .rule{width:62mm;height:2px;margin:10px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
   /* credential card */
-  .card{display:flex;gap:12mm;align-items:center;margin-top:8mm}
-  .card .emblem{width:46mm;height:auto;flex:0 0 auto;filter:drop-shadow(0 6px 14px rgba(23,63,115,.22))}
+  .card{display:flex;gap:12mm;align-items:center;margin-top:6mm}
+  .card .emblem{width:42mm;height:auto;flex:0 0 auto;filter:drop-shadow(0 6px 14px rgba(23,63,115,.22))}
   .fields{flex:1}
   .awarded{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);font-weight:600}
-  .recipient{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;font-size:46px;color:var(--ink);
-    line-height:1.02;margin:4px 0 12px}
-  .grid{display:flex;gap:10mm}
+  .recipient{font-family:"Cormorant Garamond",Georgia,serif;font-weight:700;font-size:44px;color:var(--ink);
+    line-height:1.02;margin:4px 0 10px}
+  .grid{display:flex;gap:9mm;align-items:flex-start}
   .grid .k{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
   .grid .v{font-size:16px;color:var(--ink);font-weight:600;margin-top:3px}
+  .grid .v.nw{white-space:nowrap}
+  .grid .cohort{max-width:56mm}
   .grid .v.mono{font-family:"JetBrains Mono",monospace;color:var(--navy2);letter-spacing:.06em}
   /* letter */
-  .letter{margin-top:7mm;font-size:12.5px;line-height:1.72;color:var(--body)}
-  .letter p{margin-bottom:8px}
-  .sign{margin-top:9mm;display:flex;justify-content:space-between;align-items:flex-end}
+  .letter{margin-top:4mm;font-size:12px;line-height:1.5;color:var(--body)}
+  .letter p{margin-bottom:6px}
+  .sign{margin-top:6mm;display:flex;justify-content:space-between;align-items:flex-end}
   .sig .who{font-family:"Cormorant Garamond",serif;font-size:26px;color:var(--navy);border-bottom:1px solid var(--hair);
     padding-bottom:4px;width:62mm}
   .sig .role{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:6px;font-weight:600}
   .seal{text-align:center}
-  .seal .ring{width:30mm;height:30mm;border:1.5px solid var(--gold);border-radius:50%;display:flex;
+  .seal .ring{width:26mm;height:26mm;border:1.5px solid var(--gold);border-radius:50%;display:flex;
     flex-direction:column;align-items:center;justify-content:center;color:var(--navy);
     font-family:"Cormorant Garamond",serif;font-size:13px;text-align:center;line-height:1.12;font-weight:700;
     position:relative;box-shadow:inset 0 0 0 1px rgba(168,135,66,.25)}
   .seal .ring small{display:block;font-family:Inter;font-size:6.5px;letter-spacing:.24em;color:var(--gold);
     margin-top:4px;font-weight:600}
   /* framework alignment */
-  .fw{margin-top:5mm;border:1px solid var(--hair);border-radius:7px;padding:5mm 7mm 4mm;background:#fbfcfe}
+  .fw{margin-top:4mm;border:1px solid var(--hair);border-radius:7px;padding:4mm 7mm 3.5mm;background:#fbfcfe}
   .fw-h{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:700;text-align:center;margin-bottom:2mm}
   .fw-sub{font-size:9.5px;color:var(--muted);text-align:center;margin-bottom:3.5mm}
   .fw-grid{display:flex;flex-wrap:wrap;gap:2mm 2.5mm;justify-content:center}
   .fw-chip{font-size:10px;color:var(--ink);font-weight:600;border:1px solid var(--hair);border-radius:999px;padding:1.6mm 3.5mm;background:#fff}
-  .fw-note{margin-top:3.5mm;font-size:8px;color:var(--muted);line-height:1.45;text-align:center}
+  .fw-note{margin-top:3mm;font-size:8px;color:var(--muted);line-height:1.4;text-align:center}
   /* level designation + competencies */
   .cred-level{text-align:center;font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-top:6px}
-  .comp{margin-top:5mm;border:1px solid var(--hair);border-radius:7px;padding:4.5mm 7mm 4mm;background:#fbfcfe}
+  .comp{margin-top:4mm;border:1px solid var(--hair);border-radius:7px;padding:3.5mm 7mm 3mm;background:#fbfcfe}
   .comp-h{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--navy2);font-weight:700;text-align:center;margin-bottom:3mm}
-  .comp ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:1.7mm 7mm}
-  .comp li{position:relative;padding-left:5mm;font-size:9.5px;line-height:1.38;color:var(--ink)}
+  .comp ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:1.5mm 7mm}
+  .comp li{position:relative;padding-left:5mm;font-size:9.5px;line-height:1.32;color:var(--ink)}
   .comp li::before{content:"";position:absolute;left:0;top:1.3mm;width:2mm;height:2mm;border-radius:50%;background:var(--gold)}
   /* verification footer */
   .verify{margin-top:auto;display:flex;gap:11mm;align-items:center;border-top:1px solid var(--hair);
-    padding-top:6mm}
+    padding-top:5mm;flex:0 0 auto}
   .verify .vqr{width:23mm;height:23mm;flex:0 0 auto}
   .verify .vqr svg{width:100%;height:100%;display:block}
   .card .emblem,.watermark{display:block}
@@ -303,8 +305,8 @@ export function pdfHtml(d) {
         <div class="recipient">${esc(d.name)}</div>
         <div class="grid">
           <div><div class="k">Credential ID</div><div class="v mono">${esc(d.ucid)}</div></div>
-          <div><div class="k">Date issued</div><div class="v">${esc(d.issuedDisplay)}</div></div>
-          ${d.cohort ? `<div><div class="k">Cohort</div><div class="v">${esc(d.cohort)}</div></div>` : ""}
+          <div><div class="k">Date issued</div><div class="v nw">${esc(d.issuedDisplay)}</div></div>
+          ${d.cohort ? `<div class="cohort"><div class="k">Cohort</div><div class="v">${esc(d.cohort)}</div></div>` : ""}
         </div>
       </div>
     </div>
