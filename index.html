@@ -4606,9 +4606,11 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       async loadCredStats() {
         this.credLoading = true; this.credError = null;
         try {
-          var user = Alpine.store('auth').user;
-          if (!user) throw new Error('not signed in');
-          var token = await user.getIdToken();
+          // The auth store holds a plain {uid, email} object, not the Firebase User,
+          // so the token comes from firebase.auth() as it does everywhere else here.
+          var fbUser = (window.firebase && firebase.auth().currentUser) || null;
+          if (!fbUser) throw new Error('Not signed in. Reload the page and sign in again.');
+          var token = await fbUser.getIdToken();
           var res = await fetch('https://certs.fiveinnolabs.com/api/stats', { headers: { Authorization: 'Bearer ' + token } });
           if (res.status === 401) throw new Error('This account is not the credential issuer.');
           if (!res.ok) throw new Error('certs API returned ' + res.status);
