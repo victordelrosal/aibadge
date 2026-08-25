@@ -70,6 +70,23 @@ export async function requireIssuer(request, env) {
   return principal;
 }
 
+// Any signed-in learner, as opposed to the single issuer identity. Used only to
+// let someone look up THEIR OWN credential, matched on the email inside their
+// verified Firebase token, so one learner can never read another's.
+//
+// emailVerified is deliberately NOT required: NCI students sign up with the class
+// code rather than a verification link, so demanding it would lock out most of
+// the cohort. The exposure that allows is narrow, because everything returned is
+// already public at the credential URL itself.
+export async function requireUser(request, env) {
+  const auth = request.headers.get("Authorization") || "";
+  const m = auth.match(/^Bearer\s+(.+)$/i);
+  if (!m) return null;
+  const principal = await verifyFirebaseToken(m[1], env);
+  if (!principal || !principal.email) return null;
+  return principal;
+}
+
 function b64urlToBytes(s) {
   s = String(s).replace(/-/g, "+").replace(/_/g, "/");
   const pad = s.length % 4;

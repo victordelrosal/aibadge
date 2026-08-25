@@ -1,7 +1,7 @@
 // worker.js — certs.fiveinnolabs.com. Serves the verify landing, per-credential
 // brag/verify pages, artifacts, the issuer profile + public key, the issuer-only
 // dashboard, and the issuance/verify/revoke APIs.
-import { requireIssuer } from "./lib/firebase-auth.js";
+import { requireIssuer, requireUser } from "./lib/firebase-auth.js";
 import {
   importPrivateKeyJwk,
   signCredential,
@@ -82,6 +82,7 @@ async function route(request, env, ctx) {
 
   // ---- APIs ----------------------------------------------------------------
   if (path.startsWith("/api/verify/")) return apiVerify(env, path.slice("/api/verify/".length));
+  if (path === "/api/my" && method === "GET") return apiMy(request, env);
   if (path === "/api/list" && method === "GET") return apiList(request, env);
   if (path === "/api/preview" && method === "POST") return apiPreview(request, env);
   if (path === "/api/issue" && method === "POST") return apiIssue(request, env, ctx);
@@ -278,6 +279,32 @@ function cors() {
   // gated on a bearer token, and no cookies are involved. The admin dashboard on
   // aibadge.fiveinnolabs.com relies on this to read /api/stats cross-origin.
   return { "Access-Control-Allow-Origin": "*", "Vary": "Origin" };
+}
+
+// A learner asking "where is my certificate?". Returns at most ONE credential:
+// the one belonging to the email inside the caller's own verified token.
+async function apiMy(request, env) {
+  const principal = await requireUser(request, env);
+  if (!principal) return json({ error: "unauthorised" }, 401, cors());
+  const rec = await findByEmail(env, principal.email);
+  if (!rec || rec.legacy) return json({ found: false }, 200, cors());
+  const host = new URL(request.url).host;
+  return json(
+    {
+      found: true,
+      ucid: rec.ucid,
+      name: rec.name,
+      level: rec.level || DEFAULT_LEVEL,
+      levelName: (LEVELS[rec.level || DEFAULT_LEVEL] || LEVELS[DEFAULT_LEVEL]).designation,
+      cohort: rec.cohort || "",
+      issuedDate: rec.issuedDate,
+      url: `https://${host}/${rec.ucid}`,
+      badgeUrl: `https://${host}/${rec.ucid}/badge.png`,
+      pdfUrl: `https://${host}/${rec.ucid}/credential.pdf`,
+    },
+    200,
+    cors()
+  );
 }
 
 async function apiList(request, env) {
