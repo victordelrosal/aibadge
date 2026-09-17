@@ -3600,6 +3600,17 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                  @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
         </div>
 
+        <!-- First sign-in on a hashed cohort list: we hold no name for this
+             student, so they give it once and it goes on their certificate. -->
+        <div x-show="needName" x-transition style="margin-bottom:20px;">
+          <label style="display:block;font:600 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Your full name</label>
+          <input type="text" x-model="fullName" autocomplete="name" placeholder="As it should appear on your certificate"
+                 style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:400 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;"
+                 @focus="$el.style.borderColor='#007AFF';$el.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
+                 @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
+          <p style="font:400 12.5px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.6);margin:8px 0 0;">You are on the class list. We just do not keep your name on file until you give it.</p>
+        </div>
+
         <!-- Not on the class list: ask them to double-check, then request access -->
         <div x-show="isNciEmailLive && notOnRoster && !nciRequestMode" x-transition
              style="background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.3);border-radius:10px;padding:12px 14px;margin-bottom:20px;display:none;">
@@ -4845,6 +4856,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       submitting: false,
       isRegister: false,
       notOnRoster: false,
+      needName: false,
+      fullName: '',
       nciRequestMode: false,
       regFirstName: '',
       regSurname: '',
@@ -4861,6 +4874,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.password = '';
         this.classCode = '';
         this.notOnRoster = false;
+        this.needName = false;
         this.nciRequestMode = false;
         this.regFirstName = '';
         this.regSurname = '';
@@ -4882,7 +4896,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           return;
         }
         this.submitting = true;
-        const result = await signInOrCreateNciFreeAccount(this.email, this.classCode);
+        const result = await signInOrCreateNciFreeAccount(this.email, this.classCode, this.fullName);
         this.submitting = false;
         if (result.success) {
           Alpine.store('auth').firstTime = nciMarkSeenReturnFirstTime(this.email);
@@ -4896,6 +4910,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
           } catch (e) { /* store keeps whatever onAuthChange loaded */ }
           Alpine.store('ui').closeModal();
           this._resetNci();
+        } else if (result.needName) {
+          this.needName = true;
+          this.error = this.fullName ? 'Please enter your first name and surname.' : '';
         } else if (result.notOnRoster) {
           // Valid NCI email + valid code, but not on the class list.
           // Offer the request-access flow rather than letting them in.

@@ -174,7 +174,7 @@ async function sendPasswordReset(email) {
    -------------------------------------------------------------------------- */
 
 const NCI_FREE_ACCESS_PASSWORD = "nci-domain-claim-2026-fiveinnolabs";
-const NCI_CLASS_CODES = ["NCI2026", "H9CEAI"]; // case-insensitive
+const NCI_CLASS_CODES = ["NCI2026", "H9CEAI", "9BDAIB", "BDAIB"]; // case-insensitive
 
 function isValidNciClassCode(code) {
   const c = String(code || "").trim().toUpperCase();
@@ -235,8 +235,68 @@ const NCI_ROSTER = {
   "x25145924@student.ncirl.ie": { firstName: "Cathal", fullName: "Cathal Wall", studentId: "25145924", cohort: "MSCAIBUSJAN26I" },
   "x25200992@student.ncirl.ie": { firstName: "Puneet", fullName: "Puneet Warathe", studentId: "25200992", cohort: "MSCAIBUSJAN26I" },
   "x25205048@student.ncirl.ie": { firstName: "Saw", fullName: "Saw Yamin Thwe", studentId: "25205048", cohort: "MSCAIBUSJAN26I" },
+
   "x00341506@student.ncirl.ie": { firstName: "Manuel", fullName: "Manuel Ahumada", studentId: "00341506", cohort: "MSCAIBUSJAN26I" }
 };
+
+/* --------------------------------------------------------------------------
+   Hashed cohort list. This file is served publicly, so newer cohorts are kept
+   as SHA-256 of the student email and nothing else: membership can be checked,
+   but the list cannot be read. The student supplies their name once at sign-up
+   and the student number comes out of their own email address.
+   Added 2026-09-17 for CBAIPE_SEP26 (32 students).
+   -------------------------------------------------------------------------- */
+const NCI_ROSTER_HASHED = {
+  "f927adaba958549939fb56a275bcd614477ac15e61e58d9650fbb6cd339122f3": { cohort: "CBAIPE_SEP26" },
+  "e2f017a7388078c08ddb8b21ca2e28bcb621e2a774b0dbb5bd44759218e87186": { cohort: "CBAIPE_SEP26" },
+  "efc74b814a873816490749876cd90c0d96966ef69fdb295b1951a9b3656e0b15": { cohort: "CBAIPE_SEP26" },
+  "7f7d47bc3570b82e5353ec07d1cacf91262c782360a0b4420d7aafbde73bf28e": { cohort: "CBAIPE_SEP26" },
+  "43aeb0a77351e7aef7cc9f1ebaa0a2d23c3359b1ff3fc8b03208d357c66f78dc": { cohort: "CBAIPE_SEP26" },
+  "398bb936249cc0f8a0941773257678a14ed12a565e181730fe4c6ae180bae88e": { cohort: "CBAIPE_SEP26" },
+  "54bf8b98a0ee2eb49ab4cd541b59ebb0f5ccb54454bb4bbc9e77cb9e07bbcbb0": { cohort: "CBAIPE_SEP26" },
+  "453071efb8dc6165da24fd30739bbd72a22ce860d49e4a654aad74bb2d750c34": { cohort: "CBAIPE_SEP26" },
+  "1b413d8c8eaa8dc2b04a7c6d265bd4e3af7b1f84757797d041ce24d9648f99ce": { cohort: "CBAIPE_SEP26" },
+  "b37752d9b5f48d8f7ef0e9d4bf7cbdc6164586768f5881254388a080aee05139": { cohort: "CBAIPE_SEP26" },
+  "3a806c099d49c9361b320fdb2e49ea5b63a6c2f425c70571e1205778ea7e141b": { cohort: "CBAIPE_SEP26" },
+  "df2755f4a00b680273017b8b963d2557db384cc444292136c7bbedca62095df3": { cohort: "CBAIPE_SEP26" },
+  "b76a1df4622aa7dea8202b28078889f9a1ef8b6a0b081dab5197e7fce7248627": { cohort: "CBAIPE_SEP26" },
+  "4f511c5074fc91e3aac1ccbb4c47b6b4cd6b0da820815c1ced08e9f6b797284b": { cohort: "CBAIPE_SEP26" },
+  "813ce83076b0442405bc6691b5507f9f0f2bb74b82d7140361f38c69fd92eba9": { cohort: "CBAIPE_SEP26" },
+  "0fd9beb26ffffec530ee85a563c5ac9efbfca2ab088cf0e0ca65cda3fe089d60": { cohort: "CBAIPE_SEP26" },
+  "7f0e650155761b2f940b0d19274cc689775495a5aea2c9110caf0e1467a0ba96": { cohort: "CBAIPE_SEP26" },
+  "5ffd87a3a287b22436f8f53211021ed9f4c1364b57ac3051c94e042ded96f561": { cohort: "CBAIPE_SEP26" },
+  "236a9c3870aabd4ddd11b2ce5773ace6d792139c53db937e620b21a653b12ac7": { cohort: "CBAIPE_SEP26" },
+  "3b995bccc84fee801bf7c583675e6ec28ad2a2c779420e3bd5d0cc7b7867bf51": { cohort: "CBAIPE_SEP26" },
+  "334394ef2d61667fa5b3454a165d75110bcea57b8a9629451d349a94512dfb85": { cohort: "CBAIPE_SEP26" },
+  "1bdb1fdd4c102bde4c9e6230b70052947ba06a495302c474fefb566d9f37dd05": { cohort: "CBAIPE_SEP26" },
+  "949111d7c7ff31048b25977f23cc6b7fafe6924f1812a7a7c71e3b919b44e9a4": { cohort: "CBAIPE_SEP26" },
+  "ac2cdc045cfd50384fa392d42fa3f935b802235e68e0e805147127a85e0290db": { cohort: "CBAIPE_SEP26" },
+  "7ee8b830b3bbb6c7f9f24bba9310252c05e3c765eba2ee909413b058cb12d1ae": { cohort: "CBAIPE_SEP26" },
+  "9aeb03310b4551688f43ec867895feaff5f23fd918022472ededba81234763ff": { cohort: "CBAIPE_SEP26" },
+  "448c003e5cf67f03051cfe7f0466df039b075b157221a03c4f29111144a2d72a": { cohort: "CBAIPE_SEP26" },
+  "baad56642e68362f5878c3e1b3052deed165ec0b04f8fb9bc23b2d9f50c13591": { cohort: "CBAIPE_SEP26" },
+  "bc8680fdb8ef330383c8475579c87e792e5a90f8f7649145fb46e57d19ef56cb": { cohort: "CBAIPE_SEP26" },
+  "06f288e42b8d609d5a2f29e722bb36fcb02a34bf8f6d48b977f95325566264ae": { cohort: "CBAIPE_SEP26" },
+  "5060b303c8761067cf6acc13bad489471a2dd297eef259619996aadf54f458ad": { cohort: "CBAIPE_SEP26" },
+  "a4e67429116c6a48451cecba38e5dfaf5f5358f0f2d5c70dd46ee449a3df8456": { cohort: "CBAIPE_SEP26" },
+};
+
+async function sha256Hex(text) {
+  const bytes = new TextEncoder().encode(String(text || ""));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Roster lookup across both shapes. Plain entries carry their own name; hashed
+// ones return { needsName: true } so the caller can ask for it.
+async function findNciRosterEntry(email) {
+  const e = String(email || "").trim().toLowerCase();
+  const plain = NCI_ROSTER[e];
+  if (plain) return plain;
+  const hit = NCI_ROSTER_HASHED[await sha256Hex(e)];
+  if (!hit) return null;
+  return { cohort: hit.cohort, needsName: true, studentId: deriveStudentIdFromEmail(e) };
+}
 
 function getNciRosterEntry(email) {
   const e = String(email || "").trim().toLowerCase();
@@ -279,7 +339,7 @@ async function _nciAuthenticate(target) {
 // Class-code path: ONLY roster students get in here. Non-roster NCI emails
 // are bounced back with { notOnRoster: true } so the UI can offer the
 // request-access registration flow.
-async function signInOrCreateNciFreeAccount(email, classCode) {
+async function signInOrCreateNciFreeAccount(email, classCode, fullName) {
   initFirebase();
   const target = String(email || "").trim().toLowerCase();
   if (!isNciEmail(target)) {
@@ -288,7 +348,19 @@ async function signInOrCreateNciFreeAccount(email, classCode) {
   if (!isValidNciClassCode(classCode)) {
     return { success: false, error: "That class code isn't right. Ask Victor for the current code." };
   }
-  const entry = getNciRosterEntry(target);
+  let entry = await findNciRosterEntry(target);
+  if (entry && entry.needsName) {
+    const name = String(fullName || "").replace(/\s+/g, " ").trim();
+    if (name.length < 3 || !/\s/.test(name)) {
+      return { success: false, needName: true, error: "" };
+    }
+    entry = {
+      firstName: name.split(" ")[0],
+      fullName: name,
+      studentId: entry.studentId || deriveStudentIdFromEmail(target),
+      cohort: entry.cohort
+    };
+  }
   if (!entry) {
     return {
       success: false,
