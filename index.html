@@ -3598,6 +3598,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                  style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:600 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;letter-spacing:0.05em;text-transform:uppercase;"
                  @focus="$el.style.borderColor='#007AFF';$el.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
                  @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
+          <p x-show="codeFromHub && classCode" style="margin:8px 0 0;font:500 13px/1.4 -apple-system,sans-serif;color:#1f7a3a;">
+            ✓ Your class code <b x-text="classCode"></b> came across from your class hub. Just add your NCI email.
+          </p>
         </div>
 
         <!-- First sign-in on a hashed cohort list: we hold no name for this
@@ -4118,6 +4121,25 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   // access until 1 Sept 2026, so no student is ever blocked mid-semester by a
   // profile-state glitch. After this date the freemium gate resumes.
   var ACCESS_AMNESTY_UNTIL = Date.parse('2026-09-01T00:00:00+01:00');
+
+  // Class-hub handoff (2026-09-22). The NCI module hubs (lochf-hub, bdaib-hub)
+  // link here as /?code=NCI2026. We keep the code for this tab, strip it from
+  // the address bar, open the sign-in sheet for a logged-out visitor, and
+  // prefill the class-code field so a student only types their email.
+  var HUB_CLASS_CODE = '';
+  try {
+    var _sp = new URLSearchParams(location.search);
+    var _c = (_sp.get('code') || _sp.get('nci') || '').trim().toUpperCase();
+    if (_c) {
+      HUB_CLASS_CODE = _c;
+      try { sessionStorage.setItem('nci-class-code', _c); } catch (e) {}
+      _sp.delete('code'); _sp.delete('nci');
+      var _q = _sp.toString();
+      try { history.replaceState({}, '', location.pathname + (_q ? '?' + _q : '') + location.hash); } catch (e) {}
+    } else {
+      try { HUB_CLASS_CODE = sessionStorage.getItem('nci-class-code') || ''; } catch (e) {}
+    }
+  } catch (e) {}
   function registerStores(Alpine) {
     Alpine.store('auth', {
       user: null,
@@ -4341,6 +4363,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         auth.setUser(null);
         auth.setProfile(null);
         try { if (typeof stopEngagementHeartbeat === 'function') stopEngagementHeartbeat(); } catch (e) {}
+        // Arrived from a class hub with a code: go straight to the sign-in sheet.
+        if (HUB_CLASS_CODE) { try { Alpine.store('ui').showModal('signin'); } catch (e) {} }
       }
       auth.setLoading(false);
       route();
@@ -4850,7 +4874,8 @@ document.querySelectorAll('#navLinks a').forEach(a => {
     return {
       email: '',
       password: '',
-      classCode: '',
+      classCode: (typeof HUB_CLASS_CODE === 'string' ? HUB_CLASS_CODE : ''),
+      codeFromHub: !!(typeof HUB_CLASS_CODE === 'string' && HUB_CLASS_CODE),
       error: '',
       success: '',
       submitting: false,
