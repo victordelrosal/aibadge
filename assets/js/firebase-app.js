@@ -190,53 +190,10 @@ function isValidNciClassCode(code) {
    To add/remove a student, edit this object and redeploy (git push).
    -------------------------------------------------------------------------- */
 const NCI_ROSTER = {
-  "x25115880@student.ncirl.ie": { firstName: "Obafemi", fullName: "Obafemi Akin-Laguda", studentId: "25115880", cohort: "PGDAIBUS_SEP" },
-  "x24137561@student.ncirl.ie": { firstName: "Luan", fullName: "Luan Carlos Amaral Sandes", studentId: "24137561", cohort: "PGDAIBUS_SEP" },
-  "x25130757@student.ncirl.ie": { firstName: "Andres", fullName: "Andres Arguello Pitt", studentId: "25130757", cohort: "PGDAIBUS_SEP" },
-  "x25123238@student.ncirl.ie": { firstName: "Fuat", fullName: "Fuat Aygin", studentId: "25123238", cohort: "PGDAIBUS_SEP" },
-  "x25115774@student.ncirl.ie": { firstName: "Namir", fullName: "Namir Ben", studentId: "25115774", cohort: "PGDAIBUS_SEP" },
-  "x25120085@student.ncirl.ie": { firstName: "Tom", fullName: "Tom Crotty", studentId: "25120085", cohort: "PGDAIBUS_SEP" },
-  "x20216114@student.ncirl.ie": { firstName: "Frank", fullName: "Frank Devins", studentId: "20216114", cohort: "PGDAIBUS_SEP" },
-  "x25134621@student.ncirl.ie": { firstName: "Ross", fullName: "Ross Doherty", studentId: "25134621", cohort: "PGDAIBUS_SEP" },
-  "x25130749@student.ncirl.ie": { firstName: "Brendan", fullName: "Brendan Dolan", studentId: "25130749", cohort: "PGDAIBUS_SEP" },
-  "x17166080@student.ncirl.ie": { firstName: "Paula", fullName: "Paula Dowling", studentId: "17166080", cohort: "PGDAIBUS_SEP" },
-  "x25134680@student.ncirl.ie": { firstName: "Sara", fullName: "Sara Eltayeb", studentId: "25134680", cohort: "PGDAIBUS_SEP" },
-  "x20180861@student.ncirl.ie": { firstName: "Laura", fullName: "Laura Ferreira Motta", studentId: "20180861", cohort: "PGDAIBUS_SEP" },
-  "x24132292@student.ncirl.ie": { firstName: "Mark", fullName: "Mark Galvin", studentId: "24132292", cohort: "PGDAIBUS_SEP" },
-  "x15001725@student.ncirl.ie": { firstName: "William", fullName: "William Ho", studentId: "15001725", cohort: "PGDAIBUS_SEP" },
-  "x25125133@student.ncirl.ie": { firstName: "Jasson", fullName: "Jasson Ji", studentId: "25125133", cohort: "PGDAIBUS_SEP" },
-  "x25123114@student.ncirl.ie": { firstName: "Ganesh", fullName: "Ganesh Karnambakkam Babu", studentId: "25123114", cohort: "PGDAIBUS_SEP" },
-  "x25155237@student.ncirl.ie": { firstName: "Daniel", fullName: "Daniel Kelly", studentId: "25155237", cohort: "PGDAIBUS_SEP" },
-  "x25132644@student.ncirl.ie": { firstName: "Ozgul", fullName: "Ozgul Kilinc", studentId: "25132644", cohort: "PGDAIBUS_SEP" },
-  "x25118447@student.ncirl.ie": { firstName: "Amay", fullName: "Amay Kumar", studentId: "25118447", cohort: "PGDAIBUS_SEP" },
-  "x25159704@student.ncirl.ie": { firstName: "Vinod", fullName: "Vinod Madan", studentId: "25159704", cohort: "PGDAIBUS_SEP" },
-  "x17115949@student.ncirl.ie": { firstName: "Kevin", fullName: "Kevin Mccarthy", studentId: "17115949", cohort: "PGDAIBUS_SEP" },
-  "x25146041@student.ncirl.ie": { firstName: "John", fullName: "John O Callaghan", studentId: "25146041", cohort: "PGDAIBUS_SEP" },
-  "x25140094@student.ncirl.ie": { firstName: "Manus", fullName: "Manus Ó Dálaigh", studentId: "25140094", cohort: "PGDAIBUS_SEP" },
-  "x25126466@student.ncirl.ie": { firstName: "Elizabeth", fullName: "Elizabeth Oladipo", studentId: "25126466", cohort: "PGDAIBUS_SEP" },
-  "x25115839@student.ncirl.ie": { firstName: "Diana", fullName: "Diana Parau", studentId: "25115839", cohort: "PGDAIBUS_SEP" },
-  "x25113160@student.ncirl.ie": { firstName: "Fabio", fullName: "Fabio Poli", studentId: "25113160", cohort: "PGDAIBUS_SEP" },
-  "x25113046@student.ncirl.ie": { firstName: "Pedro", fullName: "Pedro Queiroga", studentId: "25113046", cohort: "PGDAIBUS_SEP" },
-  "x25115871@student.ncirl.ie": { firstName: "Syamalarao", fullName: "Syamalarao Rakoti", studentId: "25115871", cohort: "PGDAIBUS_SEP" },
-  "x25119371@student.ncirl.ie": { firstName: "Nagarajan", fullName: "Nagarajan Ramu", studentId: "25119371", cohort: "PGDAIBUS_SEP" },
-  "x25134655@student.ncirl.ie": { firstName: "Rohith", fullName: "Rohith Ray", studentId: "25134655", cohort: "PGDAIBUS_SEP" },
-  "x25111485@student.ncirl.ie": { firstName: "Naomi", fullName: "Naomi Del Carmen Santana Sosa", studentId: "25111485", cohort: "PGDAIBUS_SEP" },
-  "x25128442@student.ncirl.ie": { firstName: "Nadiya", fullName: "Nadiya Sydorenko", studentId: "25128442", cohort: "PGDAIBUS_SEP" },
-  "x25137972@student.ncirl.ie": { firstName: "Sebastian", fullName: "Sebastian Thim", studentId: "25137972", cohort: "PGDAIBUS_SEP" },
-  "x24323870@student.ncirl.ie": { firstName: "Rashmi", fullName: "Rashmi Belimagga Shetty Manjunath", studentId: "24323870", cohort: "MSCAIBUSJAN26I" },
-  "x25104403@student.ncirl.ie": { firstName: "Aleyna", fullName: "Aleyna Eski", studentId: "25104403", cohort: "MSCAIBUSJAN26I" },
-  "x25155717@student.ncirl.ie": { firstName: "Chris", fullName: "Chris Crasto Gomes", studentId: "25155717", cohort: "MSCAIBUSJAN26I" },
-  "x24160873@student.ncirl.ie": { firstName: "Axel", fullName: "Axel Adewale Ilenre", studentId: "24160873", cohort: "MSCAIBUSJAN26I" },
-  "x25211013@student.ncirl.ie": { firstName: "Navera", fullName: "Navera Fatima Kurnool", studentId: "25211013", cohort: "MSCAIBUSJAN26I" },
-  "x24266213@student.ncirl.ie": { firstName: "Dnyanesh", fullName: "Dnyanesh Kailas Mali", studentId: "24266213", cohort: "MSCAIBUSJAN26I" },
-  "x25161474@student.ncirl.ie": { firstName: "Onyinyechi", fullName: "Onyinyechi Miracle Obodoeze", studentId: "25161474", cohort: "MSCAIBUSJAN26I" },
-  "x25128558@student.ncirl.ie": { firstName: "Darshankumar", fullName: "Darshankumar Sureshbhai Savaj", studentId: "25128558", cohort: "MSCAIBUSJAN26I" },
-  "x25236482@student.ncirl.ie": { firstName: "Giovanni", fullName: "Giovanni Sottana", studentId: "25236482", cohort: "MSCAIBUSJAN26I" },
-  "x25145924@student.ncirl.ie": { firstName: "Cathal", fullName: "Cathal Wall", studentId: "25145924", cohort: "MSCAIBUSJAN26I" },
-  "x25200992@student.ncirl.ie": { firstName: "Puneet", fullName: "Puneet Warathe", studentId: "25200992", cohort: "MSCAIBUSJAN26I" },
-  "x25205048@student.ncirl.ie": { firstName: "Saw", fullName: "Saw Yamin Thwe", studentId: "25205048", cohort: "MSCAIBUSJAN26I" },
-
-  "x00341506@student.ncirl.ie": { firstName: "Manuel", fullName: "Manuel Ahumada", studentId: "00341506", cohort: "MSCAIBUSJAN26I" }
+  /* Emptied 2026-09-20: this file is public, so the two older cohorts
+     (PGDAIBUS_SEP, MSCAIBUSJAN26I) moved into NCI_ROSTER_HASHED below,
+     same as CBAIPE_SEP26. Names come from Firebase profiles or are asked
+     once at sign-up (needsName flow). */
 };
 
 /* --------------------------------------------------------------------------
@@ -279,7 +236,83 @@ const NCI_ROSTER_HASHED = {
   "06f288e42b8d609d5a2f29e722bb36fcb02a34bf8f6d48b977f95325566264ae": { cohort: "CBAIPE_SEP26" },
   "5060b303c8761067cf6acc13bad489471a2dd297eef259619996aadf54f458ad": { cohort: "CBAIPE_SEP26" },
   "a4e67429116c6a48451cecba38e5dfaf5f5358f0f2d5c70dd46ee449a3df8456": { cohort: "CBAIPE_SEP26" },
+  /* PGDAIBUS_SEP + MSCAIBUSJAN26I, hashed 2026-09-20 (46 entries) */
+  "9f5b9ab1431c8d367f16f9fdea54a0ca0370de8829dd8ec148aee81570317e42": { cohort: "PGDAIBUS_SEP" },
+  "5bd67878b4b4310edea48fb22d4a6b7d91e693efe42c63163a5c09e2078d513c": { cohort: "PGDAIBUS_SEP" },
+  "f15dcd9066bc5599401f8ce69dd56c8a67600bce8f2eb3af90cda6b1454151e5": { cohort: "PGDAIBUS_SEP" },
+  "1ff3701886b8751f94a23a760b713101a5015a2500ccf4f5480c72a4ca29546a": { cohort: "PGDAIBUS_SEP" },
+  "8a330484a3d24741c891907d76e26e7a3d44be26bd10702e135f031f7a8f4be1": { cohort: "PGDAIBUS_SEP" },
+  "4e509ed9bd5e39d5c251ddfc13d86ba00a5ddaffb783cc611bbe37fae8de5bdc": { cohort: "PGDAIBUS_SEP" },
+  "84ec5b9707540663e09e9f81b2323fa889b23dd83ad91dc44d90989ad28b9a82": { cohort: "PGDAIBUS_SEP" },
+  "e8ab84a4d3cc305e1c804d858ef09d79843c5a0817b48735b564232ec0c30a5a": { cohort: "PGDAIBUS_SEP" },
+  "cf7c25528f088e9dfd57435aeedd4e61f1dabaaba59b80e46baf62b926729a0f": { cohort: "PGDAIBUS_SEP" },
+  "6995bf1d9c4e5010bdac12c1534828f309628086394281a1ba45baf215c924e8": { cohort: "PGDAIBUS_SEP" },
+  "3ed6a10ab90698b24f7383833ab51c90857dedd6b5352f87d9b76afacc4562a1": { cohort: "PGDAIBUS_SEP" },
+  "25de6d23d079a15d97c4b0e4094139cb5cc54ca0a00af137aad04574629dedb4": { cohort: "PGDAIBUS_SEP" },
+  "69e5db8d94127a02636d218a3fbfc720acf58fb041e561d95b4e3686dcfb11cb": { cohort: "PGDAIBUS_SEP" },
+  "f1a5d1144e2205926d2ed744e14e1bcfef57fafda83ac2c1a6847ebaeaed22ad": { cohort: "PGDAIBUS_SEP" },
+  "d6be9fd7906bac94818c5d78ff000b6b42b127ab4931e24783bf4c627329969b": { cohort: "PGDAIBUS_SEP" },
+  "5f8f688baec92f3d3ad221d361463b4125a468d2d80d0b65e1bb6d7db5e233f0": { cohort: "PGDAIBUS_SEP" },
+  "357c87c8f32bc432263a08f5993f94bdcc75067f2f2aa28cb6a0b18cd5c864b4": { cohort: "PGDAIBUS_SEP" },
+  "77bcfa7a96c6fddc88cb33a0082f7b8b984c4869fe07ae2fbc2cdd074d0f8e37": { cohort: "PGDAIBUS_SEP" },
+  "2d33c139923974a3d05c3d881b79823522d79298a4839fca79e489267e4aa1b5": { cohort: "PGDAIBUS_SEP" },
+  "4b2feafd870e2499204bdf27f8edd2676a55b7a32f57936eba4e2e1eaf94bb23": { cohort: "PGDAIBUS_SEP" },
+  "9aaa0c956a13ef41ad9e52e456161be6cb5d9c6cf7b85b900f4d1303cbfecaf8": { cohort: "PGDAIBUS_SEP" },
+  "40d679b4c1ffb4e8b81572b5a66a08a7b43f030c53f1456c62a1e5124e9b4861": { cohort: "PGDAIBUS_SEP" },
+  "81fa0e5920d119f07fac778e52e41553124b6c6fc376dee1e201c988d3be5df2": { cohort: "PGDAIBUS_SEP" },
+  "1eee5f2001db718a0263d38ca14c6966af258590732b186b521c41e408fe6f47": { cohort: "PGDAIBUS_SEP" },
+  "996a9a1dfbf64d78fda5339099eee882153967d178e3ca1b96fcb701226521d5": { cohort: "PGDAIBUS_SEP" },
+  "44c81e7d08d6a3627e39ff234ae376a5e642aa09fb36c0292d290aca78381dcf": { cohort: "PGDAIBUS_SEP" },
+  "945576e81657fbe225a025c966f4b7d41ad4b01a1bb68877fe827203495f9d20": { cohort: "PGDAIBUS_SEP" },
+  "c7d271d0e6f54e2fff9b5db19aba53c6a881c332ca38c94054ade82dc96f31a9": { cohort: "PGDAIBUS_SEP" },
+  "dda8ff41bdcdfd8bea60d305c0f51d13489ba012211d04ca9f43daae0babb454": { cohort: "PGDAIBUS_SEP" },
+  "9b7cb2cd3fa727af85b75d057a398cfeff7e212398b37ad8dc155066e7c6302f": { cohort: "PGDAIBUS_SEP" },
+  "7ff84284befa0607053286756a8690fd8e062ca1c1fc6f4f63e806ce72d79745": { cohort: "PGDAIBUS_SEP" },
+  "b6f584e7163c8436e3760db52ff51db4cf19fd013f28172de9237b1085ecdf69": { cohort: "PGDAIBUS_SEP" },
+  "6ba59f846d15e074a866323a1755d86690e138d62dbe0dad356bb5221af0de27": { cohort: "PGDAIBUS_SEP" },
+  "9543dc29f39096788636c69dbf2f2aea6b916d8c83adbb4464cf904b17040dc0": { cohort: "MSCAIBUSJAN26I" },
+  "2ed3238fa971d84129093428d457132c61870188ed5d2887eddcafc6b0d40c97": { cohort: "MSCAIBUSJAN26I" },
+  "09f979bf687b25e315229bc790fd18b1f08e762f16ddb63e2f719408f0b49fd2": { cohort: "MSCAIBUSJAN26I" },
+  "fb874021d882e0b54bd16e02c0a4cc9f2064718620343769f8a25ca26f7b1bc2": { cohort: "MSCAIBUSJAN26I" },
+  "c62a18280135cfe9167a50a87baa3e730f3f8267229a553c27366f7f8cef0300": { cohort: "MSCAIBUSJAN26I" },
+  "7f225f10e320efdd4ccb372e7ac923ea026345ef09eebb3837e36414166738b3": { cohort: "MSCAIBUSJAN26I" },
+  "39b64c718c661dae155b7cc0b7e4fe1235a825bad5638db22e0cb75e1155552b": { cohort: "MSCAIBUSJAN26I" },
+  "36ebca8d74a8dbf13d9fe0cd358e5ad00dde738b2c496f9f4d1c55d157cd70ad": { cohort: "MSCAIBUSJAN26I" },
+  "587d0c207e0e0fe6f0517282506748e59b177f2ab5c6132f83a20668b39bf6f4": { cohort: "MSCAIBUSJAN26I" },
+  "bfc48c0c1e7681f0da3adea0ced7a5107fe11d93a11064385c8b812a037cd931": { cohort: "MSCAIBUSJAN26I" },
+  "1cc9039ccaad388e616045989ae82b188f4309e96f9cce17d9e4aef05baefdf1": { cohort: "MSCAIBUSJAN26I" },
+  "f1fe99cea6de712eb71f58f809c5868ddf2c459bc24d6c52f3b9ccdaf60e99fd": { cohort: "MSCAIBUSJAN26I" },
+  "f1406898fe6e8b66815d61959abbd0da93c7143bfb2e0f6d1195f3ab4401adf4": { cohort: "MSCAIBUSJAN26I" },
+  /* H9LOCHFFT (MSCFTD), from the Moodle participants list 2026-09-22 (14 students) */
+  "026d95306191dcd805165d651e241758a4bd7168bb357845c1b8707513774aeb": { cohort: "MSCFTD_SEP26" },
+  "289ca2c62cdfeadec4f11683f4e36d2972031efa8d9d8dcd05b67d1c9a6eed8c": { cohort: "MSCFTD_SEP26" },
+  "d317621af00ca326a125e7ea5640fc589ef0928dd2b102a93d84982226c35698": { cohort: "MSCFTD_SEP26" },
+  "a9574d748e5ae654849334cf20c4b74896c0fe84dae4ab451af679d55fbd2557": { cohort: "MSCFTD_SEP26" },
+  "8d9b20d07270113282f4dcc4e4ab3cbadd1d3fef7e29368281bf91e283e2c2b5": { cohort: "MSCFTD_SEP26" },
+  "889bdedca6b6ccc9bd2cce9878dc6dcb0fbb283796f5f0c490681a04e447db02": { cohort: "MSCFTD_SEP26" },
+  "7b6f887b63a45028e7ff8b9be053ee750415bbbec3b89a5b878dc5426a559457": { cohort: "MSCFTD_SEP26" },
+  "35ec22a48608959b0361abe6a041d27cea413221d214c82d3e24f9836701c5d0": { cohort: "MSCFTD_SEP26" },
+  "c1aa8acafaf84c2c1daca5906eadcd3be7e722a924f6a977260325b52db8e3ce": { cohort: "MSCFTD_SEP26" },
+  "44a3b7e8487402ec770f05edb44d05bcc31707a7517617957abdd52d98b0ed91": { cohort: "MSCFTD_SEP26" },
+  "7e21a9fcf696370b48765227518922c4a620ed5d799a1aeb699032f5c585de6a": { cohort: "MSCFTD_SEP26" },
+  "ab4b87f034001a545e493bf31fa25b1ad0dfde992f34269d6df3bed1c13267d1": { cohort: "MSCFTD_SEP26" },
+  "9f50a2533b089613c75062f583ba9caa6dd97b7ea3c58c18fbcaaaafa26367f3": { cohort: "MSCFTD_SEP26" },
+  "8bbb19f34712d7e88854111991f423d69df9fa3082b3c181cab95f85ef4ec024": { cohort: "MSCFTD_SEP26" },
 };
+
+// Cohorts whose class code we fill in for the student as soon as their email
+// matches the list, so a rostered student only types their email.
+const NCI_COHORT_CLASS_CODES = {
+  MSCFTD_SEP26: "NCI2026"
+};
+
+// Returns the class code to prefill for a rostered email, or "".
+async function nciRosterClassCode(email) {
+  const e = String(email || "").trim().toLowerCase();
+  if (!isNciEmail(e)) return "";
+  const hit = NCI_ROSTER[e] || NCI_ROSTER_HASHED[await sha256Hex(e)];
+  return (hit && NCI_COHORT_CLASS_CODES[hit.cohort]) || "";
+}
 
 async function sha256Hex(text) {
   const bytes = new TextEncoder().encode(String(text || ""));

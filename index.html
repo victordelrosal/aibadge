@@ -3587,7 +3587,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <div style="margin-bottom:16px;">
           <label style="display:block;font:600 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Email</label>
           <input type="email" x-model="email" required autocomplete="email" placeholder="you@ncirl.ie"
-                 @input="notOnRoster = false; nciRequestMode = false;"
+                 @input="notOnRoster = false; nciRequestMode = false; checkRosterCode();"
                  style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:400 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;"
                  @focus="$el.style.borderColor='#007AFF';$el.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
                  @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
@@ -3600,6 +3600,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                  @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
           <p x-show="codeFromHub && classCode" style="margin:8px 0 0;font:500 13px/1.4 -apple-system,sans-serif;color:#1f7a3a;">
             ✓ Your class code <b x-text="classCode"></b> came across from your class hub. Just add your NCI email.
+          </p>
+          <p x-show="!codeFromHub && codeFromRoster && classCode" style="margin:8px 0 0;font:500 13px/1.4 -apple-system,sans-serif;color:#1f7a3a;">
+            ✓ You're on the class list, so we filled in your class code <b x-text="classCode"></b>.
           </p>
         </div>
 
@@ -4112,7 +4115,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="assets/js/firebase-app.js?v=6"></script>
+<script src="assets/js/firebase-app.js?v=7"></script>
 
 <!-- SPA Init -->
 <script>
@@ -4876,6 +4879,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       password: '',
       classCode: (typeof HUB_CLASS_CODE === 'string' ? HUB_CLASS_CODE : ''),
       codeFromHub: !!(typeof HUB_CLASS_CODE === 'string' && HUB_CLASS_CODE),
+      codeFromRoster: false,
       error: '',
       success: '',
       submitting: false,
@@ -4894,10 +4898,22 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         return typeof isNciEmail === 'function' && isNciEmail(this.email);
       },
 
+      // Rostered email typed with no code yet: fill it in. Never overwrites a
+      // code the student (or their class hub) already supplied.
+      async checkRosterCode() {
+        if (typeof nciRosterClassCode !== 'function') return;
+        var typed = this.email;
+        var code = await nciRosterClassCode(typed);
+        if (typed !== this.email) return;
+        if (code && !this.classCode) { this.classCode = code; this.codeFromRoster = true; }
+        else if (!code && this.codeFromRoster) { this.classCode = ''; this.codeFromRoster = false; }
+      },
+
       _resetNci() {
         this.email = '';
         this.password = '';
         this.classCode = '';
+        this.codeFromRoster = false;
         this.notOnRoster = false;
         this.needName = false;
         this.nciRequestMode = false;
