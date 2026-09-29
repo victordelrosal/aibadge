@@ -3594,7 +3594,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </div>
         <div x-show="isNciEmailLive" style="margin-bottom:20px;">
           <label style="display:block;font:600 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Class code</label>
-          <input type="text" x-model="classCode" :required="isNciEmailLive" autocomplete="off" autocapitalize="characters" placeholder="From your lecture"
+          <input type="text" x-model="classCode" @input="codeFromRoster = false; codeFromDomain = false;" :required="isNciEmailLive" autocomplete="off" autocapitalize="characters" placeholder="From your lecture"
                  style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:600 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;letter-spacing:0.05em;text-transform:uppercase;"
                  @focus="$el.style.borderColor='#007AFF';$el.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
                  @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
@@ -3603,6 +3603,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           </p>
           <p x-show="!codeFromHub && codeFromRoster && classCode" style="margin:8px 0 0;font:500 13px/1.4 -apple-system,sans-serif;color:#1f7a3a;">
             ✓ You're on the class list, so we filled in your class code <b x-text="classCode"></b>.
+          </p>
+          <p x-show="!codeFromHub && !codeFromRoster && codeFromDomain && classCode" style="margin:8px 0 0;font:500 13px/1.4 -apple-system,sans-serif;color:#1f7a3a;">
+            ✓ NCI email recognised, so we filled in the class code <b x-text="classCode"></b>.
           </p>
         </div>
 
@@ -4880,6 +4883,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       classCode: (typeof HUB_CLASS_CODE === 'string' ? HUB_CLASS_CODE : ''),
       codeFromHub: !!(typeof HUB_CLASS_CODE === 'string' && HUB_CLASS_CODE),
       codeFromRoster: false,
+      codeFromDomain: false,
       error: '',
       success: '',
       submitting: false,
@@ -4907,6 +4911,10 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         if (typed !== this.email) return;
         if (code && !this.classCode) { this.classCode = code; this.codeFromRoster = true; }
         else if (!code && this.codeFromRoster) { this.classCode = ''; this.codeFromRoster = false; }
+        // Any other NCI email (staff or student) gets NCI2026 filled in too.
+        // Same rule: never overwrite a code someone already supplied.
+        if (this.isNciEmailLive && !this.classCode) { this.classCode = 'NCI2026'; this.codeFromDomain = true; }
+        else if (!this.isNciEmailLive && this.codeFromDomain) { this.classCode = ''; this.codeFromDomain = false; }
       },
 
       _resetNci() {
@@ -4914,6 +4922,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
         this.password = '';
         this.classCode = '';
         this.codeFromRoster = false;
+        this.codeFromDomain = false;
         this.notOnRoster = false;
         this.needName = false;
         this.nciRequestMode = false;
