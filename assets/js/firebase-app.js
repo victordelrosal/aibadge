@@ -77,6 +77,13 @@ function isNciEmail(email) {
   return e.endsWith(NCI_DOMAIN_SUFFIX) || e.endsWith("@ncirl.ie");
 }
 
+// NCI staff = any NCI address that is not a student one. Staff skip the class
+// list and get in with the class code, giving their name once.
+function isNciStaffEmail(email) {
+  const e = String(email || "").toLowerCase().trim();
+  return isNciEmail(e) && !e.endsWith("@student.ncirl.ie");
+}
+
 async function signInWithMicrosoft() {
   initFirebase();
   try {
@@ -382,6 +389,9 @@ async function signInOrCreateNciFreeAccount(email, classCode, fullName) {
     return { success: false, error: "That class code isn't right. Ask Victor for the current code." };
   }
   let entry = await findNciRosterEntry(target);
+  if (!entry && isNciStaffEmail(target)) {
+    entry = { cohort: "NCI_STAFF", needsName: true, studentId: "" };
+  }
   if (entry && entry.needsName) {
     const name = String(fullName || "").replace(/\s+/g, " ").trim();
     if (name.length < 3 || !/\s/.test(name)) {
@@ -414,14 +424,14 @@ async function signInOrCreateNciFreeAccount(email, classCode, fullName) {
       email: credential.user.email,
       enrolled: true,
       enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
-      enrolmentSource: "nci-roster",
+      enrolmentSource: entry.cohort === "NCI_STAFF" ? "nci-staff" : "nci-roster",
       classCode: String(classCode || "").trim().toUpperCase(),
       firstName: entry.firstName,
       fullName: entry.fullName,
       displayName: entry.fullName,
       studentId: entry.studentId,
       cohort: entry.cohort,
-      onRoster: true
+      onRoster: entry.cohort !== "NCI_STAFF"
     });
   } catch (e) { console.warn("NCI roster enrol write failed:", e); }
   return { success: true, user: credential.user };
