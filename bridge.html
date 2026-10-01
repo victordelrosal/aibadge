@@ -15,8 +15,7 @@
      aireckon.ing in the address fragment (never sent to any server on the way), where the
      deck checks its own state value and the server verifies the token as usual.
 
-     It will only return to aireckon.ing (or that project's own preview addresses), and
-     only to a deck path. Anything else gets a plain message and no token.
+     It will only return to aireckon.ing, and only to a deck path. Anything else gets a plain message and no token.
      --------------------------------------------------------------- -->
 <style>
   html,body{margin:0;height:100%;background:#05061c;color:#F2EFE6;
@@ -43,8 +42,8 @@
   var ret = null;
   try { ret = new URL(q.get('return') || ''); } catch (_) {}
 
-  var okOrigin = ret && (ret.origin === 'https://aireckon.ing' ||
-    /^https:\/\/([a-z0-9-]+\.)?ai-reckoning-summit\.pages\.dev$/.test(ret.origin));
+  /* aireckon.ing only: a preview address of the Pages project is anyone's branch (verifier, 1 Oct). */
+  var okOrigin = ret && ret.origin === 'https://aireckon.ing';
   var okPath = ret && /^\/p(\/|$)/.test(ret.pathname);
   if (!okOrigin || !okPath || !/^[A-Za-z0-9]{8,64}$/.test(state)) {
     document.getElementById('msg').textContent = 'This link cannot be used. Go back to the deck and sign in there.';
