@@ -16,14 +16,6 @@ service cloud.firestore {
           && request.auth.uid == userId;
     }
 
-    // A learner-side submission write: only the artefact fields, status fixed to "submitted",
-    // and none of the reserved verdict fields present.
-    function learnerSubmissionOk() {
-      return request.resource.data.status == 'submitted'
-          && request.resource.data.keys().hasOnly(['exerciseId', 'type', 'value', 'status', 'submittedAt', 'meta'])
-          && !request.resource.data.keys().hasAny(['reviewStatus', 'verdict', 'result', 'level', 'passedAt', 'reviewer', 'feedback']);
-    }
-
     // ----------------------------------------------------------------
     // Users: owners can read/write their own doc; admin reads all
     // ----------------------------------------------------------------
@@ -68,21 +60,14 @@ service cloud.firestore {
       }
 
       // Exercise submissions subcollection (URL/text/file artefacts)
-      // 1 Oct 2026 (Victor): learners must never award or edit a PASS. A learner may only
-      // write their own artefact with status "submitted". Verdict fields (reviewStatus,
-      // verdict, result, level, passedAt, reviewer, feedback) are server/admin only;
-      // client writes that touch them are refused.
       match /submissions/{exerciseId} {
         allow read: if isOwner(userId) || isAdmin();
-        allow create, update: if isAdmin() || (isOwner(userId) && learnerSubmissionOk());
-        allow delete: if isOwner(userId) || isAdmin();
+        allow write: if isOwner(userId) || isAdmin();
 
-        // Archive of prior submissions: write-once audit trail. Learners may add a
-        // record (when they edit or withdraw) but never change or remove one.
+        // Archive of prior submissions (kept for audit when user edits/deletes)
         match /archive/{archiveId} {
           allow read: if isOwner(userId) || isAdmin();
-          allow create: if isOwner(userId) || isAdmin();
-          allow update, delete: if isAdmin();
+          allow write: if isOwner(userId) || isAdmin();
         }
       }
     }

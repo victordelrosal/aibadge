@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 import { execFileSync } from "node:child_process";
+import { readIssuerPrivateJwk } from "./issuer-key.mjs";
 import puppeteer from "puppeteer-core";
 import { signCredential, importPrivateKeyJwk } from "../src/lib/crypto-core.js";
 import { buildLegacyCredential, VERIFICATION_METHOD } from "../src/lib/credential.js";
@@ -30,7 +31,7 @@ const ROSTER = [
   { ucid: "x3r48", name: "Patrick Baxter", issuedDate: "2025-09-03", cohort: "Aug 2025" },
 ];
 
-const priv = await importPrivateKeyJwk(JSON.parse(readFileSync(join(root, "keys/issuer-private.jwk.json"), "utf8")));
+const priv = await importPrivateKeyJwk(readIssuerPrivateJwk()); // macOS Keychain (moved out of Dropbox 1 Oct 2026)
 const emblem = "data:image/png;base64," + readFileSync(join(root, "assets/emblem-web.png")).toString("base64");
 
 function shellPath() {

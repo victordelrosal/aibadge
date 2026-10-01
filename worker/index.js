@@ -108,6 +108,14 @@ async function route(request, env) {
     if (path === "/api/cert-pricing" && request.method === "POST") {
       return handleCertPricing(request, env);
     }
+    // Grading write-back (1 Oct 2026). Verdicts live server-side only, never in a
+    // learner-writable store. Resolve needs the grading key AND a recorded human approval.
+    if (path === "/api/cert-resolve" && request.method === "POST") {
+      return handleCertResolve(request, env);
+    }
+    if (path === "/api/my-verdict" && request.method === "GET") {
+      return handleMyVerdict(request, env);
+    }
 
     // ── Legacy: report mailer (POST to root) ──
     if (request.method === "POST" && (path === "/" || path === "")) {
@@ -1644,6 +1652,109 @@ function formatReportHTML(text) {
 // ══════════════════════════════════════════
 // UTILITIES
 // ══════════════════════════════════════════
+
+
+// ══════════════════════════════════════════
+// GRADING WRITE-BACK (1 Oct 2026, Forge grading-safety)
+// ══════════════════════════════════════════
+// The AI that reads submissions has no tools and no credentials. A trusted local
+// script validates its JSON, Victor approves, and only then is this endpoint called
+// with the grading key (a Worker secret; the local copy lives in the macOS Keychain).
+// Anthropic's Usage Policy treats certification as high-risk: a qualified human must
+// review each decision before it is final, so humanApproval is mandatory here.
+
+function gradingKeyOk(request, env) {
+  const got = request.headers.get("X-Grading-Key") || "";
+  const want = env.GRADING_RESOLVE_KEY || "";
+  if (!want || want.length < 32 || got.length !== want.length) return false;
+  let diff = 0;
+  for (let i = 0; i < want.length; i++) diff |= got.charCodeAt(i) ^ want.charCodeAt(i);
+  return diff === 0;
+}
+
+function cleanText(s, max) {
+  // Plain text only: no markup, no control characters, bounded length.
+  return String(s == null ? "" : s)
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F​-‏‪-‮⁠-⁤﻿]/g, "")
+    .replace(/[<>]/g, "")
+    .trim()
+    .slice(0, max);
+}
+
+// POST /api/cert-resolve  (grading key only)
+// body: { uid, outcome: "pass"|"repeat", humanApproval: { by, at }, exercises: [
+//   { exerciseId, verdict: "PASS"|"REPEAT", feedback, submissionSha256 } ] }
+async function handleCertResolve(request, env) {
+  if (!gradingKeyOk(request, env)) return jsonResponse({ error: "Forbidden" }, 403);
+  let body; try { body = await request.json(); } catch (e) { return jsonResponse({ error: "Invalid JSON" }, 400); }
+
+  const uid = String(body.uid || "");
+  if (!/^[A-Za-z0-9_-]{6,128}$/.test(uid)) return jsonResponse({ error: "Bad uid" }, 400);
+  const outcome = body.outcome === "pass" ? "pass" : body.outcome === "repeat" ? "repeat" : null;
+  if (!outcome) return jsonResponse({ error: "outcome must be pass or repeat" }, 400);
+
+  const ha = body.humanApproval || {};
+  const approvedBy = cleanText(ha.by, 80);
+  const approvedAt = String(ha.at || "");
+  if (!approvedBy || isNaN(Date.parse(approvedAt))) {
+    return jsonResponse({ error: "A recorded human approval (by, at) is required." }, 400);
+  }
+
+  const list = Array.isArray(body.exercises) ? body.exercises : [];
+  if (!list.length || list.length > 40) return jsonResponse({ error: "1 to 40 exercises required" }, 400);
+  const exercises = [];
+  for (const ex of list) {
+    const exerciseId = String(ex.exerciseId || "");
+    if (!/^[A-Za-z0-9_.:-]{1,80}$/.test(exerciseId)) return jsonResponse({ error: "Bad exerciseId" }, 400);
+    const verdict = ex.verdict === "PASS" ? "PASS" : ex.verdict === "REPEAT" ? "REPEAT" : null;
+    if (!verdict) return jsonResponse({ error: "verdict must be PASS or REPEAT" }, 400);
+    const sha = String(ex.submissionSha256 || "");
+    if (!/^[a-f0-9]{64}$/.test(sha)) return jsonResponse({ error: "submissionSha256 required" }, 400);
+    exercises.push({ exerciseId, verdict, feedback: cleanText(ex.feedback, 600), submissionSha256: sha });
+  }
+  // A learner-level PASS requires every exercise to PASS.
+  if (outcome === "pass" && exercises.some(e => e.verdict !== "PASS")) {
+    return jsonResponse({ error: "outcome pass requires every exercise to PASS" }, 400);
+  }
+
+  const resolvedAt = new Date().toISOString();
+  const record = { uid, outcome, exercises, approvedBy, approvedAt, resolvedAt, aiAssisted: true };
+  // Keep history: the latest verdict plus an append-only log entry.
+  await env.SLOTS.put(`verdict:${uid}`, JSON.stringify(record));
+  await env.SLOTS.put(`verdictlog:${uid}:${resolvedAt}`, JSON.stringify(record));
+
+  const key = `certreq:${uid}`;
+  const raw = await env.SLOTS.get(key);
+  if (raw) {
+    const req = JSON.parse(raw);
+    req.reviewStatus = outcome === "pass" ? "passed" : "repeat";
+    req.resolvedAt = resolvedAt;
+    await env.SLOTS.put(key, JSON.stringify(req));
+  }
+  return jsonResponse({ ok: true, uid, outcome, resolvedAt });
+}
+
+// GET /api/my-verdict  (the signed-in learner, own record only)
+async function handleMyVerdict(request, env) {
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  if (!idToken) return jsonResponse({ error: "Sign in." }, 401);
+  const principal = await verifyFirebaseToken(idToken, env);
+  if (!principal || !principal.uid) return jsonResponse({ error: "Your session expired. Sign in again." }, 401);
+  const raw = await env.SLOTS.get(`verdict:${principal.uid}`);
+  const reqRaw = await env.SLOTS.get(`certreq:${principal.uid}`);
+  const req = reqRaw ? JSON.parse(reqRaw) : null;
+  if (!raw) return jsonResponse({ reviewStatus: req ? (req.reviewStatus || "pending") : "none" });
+  const v = JSON.parse(raw);
+  return jsonResponse({
+    reviewStatus: req ? req.reviewStatus : (v.outcome === "pass" ? "passed" : "repeat"),
+    outcome: v.outcome,
+    resolvedAt: v.resolvedAt,
+    aiAssisted: true,
+    reviewedBy: "a human reviewer",
+    exercises: v.exercises.map(e => ({ exerciseId: e.exerciseId, verdict: e.verdict, feedback: e.feedback })),
+  });
+}
 
 function corsHeaders() {
   return {

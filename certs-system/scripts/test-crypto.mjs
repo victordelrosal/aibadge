@@ -1,6 +1,7 @@
 // test-crypto.mjs — Phase 1 quality gate: sign a credential, verify it (must pass),
 // tamper it (must fail), tamper the proof (must fail), wrong key (must fail).
 import { readFileSync } from "node:fs";
+import { readIssuerPrivateJwk } from "./issuer-key.mjs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
@@ -15,7 +16,7 @@ import { buildCredential } from "../src/lib/credential.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const keysDir = join(here, "..", "keys");
-const privJwk = JSON.parse(readFileSync(join(keysDir, "issuer-private.jwk.json"), "utf8"));
+const privJwk = readIssuerPrivateJwk(); // macOS Keychain (moved out of Dropbox 1 Oct 2026)
 const pub = JSON.parse(readFileSync(join(keysDir, "issuer-public.json"), "utf8"));
 const pubRaw = multikeyToPublicKey(pub.multikey);
 const priv = await importPrivateKeyJwk(privJwk);
