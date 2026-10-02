@@ -27,6 +27,7 @@
     '.fil-card[hidden]{display:none}',
     '.fil-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid rgba(60,60,67,.12);min-width:0}',
     '.fil-head .fil-pav{position:relative;flex:none;width:44px;height:44px}.fil-head .fil-tag{width:18px;height:18px}.fil-head .fil-tag svg{width:11px;height:11px}',
+    '.fil-head .fil-nm{display:flex;align-items:center;gap:8px;min-width:0}.fil-head .fil-nm b{min-width:0}.fil-head fil-level{flex:none}',
     '.fil-head b{display:block;font-size:15px;font-weight:600;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
     '.fil-head small{display:block;font-size:12.5px;color:rgba(60,60,67,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
     '.fil-head > div:last-child{min-width:0}',
@@ -38,7 +39,7 @@
     '.lms-dark .fil-card fil-ways{--fil-ink:#fff;--fil-muted:rgba(235,235,245,.6);--fil-line:rgba(255,255,255,.1);--fil-accent:#0A84FF;--fil-chip:rgba(10,132,255,.18);--fil-bad:#FF6961}'
   ].join('\n');
 
-  var me = null, card = null, ways = null, user = null, via = '';
+  var me = null, card = null, ways = null, user = null, via = '', level = null;
 
   function photo(u) {
     if (u && u.photoURL && /^https:\/\//.test(u.photoURL)) {
@@ -72,7 +73,9 @@
     pav.className = 'fil-pav'; pav.append.apply(pav, [photo(user), tag(via)].filter(Boolean));
     var b = document.createElement('b'); b.textContent = user.displayName || 'Your account';
     var s = document.createElement('small'); s.textContent = user.email || '';
-    txt.append(b, s); head.replaceChildren(pav, txt);
+    var nm = document.createElement('span'); nm.className = 'fil-nm'; nm.append(b);
+    if (level) { var lv = document.createElement('fil-level'); lv.setAttribute('level', level); nm.append(lv); }   // AI Badge level
+    txt.append(nm, s); head.replaceChildren(pav, txt);
     card.hidden = false; me.setAttribute('aria-expanded', 'true');
     if (ways.isConnected) ways.refresh();
   }
@@ -99,6 +102,13 @@
       return user.linkWithPopup(new firebase.auth.GoogleAuthProvider()).then(function () { return user.reload(); });
     };
     card.appendChild(ways);
+    /* the level comes with the ways-in list; it sits beside the name */
+    ways.addEventListener('fil-ways', function (e) {
+      var l = e.detail && e.detail.level; if (l === level) return; level = l || null;
+      var nm = card.querySelector('.fil-nm'); if (!nm) return;
+      var old = nm.querySelector('fil-level'); if (old) old.remove();
+      if (level) { var lv = document.createElement('fil-level'); lv.setAttribute('level', level); nm.append(lv); }
+    });
     bar.appendChild(card);
     me.addEventListener('click', function (e) { e.stopPropagation(); card.hidden ? open() : close(true); });
     card.addEventListener('click', function (e) { e.stopPropagation(); });
