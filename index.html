@@ -4953,7 +4953,7 @@ try{
             newData.enrolled = false;
             newData.plan = 'free';
             try {
-              var enrollRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(user.email));
+              var enrollRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(user.email), { headers: { Authorization: 'Bearer ' + await user.getIdToken() } });   // own enrolment only (2 Oct 2026)
               var enrollData = await enrollRes.json();
               if (enrollData.enrolled) {
                 newData.enrolled = true;
@@ -5713,7 +5713,7 @@ try{
             // NCI emails: instant access. Admin: always. Everyone else: existing booking gate.
             if (!isAdmin && !isNci) {
               try {
-                var checkRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(mUser.email));
+                var checkRes = await fetch(API + '/check-enrollment?email=' + encodeURIComponent(mUser.email), { headers: { Authorization: 'Bearer ' + await mUser.getIdToken() } });   // own enrolment only (2 Oct 2026)
                 var checkData = await checkRes.json();
                 if (!checkData.enrolled) {
                   var existingProfile = await getUserProfile(mUser.uid);
