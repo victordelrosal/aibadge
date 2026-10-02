@@ -134,6 +134,7 @@
     var s = document.createElement('small'); s.textContent = user.email || '';
     var nm = document.createElement('span'); nm.className = 'fil-nm'; nm.append(b);
     var lv = document.createElement('fil-level'); lv.setAttribute('level', level || 0); nm.append(lv);   // AI Badge level, or the invitation to earn L1
+    lv.setAttribute('mine', ''); if (window.filXp && filXp.total != null) lv.setAttribute('xp', filXp.total);   // and their XP beside it
     txt.append(nm, s); head.replaceChildren(pav, txt);
     later.hidden = true; paintKeep();
     card.hidden = false; me.setAttribute('aria-expanded', 'true');
@@ -177,7 +178,7 @@
       var l = e.detail && e.detail.level; if (l === level) return; level = l || null;
       var nm = card.querySelector('.fil-nm'); if (!nm) return;
       var lv = nm.querySelector('fil-level');
-      if (!lv) { lv = document.createElement('fil-level'); nm.append(lv); }
+      if (!lv) { lv = document.createElement('fil-level'); lv.setAttribute('mine', ''); nm.append(lv); }
       lv.setAttribute('level', level || 0);
     });
     bar.appendChild(card);
@@ -192,9 +193,21 @@
     if (!window.firebase || !firebase.auth) return setTimeout(boot, 200);
     if (typeof initFirebase === 'function') initFirebase();
     if (!mount()) return setTimeout(boot, 400);
+    /* XP on the one account (2 Oct 2026, fiveinnolabs-identity/xp/XP.md): the broker decides, the photo takes the "+N XP" */
+    if (window.filXp) filXp.use({ idToken: function () { return user ? user.getIdToken() : null; }, anchor: function () { return me; } });
+    if (window.filXp && typeof window.saveTutorialCompletion === 'function' && !saveTutorialCompletion.xp) {
+      var save = window.saveTutorialCompletion;
+      window.saveTutorialCompletion = function (uid, id, done) {
+        var r = save.apply(this, arguments);
+        if (done && id) filXp.report('lesson_done', String(id));
+        return r;
+      };
+      window.saveTutorialCompletion.xp = true;
+    }
     firebase.auth().onAuthStateChanged(function (u) {
       var same = user && u && user.uid === u.uid;
       user = u; via = '';
+      if (window.filXp) { if (u) filXp.hello(u.uid); else filXp.reset(); }
       if (!same) { kept = null; nci = !!(u && typeof isNciEmail === 'function' && isNciEmail(u.email)); }
       if (!u) return paint();
       /* NCI: learn now whether a personal way in is linked (Google shows on the user; LinkedIn needs the broker) */
