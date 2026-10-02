@@ -2429,7 +2429,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   </header>
   <!-- Dashboard content -->
   <div style="max-width:672px;margin:0 auto;padding:32px 20px;position:relative;z-index:2;">
-    <h1 class="lms-heading" x-text="$store.auth.loading ? 'Your Learning' : ('Welcome' + ($store.auth.firstTime ? '' : ' back') + ($store.auth.firstName ? ', ' + $store.auth.firstName : ''))"></h1>
+    <!-- the learner's AI Badge level and XP beside the welcome (2 Oct 2026, Victor: "show XP and badge where appropriate") -->
+    <div style="display:flex;align-items:baseline;flex-wrap:wrap;column-gap:14px;row-gap:6px;margin-bottom:8px;">
+      <h1 class="lms-heading" style="margin-bottom:0" x-text="$store.auth.loading ? 'Your Learning' : ('Welcome' + ($store.auth.firstTime ? '' : ' back') + ($store.auth.firstName ? ', ' + $store.auth.firstName : ''))"></h1>
+      <fil-level mine x-show="$store.auth.user && !$store.auth.loading" style="zoom:1.18"></fil-level>
+    </div>
     <p class="lms-subheading" x-text="$store.auth.loading ? 'Loading...' : ($store.auth.isEnrolled ? 'Continue where you left off.' : '')"></p>
 
     <!-- Not enrolled (legacy loading race only): refresh button.
@@ -4748,7 +4752,7 @@ try{
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-app.js?v=8"></script>
 <script src="assets/js/linkedin-signin.js?v=2"></script>
-<script src="https://aireckon.ing/fil/account.js?v=e9d2742a"></script>
+<script src="https://aireckon.ing/fil/account.js?v=f1e83095"></script>
 <script src="assets/js/account-card.js?v=3"></script>
 
 <!-- SPA Init -->
