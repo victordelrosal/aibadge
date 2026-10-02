@@ -1083,7 +1083,7 @@ async function handleCertRequests(request, env) {
   const authz = request.headers.get("Authorization") || "";
   const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
   const principal = idToken ? await verifyFirebaseToken(idToken, env) : null;
-  if (!principal || !principal.emailVerified || !certIsAdmin(principal.email)) return jsonResponse({ error: "Admins only." }, 403);
+  if (!(await isLiveAdmin(principal))) return jsonResponse({ error: "Admins only." }, 403);
 
   const out = [];
   let cursor;
@@ -1105,7 +1105,7 @@ async function handleCertPricing(request, env) {
   const authz = request.headers.get("Authorization") || "";
   const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
   const principal = idToken ? await verifyFirebaseToken(idToken, env) : null;
-  if (!principal || !principal.emailVerified || !certIsAdmin(principal.email)) return jsonResponse({ error: "Admins only." }, 403);
+  if (!(await isLiveAdmin(principal))) return jsonResponse({ error: "Admins only." }, 403);
 
   let body; try { body = await request.json(); } catch (e) { return jsonResponse({ error: "Invalid JSON" }, 400); }
   const email = String(body.email || "").trim().toLowerCase();
@@ -1235,6 +1235,48 @@ async function handleTree(request, env) {
 // public JWKS and validating the aud/iss/exp claims. Keyless (no API key /
 // secret needed); this is the same verification the Firebase Admin SDK does.
 // Returns { uid, email, name } when valid, else null.
+/* Google's signing keys, cached for their max-age (audit F06): one fetch at a time, 5 s timeout, a forced refresh at
+   most once a minute */
+let JWKS_CACHE = { keys: null, exp: 0, at: 0 }, JWKS_INFLIGHT = null;
+async function googleKeys(force) {
+  const now = Date.now();
+  if (!force && JWKS_CACHE.keys && now < JWKS_CACHE.exp) return JWKS_CACHE.keys;
+  if (force && JWKS_CACHE.keys && now - JWKS_CACHE.at < 60000) return JWKS_CACHE.keys;
+  if (!JWKS_INFLIGHT) JWKS_INFLIGHT = (async () => {
+    try {
+      const r = await fetch("https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com", { signal: AbortSignal.timeout(5000) });
+      if (!r.ok) throw new Error("jwks " + r.status);
+      const { keys } = await r.json();
+      const m = /max-age=(\d+)/.exec(r.headers.get("cache-control") || "");
+      JWKS_CACHE = { keys: keys || [], at: Date.now(), exp: Date.now() + Math.min(m ? +m[1] : 3600, 21600) * 1000 };
+      return JWKS_CACHE.keys;
+    } finally { JWKS_INFLIGHT = null; }
+  })();
+  return JWKS_INFLIGHT;
+}
+
+/* Admin is Victor's Firebase UID, or the second address only when Firebase verified it (audit F04), and the account
+   must be live right now: not disabled, not deleted, not revoked since this sign-in (audit F02). The live check uses
+   Firebase's public lookup with the caller's own ID token, so the worker needs no admin credentials. Fails closed. */
+const ADMIN_UID = "4jZE7uToSXbRqu8EWbpNyycxqlH3";
+async function isLiveAdmin(principal) {
+  if (!principal) return false;
+  const byUid = principal.uid === ADMIN_UID;
+  const byMail = principal.emailVerified && String(principal.email || "").toLowerCase() === "victor@fiveinnolabs.com";
+  if (!byUid && !byMail) return false;
+  try {
+    const r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyB2KopG32ymOjNXtk6G0zwtJikPcvt_0fU", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ idToken: principal.idToken }),
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!r.ok) return false;
+    const u = ((await r.json()).users || [])[0];
+    if (!u || u.localId !== principal.uid || u.disabled === true) return false;
+    if (u.validSince && Number(u.validSince) > principal.authTime) return false;
+    return true;
+  } catch (e) { return false; }
+}
+
 async function verifyFirebaseToken(idToken, env) {
   try {
     const projectId = env.FIREBASE_PROJECT_ID || "ai-badge-2026";
@@ -1245,20 +1287,19 @@ async function verifyFirebaseToken(idToken, env) {
     const payload = JSON.parse(b64urlToString(parts[1]));
     if (!header.kid || header.alg !== "RS256") return null;
 
+    /* every claim typed and bounded (identity audit F06, 2 Oct 2026), as in the fiveinnolabs broker */
     const now = Math.floor(Date.now() / 1000);
+    const num = (v) => typeof v === "number" && Number.isFinite(v);
     if (payload.aud !== projectId) return null;
     if (payload.iss !== `https://securetoken.google.com/${projectId}`) return null;
-    if (!payload.exp || payload.exp < now) return null;
-    if (payload.iat && payload.iat > now + 300) return null;
-    const sub = payload.sub || payload.user_id;
-    if (!sub) return null;
+    if (!num(payload.exp) || payload.exp <= now) return null;
+    if (!num(payload.iat) || payload.iat > now + 300) return null;
+    if (!num(payload.auth_time) || payload.auth_time > now + 300) return null;
+    const sub = payload.sub;
+    if (typeof sub !== "string" || !sub || sub.length > 128) return null;
 
-    const jwksRes = await fetch(
-      "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com"
-    );
-    if (!jwksRes.ok) return null;
-    const jwks = await jwksRes.json();
-    const jwk = (jwks.keys || []).find((k) => k.kid === header.kid);
+    let jwk = (await googleKeys(false)).find((k) => k.kid === header.kid);
+    if (!jwk) jwk = (await googleKeys(true)).find((k) => k.kid === header.kid);   // a key rollover
     if (!jwk) return null;
 
     const key = await crypto.subtle.importKey(
@@ -1271,7 +1312,7 @@ async function verifyFirebaseToken(idToken, env) {
 
     // emailVerified travels with the principal (identity audit F04, 2 Oct 2026): anything that trusts the
     // address (admin, a price waiver) must require it, because unverified password accounts can claim any email.
-    return { uid: sub, email: payload.email || "", name: payload.name || "", emailVerified: payload.email_verified === true };
+    return { uid: sub, email: payload.email || "", name: payload.name || "", emailVerified: payload.email_verified === true, authTime: payload.auth_time, idToken };
   } catch (e) {
     return null;
   }
