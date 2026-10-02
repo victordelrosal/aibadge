@@ -4127,7 +4127,9 @@ document.querySelectorAll('#navLinks a').forEach(a => {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-app.js?v=8"></script>
-<script src="assets/js/linkedin-signin.js?v=1"></script>
+<script src="assets/js/linkedin-signin.js?v=2"></script>
+<script src="https://aireckon.ing/fil/account.js?v=1"></script>
+<script src="assets/js/account-card.js?v=1"></script>
 
 <!-- SPA Init -->
 <script>
@@ -5047,7 +5049,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
       init() {
         var self = this;
         if (window.linkedInSignInResult) window.linkedInSignInResult.then(function (r) {
-          if (r && !r.success) { self.error = r.error; Alpine.store('ui').showModal('signin'); }
+          if (r && !r.success && r.mode !== 'link') { self.error = r.error; Alpine.store('ui').showModal('signin'); }
         });
       },
 
