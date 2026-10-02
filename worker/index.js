@@ -1528,7 +1528,7 @@ async function handleReportEmail(request, env) {
         to: email,
         subject: `Your AI Competency Report: ${tier} (Score: ${score}/100)`,
         html: html,
-        text: report || "",
+        text: `Your AI Competency Report: ${score}/100. Open this email in a client that shows HTML to see the full report.`,   // never request free text from the verified domain (verifier r5)
       }),
     });
 
