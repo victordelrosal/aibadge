@@ -5,14 +5,14 @@ service cloud.firestore {
     // ----------------------------------------------------------------
     // Helper: is the current user the admin (Victor)?
     // ----------------------------------------------------------------
-    // 2 Oct 2026 (identity audit F04): the address must be VERIFIED. The project accepts password
-    // sign-ups through its public web key, so an unverified token can carry any address; without this
-    // check, registering an admin address with a password would grant admin over every learner.
+    // Admin is Victor's Firebase UID (identity audit F04, 2 Oct 2026: decided by the immutable account id, not an
+    // email string). victor@fiveinnolabs.com has never signed in; it stays admin only when Firebase has VERIFIED it,
+    // because the project accepts unverified password sign-ups for any address.
     function isAdmin() {
       return request.auth != null
-          && request.auth.token.email_verified == true
-          && (request.auth.token.email == "victor@fiveinnolabs.com"
-              || request.auth.token.email == "victordelrosal@gmail.com");
+          && (request.auth.uid == "4jZE7uToSXbRqu8EWbpNyycxqlH3"
+              || (request.auth.token.email_verified == true
+                  && request.auth.token.email == "victor@fiveinnolabs.com"));
     }
 
     function isOwner(userId) {
