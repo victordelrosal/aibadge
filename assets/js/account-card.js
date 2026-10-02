@@ -74,7 +74,7 @@
     var b = document.createElement('b'); b.textContent = user.displayName || 'Your account';
     var s = document.createElement('small'); s.textContent = user.email || '';
     var nm = document.createElement('span'); nm.className = 'fil-nm'; nm.append(b);
-    if (level) { var lv = document.createElement('fil-level'); lv.setAttribute('level', level); nm.append(lv); }   // AI Badge level
+    var lv = document.createElement('fil-level'); lv.setAttribute('level', level || 0); nm.append(lv);   // AI Badge level, or the invitation to earn L1
     txt.append(nm, s); head.replaceChildren(pav, txt);
     card.hidden = false; me.setAttribute('aria-expanded', 'true');
     if (ways.isConnected) ways.refresh();
@@ -106,8 +106,9 @@
     ways.addEventListener('fil-ways', function (e) {
       var l = e.detail && e.detail.level; if (l === level) return; level = l || null;
       var nm = card.querySelector('.fil-nm'); if (!nm) return;
-      var old = nm.querySelector('fil-level'); if (old) old.remove();
-      if (level) { var lv = document.createElement('fil-level'); lv.setAttribute('level', level); nm.append(lv); }
+      var lv = nm.querySelector('fil-level');
+      if (!lv) { lv = document.createElement('fil-level'); nm.append(lv); }
+      lv.setAttribute('level', level || 0);
     });
     bar.appendChild(card);
     me.addEventListener('click', function (e) { e.stopPropagation(); card.hidden ? open() : close(true); });
