@@ -74,6 +74,10 @@ async function route(request, env) {
       return handleStripeWebhook(request, env);
     }
     if (path === "/api/init" && request.method === "POST") {
+      /* resets every booking slot: Victor only (verifier, 2 Oct 2026: it was open to anyone) */
+      const authz = request.headers.get("Authorization") || "";
+      const p = authz.startsWith("Bearer ") ? await verifyFirebaseToken(authz.slice(7).trim(), env) : null;
+      if (!(await isLiveAdmin(p))) return jsonResponse({ error: "Admins only." }, 403);
       return handleInit(env);
     }
     if (path.startsWith("/api/calendar/") && request.method === "GET") {
@@ -85,7 +89,13 @@ async function route(request, env) {
       return handleGoogleCalendarLink(slotId, env);
     }
     if (path === "/api/check-enrollment" && request.method === "GET") {
+      /* a person's own enrolment only (verifier, 2 Oct 2026: it answered name, plan and slot for any email):
+         the caller's verified address must be the one asked about, or the caller is Victor */
       const email = url.searchParams.get("email");
+      const authz = request.headers.get("Authorization") || "";
+      const p = authz.startsWith("Bearer ") ? await verifyFirebaseToken(authz.slice(7).trim(), env) : null;
+      const own = p && p.emailVerified && String(p.email || "").toLowerCase() === String(email || "").trim().toLowerCase();
+      if (!own && !(await isLiveAdmin(p))) return jsonResponse({ error: "Sign in to check your own enrolment." }, 401);
       return handleCheckEnrollment(email, env);
     }
     if (path === "/api/invite" && request.method === "POST") {
@@ -1460,14 +1470,50 @@ async function sendReminderEmail(env, slot, weekNum, reminderType) {
 // REPORT MAILER (existing functionality)
 // ══════════════════════════════════════════
 
+/* Every value from the request is escaped and bounded before it reaches the email (verifier, 2 Oct 2026: the
+   public report mailer put request HTML into mail sent from the verified fiveinnolabs domain). */
+function cleanForMail(v, depth = 0) {
+  if (typeof v === "string") return escapeHtml(v.replace(/[\r\n]+/g, " ").slice(0, 300));
+  if (typeof v === "number") return Number.isFinite(v) ? Math.max(-1000, Math.min(1000, v)) : 0;
+  if (typeof v === "boolean" || v == null) return v;
+  if (depth > 3) return null;
+  if (Array.isArray(v)) return v.slice(0, 30).map((x) => cleanForMail(x, depth + 1));
+  if (typeof v === "object") {
+    const o = {};
+    for (const k of Object.keys(v).slice(0, 30)) o[escapeHtml(String(k).slice(0, 60))] = cleanForMail(v[k], depth + 1);
+    return o;
+  }
+  return null;
+}
+/* the anonymous self-assessment may email a report, but not on repeat: 3 a day per address, 10 an hour per IP */
+async function mailAllowed(env, email, ip) {
+  const day = new Date().toISOString().slice(0, 10), hour = new Date().toISOString().slice(0, 13);
+  const kE = `rl:mail:${email}:${day}`, kI = `rl:ip:${ip}:${hour}`;
+  const [e, i] = await Promise.all([env.SLOTS.get(kE), env.SLOTS.get(kI)]);
+  if ((+e || 0) >= 3 || (+i || 0) >= 10) return false;
+  await Promise.all([
+    env.SLOTS.put(kE, String((+e || 0) + 1), { expirationTtl: 90000 }),
+    env.SLOTS.put(kI, String((+i || 0) + 1), { expirationTtl: 4000 }),
+  ]);
+  return true;
+}
+
 async function handleReportEmail(request, env) {
   try {
-    const body = await request.json();
-    const { email, scores, score, tier, archetype, flags, report } = body;
-
-    if (!email || !email.includes("@")) {
+    const raw = await request.text();
+    if (raw.length > 20000) return jsonResponse({ error: "Too large" }, 413);
+    const body = JSON.parse(raw || "{}");
+    const email = String(body.email || "").trim().toLowerCase();
+    if (!/^[^\s@<>"']{1,64}@[^\s@<>"']{1,190}\.[a-z]{2,}$/i.test(email)) {
       return jsonResponse({ error: "Valid email required" }, 400);
     }
+    if (!(await mailAllowed(env, email, request.headers.get("CF-Connecting-IP") || "unknown"))) {
+      return jsonResponse({ error: "That report has already been sent. Check your inbox." }, 429);
+    }
+    const scores = cleanForMail(body.scores), flags = cleanForMail(body.flags);
+    const score = Math.max(0, Math.min(100, Math.round(Number(body.score) || 0)));
+    const tier = cleanForMail(String(body.tier || "").slice(0, 60)), archetype = cleanForMail(String(body.archetype || "").slice(0, 60));
+    const report = String(body.report || "").slice(0, 4000);
 
     const html = buildReportEmailHTML({ scores, score, tier, archetype, flags, report });
 
