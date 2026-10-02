@@ -904,7 +904,7 @@ async function handleInvite(request, env) {
 // KV (server-authoritative, so a client can never forge "paid") and emails
 // Victor to review. Issuance itself stays manual via certs.fiveinnolabs.com.
 
-const CERT_PRICE_CENTS = 4900;            // default €49 for non-NCI learners
+const CERT_PRICE_CENTS = 4900;            // EUR 49: the Level 2 certificate (Level 1 is free since 2 Oct 2026)
 const CERT_CURRENCY = "eur";
 const CERT_ADMIN_EMAILS = ["victor@fiveinnolabs.com", "victordelrosal@gmail.com"];
 const CERT_ALERT_TO = "victordelrosal@gmail.com";
@@ -923,6 +923,9 @@ async function resolveCertPrice(email, env) {
   const e = String(email || "").trim().toLowerCase();
   if (certIsAdmin(e)) return { cents: 0, reason: "admin" };
   if (certIsNciEmail(e)) return { cents: 0, reason: "nci" };
+  /* 2 Oct 2026 (Victor): the Level 1 certificate is free for everyone. This checkout only ever issues the
+     Level 1 certificate, so it never charges; CERT_PRICE_CENTS stays for the Level 2 certificate (EUR 49). */
+  return { cents: 0, reason: "l1-free" };
   try {
     const raw = await env.SLOTS.get(`certprice:${e}`);
     if (raw) {
