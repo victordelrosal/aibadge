@@ -18,7 +18,7 @@
   var BROKER = 'https://aireckon.ing/api/auth/linkedin';
   var ROUTE_KEY = 'fil-li-route';
   var MSG = {
-    taken: 'That LinkedIn already has an account of its own. Sign in with it instead, or write to victor@fiveinnolabs.com and we will join them.',
+    taken: 'That LinkedIn already has an account of its own. Sign in with it instead, or write to victor@fiveinnolabs.com and we will help.',
     cancelled: 'LinkedIn sign-in was cancelled.',
     unverified: 'LinkedIn has not confirmed your email address yet, so we cannot match it to your account. Confirm it on LinkedIn, or continue with Google.',
     error: 'LinkedIn sign-in did not go through. Please try again, or continue with Google.',
