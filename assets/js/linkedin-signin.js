@@ -21,7 +21,9 @@
     taken: 'That LinkedIn already has an account of its own. Sign in with it instead, or write to victor@fiveinnolabs.com and we will join them.',
     cancelled: 'LinkedIn sign-in was cancelled.',
     unverified: 'LinkedIn has not confirmed your email address yet, so we cannot match it to your account. Confirm it on LinkedIn, or continue with Google.',
-    error: 'LinkedIn sign-in did not go through. Please try again, or continue with Google.'
+    error: 'LinkedIn sign-in did not go through. Please try again, or continue with Google.',
+    held: 'An account with this email was started but never confirmed, so LinkedIn cannot open it. Continue with Google, or write to victor@fiveinnolabs.com.',
+    link: 'LinkedIn was not connected: sign in to this account first, then connect it from the account card.'
   };
 
   window.signInWithLinkedIn = function () {
@@ -33,8 +35,8 @@
   /* Synchronously, before any router sees it: take the code out of the address and put back the
      route the person left from. */
   var h = new URLSearchParams((location.hash || '').replace(/^#/, ''));
-  var code = h.get('li'), err = h.get('li-error'), linked = h.get('li-linked');
-  if (!code && !err && !linked) { window.linkedInSignInResult = Promise.resolve(null); return; }
+  var code = h.get('li'), err = h.get('li-error'), linked = h.get('li-linked'), lcode = h.get('li-link');
+  if (!code && !err && !linked && !lcode) { window.linkedInSignInResult = Promise.resolve(null); return; }
   var route = '', linking = false;
   try {
     route = sessionStorage.getItem(ROUTE_KEY) || ''; sessionStorage.removeItem(ROUTE_KEY);
@@ -44,6 +46,22 @@
 
   window.linkedInSignInResult = (async function () {
     if (linked) return { success: true, mode: 'link' };
+    /* a connected LinkedIn only counts once this browser proves it is in the account that asked (2 Oct 2026) */
+    if (lcode) {
+      try {
+        if (typeof initFirebase === 'function') initFirebase();
+        var me = await new Promise(function (ok) { var off = firebase.auth().onAuthStateChanged(function (u) { off(); ok(u); }); });
+        if (!me) return { success: false, error: MSG.link, code: 'link', mode: 'link' };
+        var cr = await fetch(BROKER + '/link/confirm', {
+          method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + await me.getIdToken() },
+          body: JSON.stringify({ code: lcode })
+        });
+        var cj = await cr.json().catch(function () { return {}; });
+        if (cr.ok && cj.linked) return { success: true, mode: 'link' };
+        var why = cj.error === 'taken' ? 'taken' : cr.status === 403 ? 'link' : 'error';
+        return { success: false, error: MSG[why], code: why, mode: 'link' };
+      } catch (e) { return { success: false, error: MSG.error, code: 'error', mode: 'link' }; }
+    }
     if (err) return { success: false, error: MSG[err] || MSG.error, code: err, mode: linking ? 'link' : 'signin' };
     try {
       var r = await fetch(BROKER + '/redeem', {
