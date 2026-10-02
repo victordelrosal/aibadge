@@ -1329,6 +1329,20 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 #view-landing .lx-btn-outline{background:transparent;color:var(--lx-navy);border-color:rgba(0,0,54,0.22)}
 #view-landing .lx-btn-outline:hover{border-color:var(--lx-navy)}
 
+/* Glass start pills (Victor, 2 Oct: "coquetas", 3D-ish, subtle) */
+#view-landing .lx-btn-glass{position:relative;isolation:isolate;color:#fff;font-weight:600;
+  background:linear-gradient(180deg,rgba(46,78,200,.50) 0%,rgba(14,24,104,.72) 100%);
+  border:1px solid rgba(124,164,255,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -3px 8px rgba(0,0,40,.45),0 0 0 1px rgba(4,10,60,.55),0 10px 24px -10px rgba(40,90,255,.65),0 0 22px -6px rgba(64,128,255,.55);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+#view-landing .lx-btn-glass::before{content:"";position:absolute;inset:1px 1px 50% 1px;border-radius:999px 999px 14px 14px;z-index:-1;
+  background:linear-gradient(180deg,rgba(255,255,255,.20),rgba(255,255,255,0));pointer-events:none}
+#view-landing .lx-btn-glass:hover{border-color:rgba(160,195,255,.9);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.34),inset 0 -3px 8px rgba(0,0,40,.4),0 0 0 1px rgba(4,10,60,.55),0 14px 30px -10px rgba(40,90,255,.8),0 0 30px -4px rgba(90,150,255,.7)}
+#view-landing .lx-btn-glass:active{transform:translateY(0);box-shadow:inset 0 2px 6px rgba(0,0,40,.5),0 0 0 1px rgba(4,10,60,.55),0 6px 16px -10px rgba(40,90,255,.6)}
+#view-landing .lx-chip{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 2px 6px rgba(0,0,40,.35);flex:0 0 auto;margin-left:-6px}
+#view-landing .lx-chip svg{width:15px;height:15px}
+
 /* --- Type --- */
 #view-landing .lx-eyebrow{font:600 12px/1 'Inter',sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:var(--lx-lapis);margin:0 0 16px}
 #view-landing .lx-eyebrow-gold{color:var(--lx-gold-soft)}
@@ -1409,6 +1423,78 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 #view-landing .aib-stage:not(.aib-3d).aib-flat-flip{cursor:pointer}
 #view-landing .lx-hint-tap{display:none}
 @media(hover:none){#view-landing .lx-hint-hover{display:none}#view-landing .lx-hint-tap{display:inline}}
+
+/* --- Hero: mapped-to row --- */
+#view-landing .lx-mapped{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin-top:30px;text-decoration:none;max-width:36em}
+#view-landing .lx-mapped-k{font:600 11px/1 'Inter',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+#view-landing .lx-mapped-list{display:flex;flex-wrap:wrap;gap:6px}
+#view-landing .lx-mapped-list b{font:600 12.5px/1 'Inter',sans-serif;color:rgba(255,255,255,.88);padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);transition:border-color .2s,background .2s}
+#view-landing .lx-mapped-list b.eu{border-color:rgba(110,160,236,.45);background:rgba(64,128,255,.12)}
+#view-landing .lx-mapped:hover .lx-mapped-list b{border-color:rgba(255,255,255,.32)}
+#view-landing .lx-mapped:hover .lx-mapped-list b.eu{border-color:rgba(140,180,255,.7)}
+
+/* --- Frameworks section --- */
+#view-landing .lx-fw{background:linear-gradient(180deg,#F3F5FB 0%,#fff 38%)}
+#view-landing .lx-fw .lx-h2 em{color:#1F3FA8}
+#view-landing .lx-fw-map{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 240px minmax(0,1fr);gap:28px 40px;align-items:center}
+#view-landing .lx-fw-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+#view-landing .lx-fw-lines path{fill:none;stroke-width:1.4}
+#view-landing .lx-fw-lines .base{stroke:rgba(31,63,168,.26)}
+#view-landing .lx-fw-lines .pulse{stroke:url(#lxFwGrad);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:26 600;animation:lxFwPulse 4.8s linear infinite}
+@keyframes lxFwPulse{from{stroke-dashoffset:626}to{stroke-dashoffset:0}}
+#view-landing .lx-fw-col{position:relative;z-index:1;display:flex;flex-direction:column;gap:16px}
+#view-landing .lx-fw-group{display:flex;align-items:center;gap:10px;font:600 12px/1 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--lx-faint);margin:0 0 2px}
+#view-landing .lx-fw-eu,#view-landing .lx-fw-intl{display:inline-grid;place-items:center;height:22px;padding:0 8px;border-radius:6px;font:700 11px/1 'Inter',sans-serif;letter-spacing:.08em}
+#view-landing .lx-fw-eu{background:#1F3FA8;color:#fff}
+#view-landing .lx-fw-intl{background:rgba(0,0,54,.07);color:var(--lx-navy)}
+#view-landing .lx-fw-card{background:#fff;border:1px solid var(--lx-line);border-radius:18px;padding:18px 20px 16px;box-shadow:0 1px 2px rgba(0,0,54,.04),0 18px 36px -26px rgba(0,0,54,.28);transition:border-color .25s,box-shadow .25s}
+#view-landing .lx-fw-card.is-eu{border-left:3px solid #1F3FA8}
+#view-landing .lx-fw-card:hover{border-color:rgba(31,63,168,.35);box-shadow:0 1px 2px rgba(0,0,54,.04),0 24px 44px -24px rgba(31,63,168,.35)}
+#view-landing .lx-fw-card header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#view-landing .lx-fw-card h3{font:700 1.12rem/1.2 'Inter',sans-serif;letter-spacing:-.015em;color:var(--lx-ink);margin:0}
+#view-landing .lx-fw-card header p{font-size:.78rem;color:var(--lx-faint);margin:0}
+#view-landing .lx-fw-desc{font-size:.9rem;line-height:1.55;color:var(--lx-muted);margin:8px 0 12px}
+#view-landing .lx-fw-bands{list-style:none;display:flex;margin:0 0 12px;padding:0;border-radius:8px;overflow:hidden;border:1px solid var(--lx-line)}
+#view-landing .lx-fw-bands li{flex:1;text-align:center;font:600 10.5px/1 'Inter',sans-serif;letter-spacing:.02em;color:#3B4256;padding:6px 4px;line-height:1.2;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--lx-line)}
+#view-landing .lx-fw-bands li:first-child{border-left:0}
+#view-landing .lx-fw-bands li:nth-child(1){background:rgba(31,63,168,.04)}
+#view-landing .lx-fw-bands li:nth-child(2){background:rgba(31,63,168,.08)}
+#view-landing .lx-fw-bands li:nth-child(3){background:rgba(31,63,168,.12)}
+#view-landing .lx-fw-bands li:nth-child(4){background:rgba(31,63,168,.16)}
+#view-landing .lx-fw-bands li:nth-child(5){background:rgba(31,63,168,.20)}
+#view-landing .lx-fw-bands li:nth-child(6){background:rgba(31,63,168,.24)}
+#view-landing .lx-fw-bands li:nth-child(7){background:rgba(31,63,168,.30)}
+#view-landing .lx-fw-link{font-size:.82rem;font-weight:600;color:#1F3FA8;text-decoration:none}
+#view-landing .lx-fw-link:hover{text-decoration:underline;text-underline-offset:3px}
+#view-landing .lx-fw-core{position:relative;z-index:1;display:grid;place-items:center;text-align:center}
+#view-landing .lx-fw-core img{width:150px;height:auto;position:relative;filter:drop-shadow(0 18px 30px rgba(0,0,54,.35))}
+#view-landing .lx-fw-ring{position:absolute;top:50%;left:50%;width:220px;height:220px;margin:-130px 0 0 -110px;border-radius:50%;border:1px dashed rgba(31,63,168,.25);animation:lxSpin 60s linear infinite}
+@keyframes lxSpin{to{transform:rotate(360deg)}}
+#view-landing .lx-fw-core p{position:relative;margin:14px 0 0;font:600 11px/1.5 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--lx-faint)}
+#view-landing .lx-fw-proof{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px;align-items:center;margin-top:72px;padding:36px;border-radius:26px;background:var(--lx-navy);color:#fff;position:relative;overflow:hidden}
+#view-landing .lx-fw-proof h3{font:700 clamp(1.5rem,2.4vw,2rem)/1.15 'Playfair Display',Georgia,serif;margin:0 0 12px}
+#view-landing .lx-fw-proof p{font-size:1rem;line-height:1.7;color:rgba(255,255,255,.72);margin:0 0 24px}
+#view-landing .lx-fw-proof .lx-btn-dark{background:#fff;color:var(--lx-navy)}
+#view-landing .lx-fw-code{margin:0;padding:20px 22px;border-radius:16px;background:#05062a;border:1px solid rgba(255,255,255,.08);font:500 12.5px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#C9D3E2;overflow-x:auto;white-space:pre}
+#view-landing .lx-fw-code i{font-style:normal;color:#8FB3FF}
+#view-landing .lx-fw-code s{text-decoration:none;color:#E9D18A}
+#view-landing .lx-fw-code u{text-decoration:none;color:rgba(255,255,255,.38)}
+#view-landing .lx-fw-disclaimer{max-width:56em;margin:22px auto 0;text-align:center;font-size:.8rem;line-height:1.6;color:var(--lx-faint)}
+@media(max-width:980px){
+  #view-landing .lx-fw-map{grid-template-columns:1fr;gap:20px}
+  #view-landing .lx-fw-core{order:-1}
+  #view-landing .lx-fw-core img{width:110px}
+  #view-landing .lx-fw-ring{width:160px;height:160px;margin:-100px 0 0 -80px}
+  #view-landing .lx-fw-lines{display:none}
+  #view-landing .lx-fw-proof{grid-template-columns:1fr;padding:26px 20px}
+  #view-landing .lx-fw-code{font-size:11px;padding:16px}
+  #view-landing .lx-mapped{justify-content:center;margin-left:auto;margin-right:auto}
+  #view-landing .lx-mapped-list{justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){
+  #view-landing .lx-fw-lines .pulse,#view-landing .lx-fw-ring{animation:none}
+  #view-landing .lx-fw-lines .pulse{display:none}
+}
 
 /* --- Steps --- */
 #view-landing .lx-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--lx-line);counter-reset:none}
@@ -1602,6 +1688,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <nav class="nav">
     <a href="#/" class="logo"><img src="assets/img/ai-badge.png" alt="" class="nav-logo"><span class="logo-ai">AI</span><span class="logo-badge">Badge</span></a>
     <ul class="nav-links" id="navLinks">
+      <li><a href="#frameworks">Frameworks</a></li>
       <li><a href="#how-it-works">How it works</a></li>
       <li><a href="#curriculum">Curriculum</a></li>
       <li><a href="#credential">Credential</a></li>
@@ -1629,16 +1716,21 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <div class="lx-hero-copy">
       <a href="#pricing-v2" class="lx-pill fade-in"><span class="lx-dot"></span>The Level&nbsp;1 certificate is now free for everyone</a>
       <h1 class="lx-h1 fade-in">Get good at AI.<br><em>Then prove it.</em></h1>
-      <p class="lx-lede fade-in">Short video tutorials for working professionals. Each one ends with something you build and submit. When your work meets the bar, you receive a signed credential that anyone can verify.</p>
+      <p class="lx-lede fade-in">Short video tutorials for working professionals. Each one ends with something you build and submit. When your work meets the bar, you receive a signed credential, mapped to European and international AI competency frameworks, that anyone can verify.</p>
 
       <div class="lx-start fade-in">
         <span class="lx-start-label">Start free with</span>
         <div class="lx-start-pills">
-          <a href="#" class="lx-btn lx-btn-light lx-btn-lg" @click.prevent="navGoogleSignup()"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Google</a>
-          <a href="#" class="lx-btn lx-btn-light lx-btn-lg" @click.prevent="signInWithLinkedIn()"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg>LinkedIn</a>
+          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="navGoogleSignup()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Google</a>
+          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="signInWithLinkedIn()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>LinkedIn</a>
         </div>
         <a href="#" class="lx-start-email" @click.prevent="$store.ui.showModal('signin')">or use your email</a>
       </div>
+
+      <a href="#frameworks" class="lx-mapped fade-in" aria-label="Mapped to six competency frameworks: see how">
+        <span class="lx-mapped-k">Mapped to</span>
+        <span class="lx-mapped-list"><b class="eu">DigComp&nbsp;3.0</b><b class="eu">EU&nbsp;AI&nbsp;Act</b><b class="eu">OECD/EC&nbsp;AILit</b><b>UNESCO</b><b>SFIA&nbsp;9</b><b>Turing</b></span>
+      </a>
 
       <ul class="lx-facts fade-in" aria-label="At a glance">
         <li><strong data-lx="l1count">9</strong> Level&nbsp;1 tutorials</li>
@@ -1657,6 +1749,89 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       </div>
       <p class="lx-badge-hint"><span class="lx-hint-hover">Hover the centre</span><span class="lx-hint-tap">Tap the badge</span> to see the certificate</p>
     </div>
+  </div>
+</section>
+
+<!-- ===================== FRAMEWORKS (USP): names only, no per-holder levels; disclaimer verbatim from certs-system/src/lib/credential.js ===================== -->
+<section class="lx-section lx-fw" id="frameworks">
+  <div class="lx-wrap">
+    <div class="lx-head fade-in">
+      <p class="lx-eyebrow">Recognised frameworks</p>
+      <h2 class="lx-h2">Built on the frameworks <em>Europe</em> already uses.</h2>
+      <p class="lx-sub">The AI Badge programme is mapped to three European competency frameworks and three international ones. The mapping is written into every credential, so your badge reads in terms that HR teams, universities and regulators already know.</p>
+    </div>
+
+    <div class="lx-fw-map fade-in">
+      <svg class="lx-fw-lines" aria-hidden="true"></svg>
+      <div class="lx-fw-col">
+        <p class="lx-fw-group"><span class="lx-fw-eu">EU</span>European frameworks</p>
+        <article class="lx-fw-card is-eu" data-fw>
+          <header><h3>DigComp&nbsp;3.0</h3><p>European Commission</p></header>
+          <p class="lx-fw-desc">The EU reference framework for digital competence, extended with AI-specific competences.</p>
+          <ol class="lx-fw-bands" aria-label="Self-assessment bands"><li>Foundation</li><li>Intermediate</li><li>Advanced</li><li>Highly specialised</li></ol>
+          <a class="lx-fw-link" href="https://joinup.ec.europa.eu/collection/digcomp" target="_blank" rel="noopener">Official source <span aria-hidden="true">&#8599;</span></a>
+        </article>
+        <article class="lx-fw-card is-eu" data-fw>
+          <header><h3>EU AI Act</h3><p>Regulation (EU) 2024/1689</p></header>
+          <p class="lx-fw-desc">The EU&rsquo;s AI regulation. Article&nbsp;4 is about AI literacy for the people who provide and use AI systems at work.</p>
+          <ol class="lx-fw-bands" aria-label="Self-assessment bands"><li>Foundation</li><li>Compliant</li><li>Strategic</li></ol>
+          <a class="lx-fw-link" href="https://artificialintelligenceact.eu/" target="_blank" rel="noopener">Official source <span aria-hidden="true">&#8599;</span></a>
+        </article>
+        <article class="lx-fw-card is-eu" data-fw>
+          <header><h3>OECD/EC AILit</h3><p>OECD and European Commission</p></header>
+          <p class="lx-fw-desc">The AI Literacy Framework that the OECD and the European Commission developed together for learners.</p>
+          <ol class="lx-fw-bands" aria-label="Self-assessment bands"><li>Foundational</li><li>Developing</li><li>Proficient</li></ol>
+          <a class="lx-fw-link" href="https://ailiteracyframework.org/" target="_blank" rel="noopener">Official source <span aria-hidden="true">&#8599;</span></a>
+        </article>
+      </div>
+      <div class="lx-fw-core" aria-hidden="true">
+        <div class="lx-fw-ring"></div>
+        <img src="assets/img/ai-badge.webp" alt="">
+        <p>Six alignments,<br>one credential</p>
+      </div>
+      <div class="lx-fw-col">
+        <p class="lx-fw-group"><span class="lx-fw-intl">Global</span>International frameworks</p>
+        <article class="lx-fw-card" data-fw>
+          <header><h3>UNESCO</h3><p>United Nations agency</p></header>
+          <p class="lx-fw-desc">UNESCO&rsquo;s AI competency frameworks: a global reference for the knowledge, skills and values needed to engage with AI responsibly.</p>
+          <ol class="lx-fw-bands" aria-label="Self-assessment bands"><li>Understand</li><li>Apply</li><li>Create</li></ol>
+          <a class="lx-fw-link" href="https://www.unesco.org/en/digital-education/ai-future-learning" target="_blank" rel="noopener">Official source <span aria-hidden="true">&#8599;</span></a>
+        </article>
+        <article class="lx-fw-card" data-fw>
+          <header><h3>SFIA&nbsp;9</h3><p>SFIA Foundation</p></header>
+          <p class="lx-fw-desc">The Skills Framework for the Information Age, the global standard for describing professional digital and AI skills.</p>
+          <ol class="lx-fw-bands" aria-label="Self-assessment bands"><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li></ol>
+          <a class="lx-fw-link" href="https://sfia-online.org/en/sfia-9" target="_blank" rel="noopener">Official source <span aria-hidden="true">&#8599;</span></a>
+        </article>
+        <article class="lx-fw-card" data-fw>
+          <header><h3>Turing</h3><p>The Alan Turing Institute</p></header>
+          <p class="lx-fw-desc">The UK&rsquo;s national institute for AI and data science. Its skills framing spans AI citizens, workers and leaders.</p>
+          <ol class="lx-fw-bands" aria-label="Self-assessment bands"><li>AI Citizen</li><li>AI Worker</li><li>AI Leader</li></ol>
+          <a class="lx-fw-link" href="https://www.turing.ac.uk/" target="_blank" rel="noopener">Official source <span aria-hidden="true">&#8599;</span></a>
+        </article>
+      </div>
+    </div>
+
+    <div class="lx-fw-proof fade-in">
+      <div class="lx-fw-proof-copy">
+        <h3>Written into the credential itself.</h3>
+        <p>Every AI Badge is an Open Badges 3.0 credential, and its signed data carries all six alignments with a link to each framework. Software that reads Open Badges can see them without asking us.</p>
+        <a href="explore.html" class="lx-btn lx-btn-dark">See where you sit on all six <span aria-hidden="true">&rarr;</span></a>
+      </div>
+      <pre class="lx-fw-code" aria-label="Excerpt of the signed credential data"><code><u>// from a signed AI Badge (Open Badges 3.0)</u>
+<i>"alignment"</i>: [
+  { <i>"targetFramework"</i>: <s>"DigComp 3.0"</s>,
+    <i>"targetUrl"</i>: <s>"https://joinup.ec.europa.eu/collection/digcomp"</s> },
+  { <i>"targetFramework"</i>: <s>"EU AI Act"</s>,
+    <i>"targetUrl"</i>: <s>"https://artificialintelligenceact.eu/"</s> },
+  { <i>"targetFramework"</i>: <s>"OECD/EC AILit"</s>, &hellip; },
+  { <i>"targetFramework"</i>: <s>"UNESCO"</s>, &hellip; },
+  { <i>"targetFramework"</i>: <s>"SFIA 9"</s>, &hellip; },
+  { <i>"targetFramework"</i>: <s>"Turing Institute"</s>, &hellip; }
+]</code></pre>
+    </div>
+
+    <p class="lx-fw-disclaimer fade-in">Independent mapping by fiveinnolabs indicating the frameworks this credential relates to. It is not a graded assessment and does not certify a level within any framework. The AI Badge is not endorsed by, accredited by, or affiliated with these organisations. The bands shown are the ones used in the free self-assessment.</p>
   </div>
 </section>
 
@@ -2021,8 +2196,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <div class="lx-start lx-start-center">
         <span class="lx-start-label">Start free with</span>
         <div class="lx-start-pills">
-          <a href="#" class="lx-btn lx-btn-light lx-btn-lg" @click.prevent="navGoogleSignup()"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Google</a>
-          <a href="#" class="lx-btn lx-btn-light lx-btn-lg" @click.prevent="signInWithLinkedIn()"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg>LinkedIn</a>
+          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="navGoogleSignup()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Google</a>
+          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="signInWithLinkedIn()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>LinkedIn</a>
         </div>
         <a href="#" class="lx-start-email" @click.prevent="$store.ui.showModal('signin')">or use your email</a>
       </div>
@@ -4440,6 +4615,30 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   }
   document.addEventListener('alpine:initialized', render);
   window.addEventListener('load', render);
+
+// Frameworks map: draw a curve from the badge to each framework card (desktop only).
+(function(){
+  var map=document.querySelector('#frameworks .lx-fw-map'); if(!map) return;
+  var svg=map.querySelector('.lx-fw-lines'), core=map.querySelector('.lx-fw-core img'), NS='http://www.w3.org/2000/svg';
+  function draw(){
+    if(getComputedStyle(svg).display==='none') return;
+    var m=map.getBoundingClientRect(), c=core.getBoundingClientRect();
+    var cx=c.left+c.width/2-m.left, cy=c.top+c.height/2-m.top;
+    var out='<defs><linearGradient id="lxFwGrad" x1="0" x2="1"><stop offset="0" stop-color="#1F3FA8" stop-opacity="0"/><stop offset=".5" stop-color="#4080ff"/><stop offset="1" stop-color="#D4AF37"/></linearGradient></defs>';
+    map.querySelectorAll('[data-fw]').forEach(function(card,i){
+      var r=card.getBoundingClientRect(), left=r.left+r.width/2<c.left+c.width/2;
+      var x=(left?r.right:r.left)-m.left, y=r.top+r.height/2-m.top;
+      var sx=cx+(left?-1:1)*c.width*0.42, mx=(sx+x)/2;
+      var d='M'+sx.toFixed(1)+' '+cy.toFixed(1)+' C'+mx.toFixed(1)+' '+cy.toFixed(1)+' '+mx.toFixed(1)+' '+y.toFixed(1)+' '+x.toFixed(1)+' '+y.toFixed(1);
+      out+='<path class="base" d="'+d+'"/><path class="pulse" d="'+d+'" style="animation-delay:-'+(i*0.8).toFixed(1)+'s"/>';
+    });
+    svg.innerHTML=out;
+  }
+  window.addEventListener('resize',draw);
+  window.addEventListener('load',draw);
+  document.fonts && document.fonts.ready.then(draw);
+  draw();
+})();
 
   document.querySelectorAll('#view-landing .faq-question').forEach(function(q){
     q.addEventListener('keydown', function(e){
