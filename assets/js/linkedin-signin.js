@@ -23,12 +23,21 @@
     unverified: 'LinkedIn has not confirmed your email address yet, so we cannot match it to your account. Confirm it on LinkedIn, or continue with Google.',
     error: 'LinkedIn sign-in did not go through. Please try again, or continue with Google.',
     held: 'An account with this email was started but never confirmed, so LinkedIn cannot open it. Continue with Google, or write to victor@fiveinnolabs.com.',
-    link: 'LinkedIn was not connected: sign in to this account first, then connect it from the account card.'
+    link: 'LinkedIn was not connected: sign in to this account first, then connect it from the account card.',
+    unsolicited: 'That LinkedIn sign-in was not started in this browser, so it was ignored. Use Continue with LinkedIn here.'
   };
+  var VERIFIER_KEY = 'fil-li-v';
+  /* identity audit F01 (2 Oct 2026): a hand-over only signs in the tab that started it. This tab keeps a random
+     verifier; the broker only sees its SHA-256 and asks for the verifier back when the code is redeemed. */
+  function b64u(bytes) { var s = ''; for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 
   window.signInWithLinkedIn = function () {
-    try { sessionStorage.setItem(ROUTE_KEY, location.hash || ''); } catch (e) {}
-    location.href = BROKER + '/start?return=' + encodeURIComponent(location.origin + location.pathname + location.search);
+    var v = b64u(crypto.getRandomValues(new Uint8Array(32)));
+    try { sessionStorage.setItem(ROUTE_KEY, location.hash || ''); sessionStorage.setItem(VERIFIER_KEY, v); } catch (e) {}
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)).then(function (d) {
+      location.href = BROKER + '/start?return=' + encodeURIComponent(location.origin + location.pathname + location.search) +
+        '&cc=' + b64u(new Uint8Array(d));
+    });
     return new Promise(function () {});   // the page is leaving
   };
 
@@ -63,9 +72,12 @@
       } catch (e) { return { success: false, error: MSG.error, code: 'error', mode: 'link' }; }
     }
     if (err) return { success: false, error: MSG[err] || MSG.error, code: err, mode: linking ? 'link' : 'signin' };
+    var verifier = null;
+    try { verifier = sessionStorage.getItem(VERIFIER_KEY); sessionStorage.removeItem(VERIFIER_KEY); } catch (e) {}
+    if (!verifier) return { success: false, error: MSG.unsolicited, code: 'unsolicited' };   // not started in this tab
     try {
       var r = await fetch(BROKER + '/redeem', {
-        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ code: code })
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ code: code, verifier: verifier })
       });
       var j = await r.json().catch(function () { return {}; });
       if (!r.ok || !j.token) return { success: false, error: MSG.error };
