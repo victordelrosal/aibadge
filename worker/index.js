@@ -919,10 +919,11 @@ function certIsAdmin(email) {
 
 // Resolve what THIS learner pays, server-side. Returns { cents, reason }.
 // cents === 0 means a comped (free) cert that still goes through review.
-async function resolveCertPrice(email, env) {
+async function resolveCertPrice(email, env, verified) {
   const e = String(email || "").trim().toLowerCase();
-  if (certIsAdmin(e)) return { cents: 0, reason: "admin" };
-  if (certIsNciEmail(e)) return { cents: 0, reason: "nci" };
+  // an address only waives the price when it is verified (audit F04): anyone can register an unverified one
+  if (verified && certIsAdmin(e)) return { cents: 0, reason: "admin" };
+  if (verified && certIsNciEmail(e)) return { cents: 0, reason: "nci" };
   /* 2 Oct 2026 (Victor): the Level 1 certificate is free for everyone. This checkout only ever issues the
      Level 1 certificate, so it never charges; CERT_PRICE_CENTS stays for the Level 2 certificate (EUR 49). */
   return { cents: 0, reason: "l1-free" };
@@ -988,7 +989,7 @@ async function handleCertCheckout(request, env) {
   const email = String(principal.email || "").trim().toLowerCase();
   if (!email) return jsonResponse({ error: "No email on your account." }, 400);
 
-  const price = await resolveCertPrice(email, env);
+  const price = await resolveCertPrice(email, env, principal.emailVerified);
 
   // Free / comped: record the request now and alert Victor. No Stripe.
   if (price.cents === 0) {
@@ -1082,7 +1083,7 @@ async function handleCertRequests(request, env) {
   const authz = request.headers.get("Authorization") || "";
   const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
   const principal = idToken ? await verifyFirebaseToken(idToken, env) : null;
-  if (!principal || !certIsAdmin(principal.email)) return jsonResponse({ error: "Admins only." }, 403);
+  if (!principal || !principal.emailVerified || !certIsAdmin(principal.email)) return jsonResponse({ error: "Admins only." }, 403);
 
   const out = [];
   let cursor;
@@ -1104,7 +1105,7 @@ async function handleCertPricing(request, env) {
   const authz = request.headers.get("Authorization") || "";
   const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
   const principal = idToken ? await verifyFirebaseToken(idToken, env) : null;
-  if (!principal || !certIsAdmin(principal.email)) return jsonResponse({ error: "Admins only." }, 403);
+  if (!principal || !principal.emailVerified || !certIsAdmin(principal.email)) return jsonResponse({ error: "Admins only." }, 403);
 
   let body; try { body = await request.json(); } catch (e) { return jsonResponse({ error: "Invalid JSON" }, 400); }
   const email = String(body.email || "").trim().toLowerCase();
@@ -1268,7 +1269,9 @@ async function verifyFirebaseToken(idToken, env) {
     const valid = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, sig, signed);
     if (!valid) return null;
 
-    return { uid: sub, email: payload.email || "", name: payload.name || "" };
+    // emailVerified travels with the principal (identity audit F04, 2 Oct 2026): anything that trusts the
+    // address (admin, a price waiver) must require it, because unverified password accounts can claim any email.
+    return { uid: sub, email: payload.email || "", name: payload.name || "", emailVerified: payload.email_verified === true };
   } catch (e) {
     return null;
   }
