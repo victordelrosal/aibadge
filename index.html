@@ -1395,7 +1395,20 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 #view-landing .lx-badge-img{width:min(340px,78%);margin:0;position:relative}
 #view-landing .hero-3d-container.lx-badge-3d{width:min(460px,100%);margin:0;position:relative;cursor:default}
 #view-landing .lx-badge-hint{position:relative;margin:6px 0 0;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
-#view-landing #hero3dContainer[style*="none"] ~ .lx-badge-hint{visibility:hidden}
+/* Flip badge (lifted from the Reckoning deck's ai-badge slide) */
+#view-landing .aib-stage{position:relative;width:min(460px,100%);aspect-ratio:1;display:grid;place-items:center;cursor:grab;z-index:2}
+#view-landing .aib-stage:active{cursor:grabbing}
+#view-landing .aib-stage canvas{position:absolute;inset:0;margin:auto;display:block}
+#view-landing .aib-stage > img{position:absolute;inset:0;margin:auto;height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
+#view-landing .aib-stage.aib-3d > img{visibility:hidden}
+#view-landing .aib-cert{position:absolute;inset:0;margin:auto;width:100%;height:100%;visibility:hidden;pointer-events:none;border-radius:22px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(227,200,120,.22);backface-visibility:hidden}
+#view-landing .aib-cert img{width:100%;height:100%;display:block}
+#view-landing .aib-stage:not(.aib-3d).aib-flat-flip > img{visibility:hidden}
+#view-landing .aib-stage:not(.aib-3d).aib-flat-flip .aib-cert{visibility:visible}
+#view-landing .aib-stage:not(.aib-3d).aib-flat-flip{cursor:pointer}
+#view-landing .lx-hint-tap{display:none}
+@media(hover:none){#view-landing .lx-hint-hover{display:none}#view-landing .lx-hint-tap{display:inline}}
 
 /* --- Steps --- */
 #view-landing .lx-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--lx-line);counter-reset:none}
@@ -1518,9 +1531,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   #view-landing .lx-hero{padding:104px 0 72px;min-height:auto}
   #view-landing .lx-hero-inner{grid-template-columns:1fr;gap:8px;text-align:center}
   #view-landing .lx-hero-badge{order:-1}
-  #view-landing .hero-3d-container.lx-badge-3d{width:min(280px,72vw)}
+  #view-landing .aib-stage{width:min(300px,76vw)}
   #view-landing .lx-badge-img{width:min(220px,56vw)}
-  #view-landing .lx-badge-hint{display:none}
+  #view-landing .lx-badge-hint{font-size:11px}
   #view-landing .lx-lede{margin:0 auto}
   #view-landing .lx-cta-row{justify-content:center}
   #view-landing .lx-start{grid-template-columns:1fr;justify-content:center;justify-items:center;row-gap:12px}
@@ -1636,11 +1649,13 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
     <div class="lx-hero-badge fade-in">
       <div class="lx-halo" aria-hidden="true"></div>
-      <img src="assets/img/ai-badge.png" alt="The AI Badge" class="hero-badge lx-badge-img" id="heroBadgeFallback">
-      <div id="hero3dContainer" class="hero-3d-container lx-badge-3d" style="display:none;">
-        <canvas id="hero3dCanvas"></canvas>
+      <!-- Flip badge lifted from aireckon.ing/p/ (Reckoning deck, slides/ai-badge): hover the centre to turn it over to the issued certificate -->
+      <div class="aib-stage" title="Hover the centre to see the certificate">
+        <img src="assets/img/ai-badge.webp" alt="The AI Badge: a glass hexagon with glowing AI lettering over a blue galaxy, the word BADGE beneath">
+        <canvas aria-hidden="true"></canvas>
+        <div class="aib-cert"><img src="assets/img/ai-badge-cert.webp" alt="The issued AI Badge certificate for Victor del Rosal, credential y5u85, issued 3 June 2026, with a QR code to certs.fiveinnolabs.com/y5u85"></div>
       </div>
-      <p class="lx-badge-hint">Hover to tilt it</p>
+      <p class="lx-badge-hint"><span class="lx-hint-hover">Hover the centre</span><span class="lx-hint-tap">Tap the badge</span> to see the certificate</p>
     </div>
   </div>
 </section>
@@ -4390,7 +4405,6 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   }
 
   // Initialize both badges
-  init3DBadge('hero3dContainer', 'hero3dCanvas', 'heroBadgeFallback', 460);
 })();
 </script>
 
@@ -4436,6 +4450,89 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     var v = document.querySelector('#view-landing .lx-hero-video'); if (v) { v.pause(); v.removeAttribute('autoplay'); }
   }
+})();
+</script>
+
+<script>
+// ==========================================
+// HERO FLIP BADGE: lifted from aireckon.ing/p/ (Reckoning deck, slides/ai-badge, 24 Sep 2026).
+// Landing changes: the cert side opens the public credential; touch scrolling is not blocked.
+// ==========================================
+(()=>{
+'use strict';
+const slide=document.getElementById('hero');
+const stage=slide.querySelector('.aib-stage'), canvas=stage.querySelector('canvas'), img=stage.querySelector(':scope > img'), cert=stage.querySelector('.aib-cert');
+const still=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* Clicking the badge must not advance the deck (reckoning.js advances on stage click).
+   Clicking the certificate side opens aibadge.fiveinnolabs.com in a new tab. */
+const certShowing=()=>getComputedStyle(cert).visibility==='visible';
+stage.addEventListener('click',e=>{if(certShowing())window.open('https://certs.fiveinnolabs.com/y5u85','_blank','noopener');});
+stage.addEventListener('pointerenter',()=>{if(!stage.classList.contains('aib-3d'))stage.classList.add('aib-flat-flip');});
+stage.addEventListener('pointerleave',()=>stage.classList.remove('aib-flat-flip'));
+if(typeof THREE==='undefined')return;
+try{
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(40,1,0.1,100);camera.position.set(0,0,4.2);
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.3;
+  const envScene=new THREE.Scene(), envCamera=new THREE.CubeCamera(0.1,100,new THREE.WebGLCubeRenderTarget(128));
+  envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50,32,32),new THREE.MeshBasicMaterial({color:0x0a1a4e,side:THREE.BackSide})));
+  [[0xffffff,10,15,20],[0xD4AF37,-15,-5,15],[0x4080ff,5,-10,-15]].forEach(([c,x,y,z])=>{const s=new THREE.Mesh(new THREE.SphereGeometry(2,16,16),new THREE.MeshBasicMaterial({color:c}));s.position.set(x,y,z);envScene.add(s);});
+  envCamera.update(renderer,envScene);const envMap=envCamera.renderTarget.texture;
+  scene.add(new THREE.AmbientLight(0xffffff,0.5));
+  const key=new THREE.DirectionalLight(0xffffff,1.2);key.position.set(2,3,4);scene.add(key);
+  const fill=new THREE.DirectionalLight(0x4080ff,0.5);fill.position.set(-3,-1,3);scene.add(fill);
+  const rim=new THREE.PointLight(0xD4AF37,1.0,12);rim.position.set(0,0,3);scene.add(rim);
+  const back=new THREE.PointLight(0x4080ff,0.6,10);back.position.set(0,0,-3);scene.add(back);
+  const geo=new THREE.CylinderGeometry(1.35,1.35,0.2,6,1,false);geo.rotateX(Math.PI/2);geo.rotateZ(Math.PI/6);
+  const BASE_Z=-29*Math.PI/180;
+  let ready=false;
+  const tex=new THREE.TextureLoader().load(img.getAttribute('src'),t=>{t.encoding=THREE.sRGBEncoding;t.center.set(0.5,0.5);t.rotation=Math.PI/2;t.needsUpdate=true;ready=true;stage.classList.add('aib-3d');draw();});
+  const front=new THREE.MeshStandardMaterial({map:tex,metalness:0.4,roughness:0.35,envMap,envMapIntensity:0.5});
+  const side=new THREE.MeshStandardMaterial({color:0x1a1a4e,metalness:1.0,roughness:0.1,envMap,envMapIntensity:1.0,emissive:0x0a0a3e,emissiveIntensity:0.15});
+  const rear=new THREE.MeshStandardMaterial({color:0x0a0e27,metalness:0.9,roughness:0.2,envMap,envMapIntensity:0.6});
+  const mesh=new THREE.Mesh(geo,[side,front,rear]);mesh.rotation.z=BASE_Z;scene.add(mesh);
+  const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geo,20),new THREE.LineBasicMaterial({color:0xD4AF37,transparent:true,opacity:0.15}));edges.rotation.z=BASE_Z;scene.add(edges);
+  let size=0;
+  function fit(){const s=Math.round(Math.min(stage.clientWidth,stage.clientHeight));if(!s||s===size)return;size=s;renderer.setSize(s,s);cert.style.width=cert.style.height=s+'px';}
+  let tx=0,ty=0,cx=0,cy=0,hover=false,idle=0,flip=0,flipTo=0;
+  function flipCheck(x,y){const r=canvas.getBoundingClientRect(), dx=x-(r.left+r.width/2), dy=y-(r.top+r.height/2);
+    if(Math.hypot(dx,dy)<r.width*0.4)flipTo=1;
+    else if(Math.abs(dx)>r.width/2||Math.abs(dy)>r.height/2)flipTo=0;}
+  function aim(x,y){flipCheck(x,y);const r=canvas.getBoundingClientRect();const c=v=>Math.max(-1,Math.min(1,v)), nx=c(((x-r.left)/r.width-0.5)*2), ny=c(((y-r.top)/r.height-0.5)*2);ty=nx*0.6;tx=-ny*0.4;rim.position.set(nx*3,-ny*3,3);}
+  stage.addEventListener('pointerenter',()=>{hover=true;});
+  stage.addEventListener('pointerleave',()=>{hover=false;tx=0;ty=0;flipTo=0;});
+  stage.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')flipTo=flipTo?0:1;});
+  stage.addEventListener('pointermove',e=>{hover=true;aim(e.clientX,e.clientY);});
+  stage.addEventListener('touchmove',e=>{hover=true;aim(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+  stage.addEventListener('touchend',()=>{hover=false;tx=0;ty=0;});
+  function draw(){fit();
+    const ease=t=>0.5-Math.cos(Math.PI*t)/2, a=ease(Math.min(flip,0.5)*2), b=ease(Math.max(flip-0.5,0)*2);
+    const turn=cy+a*Math.PI/2;
+    mesh.rotation.set(cx,turn,BASE_Z);edges.rotation.set(cx,turn,BASE_Z);
+    canvas.style.visibility=flip>0.5?'hidden':'visible';
+    cert.style.visibility=flip>0.5?'visible':'hidden';
+    stage.style.cursor=flip>0.5?'pointer':'';
+    if(flip>0.5)cert.style.transform=`perspective(1800px) rotateX(${cx*-57.3}deg) rotateY(${cy*57.3-90+b*90}deg)`;
+    renderer.render(scene,camera);}
+  let raf=0;
+  function tick(){
+    raf=0;
+    if(document.hidden)return;
+    if(ready){
+      if(flip!==flipTo){flip=still?flipTo:(flipTo>flip?Math.min(flipTo,flip+1/26):Math.max(flipTo,flip-1/26));}
+      if(hover){cx+=(tx-cx)*0.08;cy+=(ty-cy)*0.08;}
+      else{idle+=0.008;cx+=(0-cx)*0.03;cy+=(Math.sin(idle)*0.25-cy)*0.03;}
+      draw();
+    }
+    raf=requestAnimationFrame(tick);
+  }
+  const wake=()=>{if(!raf&&!document.hidden)raf=requestAnimationFrame(tick);};
+  document.addEventListener('visibilitychange',wake);
+  window.addEventListener('resize',()=>{size=0;if(ready)draw();});
+  wake();
+}catch(err){console.warn('[ai-badge] 3D badge unavailable, showing the flat image',err);stage.classList.remove('aib-3d');canvas.style.display='none';}
 })();
 </script>
 
