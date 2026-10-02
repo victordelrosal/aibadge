@@ -3,12 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Badge: Discover Your AI Capability</title>
+<title>AI Badge: Get good at AI, then prove it</title>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aibadge.fiveinnolabs.com/">
+<meta property="og:site_name" content="AI Badge">
+<meta property="og:title" content="AI Badge: Get good at AI, then prove it">
+<meta property="og:description" content="Short video tutorials for working professionals. Build something real in each one, submit it, and earn a signed credential anyone can verify. Level 1 is free for everyone.">
+<meta property="og:image" content="https://aibadge.fiveinnolabs.com/assets/img/og-aibadge.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Badge: Get good at AI, then prove it">
+<meta name="twitter:description" content="Short video tutorials, real exercises, and a signed credential anyone can verify. Level 1 is free for everyone.">
+<meta name="twitter:image" content="https://aibadge.fiveinnolabs.com/assets/img/og-aibadge.jpg">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <meta name="description" content="A self-paced path to AI fluency for the future of work. Learn through beautiful tutorials, submit your real work, and earn a verifiable AI Badge cert when it meets the bar. Level 1 is free for everyone.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231a1a4e'/><stop offset='100%25' stop-color='%23243b8e'/></linearGradient></defs><polygon points='50,3 93,28 93,72 50,97 7,72 7,28' fill='url(%23g)' rx='6'/><text x='50' y='58' text-anchor='middle' font-family='-apple-system,sans-serif' font-size='36' font-weight='700' fill='white'>AI</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.14.8/dist/cdn.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 <style>[x-cloak]{display:none !important}</style>
@@ -1260,99 +1273,721 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   }
 }
 </style>
+<!-- Landing v2 styles (2 Oct 2026). Scoped to #view-landing and .lx-* so the LMS views are untouched. -->
+<style>
+#view-landing{
+  --lx-ink:#0A0E27;
+  --lx-navy:#000036;
+  --lx-royal:#02066F;
+  --lx-gold:#D4AF37;
+  --lx-gold-soft:#E9D18A;
+  --lx-lapis:#3E52B5;
+  --lx-muted:#5B6478;
+  --lx-faint:#8A93A8;
+  --lx-line:rgba(10,14,39,0.08);
+  --lx-tint:#F5F6FA;
+  --lx-radius:20px;
+  --lx-ease:cubic-bezier(.2,.7,.2,1);
+  color:var(--lx-ink);
+  -webkit-font-smoothing:antialiased;
+}
+#view-landing .lx-wrap{max-width:1160px;margin:0 auto;padding:0 24px;position:relative;z-index:2}
+#view-landing .lx-narrow{max-width:820px}
+
+/* --- Nav --- */
+#view-landing .navbar.lx-nav{background:rgba(0,0,40,0.38);border-bottom:1px solid rgba(255,255,255,0.06)}
+#view-landing .navbar.lx-nav.compact{padding:0;background:rgba(0,0,40,0.92)}
+#view-landing .lx-nav .nav{max-width:1208px;margin:0 auto;padding:14px 24px;gap:24px}
+#view-landing .lx-nav .logo{font-size:1.25rem}
+#view-landing .lx-nav .nav-logo{height:28px}
+#view-landing .lx-nav .nav-links{gap:2rem;margin-left:auto}
+#view-landing .lx-nav .nav-links a{font-size:0.9rem;color:rgba(255,255,255,0.72)}
+#view-landing .lx-nav .nav-links a:hover{color:#fff}
+#view-landing .lx-nav .nav-signin{color:rgba(255,255,255,0.72) !important;font-size:0.9rem !important}
+#view-landing .lx-nav-right{display:flex;align-items:center;gap:14px}
+
+/* --- Buttons --- */
+#view-landing .lx-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  height:46px;padding:0 22px;border-radius:999px;
+  font:600 15px/1 'Inter',system-ui,sans-serif;letter-spacing:-0.005em;
+  text-decoration:none;white-space:nowrap;cursor:pointer;border:1px solid transparent;
+  transition:transform .2s var(--lx-ease),box-shadow .2s var(--lx-ease),background-color .2s,border-color .2s,color .2s;
+}
+#view-landing .lx-btn:hover{transform:translateY(-1px)}
+#view-landing .lx-btn:active{transform:translateY(0)}
+#view-landing .lx-btn:focus-visible{outline:2px solid var(--lx-gold);outline-offset:3px}
+#view-landing .lx-btn-lg{height:54px;padding:0 26px;font-size:16px}
+#view-landing .lx-btn-sm{height:36px;padding:0 16px;font-size:14px}
+#view-landing .lx-btn-block{width:100%}
+#view-landing .lx-btn-light{background:#fff;color:var(--lx-navy);box-shadow:0 1px 0 rgba(255,255,255,0.4) inset,0 10px 30px -10px rgba(0,0,0,0.5)}
+#view-landing .lx-btn-light:hover{box-shadow:0 14px 34px -10px rgba(0,0,0,0.55)}
+#view-landing .lx-btn-ghost{background:rgba(255,255,255,0.05);color:#fff;border-color:rgba(255,255,255,0.24)}
+#view-landing .lx-btn-ghost:hover{background:rgba(255,255,255,0.11);border-color:rgba(255,255,255,0.4)}
+#view-landing .lx-btn-dark{background:var(--lx-navy);color:#fff;box-shadow:0 10px 24px -12px rgba(0,0,54,0.6)}
+#view-landing .lx-btn-dark:hover{background:var(--lx-royal)}
+#view-landing .lx-btn-outline{background:transparent;color:var(--lx-navy);border-color:rgba(0,0,54,0.22)}
+#view-landing .lx-btn-outline:hover{border-color:var(--lx-navy)}
+
+/* --- Type --- */
+#view-landing .lx-eyebrow{font:600 12px/1 'Inter',sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:var(--lx-lapis);margin:0 0 16px}
+#view-landing .lx-eyebrow-gold{color:var(--lx-gold-soft)}
+#view-landing .lx-h2{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(2rem,3.6vw,3rem);line-height:1.1;letter-spacing:-0.015em;color:var(--lx-ink);margin:0;text-wrap:balance}
+#view-landing .lx-h2 em{font-style:italic}
+#view-landing .lx-sub{font-size:1.0625rem;line-height:1.7;color:var(--lx-muted);max-width:36em;margin:18px auto 0;text-wrap:pretty}
+#view-landing .lx-light{color:#fff}
+#view-landing .lx-light-sub{color:rgba(255,255,255,0.72)}
+#view-landing .lx-fine{font-size:0.86rem;line-height:1.6;color:var(--lx-faint);margin:14px 0 0}
+#view-landing .lx-fine a{color:var(--lx-navy);font-weight:600;text-underline-offset:3px}
+#view-landing .lx-center{text-align:center;margin-top:28px}
+
+/* --- Sections --- */
+#view-landing .lx-section{padding:clamp(76px,10vw,128px) 0;background:#fff;position:relative;overflow:hidden}
+#view-landing .lx-tint{background:var(--lx-tint)}
+#view-landing .lx-dark{background:var(--lx-navy);color:#fff}
+#view-landing .lx-head{max-width:760px;margin:0 auto 56px;text-align:center}
+#view-landing .lx-hero-grid{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(rgba(110,160,236,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(110,160,236,0.07) 1px,transparent 1px);
+  background-size:56px 56px;
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 40%,#000 30%,transparent 100%);
+  mask-image:radial-gradient(70% 60% at 50% 40%,#000 30%,transparent 100%);
+}
+
+/* --- Hero --- */
+#view-landing .lx-hero{position:relative;min-height:min(100svh,940px);display:flex;align-items:center;background:var(--lx-navy);color:#fff;overflow:hidden;padding:128px 0 88px}
+#view-landing .lx-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.32;z-index:0}
+#view-landing .lx-hero-shade{position:absolute;inset:0;z-index:1;background:
+  radial-gradient(60% 70% at 78% 45%,rgba(64,128,255,0.22) 0%,transparent 60%),
+  radial-gradient(50% 60% at 80% 55%,rgba(212,175,55,0.10) 0%,transparent 70%),
+  linear-gradient(100deg,rgba(0,0,54,0.96) 0%,rgba(0,0,54,0.82) 45%,rgba(2,6,111,0.55) 100%)}
+#view-landing .lx-hero-inner{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,0.88fr);gap:48px;align-items:center;width:100%}
+#view-landing .lx-pill{display:inline-flex;align-items:center;gap:10px;padding:7px 14px 7px 11px;border-radius:999px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.86);font-size:13px;font-weight:500;text-decoration:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#view-landing .lx-pill:hover{border-color:rgba(255,255,255,0.3)}
+#view-landing .lx-dot{width:7px;height:7px;border-radius:50%;background:var(--lx-gold);box-shadow:0 0 0 0 rgba(212,175,55,0.6);animation:lxPulse 2.4s ease-out infinite}
+@keyframes lxPulse{0%{box-shadow:0 0 0 0 rgba(212,175,55,0.55)}70%{box-shadow:0 0 0 9px rgba(212,175,55,0)}100%{box-shadow:0 0 0 0 rgba(212,175,55,0)}}
+#view-landing .lx-h1{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(2.9rem,6.4vw,5.4rem);line-height:1.02;letter-spacing:-0.025em;margin:26px 0 22px;color:#fff}
+#view-landing .lx-h1 em{font-style:italic;background:linear-gradient(100deg,#F5E7A0 0%,#D4AF37 55%,#C9A033 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:0.06em}
+#view-landing .lx-lede{font-size:clamp(1.05rem,1.4vw,1.2rem);line-height:1.65;color:rgba(255,255,255,0.76);max-width:33em;margin:0}
+#view-landing .lx-cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+#view-landing .lx-center-row{justify-content:center}
+#view-landing .lx-facts{list-style:none;display:flex;flex-wrap:wrap;gap:0;margin:44px 0 0;padding:0;color:rgba(255,255,255,0.58);font-size:13.5px}
+#view-landing .lx-facts li{padding:0 26px;border-left:1px solid rgba(255,255,255,0.14)}
+#view-landing .lx-facts li:first-child{padding-left:0;border-left:0}
+#view-landing .lx-facts strong{display:block;color:#fff;font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:2px;font-variant-numeric:tabular-nums}
+#view-landing .lx-hero-badge{position:relative;display:grid;place-items:center}
+#view-landing .lx-halo{position:absolute;width:88%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,0.22) 0%,rgba(64,128,255,0.16) 38%,transparent 68%);filter:blur(10px);animation:lxBreathe 7s ease-in-out infinite}
+@keyframes lxBreathe{0%,100%{transform:scale(0.96);opacity:0.85}50%{transform:scale(1.04);opacity:1}}
+#view-landing .lx-badge-img{width:min(340px,78%);margin:0;position:relative}
+#view-landing .hero-3d-container.lx-badge-3d{width:min(460px,100%);margin:0;position:relative;cursor:default}
+#view-landing .lx-badge-hint{position:relative;margin:6px 0 0;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4)}
+#view-landing #hero3dContainer[style*="none"] ~ .lx-badge-hint{visibility:hidden}
+
+/* --- Steps --- */
+#view-landing .lx-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--lx-line);counter-reset:none}
+#view-landing .lx-steps li{position:relative;padding:34px 28px 0 0}
+#view-landing .lx-steps li::before{content:'';position:absolute;top:-5px;left:0;width:9px;height:9px;border-radius:50%;background:var(--lx-navy);box-shadow:0 0 0 5px #fff}
+#view-landing .lx-steps li:last-child::before{background:var(--lx-gold)}
+#view-landing .lx-step-n{font:600 12px/1 'Inter',sans-serif;letter-spacing:0.14em;color:var(--lx-faint);font-variant-numeric:tabular-nums}
+#view-landing .lx-steps h3{font:600 1.3rem/1.2 'Inter',sans-serif;letter-spacing:-0.015em;margin:14px 0 10px;color:var(--lx-ink)}
+#view-landing .lx-steps p{font-size:0.97rem;line-height:1.65;color:var(--lx-muted);margin:0;max-width:24em}
+
+/* --- Curriculum --- */
+#view-landing .lx-tracks{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+#view-landing .lx-track{background:#fff;border:1px solid var(--lx-line);border-radius:24px;padding:30px 30px 22px;box-shadow:0 1px 2px rgba(0,0,54,0.04),0 24px 48px -28px rgba(0,0,54,0.22)}
+#view-landing .lx-track header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}
+#view-landing .lx-track-k{font:600 12px/1 'Inter',sans-serif;letter-spacing:0.14em;text-transform:uppercase;color:var(--lx-faint);margin:0 0 8px}
+#view-landing .lx-track h3{font:700 1.7rem/1.15 'Playfair Display',Georgia,serif;margin:0;color:inherit}
+#view-landing .lx-tag{flex:0 0 auto;font:600 12px/1 'Inter',sans-serif;padding:8px 11px;border-radius:999px;background:rgba(0,0,54,0.06);color:var(--lx-navy);white-space:nowrap}
+#view-landing .lx-tag-free{background:#E7F6EC;color:#16703D}
+#view-landing .lx-syllabus{list-style:none;margin:0;padding:0}
+#view-landing .lx-syllabus li{display:grid;grid-template-columns:38px 1fr auto;align-items:baseline;gap:8px;padding:13px 0;border-top:1px solid var(--lx-line)}
+#view-landing .lx-syllabus .i{font:600 12px/1 'Inter',sans-serif;color:var(--lx-faint);font-variant-numeric:tabular-nums;letter-spacing:0.06em}
+#view-landing .lx-syllabus .t{font-size:1rem;font-weight:500;color:inherit}
+#view-landing .lx-syllabus .d{font-size:0.85rem;color:var(--lx-faint);font-variant-numeric:tabular-nums}
+#view-landing .lx-syllabus .o{display:inline-block;margin-left:8px;padding:3px 7px;border-radius:999px;background:#E7F6EC;color:#16703D;font:600 10.5px/1.2 'Inter',sans-serif;letter-spacing:0.06em;text-transform:uppercase;vertical-align:2px}
+#view-landing .lx-syllabus .soon .t,#view-landing .lx-syllabus .soon .d{opacity:0.55}
+#view-landing .lx-track-dark{background:linear-gradient(160deg,#000036 0%,#030A6E 100%);color:#fff;border-color:transparent;box-shadow:0 30px 60px -30px rgba(0,0,54,0.6)}
+#view-landing .lx-track-dark .lx-track-k,#view-landing .lx-track-dark .i,#view-landing .lx-track-dark .d{color:rgba(255,255,255,0.5)}
+#view-landing .lx-track-dark .lx-syllabus li{border-color:rgba(255,255,255,0.1)}
+#view-landing .lx-track-dark .lx-tag{background:rgba(255,255,255,0.1);color:#fff}
+#view-landing .lx-track-note{font-size:0.88rem;line-height:1.6;color:rgba(255,255,255,0.6);margin:14px 0 4px}
+
+/* --- Credential --- */
+#view-landing .lx-cred{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);gap:64px;align-items:center}
+#view-landing .lx-cred-art{display:block;max-width:440px;margin:0 auto}
+#view-landing .lx-cred-art img{display:block;width:100%;height:auto;filter:drop-shadow(0 30px 60px rgba(0,0,0,0.5)) drop-shadow(0 0 50px rgba(64,128,255,0.25));transition:transform .5s var(--lx-ease)}
+#view-landing .lx-cred-art:hover img{transform:translateY(-6px) rotate(-1.5deg)}
+#view-landing .lx-cred-copy .lx-sub{margin-left:0}
+#view-landing .lx-ledger{margin:30px 0 0;border:1px solid rgba(255,255,255,0.12);border-radius:16px;background:rgba(255,255,255,0.03);overflow:hidden}
+#view-landing .lx-ledger div{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:13px 18px;border-top:1px solid rgba(255,255,255,0.08)}
+#view-landing .lx-ledger div:first-child{border-top:0}
+#view-landing .lx-ledger dt{font:600 11.5px/1.6 'Inter',sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45)}
+#view-landing .lx-ledger dd{margin:0;font:500 14px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#EEF2FF;overflow-wrap:anywhere}
+#view-landing .lx-ledger a{color:var(--lx-gold-soft);text-decoration:none}
+#view-landing .lx-ledger a:hover{text-decoration:underline;text-underline-offset:3px}
+#view-landing .lx-dark .lx-fine{color:rgba(255,255,255,0.5)}
+
+/* --- Dimensions + explorer --- */
+#view-landing .lx-split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr);gap:64px;align-items:center}
+#view-landing .lx-split .lx-sub{margin-left:0}
+#view-landing .lx-dims{list-style:none;padding:0;margin:30px 0 34px;display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
+#view-landing .lx-dims li{padding:14px 0;border-top:1px solid var(--lx-line)}
+#view-landing .lx-dims b{display:block;font-size:0.98rem;font-weight:600;color:var(--lx-ink);margin-bottom:3px}
+#view-landing .lx-dims span{font-size:0.9rem;line-height:1.55;color:var(--lx-muted)}
+#view-landing .lx-radar{display:block;background:#fff;border-radius:28px;padding:18px;border:1px solid var(--lx-line);box-shadow:0 30px 60px -30px rgba(0,0,54,0.3)}
+#view-landing .lx-radar img{display:block;width:100%;height:auto;border-radius:16px;transition:transform .5s var(--lx-ease)}
+#view-landing .lx-radar:hover img{transform:scale(1.02)}
+
+/* --- Guide --- */
+#view-landing .lx-guide{display:grid;grid-template-columns:300px minmax(0,1fr);gap:64px;align-items:center;max-width:1000px;margin:0 auto}
+#view-landing .lx-guide-photo{width:300px;aspect-ratio:1;border-radius:50%;padding:8px;background:linear-gradient(140deg,var(--lx-gold-soft),rgba(62,82,181,0.35) 60%,rgba(0,0,54,0.15));box-shadow:0 30px 60px -30px rgba(0,0,54,0.45)}
+#view-landing .lx-guide-photo img{width:100%;height:100%;object-fit:cover;border-radius:50%;background:#E9ECF4;display:block}
+#view-landing .lx-guide-role{font-size:0.92rem;font-weight:600;color:var(--lx-lapis);margin:10px 0 20px}
+#view-landing .lx-guide-copy > p:not(.lx-eyebrow):not(.lx-guide-role){font-size:1.02rem;line-height:1.75;color:#3B4256;margin:0 0 14px;max-width:38em}
+#view-landing .lx-award{display:flex;align-items:center;gap:14px;margin-top:22px;padding:14px 18px;background:#fff;border:1px solid var(--lx-line);border-radius:16px;max-width:38em}
+#view-landing .lx-award img{width:44px;height:auto;flex:0 0 auto}
+#view-landing .lx-award p{font-size:0.86rem;line-height:1.55;color:var(--lx-muted);margin:0}
+#view-landing .lx-logos{margin:72px 0 0}
+#view-landing .lx-logos h3{background:none;padding:0;margin:0 0 22px;font:600 12px/1 'Inter',sans-serif;letter-spacing:0.16em;text-transform:uppercase;color:var(--lx-faint)}
+#view-landing .lx-logos .training-logos-container{-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+#view-landing .lx-logos .training-logos-track img{height:88px;opacity:0.6;cursor:default}
+#view-landing .lx-logos .training-logos-track img:hover{transform:none;opacity:1}
+
+/* --- Testimonials --- */
+#view-landing .lx-carousel .testimonial{border-radius:22px;border:1px solid var(--lx-line);box-shadow:0 1px 2px rgba(0,0,54,0.04),0 24px 48px -30px rgba(0,0,54,0.25);min-height:280px}
+#view-landing .lx-carousel .testimonial-quote{font:italic 400 1.2rem/1.6 'Playfair Display',Georgia,serif;color:var(--lx-ink)}
+#view-landing .lx-carousel .carousel-dot[aria-current="true"]{background:var(--lx-navy);width:22px;border-radius:4px}
+
+/* --- Pricing --- */
+#view-landing .lx-plans{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:0 auto}
+#view-landing .lx-plan{background:#fff;border:1px solid var(--lx-line);border-radius:26px;padding:36px 34px;display:flex;flex-direction:column}
+#view-landing .lx-plan-main{border:1.5px solid var(--lx-navy);box-shadow:0 30px 60px -32px rgba(0,0,54,0.35)}
+#view-landing .lx-plan-k{font:600 12px/1 'Inter',sans-serif;letter-spacing:0.14em;text-transform:uppercase;color:var(--lx-faint);margin:0 0 18px}
+#view-landing .lx-price{font:700 3.6rem/1 'Playfair Display',Georgia,serif;letter-spacing:-0.02em;color:var(--lx-ink);margin:0}
+#view-landing .lx-price-note{font-size:0.92rem;color:var(--lx-muted);margin:10px 0 24px;min-height:2.9em}
+#view-landing .lx-checks{list-style:none;padding:0;margin:0 0 30px;flex:1}
+#view-landing .lx-checks li{position:relative;padding:9px 0 9px 30px;font-size:0.97rem;line-height:1.5;color:#2C3247;border-top:1px solid var(--lx-line)}
+#view-landing .lx-checks li::before{content:'';position:absolute;left:0;top:12px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,54,0.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000036' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat}
+
+/* --- FAQ --- */
+#view-landing .lx-faq{max-width:none;border-top:1px solid var(--lx-line)}
+#view-landing .lx-faq .faq-item{margin:0;background:none;border:0;border-bottom:1px solid var(--lx-line);border-radius:0;box-shadow:none}
+#view-landing .lx-faq .faq-item:hover{box-shadow:none}
+#view-landing .lx-faq .faq-question{padding:24px 0}
+#view-landing .lx-faq .faq-question:focus-visible{outline:2px solid var(--lx-lapis);outline-offset:4px;border-radius:6px}
+#view-landing .lx-faq .faq-question h3{font:600 1.08rem/1.4 'Inter',sans-serif;color:var(--lx-ink);letter-spacing:-0.01em}
+#view-landing .lx-faq .faq-icon{width:30px;height:30px;border-radius:50%;border:1px solid var(--lx-line);display:grid;place-items:center;font-size:1.15rem;color:var(--lx-navy)}
+#view-landing .lx-faq .faq-answer{padding:0}
+#view-landing .lx-faq .faq-answer p{font-size:1rem;line-height:1.75;color:var(--lx-muted);padding:0 48px 24px 0}
+#view-landing .lx-faq .faq-answer a{color:var(--lx-navy);font-weight:600;text-underline-offset:3px}
+
+/* --- Final CTA --- */
+#view-landing .lx-final{position:relative;overflow:hidden;background:radial-gradient(60% 80% at 50% 110%,rgba(212,175,55,0.16),transparent 60%),linear-gradient(180deg,#000036 0%,#01022E 100%);padding:clamp(88px,12vw,148px) 0;text-align:center;color:#fff}
+#view-landing .lx-final-inner{max-width:760px}
+#view-landing .lx-final .lx-h2{font-size:clamp(2.2rem,4.4vw,3.6rem)}
+#view-landing .lx-final .lx-h2 em{color:var(--lx-gold-soft)}
+#view-landing .lx-final .lx-cta-row{margin-top:36px}
+
+/* --- Footer --- */
+#view-landing .lx-footer{background:#00002A;color:rgba(255,255,255,0.5);padding:40px 0;border-top:1px solid rgba(255,255,255,0.06)}
+#view-landing .lx-footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px}
+#view-landing .lx-footer-logo{height:26px;opacity:0.75}
+#view-landing .lx-footer-links{display:flex;gap:22px;flex-wrap:wrap}
+#view-landing .lx-footer-links a{color:rgba(255,255,255,0.62);font-size:0.88rem;text-decoration:none}
+#view-landing .lx-footer-links a:hover{color:#fff}
+#view-landing .lx-footer p{font-size:0.82rem;margin:0}
+
+/* --- Responsive --- */
+@media(max-width:980px){
+  #view-landing .lx-hero{padding:104px 0 72px;min-height:auto}
+  #view-landing .lx-hero-inner{grid-template-columns:1fr;gap:8px;text-align:center}
+  #view-landing .lx-hero-badge{order:-1}
+  #view-landing .hero-3d-container.lx-badge-3d{width:min(280px,72vw)}
+  #view-landing .lx-badge-img{width:min(220px,56vw)}
+  #view-landing .lx-badge-hint{display:none}
+  #view-landing .lx-lede{margin:0 auto}
+  #view-landing .lx-cta-row{justify-content:center}
+  #view-landing .lx-facts{justify-content:center}
+  #view-landing .lx-steps{grid-template-columns:1fr 1fr;row-gap:44px}
+  #view-landing .lx-tracks,#view-landing .lx-cred,#view-landing .lx-split{grid-template-columns:1fr;gap:40px}
+  #view-landing .lx-cred-art{max-width:320px}
+  #view-landing .lx-guide{grid-template-columns:1fr;gap:32px;text-align:center}
+  #view-landing .lx-guide-photo{width:220px;margin:0 auto}
+  #view-landing .lx-guide-copy > p,#view-landing .lx-award{margin-left:auto;margin-right:auto}
+  #view-landing .lx-award{text-align:left}
+  #view-landing .lx-guide-copy > p:not(.lx-eyebrow):not(.lx-guide-role){text-align:left}
+}
+@media(max-width:680px){
+  #view-landing .lx-nav .nav{padding:12px 16px}
+  #view-landing .lx-nav .nav-links.open{background:rgba(0,0,40,0.97);padding:20px 16px;gap:18px;margin:0}
+}
+@media(max-width:560px){
+  #view-landing .lx-wrap{padding:0 16px}
+  #view-landing .lx-cta-row .lx-btn{width:100%}
+  #view-landing .lx-facts li{padding:0 14px}
+  #view-landing .lx-facts strong{font-size:16px}
+  #view-landing .lx-steps{grid-template-columns:1fr;row-gap:30px;border-top:0;border-left:1px solid var(--lx-line);margin-left:4px}
+  #view-landing .lx-steps li{padding:0 0 0 26px}
+  #view-landing .lx-steps li::before{top:2px;left:-5px}
+  #view-landing .lx-steps h3{margin:10px 0 6px}
+  #view-landing .lx-track{padding:24px 20px 16px}
+  #view-landing .lx-track h3{font-size:1.45rem}
+  #view-landing .lx-dims{grid-template-columns:1fr}
+  #view-landing .lx-ledger div{grid-template-columns:1fr;gap:2px}
+  #view-landing .lx-plans{grid-template-columns:1fr}
+  #view-landing .lx-plan{padding:28px 22px}
+  #view-landing .lx-price-note{min-height:0}
+  #view-landing .lx-logos .training-logos-track img{height:64px}
+  #view-landing .lx-faq .faq-answer p{padding-right:0}
+  #view-landing .lx-footer-inner{flex-direction:column;text-align:center}
+  #view-landing .lx-nav-right .lx-btn-sm{padding:0 14px}
+}
+@media(max-width:420px){
+  #view-landing .lx-nav .logo .logo-ai,#view-landing .lx-nav .logo .logo-badge{font-size:1.1rem}
+}
+@media(prefers-reduced-motion:reduce){
+  #view-landing .fade-in{opacity:1;transform:none;transition:none}
+  #view-landing .lx-hero-video{display:none}
+  #view-landing .lx-dot,#view-landing .lx-halo,#view-landing .training-logos-track{animation:none}
+  #view-landing .lx-btn,#view-landing .lx-cred-art img,#view-landing .lx-radar img{transition:none}
+}
+</style>
 </head>
 <body x-data>
 
 <!-- ===================== LANDING VIEW ===================== -->
 <div id="view-landing" x-show="$store.ui.view === 'landing'" x-transition:leave.opacity.duration.200ms>
 
+<!-- Landing v2 (2 Oct 2026): one badge, the real syllabus, the real credential, plain pricing.
+     Engine untouched: navbar/navLinks/mobileToggle, hero3d*, testimonials-track and faq-* hooks are kept. -->
+
 <!-- Fixed Navigation -->
-<header class="navbar" id="navbar">
+<header class="navbar lx-nav" id="navbar">
   <nav class="nav">
-    <a href="#/" class="logo"><img src="assets/img/ai-badge.png" alt="AI Badge" class="nav-logo"><span class="logo-ai">AI</span><span class="logo-badge">Badge</span></a>
+    <a href="#/" class="logo"><img src="assets/img/ai-badge.png" alt="" class="nav-logo"><span class="logo-ai">AI</span><span class="logo-badge">Badge</span></a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="#" class="nav-cta-gold" @click.prevent="navGoogleSignup()">Sign up free</a></li>
-      <li><a href="#dimensions">Dimensions</a></li>
-      <li><a href="#how-it-works">How It Works</a></li>
-      <li><a href="#guide">Guide</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#curriculum">Curriculum</a></li>
+      <li><a href="#credential">Credential</a></li>
+      <li><a href="#pricing-v2">Pricing</a></li>
       <li><a href="#" class="nav-signin" @click.prevent="$store.ui.showModal('signin')">Sign in</a></li>
     </ul>
-    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="lx-nav-right">
+      <a href="#" class="lx-btn lx-btn-light lx-btn-sm" @click.prevent="navGoogleSignup()">Start free</a>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 </header>
 
 <!-- ===================== HERO ===================== -->
-<section class="hero" id="hero">
-  <video class="hero-video" autoplay muted loop playsinline preload="auto" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080'%3E%3Crect fill='%23000036' width='1920' height='1080'/%3E%3C/svg%3E">
+<section class="lx-hero" id="hero">
+  <video class="lx-hero-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
     <source src="assets/video/hero-bg-web.mp4" type="video/mp4">
   </video>
-  <div class="hero-overlay"></div>
-  <div class="hero-particles" id="particles"></div>
-  <div class="hero-content">
-    <img src="assets/img/ai-badge.png" alt="AI Badge" class="hero-badge fade-in" id="heroBadgeFallback">
-    <div id="hero3dContainer" class="hero-3d-container fade-in" style="display:none;">
-      <canvas id="hero3dCanvas"></canvas>
-    </div>
-    <h1 class="fade-in">Go From <span class="gold">AI Curious</span> to<br><span class="gold">AI Fluent</span> at Your Own Pace</h1>
-    <p class="sub fade-in">A self-paced journey through the AI capabilities shaping the future of work. Learn through beautiful tutorials, submit your real work, and when it meets the bar your verifiable AI Badge cert is issued. Level 1 is free for everyone; the Level 2 certificate is €49, only at issue.</p>
+  <div class="lx-hero-shade" aria-hidden="true"></div>
+  <div class="lx-hero-grid" aria-hidden="true"></div>
 
-    <a href="#" class="btn-cta fade-in" @click.prevent="navGoogleSignup()" style="display:inline-flex;align-items:center;gap:10px;">
-      <span style="background:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;">
-        <svg width="15" height="15" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      </span>
-      Start free with Google
+  <div class="lx-wrap lx-hero-inner">
+    <div class="lx-hero-copy">
+      <a href="#pricing-v2" class="lx-pill fade-in"><span class="lx-dot"></span>The Level&nbsp;1 certificate is now free for everyone</a>
+      <h1 class="lx-h1 fade-in">Get good at AI.<br><em>Then prove it.</em></h1>
+      <p class="lx-lede fade-in">Short video tutorials for working professionals. Each one ends with something you build and submit. When your work meets the bar, you receive a signed credential that anyone can verify.</p>
+
+      <div class="lx-cta-row fade-in">
+        <a href="#" class="lx-btn lx-btn-light lx-btn-lg" @click.prevent="navGoogleSignup()">
+          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Start free with Google
+        </a>
+        <a href="#" class="lx-btn lx-btn-ghost lx-btn-lg" @click.prevent="$store.ui.showModal('signin')">Email or LinkedIn</a>
+      </div>
+
+      <ul class="lx-facts fade-in" aria-label="At a glance">
+        <li><strong data-lx="l1count">9</strong> Level&nbsp;1 tutorials</li>
+        <li><strong data-lx="l1time">1 h 48 min</strong> of video</li>
+        <li><strong>3 tutorials</strong> open on sign-in</li>
+      </ul>
+    </div>
+
+    <div class="lx-hero-badge fade-in">
+      <div class="lx-halo" aria-hidden="true"></div>
+      <img src="assets/img/ai-badge.png" alt="The AI Badge" class="hero-badge lx-badge-img" id="heroBadgeFallback">
+      <div id="hero3dContainer" class="hero-3d-container lx-badge-3d" style="display:none;">
+        <canvas id="hero3dCanvas"></canvas>
+      </div>
+      <p class="lx-badge-hint">Hover to tilt it</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== HOW IT WORKS ===================== -->
+<section class="lx-section" id="how-it-works">
+  <div class="lx-wrap">
+    <div class="lx-head fade-in">
+      <p class="lx-eyebrow">How it works</p>
+      <h2 class="lx-h2">From your first video to a signed credential.</h2>
+    </div>
+    <ol class="lx-steps fade-in">
+      <li>
+        <span class="lx-step-n">01</span>
+        <h3>Watch</h3>
+        <p>A short tutorial, most under twenty minutes, made for people who do not write code for a living.</p>
+      </li>
+      <li>
+        <span class="lx-step-n">02</span>
+        <h3>Build</h3>
+        <p>Every tutorial ends with an exercise. You make a web page, a game, a published project, or a decision you have worked through with AI.</p>
+      </li>
+      <li>
+        <span class="lx-step-n">03</span>
+        <h3>Submit</h3>
+        <p>Paste the link to what you made. Victor reviews every decision. If it is not there yet, you get notes and resubmit for free.</p>
+      </li>
+      <li>
+        <span class="lx-step-n">04</span>
+        <h3>Earn</h3>
+        <p>Finish Level&nbsp;1 and request your certificate. It is signed, verifiable, and yours to share on LinkedIn.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===================== CURRICULUM (rendered from window._lmsTutorials; static copy is the fallback) ===================== -->
+<section class="lx-section lx-tint" id="curriculum">
+  <div class="lx-wrap">
+    <div class="lx-head fade-in">
+      <p class="lx-eyebrow">Curriculum</p>
+      <h2 class="lx-h2">The whole of Level&nbsp;1 is under two hours of video.</h2>
+      <p class="lx-sub">These are the actual tutorials inside, with their running times. The ones marked open are yours as soon as you sign in. Nothing expires.</p>
+    </div>
+
+    <div class="lx-tracks fade-in">
+      <article class="lx-track">
+        <header>
+          <div>
+            <p class="lx-track-k">Level 1</p>
+            <h3>Foundations</h3>
+          </div>
+          <span class="lx-tag lx-tag-free">Free certificate</span>
+        </header>
+        <ol class="lx-syllabus" data-lx="track1">
+          <li><span class="i">01</span><span class="t">Hello World <span class="o">Open</span></span><span class="d">7 min</span></li>
+          <li><span class="i">02</span><span class="t">Hello World 2 <span class="o">Open</span></span><span class="d">9 min</span></li>
+          <li><span class="i">03</span><span class="t">AI Foundations 101 <span class="o">Open</span></span><span class="d">10 min</span></li>
+          <li><span class="i">04</span><span class="t">Retro Game</span><span class="d">12 min</span></li>
+          <li><span class="i">05</span><span class="t">Deploy to GitHub</span><span class="d">11 min</span></li>
+          <li><span class="i">06</span><span class="t">AI Interviews You</span><span class="d">15 min</span></li>
+          <li><span class="i">07</span><span class="t">The Five Innovators</span><span class="d">24 min</span></li>
+          <li><span class="i">08</span><span class="t">Thinking Partner</span><span class="d">12 min</span></li>
+          <li><span class="i">09</span><span class="t">The EU AI Act</span><span class="d">8 min</span></li>
+        </ol>
+      </article>
+
+      <article class="lx-track lx-track-dark">
+        <header>
+          <div>
+            <p class="lx-track-k">Level 2 &middot; optional</p>
+            <h3>AI on the terminal</h3>
+          </div>
+          <span class="lx-tag">&euro;49 certificate</span>
+        </header>
+        <ol class="lx-syllabus" data-lx="track2">
+          <li><span class="i">01</span><span class="t">Install OpenCode</span><span class="d">8 min</span></li>
+          <li><span class="i">02</span><span class="t">Your AI Workspace</span><span class="d">7 min</span></li>
+          <li><span class="i">03</span><span class="t">Your AI Team</span><span class="d">19 min</span></li>
+          <li><span class="i">04</span><span class="t">Your First Skill</span><span class="d">17 min</span></li>
+          <li><span class="i">05</span><span class="t">The Harness</span><span class="d">20 min</span></li>
+          <li class="soon"><span class="i">06</span><span class="t">AI on the Terminal</span><span class="d">Soon</span></li>
+        </ol>
+        <p class="lx-track-note">Talk to your computer in plain English with OpenCode and Claude Code. Not required for Level&nbsp;1.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CREDENTIAL ===================== -->
+<section class="lx-section lx-dark" id="credential">
+  <div class="lx-hero-grid" aria-hidden="true"></div>
+  <div class="lx-wrap lx-cred">
+    <a class="lx-cred-art fade-in" href="https://certs.fiveinnolabs.com/y5u85" target="_blank" rel="noopener" aria-label="Open a real AI Badge credential">
+      <img src="assets/img/ai-badge-credential.png" alt="An issued AI Badge credential for Victor del Rosal" loading="lazy">
     </a>
-    <div class="fade-in" style="margin-top:14px;">
-      <a href="#" @click.prevent="$store.ui.showModal('signin')" style="color:rgba(255,255,255,0.85);font-size:0.92rem;text-decoration:underline;text-underline-offset:3px;">or sign up with email</a>
+    <div class="lx-cred-copy fade-in">
+      <p class="lx-eyebrow lx-eyebrow-gold">The credential</p>
+      <h2 class="lx-h2 lx-light">A credential anyone can check in one click.</h2>
+      <p class="lx-sub lx-light-sub">Each AI Badge is an Open Badges 3.0 verifiable credential, signed by fiveinnolabs with an Ed25519 key. It lives at a public link, so an employer can confirm it without emailing anyone.</p>
+
+      <dl class="lx-ledger">
+        <div><dt>Holder</dt><dd>Victor del Rosal</dd></div>
+        <div><dt>Issuer</dt><dd>fiveinnolabs</dd></div>
+        <div><dt>Standard</dt><dd>Open Badges 3.0</dd></div>
+        <div><dt>Signature</dt><dd>Ed25519</dd></div>
+        <div><dt>Public link</dt><dd><a href="https://certs.fiveinnolabs.com/y5u85" target="_blank" rel="noopener">certs.fiveinnolabs.com/y5u85 &rarr;</a></dd></div>
+      </dl>
+      <p class="lx-fine">That is Victor&rsquo;s own badge. Open it and check the signature yourself.</p>
     </div>
   </div>
 </section>
 
-<!-- ===================== WHY NOW: URGENCY ===================== -->
-<section class="section section-light" id="why-now">
-  <div class="container">
-    <div style="max-width:840px;margin:0 auto;text-align:center">
-      <p class="fade-in" style="font-size:0.85rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-rich);margin-bottom:1rem;">The window is closing</p>
-      <h2 class="section-title fade-in" style="font-size:3rem;line-height:1.15;margin-bottom:1.5rem;">AI Literacy Is No Longer Optional.<br>It Is a <span style="color:var(--gold-premium)">Career Requirement</span>.</h2>
-      <p class="fade-in" style="font-size:1.15rem;color:var(--grey-dark);line-height:1.8;max-width:680px;margin:0 auto 3rem;">
-        Between January and March 2026 alone, every major employer began listing AI proficiency as a baseline expectation. Not a bonus. Not a nice-to-have. A filter. The professionals who invested early are now being promoted, recruited, and trusted with bigger decisions. Those who waited are being left behind.
-      </p>
+<!-- ===================== SIX DIMENSIONS + EXPLORER ===================== -->
+<section class="lx-section" id="dimensions">
+  <div class="lx-wrap lx-split">
+    <div class="fade-in">
+      <p class="lx-eyebrow">Where do you stand?</p>
+      <h2 class="lx-h2">Six dimensions of AI capability.</h2>
+      <p class="lx-sub">Rate yourself on each one and see your profile in about thirty seconds. The six dimensions draw on UNESCO, the Alan Turing Institute, DigComp, the EU AI Act and OECD frameworks.</p>
+      <ul class="lx-dims">
+        <li><b>AI Foundations</b><span>How models work, and where they fail.</span></li>
+        <li><b>Critical Evaluation</b><span>Checking outputs for accuracy, bias and fit.</span></li>
+        <li><b>Productive Creation</b><span>Making better work, faster, with AI.</span></li>
+        <li><b>Technical Building</b><span>Pages, automations and small systems.</span></li>
+        <li><b>Ethics &amp; Governance</b><span>Responsible and lawful use, including the EU AI Act.</span></li>
+        <li><b>Tool Fluency</b><span>Prompting, configuring and fitting tools into your day.</span></li>
+      </ul>
+      <a href="explore.html" class="lx-btn lx-btn-dark">Take the self-assessment <span aria-hidden="true">&rarr;</span></a>
+    </div>
+    <a href="explore.html" class="lx-radar fade-in" aria-label="Open the AI Competency Explorer">
+      <img src="assets/img/radar-preview.png" alt="A radar chart of the six AI capability dimensions" loading="lazy">
+    </a>
+  </div>
+</section>
+
+<!-- ===================== MEET YOUR GUIDE ===================== -->
+<section class="lx-section lx-tint" id="guide">
+  <div class="lx-wrap">
+    <div class="lx-guide fade-in">
+      <div class="lx-guide-photo">
+        <img src="assets/img/VictordelRosal.png" alt="Victor del Rosal" loading="lazy">
+      </div>
+      <div class="lx-guide-copy">
+        <p class="lx-eyebrow">Your guide</p>
+        <h2 class="lx-h2">Victor del Rosal</h2>
+        <p class="lx-guide-role">Adjunct Professor, National College of Ireland &middot; Chief AI Officer, fiveinnolabs</p>
+        <p>Victor teaches AI for Business at Master&rsquo;s level and has trained Fortune 500 senior managers and business leaders on generative AI with the UCD Professional Academy. He wrote <em>HUMANLIKE: The AI Transformation</em> and <em>Disruption</em>, and he builds the tools he teaches with.</p>
+        <p>His tutorials follow the ECHO5 method: Enlighten, Encourage, Envision, Empower, Equip. Beginners are welcome, and experienced people get stretched.</p>
+        <div class="lx-award">
+          <img src="assets/img/award.png" alt="" loading="lazy">
+          <p>Teaching Award, National Forum for the Enhancement of Teaching and Learning in Higher Education. NCI President&rsquo;s Award for Distinguished Teaching.</p>
+        </div>
+      </div>
     </div>
 
-    <div class="fade-in" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;max-width:960px;margin:0 auto 3rem;">
-      <div style="text-align:center;padding:2rem 1.5rem;background:linear-gradient(135deg,rgba(0,0,54,0.03),rgba(0,102,255,0.04));border-radius:20px;border:1px solid rgba(0,0,0,0.04);">
-        <div style="font-size:3rem;font-weight:800;color:var(--blue-vivid);line-height:1;margin-bottom:0.5rem;">92%</div>
-        <div style="font-size:0.92rem;color:var(--grey-dark);line-height:1.6;">of executives say AI skills will be required for most roles within 18 months</div>
+    <div class="training-logos lx-logos fade-in">
+      <h3>Victor has delivered genAI training at</h3>
+      <div class="training-logos-container">
+        <div class="training-logos-track">
+          <img src="assets/img/company01.png" alt="Company 1">
+          <img src="assets/img/company02.png" alt="Company 2">
+          <img src="assets/img/company03.png" alt="Company 3">
+          <img src="assets/img/company04.png" alt="Company 4">
+          <img src="assets/img/company05.png" alt="Company 5">
+          <img src="assets/img/company06.png" alt="Company 6">
+          <img src="assets/img/company07.png" alt="Company 7">
+          <img src="assets/img/company08.png" alt="Company 8">
+          <img src="assets/img/company09.png" alt="Company 9">
+          <img src="assets/img/company01.png" alt="" aria-hidden="true">
+          <img src="assets/img/company02.png" alt="" aria-hidden="true">
+          <img src="assets/img/company03.png" alt="" aria-hidden="true">
+          <img src="assets/img/company04.png" alt="" aria-hidden="true">
+          <img src="assets/img/company05.png" alt="" aria-hidden="true">
+          <img src="assets/img/company06.png" alt="" aria-hidden="true">
+          <img src="assets/img/company07.png" alt="" aria-hidden="true">
+          <img src="assets/img/company08.png" alt="" aria-hidden="true">
+          <img src="assets/img/company09.png" alt="" aria-hidden="true">
+        </div>
       </div>
-      <div style="text-align:center;padding:2rem 1.5rem;background:linear-gradient(135deg,rgba(0,0,54,0.03),rgba(0,102,255,0.04));border-radius:20px;border:1px solid rgba(0,0,0,0.04);">
-        <div style="font-size:3rem;font-weight:800;color:var(--blue-vivid);line-height:1;margin-bottom:0.5rem;">68%</div>
-        <div style="font-size:0.92rem;color:var(--grey-dark);line-height:1.6;">of hiring managers now filter candidates by demonstrated AI capability</div>
-      </div>
-      <div style="text-align:center;padding:2rem 1.5rem;background:linear-gradient(135deg,rgba(0,0,54,0.03),rgba(0,102,255,0.04));border-radius:20px;border:1px solid rgba(0,0,0,0.04);">
-        <div style="font-size:3rem;font-weight:800;color:var(--blue-vivid);line-height:1;margin-bottom:0.5rem;">3x</div>
-        <div style="font-size:0.92rem;color:var(--grey-dark);line-height:1.6;">faster promotion rate for professionals with verified AI competency</div>
-      </div>
-    </div>
-
-    <div class="fade-in" style="max-width:740px;margin:0 auto;background:linear-gradient(135deg,var(--blue-deep),var(--blue-royal));border-radius:20px;padding:2.5rem 3rem;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(212,175,55,0.15),transparent 70%);border-radius:50%;"></div>
-      <div style="position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(0,102,255,0.2),transparent 70%);border-radius:50%;"></div>
-      <p style="font-size:1.2rem;color:var(--white);line-height:1.8;margin-bottom:1.2rem;position:relative;z-index:1;text-align:center;">
-        <strong style="color:var(--gold-premium);">The gap between AI-literate and AI-illiterate professionals is widening every week.</strong>
-      </p>
-      <p style="font-size:1.05rem;color:rgba(255,255,255,0.75);line-height:1.8;position:relative;z-index:1;text-align:center;">
-        YouTube tutorials won't get you there. ChatGPT experiments alone won't prove it. You need a structured path, beautiful knowledge for the future of work, and a credential that means something. AI Badge gives you all three: self-paced, evidence-based, and certified only when your real work earns it.
-      </p>
-    </div>
-
-    <div class="fade-in" style="text-align:center;margin-top:2.5rem;">
-      <a href="explore.html" class="btn-cta">Find Out Where You Stand <span>&rarr;</span></a>
     </div>
   </div>
 </section>
 
+<!-- ===================== TESTIMONIALS ===================== -->
+<section class="lx-section" id="testimonials">
+  <div class="lx-wrap">
+    <div class="lx-head fade-in">
+      <p class="lx-eyebrow">In their words</p>
+      <h2 class="lx-h2">People Victor has trained.</h2>
+    </div>
+
+    <div class="testimonials-carousel lx-carousel fade-in" role="region" aria-roledescription="carousel" aria-label="Testimonials carousel">
+      <button class="carousel-button prev" aria-label="Previous" type="button">&#8249;</button>
+      <button class="carousel-button next" aria-label="Next" type="button">&#8250;</button>
+
+      <div class="carousel-viewport">
+        <div class="carousel-track" id="testimonials-track">
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <img class="testimonial-img" src="assets/img/JoeWilde.png" alt="Joe Wilde testimonial" loading="lazy">
+            </div>
+          </article>
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <img class="testimonial-img" src="assets/img/DermotBradfield.png" alt="Dermot Bradfield testimonial" loading="lazy">
+            </div>
+          </article>
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <p class="testimonial-quote">The team's officially AI-empowered. We covered everything from how AI can automate the boring stuff, to how generative models can help us brainstorm, create, and bring procurement into a new era.</p>
+              <div class="testimonial-author">Company in High Tech &amp; Telecom Supply Chain with &euro;150m turnover</div>
+            </div>
+          </article>
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <p class="testimonial-quote">Victor is incredibly knowledgeable in all things digital and has a desire to continue to learn and help people and businesses pursue their digital transformation.</p>
+              <div class="testimonial-author"><strong>Michelle Guthrie</strong>, Senior Enterprise Development Officer, Local Enterprise Office, County Clare, Ireland</div>
+            </div>
+          </article>
+          <article class="carousel-slide">
+            <div class="testimonial">
+              <p class="testimonial-quote">Victor delivered the keynote at our GenAI hackathon. It was a big hit and opened people's eyes at all levels to what can be achieved with GenAI.</p>
+              <div class="testimonial-author"><strong>Mark Greville</strong>, VP Engineering, Workhuman</div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="carousel-dots" role="tablist" aria-label="Testimonials pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRICING ===================== -->
+<section class="lx-section lx-tint" id="pricing-v2">
+  <div class="lx-wrap">
+    <div class="lx-head fade-in">
+      <p class="lx-eyebrow">Pricing</p>
+      <h2 class="lx-h2">The Level&nbsp;1 certificate is free.</h2>
+      <p class="lx-sub">Sign in and the first three tutorials open straight away. Full access to the rest is by request: one email to Victor. You only pay if you go on to the Level&nbsp;2 certificate, and only once it is issued.</p>
+    </div>
+
+    <div class="lx-plans fade-in">
+      <article class="lx-plan lx-plan-main">
+        <p class="lx-plan-k">Level&nbsp;1 certificate</p>
+        <p class="lx-price">&euro;0</p>
+        <p class="lx-price-note">Free for everyone</p>
+        <ul class="lx-checks">
+          <li>First three tutorials open as soon as you sign in</li>
+          <li>Full Level&nbsp;1 access on request</li>
+          <li>Every submission reviewed, with notes when it needs work</li>
+          <li>Resubmit as often as you need</li>
+          <li>Signed, verifiable Level&nbsp;1 certificate</li>
+        </ul>
+        <a href="#" class="lx-btn lx-btn-dark lx-btn-block" @click.prevent="navGoogleSignup()">Start free</a>
+      </article>
+
+      <article class="lx-plan">
+        <p class="lx-plan-k">Level&nbsp;2 certificate</p>
+        <p class="lx-price">&euro;49</p>
+        <p class="lx-price-note">One payment, made only when your certificate is issued</p>
+        <ul class="lx-checks">
+          <li>The OpenCode and Claude Code track</li>
+          <li>Reviews and resubmissions at no cost</li>
+          <li>Signed, verifiable Level&nbsp;2 certificate</li>
+        </ul>
+        <a href="#" class="lx-btn lx-btn-outline lx-btn-block" @click.prevent="navGoogleSignup()">Start with Level 1</a>
+      </article>
+    </div>
+    <p class="lx-fine lx-center fade-in">Training a team? <a href="mailto:victor@fiveinnolabs.com">Email Victor</a> about group access and invoice-based payment.</p>
+  </div>
+</section>
+
+<!-- ===================== FAQ ===================== -->
+<section class="lx-section" id="faq">
+  <div class="lx-wrap lx-narrow">
+    <div class="lx-head fade-in">
+      <p class="lx-eyebrow">Questions</p>
+      <h2 class="lx-h2">Before you start.</h2>
+    </div>
+
+    <div class="faq-container lx-faq fade-in">
+      <div class="faq-item">
+        <div class="faq-question" role="button" tabindex="0">
+          <h3>How does it work?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Sign in for free and the first three tutorials open straight away; <a href="mailto:victor@fiveinnolabs.com?subject=AI%20Badge%20full%20access">email Victor</a> for full access to the rest. Do each exercise as you go. You submit a link to what you made. If it meets the bar it is approved; if not, you get notes and resubmit at no cost. When every Level 1 tutorial is approved, you request your certificate.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" role="button" tabindex="0">
+          <h3>Is the certificate free?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Yes, Level&nbsp;1 is free for everyone, including the review, the signed credential (Open Badges 3.0, Ed25519) and its permanent public link. The Level&nbsp;2 certificate for the terminal track is &euro;49, paid once when it is issued.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" role="button" tabindex="0">
+          <h3>How much time do I need?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>The Level 1 videos add up to under two hours. The exercises take longer, and most people spread the whole thing over a few evenings. There is no deadline.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" role="button" tabindex="0">
+          <h3>Do I need technical experience?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>No. Level&nbsp;1 is written for non-technical professionals and starts from zero. If you already code, the Level&nbsp;2 terminal track will stretch you.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" role="button" tabindex="0">
+          <h3>What if my submission is not approved?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>You get specific, kind notes on what to improve, and you resubmit whenever you are ready. Re-review is always free.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" role="button" tabindex="0">
+          <h3>What does the certificate look like?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>A signed credential with your name, a verification QR code, the AI Badge mark and its framework alignment, hosted at a public link that anyone can check. <a href="https://certs.fiveinnolabs.com/y5u85" target="_blank" rel="noopener">See a real one</a>.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" role="button" tabindex="0">
+          <h3>Can my employer sponsor this?</h3>
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Yes. <a href="mailto:victor@fiveinnolabs.com">Email Victor</a> about team access, group arrangements or invoice-based payment.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FINAL CTA ===================== -->
+<section class="lx-final" id="start">
+  <div class="lx-hero-grid" aria-hidden="true"></div>
+  <div class="lx-wrap lx-final-inner fade-in">
+    <h2 class="lx-h2 lx-light">The first tutorial takes <em data-lx="firstmin">seven minutes</em>.</h2>
+    <p class="lx-sub lx-light-sub">Sign in, press play, and build your first web page today.</p>
+    <div class="lx-cta-row lx-center-row">
+      <a href="#" class="lx-btn lx-btn-light lx-btn-lg" @click.prevent="navGoogleSignup()">Start free with Google</a>
+      <a href="#" class="lx-btn lx-btn-ghost lx-btn-lg" @click.prevent="$store.ui.showModal('signin')">Email or LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<!-- Deprecated booking blocks and the guidelines modal, kept verbatim -->
 <!-- ===================== PRICING (DEPRECATED 2026-05-12: DIY pivot, hidden) =====================
      Time-slot booking + paid coaching is archived. Access is now invitation-only
      (Victor enrols manually via /#/admin, or NCI emails auto-enrol via Microsoft sign-in).
@@ -1396,47 +2031,6 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <a href="guidelines.html" onclick="event.preventDefault();openGuidelines()" style="font-size:0.85rem;color:var(--gold-rich);text-decoration:underline;text-underline-offset:3px;">Programme Guidelines &amp; Policies</a>
     </div>
 
-  </div>
-</section>
-
-<!-- ===================== GUARANTEE ===================== -->
-<section class="section" style="background:linear-gradient(135deg,#000036 0%,#02066F 100%);padding:3rem 0;">
-  <div class="container" style="text-align:center;max-width:640px;">
-    <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#x1F4B0;</div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;color:#D4AF37;margin-bottom:1rem;">Free to Learn. Level 1 Free to Earn.</h2>
-    <p style="font-size:1.05rem;color:#c8c8e0;line-height:1.7;margin-bottom:1rem;">
-      Every tutorial is free, and so is your Level 1 certificate once your submitted work has been reviewed and approved. If it doesn&rsquo;t meet the bar yet, you get notes, refine and resubmit, at no cost. The Level 2 certificate is &euro;49, paid only when it is issued.
-    </p>
-    <p style="font-size:1.1rem;color:#D4AF37;font-weight:600;line-height:1.6;">
-      No tuition. No subscription. Level 1 free for everyone.
-    </p>
-  </div>
-</section>
-
-<!-- ===================== CREDENTIAL ===================== -->
-<section class="section section-light" style="padding:3.5rem 0;">
-  <div class="container" style="text-align:center;max-width:720px;">
-    <h2 class="section-title fade-in" style="margin-bottom:0.5rem;">Earn Your AI Badge Credential</h2>
-    <p class="section-subtitle fade-in" style="margin-bottom:2rem;">Work through the self-paced tutorials, submit your real work, and when it meets the bar Victor approves the badge and issues your verifiable cert &mdash; a beautiful, signed credential you&rsquo;ll be proud to share on LinkedIn. <strong style="color:var(--blue-deep);">Level 1 is free for everyone. The Level 2 certificate is &euro;49, only at issue.</strong></p>
-
-    <div class="fade-in" style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;">
-      <a href="https://certs.fiveinnolabs.com/y5u85" target="_blank" style="display:block;max-width:320px;">
-        <img src="assets/img/ai-badge-credential.png" alt="AI Badge Credential" style="width:100%;border-radius:12px;filter:drop-shadow(0 8px 32px rgba(0,0,54,0.25));">
-      </a>
-
-      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;margin-top:0.25rem;">
-        <span style="padding:6px 14px;border-radius:20px;background:rgba(0,0,54,0.06);font-size:0.78rem;font-weight:600;color:var(--blue-deep);">AI Foundations</span>
-        <span style="padding:6px 14px;border-radius:20px;background:rgba(0,0,54,0.06);font-size:0.78rem;font-weight:600;color:var(--blue-deep);">Critical Evaluation</span>
-        <span style="padding:6px 14px;border-radius:20px;background:rgba(0,0,54,0.06);font-size:0.78rem;font-weight:600;color:var(--blue-deep);">Productive Creation</span>
-        <span style="padding:6px 14px;border-radius:20px;background:rgba(0,0,54,0.06);font-size:0.78rem;font-weight:600;color:var(--blue-deep);">Technical Building</span>
-        <span style="padding:6px 14px;border-radius:20px;background:rgba(0,0,54,0.06);font-size:0.78rem;font-weight:600;color:var(--blue-deep);">Ethics &amp; Governance</span>
-        <span style="padding:6px 14px;border-radius:20px;background:rgba(0,0,54,0.06);font-size:0.78rem;font-weight:600;color:var(--blue-deep);">Tool Fluency</span>
-      </div>
-
-      <p style="font-size:0.85rem;color:var(--grey-dark);line-height:1.6;max-width:520px;">
-        Issued by fiveinnolabs. Open Badges 3.0 Verifiable Credential, cryptographically signed (Ed25519), hostable, and confirmable any time from the public link. <a href="https://certs.fiveinnolabs.com/y5u85" target="_blank" style="color:var(--gold-rich);font-weight:600;">See a real cert (Victor&rsquo;s own) &rarr;</a>
-      </p>
-    </div>
   </div>
 </section>
 
@@ -1533,362 +2127,19 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   </div>
 </div>
 
-<!-- ===================== SIX DIMENSIONS ===================== -->
-<section class="section section-light" id="dimensions">
-  <div class="container">
-    <h2 class="section-title text-center fade-in">Six Dimensions of AI Capability</h2>
-    <p class="section-subtitle text-center fade-in">A comprehensive framework mapping the full spectrum of AI competency.</p>
-
-    <div class="dimensions-grid">
-      <div class="dim-card fade-in">
-        <span class="dim-icon">&#129504;</span>
-        <div class="dim-name">AI Foundations</div>
-        <div class="dim-desc">Core concepts: how models work, types of AI, capabilities and limitations.</div>
-      </div>
-      <div class="dim-card fade-in">
-        <span class="dim-icon">&#128269;</span>
-        <div class="dim-name">Critical Evaluation</div>
-        <div class="dim-desc">Assessing AI outputs for accuracy, bias, and fitness for purpose.</div>
-      </div>
-      <div class="dim-card fade-in">
-        <span class="dim-icon">&#9889;</span>
-        <div class="dim-name">Productive Creation</div>
-        <div class="dim-desc">Using AI to generate, iterate, and produce work at a higher level.</div>
-      </div>
-      <div class="dim-card fade-in">
-        <span class="dim-icon">&#128295;</span>
-        <div class="dim-name">Technical Building</div>
-        <div class="dim-desc">Building applications, automations, and systems with AI.</div>
-      </div>
-      <div class="dim-card fade-in">
-        <span class="dim-icon">&#9878;&#65039;</span>
-        <div class="dim-name">Ethics &amp; Governance</div>
-        <div class="dim-desc">Understanding responsible use, regulation, risk, and organisational policy.</div>
-      </div>
-      <div class="dim-card fade-in">
-        <span class="dim-icon">&#128736;&#65039;</span>
-        <div class="dim-name">Tool Fluency</div>
-        <div class="dim-desc">Practical skill with AI tools: prompting, configuration, and workflow integration.</div>
-      </div>
-    </div>
-
-    <p class="framework-attribution fade-in">Grounded in UNESCO, Alan Turing Institute, DigComp, EU AI Act, and OECD frameworks.</p>
-  </div>
-</section>
-
-<!-- ===================== HOW IT WORKS ===================== -->
-<section class="section section-gray" id="how-it-works">
-  <div class="container">
-    <h2 class="section-title text-center fade-in">Your Journey</h2>
-    <p class="section-subtitle text-center fade-in">Four steps from curious to credentialed. At your own pace.</p>
-
-    <div class="steps-pipeline">
-      <div class="step-item fade-in">
-        <div class="step-icon">&#128218;</div>
-        <div class="step-name">Learn</div>
-        <div class="step-desc">Work through beautiful, self-paced tutorials on the AI of the future of work.</div>
-      </div>
-      <div class="step-item fade-in">
-        <div class="step-icon">&#128736;&#65039;</div>
-        <div class="step-name">Build</div>
-        <div class="step-desc">Apply each lesson to your real work. No toy exercises.</div>
-      </div>
-      <div class="step-item fade-in">
-        <div class="step-icon">&#128228;</div>
-        <div class="step-name">Submit</div>
-        <div class="step-desc">Send your work for personal review. Notes back if it&rsquo;s not yet there; resubmit anytime.</div>
-      </div>
-      <div class="step-item fade-in">
-        <div class="step-icon">&#127942;</div>
-        <div class="step-name">Earn</div>
-        <div class="step-desc">When your work meets the bar, your verifiable cert is issued. Level 1 is free.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== WHO THIS IS FOR ===================== -->
-<section class="section section-light" id="who">
-  <div class="container">
-    <h2 class="section-title text-center fade-in">Is This For You?</h2>
-
-    <ul class="who-list fade-in">
-      <li><span class="check">&#10003;</span>Mid-career professionals who want structured AI development, not random YouTube tutorials.</li>
-      <li><span class="check">&#10003;</span>Non-technical leaders who need to understand AI deeply without writing code.</li>
-      <li><span class="check">&#10003;</span>Anyone who has tried AI tools but wants a guided path from curious to confident.</li>
-    </ul>
-
-    <p class="who-closing fade-in">If you have been meaning to "get good at AI" but don't know where to start, this is your starting point.</p>
-  </div>
-</section>
-
-<!-- ===================== WHAT YOU GET ===================== -->
-<section class="section section-gray" id="programme">
-  <div class="container">
-    <h2 class="section-title text-center fade-in">What&rsquo;s Inside</h2>
-    <p class="section-subtitle text-center fade-in">Beautiful, self-paced tutorials across the AI capabilities shaping the future of work. Curiosity, kindness, and a quiet sense of wonder by design.</p>
-
-    <div class="programme-grid">
-      <div class="week-card fade-in">
-        <div class="week-num">AI Foundations</div>
-        <div class="week-desc">How frontier AI actually works, told without jargon. The mental models that make every later tutorial click.</div>
-      </div>
-      <div class="week-card fade-in">
-        <div class="week-num">Thinking Partner</div>
-        <div class="week-desc">Use AI to think more clearly, not less. The evaluator&rsquo;s mindset: prompt, push back, verify, refine.</div>
-      </div>
-      <div class="week-card fade-in">
-        <div class="week-num">AI for Real Work</div>
-        <div class="week-desc">Apply AI to your actual workflow &mdash; the report, the deck, the inbox, the decision &mdash; with judgement intact.</div>
-      </div>
-      <div class="week-card fade-in">
-        <div class="week-num">Power Tools</div>
-        <div class="week-desc">Claude Code, Codex, OpenCode, GitHub: the fluent toolkit of the agentic era, taught from first principles.</div>
-      </div>
-      <div class="week-card fade-in">
-        <div class="week-num">AI on the Terminal</div>
-        <div class="week-desc">Drop the GUI, talk to your computer in plain English, and feel the future of work in your own hands.</div>
-      </div>
-      <div class="week-card fade-in">
-        <div class="week-num">EU AI Act &amp; Ethics</div>
-        <div class="week-desc">Use AI responsibly, lawfully, and humanely. The frameworks every literate professional now needs.</div>
-      </div>
-    </div>
-
-    <div class="format-grid fade-in">
-      <div class="format-item"><span class="icon">&#128218;</span><span>Every tutorial free to access &mdash; learn before you ever pay</span></div>
-      <div class="format-item"><span class="icon">&#9889;</span><span>Built to make you curious, kind, and quietly capable (ECHO5)</span></div>
-      <div class="format-item"><span class="icon">&#9989;</span><span>Submit your real work &mdash; Victor reviews it personally</span></div>
-      <div class="format-item"><span class="icon">&#127942;</span><span>Verifiable, signed cert issued only when it meets the bar</span></div>
-      <div class="format-item"><span class="icon">&#9200;</span><span>Fully self-paced: start, pause, and resume any time</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== BADGE SHOWCASE ===================== -->
-<section class="badge-showcase" id="badge">
-  <h2 class="fade-in">The AI Badge</h2>
-  <p class="section-subtitle fade-in">Your proof of AI fluency. Earned through real work, reviewed personally, and issued only when it meets the bar. A lively, verifiable credential you&rsquo;ll be proud to share.</p>
-  <!-- Fallback image hidden when Three.js loads -->
-  <img src="assets/img/ai-badge.png" alt="The AI Badge" class="badge-showcase-img fade-in" id="badgeFallbackImg">
-  <div id="badge3dContainer" class="badge-3d-container fade-in" style="display:none;">
-    <canvas id="badge3dCanvas"></canvas>
-  </div>
-</section>
-
-<!-- ===================== MEET YOUR GUIDE ===================== -->
-<section class="section section-light guide-section" id="guide">
-  <div class="container">
-    <h2 class="section-title text-center fade-in">Meet Your Guide</h2>
-
-    <div class="text-center fade-in">
-      <img src="assets/img/VictordelRosal.png" alt="Victor del Rosal" class="guide-photo">
-    </div>
-
-    <div class="guide-card fade-in">
-      <div class="guide-bio">
-        <p><strong>Victor del Rosal</strong> is an award-winning AI educator and author of <em>HUMANLIKE: The AI Transformation</em> and <em>Disruption</em>. He has trained Fortune 500 senior managers and business leaders on generative AI with the UCD Professional Academy, and currently serves as Chief AI Officer at fiveinnolabs and co-founder of Agentive, an AI consulting practice.</p>
-
-        <p>He is an Adjunct Professor at the National College of Ireland, where he teaches AI for Business at the Master's level. He holds degrees from Tec de Monterrey, UCD Smurfit, Oxford, and Harvard. He is the creator of the Five Innovators Framework and the ECHO5 methodology, and a recipient of the Ohtli Prize from the Mexican Embassy in Ireland.</p>
-
-        <p>Victor delivers sessions using his <strong style="color:var(--blue-electric)">ECHO5 method</strong>: Enlighten, Encourage, Envision, Empower, Equip. Whether you are new to AI or at an intermediate level, you will feel guided, challenged, and supported. He has 170+ GitHub repositories and builds the tools he teaches with.</p>
-
-        <div class="training-logos">
-          <h3>Delivered genAI training at</h3>
-          <div class="training-logos-container">
-            <div class="training-logos-track">
-              <img src="assets/img/company01.png" alt="Company 1">
-              <img src="assets/img/company02.png" alt="Company 2">
-              <img src="assets/img/company03.png" alt="Company 3">
-              <img src="assets/img/company04.png" alt="Company 4">
-              <img src="assets/img/company05.png" alt="Company 5">
-              <img src="assets/img/company06.png" alt="Company 6">
-              <img src="assets/img/company07.png" alt="Company 7">
-              <img src="assets/img/company08.png" alt="Company 8">
-              <img src="assets/img/company09.png" alt="Company 9">
-              <img src="assets/img/company01.png" alt="" aria-hidden="true">
-              <img src="assets/img/company02.png" alt="" aria-hidden="true">
-              <img src="assets/img/company03.png" alt="" aria-hidden="true">
-              <img src="assets/img/company04.png" alt="" aria-hidden="true">
-              <img src="assets/img/company05.png" alt="" aria-hidden="true">
-              <img src="assets/img/company06.png" alt="" aria-hidden="true">
-              <img src="assets/img/company07.png" alt="" aria-hidden="true">
-              <img src="assets/img/company08.png" alt="" aria-hidden="true">
-              <img src="assets/img/company09.png" alt="" aria-hidden="true">
-            </div>
-          </div>
-        </div>
-
-        <div class="award-box">
-          <img src="assets/img/award.png" alt="Teaching Award">
-          <p>Recognised with the <strong>Teaching Award by the National Forum of T&amp;L Enhancement in Higher Education</strong> and the <strong>NCI President's Award for Distinguished Teaching</strong>.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== TESTIMONIALS ===================== -->
-<section class="section section-gray" id="testimonials">
-  <div class="container">
-    <h2 class="section-title text-center fade-in">What Participants Say</h2>
-
-    <div class="testimonials-carousel fade-in" role="region" aria-roledescription="carousel" aria-label="Testimonials carousel">
-      <button class="carousel-button prev" aria-label="Previous" type="button">&#8249;</button>
-      <button class="carousel-button next" aria-label="Next" type="button">&#8250;</button>
-
-      <div class="carousel-viewport">
-        <div class="carousel-track" id="testimonials-track">
-          <!-- Slide 1: Image (Joe) -->
-          <article class="carousel-slide">
-            <div class="testimonial">
-              <img class="testimonial-img" src="assets/img/JoeWilde.png" alt="Joe Wilde testimonial" loading="lazy">
-            </div>
-          </article>
-
-          <!-- Slide 2: Image (Dermot) -->
-          <article class="carousel-slide">
-            <div class="testimonial">
-              <img class="testimonial-img" src="assets/img/DermotBradfield.png" alt="Dermot Bradfield testimonial" loading="lazy">
-            </div>
-          </article>
-
-          <!-- Slide 3: Text -->
-          <article class="carousel-slide">
-            <div class="testimonial">
-              <p class="testimonial-quote">The team's officially AI-empowered. We covered everything from how AI can automate the boring stuff, to how generative models can help us brainstorm, create, and bring procurement into a new era.</p>
-              <div class="testimonial-author">Company in High Tech &amp; Telecom Supply Chain with &euro;150m turnover</div>
-            </div>
-          </article>
-
-          <!-- Slide 4: Text -->
-          <article class="carousel-slide">
-            <div class="testimonial">
-              <p class="testimonial-quote">Victor is incredibly knowledgeable in all things digital and has a desire to continue to learn and help people and businesses pursue their digital transformation.</p>
-              <div class="testimonial-author"><strong>Michelle Guthrie</strong>, Senior Enterprise Development Officer, Local Enterprise Office, County Clare, Ireland</div>
-            </div>
-          </article>
-
-          <!-- Slide 5: Text -->
-          <article class="carousel-slide">
-            <div class="testimonial">
-              <p class="testimonial-quote">Victor delivered the keynote at our GenAI hackathon. It was a big hit and opened people's eyes at all levels to what can be achieved with GenAI.</p>
-              <div class="testimonial-author"><strong>Mark Greville</strong>, VP Engineering, Workhuman</div>
-            </div>
-          </article>
-        </div>
-      </div>
-
-      <div class="carousel-dots" role="tablist" aria-label="Testimonials pagination"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== EXPLORER PREVIEW ===================== -->
-<section class="section section-gray" id="explorer">
-  <div class="container">
-    <h2 class="section-title text-center fade-in">Try the AI Competency Explorer</h2>
-    <p class="section-subtitle text-center fade-in">Rate yourself across six dimensions. Get your score in 30 seconds.</p>
-
-    <div class="fade-in" style="max-width:600px;margin:0 auto 2rem;">
-      <img src="assets/img/radar-preview.png" alt="AI Competency Radar Chart" style="width:100%;height:auto;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.12);">
-    </div>
-
-    <div class="text-center fade-in">
-      <a href="explore.html" class="btn-cta">Get Your Full Assessment <span>&rarr;</span></a>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== FAQ ===================== -->
-<section class="section section-gray" id="faq">
-  <div class="container">
-    <h2 class="section-title text-center fade-in">Frequently Asked Questions</h2>
-
-    <div class="faq-container fade-in">
-      <div class="faq-item">
-        <div class="faq-question">
-          <h3>How does it actually work?</h3>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">
-          <p>Sign in (free), work through the self-paced tutorials, and apply what you learn to your real work. When you&rsquo;re ready, submit your work for review. If it meets the bar, your AI Badge is approved and your verifiable Level 1 cert is issued, free. If it&rsquo;s not quite there, you&rsquo;ll get notes and can resubmit, at no cost.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question">
-          <h3>Is the certificate free?</h3>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">
-          <p>Yes, Level 1 is free for everyone. The personal review, the verifiable cryptographic credential (signed Ed25519, Open Badges 3.0), the lively certificate and a permanent verification URL all come at no cost. The Level 2 certificate (the terminal track) is &euro;49, one-time, paid only when it is issued.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question">
-          <h3>How much time do I need?</h3>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">
-          <p>The tutorials are designed for working professionals: short, dense, and beautiful. Most people complete what they need in a handful of evenings. There&rsquo;s no deadline &mdash; pause, resume, and submit when you&rsquo;re ready.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question">
-          <h3>Do I need technical experience?</h3>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">
-          <p>No. The tutorials are calibrated for non-technical professionals first, then go as deep as you want. Beginners are welcome. If you&rsquo;re more experienced, the &ldquo;Power Tools&rdquo; and &ldquo;AI on the Terminal&rdquo; modules will stretch you.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question">
-          <h3>What if my submission isn&rsquo;t approved?</h3>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">
-          <p>You get specific, kind notes on what to improve, and you resubmit whenever you&rsquo;re ready. There&rsquo;s no fee for re-review, and the Level 1 certificate itself is free. Only the Level 2 certificate costs &euro;49, paid once when it is issued.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question">
-          <h3>What does the certificate actually look like?</h3>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">
-          <p>A lively, signed cert with your name, a verifiable QR code, the AI Badge mark, and framework alignment (UNESCO, Turing, DigComp 3.0, SFIA 9, EU AI Act, OECD/EC AILit). Cryptographically signed Ed25519 as an Open Badges 3.0 Verifiable Credential &mdash; tamper-evident, hostable, and confirmable any time from the public link. See <a href="https://certs.fiveinnolabs.com/y5u85" target="_blank" rel="noopener" style="color:var(--gold-rich);font-weight:600;">a real one</a>.</p>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-question">
-          <h3>Can my employer sponsor this?</h3>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">
-          <p>Yes. <a href="mailto:victor@fiveinnolabs.com" style="color:var(--gold-rich);font-weight:600;">Email Victor</a> for corporate arrangements, team packages, or invoice-based payment.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ===================== FOOTER ===================== -->
-<footer class="footer">
-  <img src="assets/img/fiveinnolabs.png" alt="fiveinnolabs" class="footer-logo">
-  <p>&copy; 2026 fiveinnolabs. All rights reserved.</p>
-  <div class="footer-links">
-    <a href="terms.html">Terms &amp; Conditions</a>
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="mailto:victor@fiveinnolabs.com">Contact</a>
+<footer class="lx-footer">
+  <div class="lx-wrap lx-footer-inner">
+    <img src="assets/img/fiveinnolabs.png" alt="fiveinnolabs" class="lx-footer-logo">
+    <nav class="lx-footer-links" aria-label="Footer">
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="#" onclick="event.preventDefault();openGuidelines()">Guidelines</a>
+      <a href="mailto:victor@fiveinnolabs.com">Contact</a>
+    </nav>
+    <p>&copy; 2026 fiveinnolabs. AI Badge is a fiveinnolabs product.</p>
   </div>
-  <p class="footer-brand">AI Badge is a fiveinnolabs product.</p>
 </footer>
 
 </div><!-- /view-landing -->
@@ -3803,9 +4054,7 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   function goTo(idx) {
     const pages = totalPages();
     current = ((idx % pages) + pages) % pages;
-    const offset = current * slidesPerView();
-    const pct = (offset / originalCount) * 100;
-    track.style.transform = 'translateX(-' + pct + '%)';
+    track.style.transform = 'translateX(-' + (current * 100) + '%)';
     updateDots();
   }
 
@@ -4114,8 +4363,52 @@ document.querySelectorAll('#navLinks a').forEach(a => {
   }
 
   // Initialize both badges
-  init3DBadge('hero3dContainer', 'hero3dCanvas', 'heroBadgeFallback', 200);
-  init3DBadge('badge3dContainer', 'badge3dCanvas', 'badgeFallbackImg', 500);
+  init3DBadge('hero3dContainer', 'hero3dCanvas', 'heroBadgeFallback', 460);
+})();
+</script>
+
+<script>
+// ==========================================
+// LANDING v2: syllabus from the live tutorial registry (read-only), FAQ keyboard access
+// ==========================================
+(function(){
+  var done = false;
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function fmt(min){ var h = Math.floor(min/60), m = min%60; return h ? (h + ' h ' + m + ' min') : (m + ' min'); }
+  var WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
+  function render(){
+    var list = window._lmsTutorials;
+    if (done || !Array.isArray(list) || !list.length) return;
+    done = true;
+    [1,2].forEach(function(track){
+      var el = document.querySelector('[data-lx="track' + track + '"]');
+      var items = list.filter(function(t){ return t.track === track; });
+      if (!el || !items.length) return;
+      el.innerHTML = items.map(function(t, i){
+        var n = String(i + 1).padStart(2, '0');
+        var d = t.pending ? 'Soon' : (t.durationMinutes ? t.durationMinutes + ' min' : '');
+        return '<li' + (t.pending ? ' class="soon"' : '') + '><span class="i">' + n + '</span><span class="t">' + esc(t.title) + (t.free ? ' <span class="o">Open</span>' : '') + '</span><span class="d">' + d + '</span></li>';
+      }).join('');
+    });
+    var l1 = list.filter(function(t){ return t.track === 1 && !t.pending; });
+    var mins = l1.reduce(function(a, t){ return a + (t.durationMinutes || 0); }, 0);
+    var c = document.querySelector('[data-lx="l1count"]'); if (c && l1.length) c.textContent = l1.length;
+    var tm = document.querySelector('[data-lx="l1time"]'); if (tm && mins) tm.textContent = fmt(mins);
+    var f = document.querySelector('[data-lx="firstmin"]');
+    if (f && l1[0] && l1[0].durationMinutes) { var w = WORDS[l1[0].durationMinutes]; f.textContent = (w || l1[0].durationMinutes) + ' minutes'; }
+  }
+  document.addEventListener('alpine:initialized', render);
+  window.addEventListener('load', render);
+
+  document.querySelectorAll('#view-landing .faq-question').forEach(function(q){
+    q.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); q.click(); }
+    });
+  });
+
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var v = document.querySelector('#view-landing .lx-hero-video'); if (v) { v.pause(); v.removeAttribute('autoplay'); }
+  }
 })();
 </script>
 
