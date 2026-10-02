@@ -5,8 +5,12 @@ service cloud.firestore {
     // ----------------------------------------------------------------
     // Helper: is the current user the admin (Victor)?
     // ----------------------------------------------------------------
+    // 2 Oct 2026 (identity audit F04): the address must be VERIFIED. The project accepts password
+    // sign-ups through its public web key, so an unverified token can carry any address; without this
+    // check, registering an admin address with a password would grant admin over every learner.
     function isAdmin() {
       return request.auth != null
+          && request.auth.token.email_verified == true
           && (request.auth.token.email == "victor@fiveinnolabs.com"
               || request.auth.token.email == "victordelrosal@gmail.com");
     }
