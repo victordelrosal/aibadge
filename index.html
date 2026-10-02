@@ -2556,8 +2556,15 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-dark .lms-tree-btn { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.16); }
       .lms-dark .lms-tree-btn:hover { background:rgba(255,255,255,0.12); }
       @media (max-width:600px) {
+        /* phone top bar fits the screen, so the account photo and Sign Out stay reachable (2 Oct 2026) */
+        .lms-topbar { padding:0 12px; }
+        .lms-topbar > div { gap:6px !important; }
+        .lms-theme-toggle { flex:none; }
+        .lms-signout-btn { white-space:nowrap; font-size:0.8rem; }
+        .lms-topbar-logo { font-size:0; gap:0; }
+        .lms-topbar a[href="explore.html"], .lms-topbar-identity { display:none !important; }
         .lms-invite-input { display:none; }
-        .lms-invite-btn { border-radius:999px; padding:0 16px; }
+        .lms-invite-btn { border-radius:999px; padding:0 12px; }
         .lms-invite-label { display:none; }
       }
 
@@ -4742,7 +4749,7 @@ try{
 <script src="assets/js/firebase-app.js?v=8"></script>
 <script src="assets/js/linkedin-signin.js?v=2"></script>
 <script src="https://aireckon.ing/fil/account.js?v=1"></script>
-<script src="assets/js/account-card.js?v=1"></script>
+<script src="assets/js/account-card.js?v=2"></script>
 
 <!-- SPA Init -->
 <script>
