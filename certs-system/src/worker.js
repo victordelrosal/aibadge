@@ -90,6 +90,8 @@ async function route(request, env, ctx) {
   if (path === "/api/send" && method === "POST") return apiSend(request, env);
   if (path === "/api/revoke" && method === "POST") return apiRevoke(request, env);
   if (path === "/api/delete" && method === "POST") return apiDelete(request, env);
+  if (path === "/api/auto-issue" && method === "POST") return apiAutoIssue(request, env);
+  if (path === "/api/auto-send" && method === "POST") return apiAutoSend(request, env);
 
   // ---- engagement tracking -------------------------------------------------
   // The graduation email's badge <img> points here. It records the open and then
@@ -408,8 +410,10 @@ async function apiIssue(request, env, ctx) {
   const body = await request.json().catch(() => null);
   const err = validateInput(body);
   if (err) return json({ error: err }, 400);
+  return issueCore(env, new URL(request.url).host, body, principal.email);
+}
 
-  const host = new URL(request.url).host;
+async function issueCore(env, host, body, createdBy) {
 
   // One live credential per person. This is what makes a 37-row bulk run safely
   // resumable: re-running it cannot issue anybody twice.
@@ -449,7 +453,7 @@ async function apiIssue(request, env, ctx) {
     status: "issued",
     legacy: false,
     createdAt: new Date().toISOString(),
-    createdBy: principal.email,
+    createdBy,
   };
 
   // 1. build + sign VC
@@ -512,6 +516,10 @@ async function apiSend(request, env) {
   const principal = await requireIssuer(request, env);
   if (!principal) return json({ error: "unauthorised" }, 401);
   const body = await request.json().catch(() => null);
+  return sendCore(env, new URL(request.url).host, body);
+}
+
+async function sendCore(env, host, body) {
   const code = String((body && body.ucid) || "").toLowerCase();
   if (!UCID_RE.test(code)) return json({ error: "invalid code" }, 400);
   const rec = await getRecord(env, code);
@@ -525,7 +533,6 @@ async function apiSend(request, env) {
     if (already) return json({ error: "already_emailed", ucid: code, emailedAt: already }, 409);
   }
 
-  const host = new URL(request.url).host;
   const [badgeObj, pdfObj] = await Promise.all([
     getArtifact(env, artifactKeys(code).badge),
     getArtifact(env, artifactKeys(code).pdf),
@@ -629,4 +636,50 @@ function notFoundPage(host, code) {
 <body style="font-family:Inter,system-ui,sans-serif;background:linear-gradient(165deg,#0a1230,#04060f);color:#eef2ff;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;margin:0">
 <div><img src="/assets/emblem.png" style="width:120px" alt=""><h1 style="font-weight:600">No credential found${code ? ` for <code style="color:#d8bd78">${code}</code>` : ""}</h1>
 <p style="color:#9aa6c8">Check the 5-character code, or <a href="/" style="color:#6ea0ec">verify another credential</a>.</p></div></body>`;
+}
+
+// ---- Autonomous Level 1 issuance (Lars grading pipeline, 3 Oct 2026) ----
+// A machine key that can do exactly two things: issue a Level 1 credential and email it,
+// or email an existing credential that was never emailed. It cannot pick a level, a code,
+// overwrite, duplicate, force a resend, revoke, delete, list or read stats; those stay
+// behind Google sign-in (see requireIssuer). Off unless KV "config:autoissue" is "on".
+const AUTO_DAILY_CAP = 25;
+
+function autoKeyOk(request, env) {
+  const got = request.headers.get("X-Auto-Issue-Key") || "";
+  const want = env.AUTO_ISSUE_KEY || "";
+  if (!want || want.length < 32 || got.length !== want.length) return false;
+  let diff = 0;
+  for (let i = 0; i < want.length; i++) diff |= got.charCodeAt(i) ^ want.charCodeAt(i);
+  return diff === 0;
+}
+
+async function autoGate(request, env) {
+  if (!autoKeyOk(request, env)) return json({ error: "unauthorised" }, 401);
+  if ((await env.CERTS_KV.get("config:autoissue")) !== "on") return json({ error: "autoissue_off" }, 403);
+  return null;
+}
+
+async function apiAutoIssue(request, env) {
+  const denied = await autoGate(request, env);
+  if (denied) return denied;
+  const b = await request.json().catch(() => null);
+  if (!b || typeof b !== "object") return json({ error: "invalid body" }, 400);
+  const today = new Date().toISOString().slice(0, 10);
+  const body = { name: b.name, email: b.email, cohort: "", issuedDate: today, level: 1, sendEmail: true };
+  const err = validateInput(body);
+  if (err) return json({ error: err }, 400);
+  const capKey = "autoissue:count:" + today;
+  const n = Number((await env.CERTS_KV.get(capKey)) || 0);
+  if (n >= AUTO_DAILY_CAP) return json({ error: "daily_cap", cap: AUTO_DAILY_CAP }, 429);
+  const res = await issueCore(env, new URL(request.url).host, body, "lars-auto (policy v1)");
+  if (res.status === 200) await env.CERTS_KV.put(capKey, String(n + 1), { expirationTtl: 3 * 86400 });
+  return res;
+}
+
+async function apiAutoSend(request, env) {
+  const denied = await autoGate(request, env);
+  if (denied) return denied;
+  const b = await request.json().catch(() => null);
+  return sendCore(env, new URL(request.url).host, { ucid: b && b.ucid });
 }
