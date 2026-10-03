@@ -288,7 +288,7 @@
 
         <div class="cg-callout success">
           <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> The one habit to take away</h4>
-          <p>Save a restore point before the agent touches anything. Read every request it makes before you say yes. If it goes wrong anyway, one command puts everything back.</p>
+          <p>Save a restore point before the agent touches anything. When it asks permission, read the request before you say yes. If it goes wrong anyway, one command puts everything back.</p>
         </div>
       </div>
     </div>
@@ -332,7 +332,7 @@
               <tr>
                 <td data-label="Agent"><strong>Codex CLI</strong><br><span class="aot-sub">OpenAI</span></td>
                 <td data-label="Cost today"><span class="aot-chip paid">ChatGPT Plus and up</span></td>
-                <td data-label="What you need">A paid ChatGPT plan. OpenAI lists the terminal version from Plus up; Free and Go get Codex in the desktop app.</td>
+                <td data-label="What you need">A paid ChatGPT plan. OpenAI lists the terminal version from Plus up; Free and Go do not include it.</td>
                 <td data-label="The catch">If you already pay for ChatGPT, this is the natural pick. <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener">Source</a></td>
               </tr>
               <tr>
@@ -344,7 +344,7 @@
               <tr class="aot-ended">
                 <td data-label="Agent"><strong>Gemini CLI</strong></td>
                 <td data-label="Cost today"><span class="aot-chip ended">Free ended</span></td>
-                <td data-label="Details" colspan="2">Google stopped serving free Gemini CLI users on 18 June 2026 and moved them to the Antigravity CLI. Older guides that promise free daily Gemini CLI requests are out of date. <a href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/" target="_blank" rel="noopener">Source</a></td>
+                <td data-label="Details" colspan="2">Google stopped serving free Gemini CLI users on 18 June 2026 and pointed them to its replacement, the Antigravity CLI. Older guides that promise free daily Gemini CLI requests are out of date. <a href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/" target="_blank" rel="noopener">Source</a></td>
               </tr>
               <tr class="aot-ended">
                 <td data-label="Agent"><strong>Qwen Code</strong></td>
@@ -502,7 +502,7 @@ git commit -m "Before the agent"</pre></div>
         <ul class="aot-pick">
           <li><strong>OpenCode</strong> edits files and runs commands without asking.</li>
           <li><strong>Codex CLI</strong>, in a folder with git (yours, after step 4), edits files and runs commands inside that folder without asking. It asks before going outside the folder or online.</li>
-          <li><strong>Claude Code</strong> starts in "auto" mode: a separate safety model approves routine actions and blocks the ones it judges unsafe.</li>
+          <li><strong>Claude Code</strong> starts in "auto" mode (or in manual mode, if auto is not available on your account): a separate safety model approves routine actions and blocks the ones it judges unsafe.</li>
         </ul>
         <p>So on most agents you will see fewer questions than you might expect. That is why the restore point in step 4 matters more than any prompt. While you are learning, you can make Claude Code and Codex ask before every change, so you see each step:</p>
         <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>claude --permission-mode manual</pre></div>
@@ -545,7 +545,7 @@ git commit -m "Organised and fixed hours"</pre></div>
           <div class="aot-mission-tag">Mission 4 · Break it, then undo it</div>
           <p>You will only trust the undo button once you have pressed it. Start the agent again if you exited, and ask it to do something destructive on purpose:</p>
           <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div><pre>This is a test of my undo button. Delete every .txt file in this folder and its subfolders.</pre></div>
-          <p>Approve it. Then exit the agent (or switch to your second terminal window) and look at the damage:</p>
+          <p>Approve it if it asks. Then exit the agent (or switch to your second terminal window) and look at the damage:</p>
           <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git status</pre></div>
           <p>Git lists every deleted file. Now bring them all back:</p>
           <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git restore --staged --worktree .</pre></div>
@@ -562,7 +562,7 @@ git commit -m "Session report"</pre></div>
 
         <div class="cg-callout success">
           <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> What you can now do</h4>
-          <p>You picked an agent, gave it a folder, watched it read, organise and fix real files, approved or refused its requests, and undid its work with one command. Every later Level 2 lesson builds on this: same folder habit, same restore points, whichever agent you use.</p>
+          <p>You picked an agent, gave it a folder, watched it read, organise and fix real files, approved, refused or simply watched its actions, and undid its work with one command. Every later Level 2 lesson builds on this: same folder habit, same restore points, whichever agent you use.</p>
         </div>
       </div>
     </div>
