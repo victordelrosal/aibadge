@@ -172,11 +172,15 @@
     me.parentNode.insertBefore(keep, me);
     /* the AI Badge level gem and XP in the top bar, beside the photo, as on aireckon.ing (3 Oct 2026, Victor:
        "these students MUST GET the XP ... must show in AI badge navbar"). <fil-level mine> fills itself from filXp. */
-    topLevel = document.createElement('fil-level'); topLevel.setAttribute('mine', ''); topLevel.className = 'fil-top-level'; topLevel.hidden = true;
-    me.parentNode.insertBefore(topLevel, keep);
-    /* phones show the gem alone; the XP stays in the photo card and beside the welcome */
+    /* phones show the gem alone; the XP stays in the photo card and beside the welcome. The chip draws itself
+       when inserted, so a width change swaps in a fresh one rather than toggling the attribute. */
     var narrow = window.matchMedia('(max-width:600px)');
-    var fit = function () { if (narrow.matches) topLevel.removeAttribute('mine'); else topLevel.setAttribute('mine', ''); };
+    var fit = function () {
+      var el = document.createElement('fil-level'); el.className = 'fil-top-level'; el.hidden = !user;
+      if (!narrow.matches) el.setAttribute('mine', '');
+      if (topLevel && topLevel.parentNode) topLevel.parentNode.replaceChild(el, topLevel); else me.parentNode.insertBefore(el, keep);
+      topLevel = el;
+    };
     fit(); if (narrow.addEventListener) narrow.addEventListener('change', fit);
     keep.addEventListener('click', function (e) { e.stopPropagation(); card.hidden ? open() : close(true); });
     ways = document.createElement('fil-ways'); ways.setAttribute('auth', 'firebase');
