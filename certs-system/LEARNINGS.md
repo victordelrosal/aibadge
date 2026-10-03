@@ -40,6 +40,12 @@
   match) on a throwaway account, burst, then delete the account and keys. [2026-10, round 3]
 - A per-IP cap must allow a whole class behind one campus address; check it after the per-address limit.
   [2026-10, cold verifier round 3: 10/day would have locked out the 11th NCI student]
+- The XP broker (Reckoning/rsvp/functions/_lib/firebase.js) refuses email_verified:false tokens, and every
+  NCI student signs in unverified, so they silently got no XP, gem or LinkedIn linking. A badge_levels row
+  alone does nothing for them; the account must be verified (sync-levels.mjs). [2026-10, live: 401 before,
+  +275 XP after verifying a test account at L1]
+- <fil-level> draws itself when inserted; changing its `mine` attribute afterwards does not redraw it.
+  Decide the variant before inserting. [2026-10, phone render showed XP after removing `mine`]
 - The outbound-gate hook matches the command TEXT: code containing an email-API URL must be written with
   the file tool, and any curl to a code-send route needs Victor's authorisation in his own words, which can
   stop applying once he sends further messages. [2026-10, two blocks in one session]
