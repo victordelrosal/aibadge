@@ -1022,7 +1022,7 @@ async function handleCertCheckout(request, env) {
     "line_items[0][price_data][currency]": CERT_CURRENCY,
     "line_items[0][price_data][unit_amount]": String(price.cents),
     "line_items[0][price_data][product_data][name]": "AI Badge — Verified Certificate",
-    "line_items[0][price_data][product_data][description]": "Human-reviewed certificate of completion, issued as a verifiable credential after your work is validated.",
+    "line_items[0][price_data][product_data][description]": "Certificate of completion, issued as a verifiable credential after your work is reviewed against the published AI Badge rubric.",
     "line_items[0][quantity]": "1",
     "metadata[type]": "cert",
     "metadata[uid]": principal.uid,
@@ -1783,8 +1783,9 @@ async function handleCertResolve(request, env) {
 
   const uid = String(body.uid || "");
   if (!/^[A-Za-z0-9_-]{6,128}$/.test(uid)) return jsonResponse({ error: "Bad uid" }, 400);
-  const outcome = body.outcome === "pass" ? "pass" : body.outcome === "repeat" ? "repeat" : null;
-  if (!outcome) return jsonResponse({ error: "outcome must be pass or repeat" }, 400);
+  // superseded: the learner already holds a higher-level credential, so nothing is graded or issued.
+  const outcome = ["pass", "repeat", "superseded"].includes(body.outcome) ? body.outcome : null;
+  if (!outcome) return jsonResponse({ error: "outcome must be pass, repeat or superseded" }, 400);
 
   const ha = body.humanApproval || {};
   const approvedBy = cleanText(ha.by, 80);
@@ -1794,7 +1795,7 @@ async function handleCertResolve(request, env) {
   }
 
   const list = Array.isArray(body.exercises) ? body.exercises : [];
-  if (!list.length || list.length > 40) return jsonResponse({ error: "1 to 40 exercises required" }, 400);
+  if ((outcome !== "superseded" && !list.length) || list.length > 40) return jsonResponse({ error: "1 to 40 exercises required" }, 400);
   const exercises = [];
   for (const ex of list) {
     const exerciseId = String(ex.exerciseId || "");
@@ -1811,7 +1812,7 @@ async function handleCertResolve(request, env) {
   }
 
   const resolvedAt = new Date().toISOString();
-  const record = { uid, outcome, exercises, approvedBy, approvedAt, resolvedAt, aiAssisted: true };
+  const record = { uid, outcome, exercises, approvedBy, approvedAt, resolvedAt, aiAssisted: true, note: cleanText(body.note, 200) };
   // Keep history: the latest verdict plus an append-only log entry.
   await env.SLOTS.put(`verdict:${uid}`, JSON.stringify(record));
   await env.SLOTS.put(`verdictlog:${uid}:${resolvedAt}`, JSON.stringify(record));
@@ -1820,7 +1821,7 @@ async function handleCertResolve(request, env) {
   const raw = await env.SLOTS.get(key);
   if (raw) {
     const req = JSON.parse(raw);
-    req.reviewStatus = outcome === "pass" ? "passed" : "repeat";
+    req.reviewStatus = { pass: "passed", repeat: "repeat", superseded: "superseded" }[outcome];
     req.resolvedAt = resolvedAt;
     await env.SLOTS.put(key, JSON.stringify(req));
   }
@@ -1844,7 +1845,7 @@ async function handleMyVerdict(request, env) {
     outcome: v.outcome,
     resolvedAt: v.resolvedAt,
     aiAssisted: true,
-    reviewedBy: "a human reviewer",
+    reviewedBy: v.approvedBy,
     exercises: v.exercises.map(e => ({ exerciseId: e.exerciseId, verdict: e.verdict, feedback: e.feedback })),
   });
 }
