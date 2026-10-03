@@ -44,7 +44,12 @@
     '.fil-keep:hover{background:rgba(0,122,255,.13);border-color:rgba(0,122,255,.55)}.fil-keep:active{transform:scale(.96)}',
     '.fil-keep:focus-visible{outline:2px solid #007AFF;outline-offset:2px}.fil-keep[hidden]{display:none}',
     '.fil-keep .fil-pair{display:flex}.fil-keep .fil-pair i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:0 0 0 1.5px #fff,0 1px 2px rgba(0,0,0,.15)}',
-    '.fil-keep .fil-pair i.li{background:#0A66C2}.fil-top-level{display:inline-flex;align-items:center}.fil-top-level[hidden]{display:none}',
+    '.fil-keep .fil-pair i.li{background:#0A66C2}.fil-top-level{display:inline-flex;align-items:center;flex:none}.fil-top-level[hidden]{display:none}',
+    /* room for the level chip (3 Oct 2026): the email text repeats the photo card, and the invite field collapses
+       to its button below 1100px as it already did on phones; on phones the pill keeps only its icon */
+    '@media (max-width:1440px){.lms-topbar .lms-topbar-identity{display:none !important}}',
+    '@media (max-width:1100px){.lms-topbar a[href="explore.html"]{display:none !important}.lms-topbar .lms-invite-input,.lms-topbar .lms-invite-label{display:none}.lms-topbar .lms-invite-btn{border-radius:999px;padding:0 12px}}',
+    '@media (max-width:600px){.fil-keep>span:last-child{display:none}.fil-keep{padding-right:6px}}',
     '.fil-keep .fil-pair i+i{margin-left:-6px;background:#0A66C2}.fil-keep .fil-pair svg{width:13px;height:13px;display:block}.fil-keep .fil-pair i+i svg{width:12px;height:12px}',
     /* phone: the pill stands in for the photo until something is linked (both open the same card) */
     '@media (max-width:600px){.fil-keep{padding:0 12px 0 7px;gap:6px}.fil-keep .fil-long{display:none}.fil-keep:not([hidden])+.fil-me{display:none}}',
@@ -169,6 +174,10 @@
        "these students MUST GET the XP ... must show in AI badge navbar"). <fil-level mine> fills itself from filXp. */
     topLevel = document.createElement('fil-level'); topLevel.setAttribute('mine', ''); topLevel.className = 'fil-top-level'; topLevel.hidden = true;
     me.parentNode.insertBefore(topLevel, keep);
+    /* phones show the gem alone; the XP stays in the photo card and beside the welcome */
+    var narrow = window.matchMedia('(max-width:600px)');
+    var fit = function () { if (narrow.matches) topLevel.removeAttribute('mine'); else topLevel.setAttribute('mine', ''); };
+    fit(); if (narrow.addEventListener) narrow.addEventListener('change', fit);
     keep.addEventListener('click', function (e) { e.stopPropagation(); card.hidden ? open() : close(true); });
     ways = document.createElement('fil-ways'); ways.setAttribute('auth', 'firebase');
     ways.idToken = function () { return user ? user.getIdToken() : Promise.resolve(null); };
