@@ -1862,7 +1862,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <li>
         <span class="lx-step-n">03</span>
         <h3>Submit</h3>
-        <p>Paste the link to what you made. Victor reviews every decision. If it is not there yet, you get notes and resubmit for free.</p>
+        <p>Paste the link to what you made. AI marks it against a published rubric. If it is not there yet, improve it and resubmit for free.</p>
       </li>
       <li>
         <span class="lx-step-n">04</span>
@@ -2963,7 +2963,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <div style="flex:1;min-width:200px;">
               <div style="font:700 17px/1.25 -apple-system,sans-serif;color:#000036;">You&rsquo;ve finished Level 1</div>
               <div class="lms-subheading" style="font-size:0.9rem;margin-top:2px;">
-                <span>Free, for everyone. Victor reviews your work personally, then issues your verifiable credential. </span>
+                <span>Free, for everyone. AI marks your work against a published rubric; when it passes, your verifiable credential is issued. </span>
                 <a href="#" @click.prevent="$store.ui.showModal('cert')" style="color:#1d4d8c;font-weight:600;text-decoration:none;white-space:nowrap;">See how it works &rsaquo;</a>
               </div>
             </div>
@@ -4136,7 +4136,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
     <!-- Earn your own -->
     <h3 style="font:700 18px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 6px;">Earn your own</h3>
-    <p style="font:400 14px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.75);margin:0 0 16px;">Finish all the <strong>Level 1</strong> tutorials and submit your work, then request your certificate. The <strong>Level 2</strong> terminal track (OpenCode, Claude Code) is optional and not required. Victor reviews your work personally and issues it as a verifiable credential you can share on LinkedIn.</p>
+    <p style="font:400 14px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.75);margin:0 0 16px;">Finish all the <strong>Level 1</strong> tutorials and submit your work, then request your certificate. The <strong>Level 2</strong> terminal track (OpenCode, Claude Code) is optional and not required. AI marks your submissions against a published rubric, and when they pass you receive a verifiable credential you can share on LinkedIn.</p>
 
     <!-- Availability + price (2 Oct 2026, Victor: Level 1 certificate free for everyone; Level 2 certificate EUR 49) -->
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
@@ -6202,7 +6202,7 @@ try{
           if (data.checkoutUrl) { window.location.href = data.checkoutUrl; return; }
           if (data.free) {
             this.certState = 'requested';
-            this.certMsg = '✅ Request received. Victor will review your work and issue your certificate. You’ll hear within 72 hours.';
+            this.certMsg = '✅ Request received. AI marks your work against the published rubric; when it passes, your certificate is emailed to you, usually within 72 hours.';
             return;
           }
           this.certState = 'idle';
@@ -6243,7 +6243,7 @@ try{
   window.certNotice = function() {
     return {
       steps: [
-        'You submit all your <strong>Level 1</strong> tutorial work. Victor reviews everything internally. It is <strong>free</strong>, for everyone.',
+        'You submit all your <strong>Level 1</strong> tutorial work. AI marks it against a published rubric. It is <strong>free</strong>, for everyone.',
         'If it isn’t a pass yet, you get notes: revise and resubmit as often as you need, at <strong>no cost</strong>.',
         'When it passes, your verifiable Level 1 credential is issued, free.',
         'The <strong>Level 2</strong> certificate (the terminal track) is <strong>€49</strong>, one-time, paid only when it is issued.'
