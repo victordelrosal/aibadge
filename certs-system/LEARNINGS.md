@@ -29,3 +29,17 @@
 - Every AI Badge PDF is one page. A page count derived from `/Type /Page` also matches the
   `/Pages` tree object and reports 2. Count via the `/Count` field on the Pages object.
   [2026-08, a wrong regex produced a wrong claim to Victor that had to be corrected]
+- On ncirl.ie, a verification LINK proves nothing (Defender Safe Links pre-clicks it), and a token's
+  google.com provider + email_verified proves nothing either: a scanner-verified password account on
+  someone else's address can link the attacker's own Google. Only a code the learner TYPES proves the
+  mailbox. [2026-10, cold verifier round 1; fixed 344623f]
+- KV read-modify-write is not a limit. Parallel bursts overrun per-key counters; enforce attempt and send
+  limits in a Durable Object and reserve the attempt before checking it. [2026-10, live: 30 parallel wrong
+  guesses -> exactly 5 checked on worker c2c77466]
+- To live-test guess limits without sending email, seed `certcode:<addr>` with an all-zero HMAC (no code can
+  match) on a throwaway account, burst, then delete the account and keys. [2026-10, round 3]
+- A per-IP cap must allow a whole class behind one campus address; check it after the per-address limit.
+  [2026-10, cold verifier round 3: 10/day would have locked out the 11th NCI student]
+- The outbound-gate hook matches the command TEXT: code containing an email-API URL must be written with
+  the file tool, and any curl to a code-send route needs Victor's authorisation in his own words, which can
+  stop applying once he sends further messages. [2026-10, two blocks in one session]
