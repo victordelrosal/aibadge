@@ -49,7 +49,8 @@
        to its button below 1100px as it already did on phones; on phones the pill keeps only its icon */
     '@media (max-width:1440px){.lms-topbar .lms-topbar-identity{display:none !important}}',
     '@media (max-width:1100px){.lms-topbar a[href="explore.html"]{display:none !important}.lms-topbar .lms-invite-input,.lms-topbar .lms-invite-label{display:none}.lms-topbar .lms-invite-btn{border-radius:999px;padding:0 12px}}',
-    '@media (max-width:600px){.fil-keep>span:last-child{display:none}.fil-keep{padding-right:6px}}',
+    /* phones: no room in the bar, so the gem and XP show beside the welcome just below it (index.html) */
+    '@media (max-width:600px){.fil-keep>span:last-child{display:none}.fil-keep{padding-right:6px}.lms-topbar .fil-top-level{display:none !important}}',
     '.fil-keep .fil-pair i+i{margin-left:-6px;background:#0A66C2}.fil-keep .fil-pair svg{width:13px;height:13px;display:block}.fil-keep .fil-pair i+i svg{width:12px;height:12px}',
     /* phone: the pill stands in for the photo until something is linked (both open the same card) */
     '@media (max-width:600px){.fil-keep{padding:0 12px 0 7px;gap:6px}.fil-keep .fil-long{display:none}.fil-keep:not([hidden])+.fil-me{display:none}}',
@@ -172,16 +173,8 @@
     me.parentNode.insertBefore(keep, me);
     /* the AI Badge level gem and XP in the top bar, beside the photo, as on aireckon.ing (3 Oct 2026, Victor:
        "these students MUST GET the XP ... must show in AI badge navbar"). <fil-level mine> fills itself from filXp. */
-    /* phones show the gem alone; the XP stays in the photo card and beside the welcome. The chip draws itself
-       when inserted, so a width change swaps in a fresh one rather than toggling the attribute. */
-    var narrow = window.matchMedia('(max-width:600px)');
-    var fit = function () {
-      var el = document.createElement('fil-level'); el.className = 'fil-top-level'; el.hidden = !user;
-      if (!narrow.matches) el.setAttribute('mine', '');
-      if (topLevel && topLevel.parentNode) topLevel.parentNode.replaceChild(el, topLevel); else me.parentNode.insertBefore(el, keep);
-      topLevel = el;
-    };
-    fit(); if (narrow.addEventListener) narrow.addEventListener('change', fit);
+    topLevel = document.createElement('fil-level'); topLevel.setAttribute('mine', ''); topLevel.className = 'fil-top-level'; topLevel.hidden = true;
+    me.parentNode.insertBefore(topLevel, keep);
     keep.addEventListener('click', function (e) { e.stopPropagation(); card.hidden ? open() : close(true); });
     ways = document.createElement('fil-ways'); ways.setAttribute('auth', 'firebase');
     ways.idToken = function () { return user ? user.getIdToken() : Promise.resolve(null); };
