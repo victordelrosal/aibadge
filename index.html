@@ -3019,6 +3019,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
   .cg-topbar .cg-breadcrumb { font-size: 0.85rem; color: var(--cg-text-tertiary); display: flex; align-items: center; gap: 0.5rem; }
   .cg-topbar .cg-breadcrumb span { color: var(--cg-text-muted); }
+  @media (max-width: 600px) { .cg-topbar .cg-breadcrumb { display: none; } }
 
   /* Main content */
   .cg-main {
@@ -3395,6 +3396,74 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   .cg-lesson.light-mode .hx-dl { background: #f8f9fa; border-color: #dadce0; color: #5f6368; }
   .cg-lesson.light-mode .hx-dl:hover { border-color: #1a73e8; background: #e8f0fe; }
   @media (max-width: 768px) { .hx-dl-grid { grid-template-columns: 1fr; } }
+
+  /* AI on the Terminal lesson */
+  .aot-answer { font-size: 1.05rem; line-height: 1.65; color: var(--cg-text-primary); margin: 0 0 1.25rem; }
+  .aot-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 1.5rem; border: 1px solid var(--cg-border); border-radius: 0.75rem; }
+  .aot-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 640px; }
+  .aot-table th { text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cg-text-tertiary); padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--cg-border); background: rgba(0,102,255,0.06); }
+  .aot-table td { padding: 0.8rem 0.9rem; vertical-align: top; color: var(--cg-text-secondary); border-bottom: 1px solid rgba(0,180,255,0.08); line-height: 1.5; }
+  .aot-table tr:last-child td { border-bottom: none; }
+  .aot-table td strong { color: var(--cg-text-primary); }
+  .aot-table a { color: var(--cg-cyan); white-space: nowrap; }
+  .aot-table tr.aot-ended td { color: var(--cg-text-muted); }
+  .aot-sub { font-size: 0.75rem; color: var(--cg-text-muted); }
+  .aot-chip { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; border: 1px solid; }
+  .aot-chip.free { color: #4ade80; border-color: rgba(34,197,94,0.45); background: rgba(34,197,94,0.1); }
+  .aot-chip.paid { color: #7dd3fc; border-color: rgba(125,211,252,0.4); background: rgba(0,102,255,0.1); }
+  .aot-chip.ended { color: #a3a3a3; border-color: rgba(163,163,163,0.35); background: rgba(115,115,115,0.1); }
+  .aot-step { display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--cg-electric); color: #fff; font-size: 0.85rem; font-weight: 700; margin-right: 0.5rem; vertical-align: 0.1em; }
+  .aot-pick { margin: 0.5rem 0 1.1rem; padding-left: 1.2rem; }
+  .aot-pick li { margin: 0.4rem 0; color: var(--cg-text-secondary); }
+  .aot-agent { border: 1px solid var(--cg-border); border-radius: 0.75rem; margin: 0.6rem 0; background: rgba(0,0,0,0.2); overflow: hidden; }
+  .aot-agent-head { display: flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1rem; cursor: pointer; color: var(--cg-text-primary); user-select: none; }
+  .aot-agent-head .aot-chip { margin-left: auto; }
+  .aot-agent-head::after { content: ''; width: 0.5rem; height: 0.5rem; border-right: 2px solid var(--cg-text-tertiary); border-bottom: 2px solid var(--cg-text-tertiary); transform: rotate(45deg); transition: transform 0.2s; margin-left: 0.25rem; flex: 0 0 auto; }
+  .aot-agent.open .aot-agent-head::after { transform: rotate(225deg); }
+  .aot-agent-body { display: none; padding: 0 1rem 0.9rem; }
+  .aot-agent.open .aot-agent-body { display: block; }
+  .aot-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; line-height: 1.7; white-space: pre-wrap; background: #05050f; color: #e5e5e5; border: 1px solid rgba(0,180,255,0.2); border-radius: 0.6rem; padding: 0.9rem 1rem; margin: 0.75rem 0 0.25rem; overflow-x: auto; }
+  .aot-term-dim { color: #8b8b8b; }
+  .aot-term b { color: #7dd3fc; font-weight: 600; }
+  .aot-caption { font-size: 0.78rem; color: var(--cg-text-muted); margin: 0 0 1rem; }
+  .aot-mission { border-left: 3px solid var(--cg-electric); padding: 0.2rem 0 0.2rem 1rem; margin: 1.5rem 0; }
+  .aot-mission-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; color: var(--cg-cyan); text-transform: uppercase; margin-bottom: 0.35rem; }
+  .aot-notice { font-size: 0.9rem; color: var(--cg-text-secondary); }
+  .aot-notice b { color: var(--cg-text-primary); }
+  .aot-table code { white-space: nowrap; }
+  .cg-step-grid.aot-grid3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px) { .cg-step-grid.aot-grid3 { grid-template-columns: 1fr; } }
+  .aot-agent-body p, .aot-notice { overflow-wrap: anywhere; }
+  .aot-download { display: flex; align-items: center; gap: 0.85rem; padding: 0.9rem 1.1rem; border-radius: 0.75rem; border: 1px solid rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); color: var(--cg-text-secondary); text-decoration: none; font-size: 0.88rem; line-height: 1.45; margin: 0.75rem 0 1rem; transition: border-color 0.18s, background 0.18s; }
+  .aot-download:hover { border-color: #4ade80; background: rgba(34,197,94,0.12); text-decoration: none; }
+  .aot-download b { color: var(--cg-text-primary); }
+  .aot-download svg { flex: 0 0 auto; color: #4ade80; }
+  .cg-lesson.light-mode .aot-answer { color: #202124; }
+  .cg-lesson.light-mode .aot-table-wrap, .cg-lesson.light-mode .aot-agent { border-color: #dadce0; background: #fff; }
+  .cg-lesson.light-mode .aot-table th { background: #f1f3f4; color: #5f6368; border-color: #dadce0; }
+  .cg-lesson.light-mode .aot-table td { color: #3c4043; border-color: #eceff1; }
+  .cg-lesson.light-mode .aot-table td strong, .cg-lesson.light-mode .aot-agent-head, .cg-lesson.light-mode .aot-notice b, .cg-lesson.light-mode .aot-download b { color: #202124; }
+  .cg-lesson.light-mode .aot-table a { color: #1a73e8; }
+  .cg-lesson.light-mode .aot-chip.free { color: #137333; background: #e6f4ea; border-color: #a8dab5; }
+  .cg-lesson.light-mode .aot-chip.paid { color: #1a73e8; background: #e8f0fe; border-color: #aecbfa; }
+  .cg-lesson.light-mode .aot-chip.ended { color: #5f6368; background: #f1f3f4; border-color: #dadce0; }
+  .cg-lesson.light-mode .aot-pick li, .cg-lesson.light-mode .aot-notice, .cg-lesson.light-mode .aot-download { color: #3c4043; }
+  .cg-lesson.light-mode .aot-mission-tag { color: #1a73e8; }
+  .cg-lesson.light-mode .aot-download { background: #f6fbf7; }
+  @media (max-width: 600px) { .aot-agent-head { flex-wrap: wrap; } .aot-mission { padding-left: 0.75rem; } }
+  @media (prefers-reduced-motion: reduce) { .aot-agent-head::after, .aot-download { transition: none; } }
+  @media (max-width: 640px) {
+    .aot-table-wrap { border: none; overflow: visible; }
+    .aot-table { min-width: 0; }
+    .aot-table thead { display: none; }
+    .aot-table, .aot-table tbody, .aot-table tr, .aot-table td { display: block; width: 100%; box-sizing: border-box; }
+    .aot-table tr { border: 1px solid var(--cg-border); border-radius: 0.75rem; margin: 0 0 0.75rem; padding: 0.35rem 0; }
+    .aot-table td { border: none; padding: 0.4rem 0.9rem; }
+    .aot-table td::before { content: attr(data-label); display: block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cg-text-muted); margin-bottom: 0.15rem; }
+    .aot-table td:first-child::before { display: none; }
+    .aot-table td:first-child { font-size: 1rem; }
+    .cg-lesson.light-mode .aot-table tr { border-color: #dadce0; background: #fff; }
+  }
 
   @media (max-width: 540px) {
     .cg-submit-row { flex-direction: column; }
@@ -5821,12 +5890,12 @@ try{
     { id: 'thinking-partner', moduleId: 'thinking-partner', title: 'Thinking Partner', icon: '🧭', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 1, durationMinutes: 12, type: 'video', lessonPath: 'tutorials/thinking-partner/thinking-partner.html' },
     { id: 'eu-ai-act', moduleId: 'eu-ai-act', title: 'The EU AI Act', icon: '⚖️', iconBg: 'rgba(255,159,10,0.12)', level: 'beginner', track: 1, durationMinutes: 8, type: 'video', lessonPath: 'tutorials/eu-ai-act/eu-ai-act.html' },
     // ----- Level 2: AI on the Terminal (optional) -----
+    { id: 'ai-on-terminal', moduleId: 'ai-on-terminal', title: 'AI on the Terminal', icon: '⌨️', iconBg: 'rgba(255,149,0,0.12)', level: 'beginner', track: 2, durationMinutes: 40, type: 'guide', lessonPath: 'tutorials/ai-on-terminal/ai-on-terminal.html' },
     { id: 'opencode', moduleId: 'opencode', title: 'Install OpenCode', icon: '🦊', iconBg: 'rgba(48,209,88,0.12)', level: 'beginner', track: 2, durationMinutes: 8, type: 'guide', lessonPath: 'tutorials/opencode/opencode.html' },
     { id: 'your-ai-workspace', moduleId: 'your-ai-workspace', title: 'Your AI Workspace', icon: '🗂️', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 2, durationMinutes: 7, type: 'video', lessonPath: 'tutorials/your-ai-workspace/your-ai-workspace.html' },
     { id: 'your-ai-team', moduleId: 'your-ai-team', title: 'Your AI Team', icon: '👥', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 2, durationMinutes: 19, type: 'video', lessonPath: 'tutorials/your-ai-team/your-ai-team.html' },
     { id: 'your-first-skill', moduleId: 'your-first-skill', title: 'Your First Skill', icon: '🧰', iconBg: 'rgba(255,159,10,0.12)', level: 'beginner', track: 2, durationMinutes: 17, type: 'video', lessonPath: 'tutorials/your-first-skill/your-first-skill.html' },
-    { id: 'the-harness', moduleId: 'the-harness', title: 'The Harness', icon: '🐎', iconBg: 'rgba(255,159,10,0.12)', level: 'intermediate', track: 2, durationMinutes: 20, type: 'video', lessonPath: 'tutorials/the-harness/the-harness.html' },
-    { id: 'ai-on-terminal', moduleId: 'ai-on-terminal', title: 'AI on the Terminal', icon: '⌨️', iconBg: 'rgba(255,149,0,0.12)', level: 'intermediate', track: 2, durationMinutes: 25, type: 'video', pending: true }
+    { id: 'the-harness', moduleId: 'the-harness', title: 'The Harness', icon: '🐎', iconBg: 'rgba(255,159,10,0.12)', level: 'intermediate', track: 2, durationMinutes: 20, type: 'video', lessonPath: 'tutorials/the-harness/the-harness.html' }
   ];
 
   window.lmsDashboard = function() {
@@ -6324,6 +6393,7 @@ try{
       var pre = block && block.querySelector('pre');
       if (!pre) return;
       var label = btn.querySelector('.cg-btn-text');
+      if (label && !label.dataset.orig) label.dataset.orig = label.textContent;
       var text = pre.innerText;
       var restore = function(ok){
         if (label) {
@@ -6331,7 +6401,7 @@ try{
         }
         if (ok) { btn.classList.add('copied'); }
         setTimeout(function(){
-          if (label) { label.textContent = 'Copy prompt'; }
+          if (label) { label.textContent = label.dataset.orig || 'Copy prompt'; }
           btn.classList.remove('copied');
         }, 2000);
       };
@@ -6489,6 +6559,48 @@ try{
         if (status) { status.style.display = 'block'; status.className = 'cg-submit-status ok'; status.innerHTML = 'Submission deleted. You can submit a new URL any time.'; }
         if (typeof saveTutorialCompletion === 'function') {
           try { await saveTutorialCompletion(user.uid, 'five-innovators', false); } catch (e) {}
+        }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset._label || 'Delete'; }
+    }
+  };
+
+  // AI on the Terminal submission handlers (mirrors aiy* pattern; SPA-loaded lessons need globals)
+  window.__aotScrollToSubmit = function() {
+    var box = __findSubmitBox('ai-on-terminal');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('aotInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__aotEditSubmission = function() {
+    __renderEditing('ai-on-terminal');
+    var input = document.getElementById('aotInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__aotDeleteSubmission = async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    var btn = document.getElementById('aotDeleteBtn');
+    if (btn) { btn.disabled = true; btn.dataset._label = btn.textContent; btn.textContent = 'Deleting...'; }
+    try {
+      var out = await deleteSubmission(user.uid, 'ai-on-terminal');
+      if (out && out.success) {
+        var input = document.getElementById('aotInput');
+        if (input) input.value = '';
+        __renderEditing('ai-on-terminal');
+        var status = document.getElementById('aotStatus');
+        if (status) { status.style.display = 'block'; status.className = 'cg-submit-status ok'; status.innerHTML = 'Submission deleted. You can submit a new URL any time.'; }
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, 'ai-on-terminal', false); } catch (e) {}
         }
       } else {
         alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));

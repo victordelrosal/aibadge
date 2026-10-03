@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI on the Terminal | AI Badge</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+  .cg-lesson {
+    --cg-electric: #0066FF;
+    --cg-cyan: #00D4FF;
+    --cg-ice: #7dd3fc;
+    --cg-text-primary: #f5f5f5;
+    --cg-text-secondary: #d4d4d4;
+    --cg-text-tertiary: #a3a3a3;
+    --cg-text-muted: #737373;
+    --cg-bg-dark: #000010;
+    --cg-border: rgba(0, 180, 255, 0.15);
+    --cg-success: #22c55e;
+    --cg-warning: #f59e0b;
+    --cg-error: #ef4444;
+    --cg-card-shadow: 0 0 0 1px rgba(0, 180, 255, 0.1) inset, 0 20px 40px -16px rgba(0, 0, 0, 0.5), 0 0 60px -20px rgba(0, 102, 255, 0.3);
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cg-bg-dark);
+    color: var(--cg-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cg-lesson::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 102, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 0% 0%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+    pointer-events: none; z-index: 1;
+  }
+  .cg-topbar { position: sticky; top: 0; z-index: 100; height: 56px; background: rgba(0, 0, 54, 0.95); border-bottom: 1px solid rgba(0, 102, 255, 0.2); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+  .cg-topbar a { color: var(--cg-cyan); text-decoration: none; font-size: 0.9rem; }
+  .cg-topbar .cg-logo { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; letter-spacing: 0.02em; }
+  .cg-main { max-width: 900px; margin: 0 auto; padding: 2rem; position: relative; z-index: 2; }
+  .cg-course-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--cg-border); text-align: center; }
+  .cg-course-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--cg-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .cg-course-header .cg-subtitle { color: var(--cg-text-secondary); font-size: 1.1rem; }
+  .cg-course-header .cg-meta { display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.875rem; color: var(--cg-text-tertiary); flex-wrap: wrap; justify-content: center; }
+  .cg-course-header .cg-meta span { display: flex; align-items: center; gap: 0.35rem; }
+  .cg-course-header .cg-meta svg { color: var(--cg-cyan); }
+  .cg-video-wrapper { margin-bottom: 2rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--cg-border); box-shadow: var(--cg-card-shadow); }
+  .cg-video-wrapper iframe { width: 100%; aspect-ratio: 16/9; display: block; border: none; }
+  .cg-video-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(0, 102, 255, 0.18), rgba(0, 212, 255, 0.10)); color: var(--cg-text-secondary); font-size: 1.05rem; flex-direction: column; gap: 0.6rem; text-align: center; padding: 1.5rem; }
+  .cg-video-placeholder svg { opacity: 0.7; color: var(--cg-cyan); }
+  .cg-video-placeholder strong { color: var(--cg-text-primary); font-size: 1.2rem; font-weight: 600; }
+  .cg-video-placeholder span { color: var(--cg-text-tertiary); font-size: 0.92rem; max-width: 38ch; }
+  .cg-session { margin-bottom: 1rem; }
+  .cg-session-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-radius: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--cg-card-shadow); position: relative; overflow: hidden; }
+  .cg-session.open .cg-session-header { border-radius: 1rem 1rem 0 0; }
+  .cg-session-header:hover { border-color: rgba(0, 212, 255, 0.3); transform: translateY(-2px); }
+  .cg-session-number { width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; }
+  .cg-session-info { flex: 1; }
+  .cg-session-info h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--cg-text-primary); }
+  .cg-session-info .cg-session-meta { font-size: 0.8rem; color: var(--cg-text-tertiary); }
+  .cg-session-toggle { color: var(--cg-text-muted); transition: transform 0.3s ease, color 0.2s; }
+  .cg-session.open .cg-session-toggle { transform: rotate(180deg); color: var(--cg-cyan); }
+  .cg-session-content { display: none; padding: 1.5rem; background: #0a0a2e; border: 1px solid var(--cg-border); border-top: none; border-radius: 0 0 1rem 1rem; position: relative; }
+  .cg-session.open .cg-session-content { display: block; }
+  .cg-session-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--cg-cyan); }
+  .cg-session-content h3:first-child { margin-top: 0; }
+  .cg-session-content h4 { font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--cg-text-primary); }
+  .cg-session-content p { margin-bottom: 0.75rem; color: var(--cg-text-secondary); }
+  .cg-session-content ul, .cg-session-content ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--cg-text-secondary); }
+  .cg-session-content li { margin-bottom: 0.4rem; }
+  .cg-session-content a { color: var(--cg-cyan); text-decoration: none; }
+  .cg-session-content a:hover { text-decoration: underline; }
+  .cg-session-content code { background: rgba(0, 102, 255, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.875em; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; }
+  .cg-session-content strong { color: var(--cg-ice); }
+  .cg-code-block { margin: 1rem 0; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cg-border); border-radius: 0.5rem; overflow: hidden; }
+  .cg-code-block pre { margin: 0; background: none; border: none; white-space: pre-wrap; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; padding: 1rem; color: var(--cg-text-secondary); font-family: 'IBM Plex Mono', monospace; max-height: 340px; overflow-y: auto; }
+  .cg-code-footer { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); }
+  .cg-code-header { display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem; background: rgba(0, 0, 0, 0.15); border-bottom: 1px solid var(--cg-border); }
+  .cg-copy-btn { background: transparent; border: none; border-radius: 4px; padding: 0.35rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--cg-text-muted); font-size: 0.75rem; transition: all 0.2s; }
+  .cg-copy-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--cg-text-primary); }
+  .cg-copy-btn svg { width: 16px; height: 16px; }
+  .cg-copy-btn.copied { background: #00663d; color: #00ff88; font-weight: 700; }
+  .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied { background: #00663d; color: #00ff88; }
+  .cg-lesson.light-mode .cg-copy-btn.copied:hover { background: #007a4a; color: #00ff88; }
+  .cg-callout { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; border-left: 4px solid; }
+  .cg-callout.info { background: rgba(0, 102, 255, 0.15); border-color: var(--cg-electric); }
+  .cg-callout.warning { background: rgba(245, 158, 11, 0.15); border-color: var(--cg-warning); }
+  .cg-callout.success { background: rgba(34, 197, 94, 0.15); border-color: var(--cg-success); }
+  .cg-callout.error { background: rgba(239, 68, 68, 0.15); border-color: var(--cg-error); }
+  .cg-callout h4 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .cg-callout.info h4 { color: var(--cg-electric); }
+  .cg-callout.warning h4 { color: var(--cg-warning); }
+  .cg-callout.success h4 { color: var(--cg-success); }
+  .cg-callout.error h4 { color: var(--cg-error); }
+  .cg-callout p { color: var(--cg-text-secondary); margin: 0; }
+  .cg-step-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+  .cg-step-card { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cg-border); border-radius: 0.75rem; padding: 1.25rem; }
+  .cg-step-num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, var(--cg-cyan), var(--cg-ice)); border-radius: 50%; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: #000; }
+  .cg-step-card h5 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cg-text-primary); }
+  .cg-step-card p { font-size: 0.85rem; color: var(--cg-text-secondary); margin: 0; }
+  .cg-concept-card { background: rgba(0, 102, 255, 0.1); border: 1px solid rgba(0, 180, 255, 0.2); border-radius: 0.75rem; padding: 1rem; margin: 0.5rem 0; }
+  .cg-concept-card h4 { color: var(--cg-cyan); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .cg-footer { text-align: center; padding: 1.5rem; color: var(--cg-text-muted); font-size: 0.85rem; position: relative; z-index: 2; border-top: 1px solid var(--cg-border); display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+  .cg-theme-toggle { background: transparent; border: 1px solid var(--cg-border); border-radius: 8px; padding: 0; cursor: pointer; color: var(--cg-text-secondary); transition: all 0.2s; display: flex; align-items: center; justify-content: center; height: 36px; width: 36px; }
+  .cg-theme-toggle:hover { background: rgba(0, 102, 255, 0.2); border-color: var(--cg-cyan); color: var(--cg-text-primary); }
+  .cg-theme-toggle .cg-sun { display: none; } .cg-theme-toggle .cg-moon { display: block; }
+  /* Submission UI */
+  .cg-submit-box { background: linear-gradient(145deg, rgba(0,102,255,0.08), rgba(0,212,255,0.04)); border: 1.5px solid rgba(0,212,255,0.25); border-radius: 1rem; padding: 1.75rem; margin: 1.25rem 0; width: 100%; box-sizing: border-box; box-shadow: 0 4px 24px rgba(0,102,255,0.08); }
+  .cg-submit-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--cg-cyan); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
+  .cg-submit-row { display: flex; gap: 0.75rem; align-items: stretch; flex-wrap: wrap; width: 100%; }
+  .cg-submit-input { flex: 1 1 100%; width: 100%; min-width: 0; padding: 1.1rem 1.2rem; background: rgba(0, 0, 0, 0.55); border: 1.5px solid var(--cg-border); border-radius: 10px; color: var(--cg-text-primary); font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; transition: all 0.2s; box-sizing: border-box; }
+  .cg-submit-input:focus { outline: none; border-color: var(--cg-cyan); box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.7); }
+  .cg-submit-btn { flex: 1 1 auto; padding: 1.05rem 2rem; background: linear-gradient(135deg, var(--cg-electric), var(--cg-cyan)); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; letter-spacing: 0.02em; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 52px; }
+  .cg-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5); }
+  .cg-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .cg-submit-btn.secondary { background: rgba(255,255,255,0.08); color: var(--cg-text-primary); border: 1px solid var(--cg-border); }
+  .cg-submit-btn.secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+  .cg-submit-btn.danger { background: rgba(255,69,58,0.14); color: #ff6b5e; border: 1px solid rgba(255,69,58,0.35); }
+  .cg-submit-btn.danger:hover { background: rgba(255,69,58,0.24); box-shadow: none; }
+  .cg-submit-status { margin-top: 0.9rem; font-size: 0.95rem; padding: 0.6rem 0.8rem; border-radius: 8px; }
+  .cg-submit-status.ok { color: #7dffaf; background: rgba(0,255,136,0.08); border-left: 3px solid var(--cg-success); }
+  .cg-submit-status.err { color: #ff9a8f; background: rgba(255,69,58,0.08); border-left: 3px solid var(--cg-error); }
+  .cg-submit-status a { color: var(--cg-cyan); }
+  .cg-submitted-card { display: none; padding: 1.25rem; background: rgba(0,255,136,0.06); border: 1.5px solid rgba(0,255,136,0.3); border-radius: 10px; margin-bottom: 0.75rem; }
+  .cg-submitted-card.visible { display: block; }
+  .cg-submitted-label { font-size: 0.8rem; color: var(--cg-success); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .cg-submitted-url { display: block; word-break: break-all; color: var(--cg-cyan); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; margin-bottom: 0.25rem; text-decoration: none; }
+  .cg-submitted-url:hover { text-decoration: underline; }
+  .cg-submitted-meta { font-size: 0.82rem; color: var(--cg-text-secondary); }
+  .cg-submitted-actions { display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .cg-submitted-actions .cg-submit-btn { flex: 0 1 auto; padding: 0.6rem 1.1rem; font-size: 0.9rem; min-height: 0; }
+  @media (max-width: 540px) {
+    .cg-submit-row { flex-direction: column; }
+    .cg-submit-btn { width: 100%; }
+  }
+  /* Floating reminder */
+  .cg-submit-fab { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 9999; padding: 0.55rem 1.05rem 0.55rem 0.85rem; background: rgba(15, 18, 38, 0.78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--cg-text-primary); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 999px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 500; font-size: 0.82rem; letter-spacing: 0.005em; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); display: none; align-items: center; gap: 0.5rem; transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+  .cg-submit-fab.visible { display: inline-flex; }
+  .cg-submit-fab:hover { transform: translateY(-1px); border-color: rgba(0, 212, 255, 0.4); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28); }
+  .cg-submit-fab svg { width: 14px; height: 14px; opacity: 0.85; }
+  .cg-lesson.light-mode .cg-submit-fab { background: rgba(255, 255, 255, 0.92); color: #1f2937; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-submit-fab:hover { border-color: #1a73e8; }
+  @media (max-width: 540px) { .cg-submit-fab { right: 0.85rem; bottom: 0.85rem; padding: 0.5rem 0.95rem 0.5rem 0.8rem; font-size: 0.78rem; } }
+  /* Light mode */
+  .cg-lesson.light-mode { --cg-text-primary: #202124; --cg-text-secondary: #5f6368; --cg-text-tertiary: #80868b; --cg-text-muted: #9aa0a6; --cg-bg-dark: #ffffff; --cg-border: #dadce0; --cg-cyan: #1a73e8; --cg-electric: #1a73e8; --cg-ice: #1a73e8; --cg-success: #1e8e3e; --cg-warning: #f9ab00; --cg-error: #d93025; background: #f8f9fa; }
+  .cg-lesson.light-mode::before { display: none; }
+  .cg-lesson.light-mode .cg-topbar { background: #fff; border-bottom: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-logo { color: #000036 !important; }
+  .cg-lesson.light-mode .cg-theme-toggle .cg-sun { display: block; } .cg-lesson.light-mode .cg-theme-toggle .cg-moon { display: none; }
+  .cg-lesson.light-mode .cg-course-header h1 { background: #202124; -webkit-background-clip: text; font-weight: 400; }
+  .cg-lesson.light-mode .cg-session-header { background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  .cg-lesson.light-mode .cg-session-number { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-session-content { background: #fff; border: 1px solid #e0e0e0; border-top: none; }
+  .cg-lesson.light-mode .cg-session-content code { background: #e8f0fe; color: #1a73e8; }
+  .cg-lesson.light-mode .cg-code-block { background: #f8f9fa; border-color: #dadce0; }
+  .cg-lesson.light-mode .cg-code-block pre { color: #5f6368; }
+  .cg-lesson.light-mode .cg-callout.info { background: #e8f0fe; }
+  .cg-lesson.light-mode .cg-callout.success { background: #e6f4ea; }
+  .cg-lesson.light-mode .cg-callout.warning { background: #fef7e0; }
+  .cg-lesson.light-mode .cg-callout.error { background: #fce8e6; }
+  .cg-lesson.light-mode .cg-step-card, .cg-lesson.light-mode .cg-concept-card, .cg-lesson.light-mode .cg-submit-box { background: #f8f9fa; border: 1px solid #dadce0; }
+  .cg-lesson.light-mode .cg-submit-input { background: #fff; border: 1px solid #dadce0; color: #202124; }
+  .cg-lesson.light-mode .cg-submit-btn { background: #1a73e8; }
+  .cg-lesson.light-mode .cg-video-placeholder { background: linear-gradient(135deg, rgba(26,115,232,0.10), rgba(26,115,232,0.04)); color: #5f6368; }
+  .cg-lesson.light-mode .cg-video-placeholder strong { color: #202124; }
+  @media (max-width: 768px) { .cg-step-grid { grid-template-columns: 1fr; } .cg-course-header h1 { font-size: 1.75rem; } }
+  /* AI on the Terminal lesson */
+  .aot-answer { font-size: 1.05rem; line-height: 1.65; color: var(--cg-text-primary); margin: 0 0 1.25rem; }
+  .aot-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 1.5rem; border: 1px solid var(--cg-border); border-radius: 0.75rem; }
+  .aot-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 640px; }
+  .aot-table th { text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cg-text-tertiary); padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--cg-border); background: rgba(0,102,255,0.06); }
+  .aot-table td { padding: 0.8rem 0.9rem; vertical-align: top; color: var(--cg-text-secondary); border-bottom: 1px solid rgba(0,180,255,0.08); line-height: 1.5; }
+  .aot-table tr:last-child td { border-bottom: none; }
+  .aot-table td strong { color: var(--cg-text-primary); }
+  .aot-table a { color: var(--cg-cyan); white-space: nowrap; }
+  .aot-table tr.aot-ended td { color: var(--cg-text-muted); }
+  .aot-sub { font-size: 0.75rem; color: var(--cg-text-muted); }
+  .aot-chip { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; border: 1px solid; }
+  .aot-chip.free { color: #4ade80; border-color: rgba(34,197,94,0.45); background: rgba(34,197,94,0.1); }
+  .aot-chip.paid { color: #7dd3fc; border-color: rgba(125,211,252,0.4); background: rgba(0,102,255,0.1); }
+  .aot-chip.ended { color: #a3a3a3; border-color: rgba(163,163,163,0.35); background: rgba(115,115,115,0.1); }
+  .aot-step { display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--cg-electric); color: #fff; font-size: 0.85rem; font-weight: 700; margin-right: 0.5rem; vertical-align: 0.1em; }
+  .aot-pick { margin: 0.5rem 0 1.1rem; padding-left: 1.2rem; }
+  .aot-pick li { margin: 0.4rem 0; color: var(--cg-text-secondary); }
+  .aot-agent { border: 1px solid var(--cg-border); border-radius: 0.75rem; margin: 0.6rem 0; background: rgba(0,0,0,0.2); overflow: hidden; }
+  .aot-agent-head { display: flex; align-items: center; gap: 0.6rem; padding: 0.85rem 1rem; cursor: pointer; color: var(--cg-text-primary); user-select: none; }
+  .aot-agent-head .aot-chip { margin-left: auto; }
+  .aot-agent-head::after { content: ''; width: 0.5rem; height: 0.5rem; border-right: 2px solid var(--cg-text-tertiary); border-bottom: 2px solid var(--cg-text-tertiary); transform: rotate(45deg); transition: transform 0.2s; margin-left: 0.25rem; flex: 0 0 auto; }
+  .aot-agent.open .aot-agent-head::after { transform: rotate(225deg); }
+  .aot-agent-body { display: none; padding: 0 1rem 0.9rem; }
+  .aot-agent.open .aot-agent-body { display: block; }
+  .aot-term { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; line-height: 1.7; white-space: pre-wrap; background: #05050f; color: #e5e5e5; border: 1px solid rgba(0,180,255,0.2); border-radius: 0.6rem; padding: 0.9rem 1rem; margin: 0.75rem 0 0.25rem; overflow-x: auto; }
+  .aot-term-dim { color: #8b8b8b; }
+  .aot-term b { color: #7dd3fc; font-weight: 600; }
+  .aot-caption { font-size: 0.78rem; color: var(--cg-text-muted); margin: 0 0 1rem; }
+  .aot-mission { border-left: 3px solid var(--cg-electric); padding: 0.2rem 0 0.2rem 1rem; margin: 1.5rem 0; }
+  .aot-mission-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; color: var(--cg-cyan); text-transform: uppercase; margin-bottom: 0.35rem; }
+  .aot-notice { font-size: 0.9rem; color: var(--cg-text-secondary); }
+  .aot-notice b { color: var(--cg-text-primary); }
+  .aot-table code { white-space: nowrap; }
+  .cg-step-grid.aot-grid3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px) { .cg-step-grid.aot-grid3 { grid-template-columns: 1fr; } }
+  .aot-agent-body p, .aot-notice { overflow-wrap: anywhere; }
+  .aot-download { display: flex; align-items: center; gap: 0.85rem; padding: 0.9rem 1.1rem; border-radius: 0.75rem; border: 1px solid rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); color: var(--cg-text-secondary); text-decoration: none; font-size: 0.88rem; line-height: 1.45; margin: 0.75rem 0 1rem; transition: border-color 0.18s, background 0.18s; }
+  .aot-download:hover { border-color: #4ade80; background: rgba(34,197,94,0.12); text-decoration: none; }
+  .aot-download b { color: var(--cg-text-primary); }
+  .aot-download svg { flex: 0 0 auto; color: #4ade80; }
+  .cg-lesson.light-mode .aot-answer { color: #202124; }
+  .cg-lesson.light-mode .aot-table-wrap, .cg-lesson.light-mode .aot-agent { border-color: #dadce0; background: #fff; }
+  .cg-lesson.light-mode .aot-table th { background: #f1f3f4; color: #5f6368; border-color: #dadce0; }
+  .cg-lesson.light-mode .aot-table td { color: #3c4043; border-color: #eceff1; }
+  .cg-lesson.light-mode .aot-table td strong, .cg-lesson.light-mode .aot-agent-head, .cg-lesson.light-mode .aot-notice b, .cg-lesson.light-mode .aot-download b { color: #202124; }
+  .cg-lesson.light-mode .aot-table a { color: #1a73e8; }
+  .cg-lesson.light-mode .aot-chip.free { color: #137333; background: #e6f4ea; border-color: #a8dab5; }
+  .cg-lesson.light-mode .aot-chip.paid { color: #1a73e8; background: #e8f0fe; border-color: #aecbfa; }
+  .cg-lesson.light-mode .aot-chip.ended { color: #5f6368; background: #f1f3f4; border-color: #dadce0; }
+  .cg-lesson.light-mode .aot-pick li, .cg-lesson.light-mode .aot-notice, .cg-lesson.light-mode .aot-download { color: #3c4043; }
+  .cg-lesson.light-mode .aot-mission-tag { color: #1a73e8; }
+  .cg-lesson.light-mode .aot-download { background: #f6fbf7; }
+  @media (max-width: 600px) { .aot-agent-head { flex-wrap: wrap; } .aot-mission { padding-left: 0.75rem; } }
+  @media (prefers-reduced-motion: reduce) { .aot-agent-head::after, .aot-download { transition: none; } }
+  @media (max-width: 640px) {
+    .aot-table-wrap { border: none; overflow: visible; }
+    .aot-table { min-width: 0; }
+    .aot-table thead { display: none; }
+    .aot-table, .aot-table tbody, .aot-table tr, .aot-table td { display: block; width: 100%; box-sizing: border-box; }
+    .aot-table tr { border: 1px solid var(--cg-border); border-radius: 0.75rem; margin: 0 0 0.75rem; padding: 0.35rem 0; }
+    .aot-table td { border: none; padding: 0.4rem 0.9rem; }
+    .aot-table td::before { content: attr(data-label); display: block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cg-text-muted); margin-bottom: 0.15rem; }
+    .aot-table td:first-child::before { display: none; }
+    .aot-table td:first-child { font-size: 1rem; }
+    .cg-lesson.light-mode .aot-table tr { border-color: #dadce0; background: #fff; }
+  }
+    </style>
+</head>
+<body>
+<div class="cg-lesson">
+  <div class="cg-topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="cg-logo">AI Badge</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="cg-theme-toggle" onclick="var el=document.querySelector('.cg-lesson');el.classList.toggle('light-mode');localStorage.setItem('lesson-theme',el.classList.contains('light-mode')?'light':'dark')" title="Toggle theme">
+        <svg class="cg-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="cg-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="cg-main">
+    <!-- Course header -->
+    <div class="cg-course-header">
+      <h1>AI on the Terminal</h1>
+      <p class="cg-subtitle">Hand an AI agent a real folder, watch it work, and keep an undo button. Works with any agent.</p>
+      <div class="cg-meta">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Any agent, Mac or Windows</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~40 minutes hands-on</span>
+      </div>
+    </div>
+
+    <div class="cg-callout info">
+      <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> A written lesson</h4>
+      <p>There is no video for this one. Every step is on this page, in order. Keep it open next to your terminal and work down it. Prices and free plans were checked against each company's own pages on <strong>3 October 2026</strong>; they change often, so the date matters.</p>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Quick Start</h2>
+          <span class="cg-session-meta">Five moves. The detailed guide below walks through each one.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <p>In Level 1 the AI lived in a browser tab. You copied its answers out and pasted them into files yourself. A terminal agent skips that step: it opens your files, edits them and runs commands on your computer. It has hands. This lesson teaches one safe way to work with those hands, and the same method works whichever agent you choose.</p>
+
+        <div class="cg-step-grid">
+          <div class="cg-step-card"><div class="cg-step-num">1</div><h5>Choose an agent</h5><p>Free or paid, five options. The table in the next section shows what each costs today.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">2</div><h5>Get the practice folder</h5><p>Download <a href="driftwood-cafe.zip">driftwood-cafe.zip</a>, a made-up café's messy files. Unzip it.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">3</div><h5>Save a restore point</h5><p>Three <code>git</code> commands photograph the folder, so anything the agent does can be undone.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">4</div><h5>Run four missions</h5><p>Look, organise, fix, then break something on purpose and bring it back.</p></div>
+          <div class="cg-step-card"><div class="cg-step-num">5</div><h5>Submit your report</h5><p>The agent writes <code>SESSION-REPORT.md</code>. You share a public link to it.</p></div>
+        </div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> The one habit to take away</h4>
+          <p>Save a restore point before the agent touches anything. Read every request it makes before you say yes. If it goes wrong anyway, one command puts everything back.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- IS IT FREE -->
+    <div class="cg-session open" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Can I Use AI on the Terminal for Free?</h2>
+          <span class="cg-session-meta">The honest answer, as of 3 October 2026.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <p class="aot-answer"><strong>Yes, with limits.</strong> Three routes cost nothing today: OpenCode with one of its free models, GitHub Copilot CLI on the Copilot Free plan, and Google's Antigravity CLI on its $0 plan. Claude Code and the Codex CLI need a paid plan.</p>
+
+        <div class="aot-table-wrap">
+          <table class="aot-table">
+            <thead><tr><th>Agent</th><th>Cost today</th><th>What you need</th><th>The catch</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Agent"><strong>OpenCode</strong><br><span class="aot-sub">open source</span></td>
+                <td data-label="Cost today"><span class="aot-chip free">Free models</span></td>
+                <td data-label="What you need">A Google or GitHub sign-in. Pick a model ending in <code>-free</code>.</td>
+                <td data-label="The catch">Free models are "available for a limited time" and get swapped often. Several of them say "collected data may be used to improve the model". <a href="https://opencode.ai/docs/zen/" target="_blank" rel="noopener">Source</a></td>
+              </tr>
+              <tr>
+                <td data-label="Agent"><strong>GitHub Copilot CLI</strong></td>
+                <td data-label="Cost today"><span class="aot-chip free">Free plan</span></td>
+                <td data-label="What you need">The GitHub account you made in Level 1, with Copilot Free switched on.</td>
+                <td data-label="The catch">Limited monthly allowance, size not published. You cannot pick the model. GitHub uses Free-plan interaction data for training unless you opt out. <a href="https://docs.github.com/en/copilot/get-started/plans" target="_blank" rel="noopener">Source</a></td>
+              </tr>
+              <tr>
+                <td data-label="Agent"><strong>Antigravity CLI</strong><br><span class="aot-sub">Google</span></td>
+                <td data-label="Cost today"><span class="aot-chip free">$0 plan</span></td>
+                <td data-label="What you need">A Google account.</td>
+                <td data-label="The catch">"Basic weekly rate limits", number not published. Google may review your interactions; you can opt out in settings. <a href="https://antigravity.google/docs/plans/" target="_blank" rel="noopener">Source</a></td>
+              </tr>
+              <tr>
+                <td data-label="Agent"><strong>Codex CLI</strong><br><span class="aot-sub">OpenAI</span></td>
+                <td data-label="Cost today"><span class="aot-chip paid">ChatGPT Plus and up</span></td>
+                <td data-label="What you need">A paid ChatGPT plan. OpenAI lists the terminal version from Plus up; Free and Go get Codex in the desktop app.</td>
+                <td data-label="The catch">If you already pay for ChatGPT, this is the natural pick. <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener">Source</a></td>
+              </tr>
+              <tr>
+                <td data-label="Agent"><strong>Claude Code</strong><br><span class="aot-sub">Anthropic</span></td>
+                <td data-label="Cost today"><span class="aot-chip paid">Claude Pro and up</span></td>
+                <td data-label="What you need">A paid Claude plan or API credits. "The free claude.ai plan does not include Claude Code access."</td>
+                <td data-label="The catch">If you already pay for Claude, this is the natural pick. <a href="https://code.claude.com/docs/en/setup" target="_blank" rel="noopener">Source</a></td>
+              </tr>
+              <tr class="aot-ended">
+                <td data-label="Agent"><strong>Gemini CLI</strong></td>
+                <td data-label="Cost today"><span class="aot-chip ended">Free ended</span></td>
+                <td data-label="Details" colspan="2">Google stopped serving free Gemini CLI users on 18 June 2026 and moved them to the Antigravity CLI. Older guides that promise "1,000 free requests a day" are out of date. <a href="https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/" target="_blank" rel="noopener">Source</a></td>
+              </tr>
+              <tr class="aot-ended">
+                <td data-label="Agent"><strong>Qwen Code</strong></td>
+                <td data-label="Cost today"><span class="aot-chip ended">Free ended</span></td>
+                <td data-label="Details" colspan="2">"The Qwen OAuth free tier was discontinued on 2026-04-15." <a href="https://qwenlm.github.io/qwen-code-docs/en/users/configuration/auth/" target="_blank" rel="noopener">Source</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>What happened to "completely free"?</h3>
+        <p>A year ago you could install OpenCode and code all day on a free model. That era ended in stages. OpenCode added limits to its free usage in early 2026, and when you hit them it now offers its paid plan, OpenCode Go. Its free models also rotate: OpenCode's public model list (<a href="https://models.dev" target="_blank" rel="noopener">models.dev</a>) shows 36 free models since August 2025, and 26 of them have already been retired. Google and Alibaba closed their free terminal tiers outright in 2026. Free still exists, but it moves. If a free model vanishes from your list, pick another one; that is normal, not a fault on your side.</p>
+
+        <h3>Three rules for free routes</h3>
+        <div class="cg-step-grid aot-grid3">
+          <div class="cg-step-card"><h5>Practice files only</h5><p>Most free plans can use what you type to train or improve their models. Never give a free agent customer data, passwords or anything private. The café folder in this lesson is made up for exactly that reason.</p></div>
+          <div class="cg-step-card"><h5>Expect a wall</h5><p>Every free route has a limit, and most do not publish the number. When you hit it, wait, switch model, or switch agent. Your folder and restore points stay put.</p></div>
+          <div class="cg-step-card"><h5>Check the date</h5><p>This table is correct for 3 October 2026. Before you rely on it, open the "Source" link in your row and read the current page.</p></div>
+        </div>
+
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Students</h4>
+          <p>Verified students can get GitHub's <strong>Copilot Student</strong> plan free through <a href="https://education.github.com" target="_blank" rel="noopener">GitHub Education</a>. Sign-ups were paused in spring 2026 and reopened gradually from 16 June 2026. It uses automatic model selection, like Copilot Free.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED GUIDE -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Detailed Step-by-Step Guide</h2>
+          <span class="cg-session-meta">Seven steps, from no agent to a finished session report.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+
+        <!-- STEP 1 -->
+        <h3><span class="aot-step">1</span> Choose your agent</h3>
+        <p>Pick the first line that is true for you:</p>
+        <ul class="aot-pick">
+          <li>You pay for <strong>ChatGPT</strong> (Plus or above): use <strong>Codex CLI</strong>.</li>
+          <li>You pay for <strong>Claude</strong> (Pro or above): use <strong>Claude Code</strong>.</li>
+          <li>You pay for nothing and want the simplest free start: use <strong>OpenCode</strong>. If you did the Install OpenCode lesson, it is already on your computer.</li>
+          <li>You pay for nothing and OpenCode's free models are busy: try <strong>Copilot CLI</strong> or <strong>Antigravity CLI</strong>.</li>
+        </ul>
+        <p>The agents differ in price, models and polish. The way you work with them is the same, and that is what the rest of this lesson teaches.</p>
+
+        <!-- STEP 2 -->
+        <h3><span class="aot-step">2</span> Install it and sign in</h3>
+        <p>Open your terminal. On a Mac, press <code>Cmd + Space</code>, type <code>Terminal</code>, press Enter. On Windows, press the Windows key, type <code>PowerShell</code>, press Enter. Then open the block for your agent.</p>
+
+        <div class="aot-agent">
+          <div class="aot-agent-head" onclick="this.parentElement.classList.toggle('open')"><strong>OpenCode</strong><span class="aot-chip free">Free models</span></div>
+          <div class="aot-agent-body">
+            <p>Follow the <strong>Install OpenCode</strong> lesson in this level (about 8 minutes), then come back here. It covers the install for Mac and Windows, signing in with <code>/connect</code>, and choosing a free model with <code>/models</code>.</p>
+          </div>
+        </div>
+
+        <div class="aot-agent">
+          <div class="aot-agent-head" onclick="this.parentElement.classList.toggle('open')"><strong>GitHub Copilot CLI</strong><span class="aot-chip free">Free plan</span></div>
+          <div class="aot-agent-body">
+            <p><strong>Mac:</strong></p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>curl -fsSL https://gh.io/copilot-install | bash</pre></div>
+            <p><strong>Windows:</strong> Copilot CLI needs PowerShell 7. Windows ships with an older version, so install the new one first, close the window, then open <strong>PowerShell 7</strong> from the Start menu:</p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>winget install Microsoft.PowerShell</pre></div>
+            <p>Then, in PowerShell 7:</p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>winget install GitHub.Copilot</pre></div>
+            <p><strong>Start and sign in:</strong> type <code>copilot</code> and press Enter. If it says you are not signed in, type <code>/login</code> and follow the browser steps. If GitHub says you have no Copilot plan, open <a href="https://github.com/features/copilot/plans" target="_blank" rel="noopener">github.com/features/copilot/plans</a>, choose <strong>Free</strong>, then try again.</p>
+          </div>
+        </div>
+
+        <div class="aot-agent">
+          <div class="aot-agent-head" onclick="this.parentElement.classList.toggle('open')"><strong>Antigravity CLI</strong> (Google)<span class="aot-chip free">$0 plan</span></div>
+          <div class="aot-agent-body">
+            <p><strong>Mac:</strong></p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>curl -fsSL https://antigravity.google/cli/install.sh | bash</pre></div>
+            <p><strong>Windows (PowerShell):</strong></p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>irm https://antigravity.google/cli/install.ps1 | iex</pre></div>
+            <p><strong>Start:</strong> type <code>agy</code> and press Enter. The first launch walks you through a short setup, including whether to trust the folder you are in. Follow its prompts to sign in.</p>
+          </div>
+        </div>
+
+        <div class="aot-agent">
+          <div class="aot-agent-head" onclick="this.parentElement.classList.toggle('open')"><strong>Codex CLI</strong> (OpenAI)<span class="aot-chip paid">ChatGPT Plus and up</span></div>
+          <div class="aot-agent-body">
+            <p><strong>Mac:</strong></p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>curl -fsSL https://chatgpt.com/codex/install.sh | sh</pre></div>
+            <p><strong>Windows (PowerShell):</strong></p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"</pre></div>
+            <p><strong>Start and sign in:</strong> type <code>codex</code> and press Enter, then choose <strong>Sign in with ChatGPT</strong> and finish in the browser.</p>
+          </div>
+        </div>
+
+        <div class="aot-agent">
+          <div class="aot-agent-head" onclick="this.parentElement.classList.toggle('open')"><strong>Claude Code</strong> (Anthropic)<span class="aot-chip paid">Claude Pro and up</span></div>
+          <div class="aot-agent-body">
+            <p><strong>Mac:</strong></p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>curl -fsSL https://claude.ai/install.sh | bash</pre></div>
+            <p><strong>Windows (PowerShell):</strong></p>
+            <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>irm https://claude.ai/install.ps1 | iex</pre></div>
+            <p><strong>Start and sign in:</strong> type <code>claude</code> and press Enter, then follow the browser prompts to log in with your Claude account.</p>
+          </div>
+        </div>
+
+        <div class="cg-callout warning">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> "command not found" after installing?</h4>
+          <p>Close the terminal window completely, open a new one, and try again. A new window picks up newly installed programs. This fixes most install problems on both Mac and Windows.</p>
+        </div>
+
+        <p>Once the agent starts, quit it for now (type <code>/exit</code>, or press <code>Ctrl + C</code> twice). You will start it again inside the practice folder.</p>
+
+        <!-- STEP 3 -->
+        <h3><span class="aot-step">3</span> Get the practice folder and open a terminal in it</h3>
+        <a class="aot-download" href="driftwood-cafe.zip" download>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span><b>driftwood-cafe.zip</b><br>Ten messy files from a made-up café in Westport. Notes, two menus that disagree, reviews, a draft email and a small website.</span>
+        </a>
+        <p>Unzip it somewhere easy to find, such as your Desktop. You should now have a folder called <code>driftwood-cafe</code>.</p>
+        <p>An agent works on the folder your terminal is "in", so the next job is to put the terminal inside <code>driftwood-cafe</code>:</p>
+        <ul class="aot-pick">
+          <li><strong>Mac:</strong> in Terminal, type <code>cd</code> followed by a space. Drag the <code>driftwood-cafe</code> folder from Finder into the Terminal window (this types its location for you), then press Enter.</li>
+          <li><strong>Windows 11:</strong> open the <code>driftwood-cafe</code> folder in File Explorer, right-click an empty space inside it, and choose <strong>Open in Terminal</strong>.</li>
+          <li><strong>Windows 10:</strong> open the folder in File Explorer, click the address bar, type <code>powershell</code>, press Enter.</li>
+        </ul>
+        <p>Check you are in the right place. Type this and press Enter:</p>
+        <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>ls</pre></div>
+        <p>You should see the café's files listed, including <code>menu.csv</code> and <code>index.html</code>. <code>ls</code> means "list what is here" and works on Mac and in PowerShell. If you see other files, you are in the wrong folder: repeat the step above.</p>
+
+        <!-- STEP 4 -->
+        <h3><span class="aot-step">4</span> Save a restore point with git</h3>
+        <p>Git is a tool that takes snapshots of a folder. Developers use it to track changes; you will use it as an undo button for everything the agent does. Check whether you have it:</p>
+        <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git --version</pre></div>
+        <ul class="aot-pick">
+          <li>A version number like <code>git version 2.4x</code>: you have it, skip ahead.</li>
+          <li><strong>Mac</strong>, a pop-up offering to install "command line developer tools": click <strong>Install</strong>, wait for it to finish, then run <code>git --version</code> again.</li>
+          <li><strong>Windows</strong>, "not recognized": run <code>winget install --id Git.Git -e</code>, close the terminal, open a new one in the folder again (step 3), and check once more.</li>
+        </ul>
+        <p>The first time you use git, tell it your name and email. These label your snapshots and stay on your computer. Run both lines, with your own details inside the quotes:</p>
+        <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git config --global user.name "Your Name"
+git config --global user.email "you@example.com"</pre></div>
+        <p>Now take the first snapshot. Run these three lines, one at a time:</p>
+        <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git init
+git add -A
+git commit -m "Before the agent"</pre></div>
+        <p>The last line should report something like <code>10 files changed</code>. That snapshot is your restore point.</p>
+
+        <!-- STEP 5 -->
+        <h3><span class="aot-step">5</span> Start the agent and learn to read its requests</h3>
+        <p>From inside <code>driftwood-cafe</code>, start your agent: <code>opencode</code>, <code>copilot</code>, <code>agy</code>, <code>codex</code> or <code>claude</code>. If it asks whether you trust this folder, say yes: it is the practice folder.</p>
+        <p>Before an agent edits a file or runs a command, most agents stop and ask you. A request usually looks like this:</p>
+        <div class="aot-term"><span class="aot-term-dim">Agent wants to run:</span>
+  mkdir menus &amp;&amp; mv menu.csv "copy of menu.csv" menus/
+<span class="aot-term-dim">Allow?</span>  <b>[y]</b> yes   <b>[a]</b> always   <b>[n]</b> no, tell it what to do instead</div>
+        <p class="aot-caption">An illustration. The exact wording and keys differ between agents.</p>
+        <p>Read the command. Ask yourself: is it only touching files in this folder, and is it what I asked for? If yes, allow it. If you are unsure, say no and ask the agent to explain in plain English. Two warnings:</p>
+        <ul class="aot-pick">
+          <li><strong>OpenCode does not ask by default.</strong> It lets the agent edit files and run commands straight away. That is fine in the practice folder, because your restore point covers it.</li>
+          <li>Never start an agent with a flag containing <code>yolo</code>, <code>dangerously</code> or <code>bypass</code> on your real files. Those switch the questions off entirely.</li>
+        </ul>
+
+        <!-- STEP 6 -->
+        <h3><span class="aot-step">6</span> Run the four missions</h3>
+        <p>Paste each prompt into the agent, one at a time. Wait for each to finish before the next.</p>
+
+        <div class="aot-mission">
+          <div class="aot-mission-tag">Mission 1 · Look</div>
+          <p>Agents can read everything in a folder. Start with a request that changes nothing.</p>
+          <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div><pre>Read every file in this folder. Do not change anything yet. Tell me in five bullet points what this business is and what needs doing. Then list anything you found that should not be lying around in plain text.</pre></div>
+          <p class="aot-notice"><b>Notice:</b> did it find the Wi-Fi password in <code>Untitled 3.txt</code>? An agent sees every file you point it at. That is why real passwords and private data never go into a folder you share with an agent, and why the free routes above get practice files only.</p>
+        </div>
+
+        <div class="aot-mission">
+          <div class="aot-mission-tag">Mission 2 · Organise</div>
+          <p>Knowledge work, not code. This is where most people realise these agents are not just for programmers.</p>
+          <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div><pre>Organise this folder for the café owner. Sort the files into a few sensible subfolders. The two menu files disagree: merge them into one menu.csv, use the newest prices from the notes, and list every conflict you resolved. Read the reviews and tell me if there is a pattern. Rewrite the email to Seamus so it is firm but polite, as a new file; do not send anything. Finally, write INDEX.md explaining where everything now lives. Show me your plan before you start.</pre></div>
+          <p class="aot-notice"><b>Notice:</b> the agent should show a plan, then ask before moving files (unless you use OpenCode). Read each request. When it finishes, open the folder in Finder or File Explorer and look at what changed.</p>
+        </div>
+
+        <div class="aot-mission">
+          <div class="aot-mission-tag">Mission 3 · Fix</div>
+          <p>Now a small code change. The website shows the old opening hours.</p>
+          <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div><pre>The opening hours on index.html are out of date. Use the owner's notes to update them. Change nothing else on the page, then tell me exactly which lines you changed.</pre></div>
+          <p class="aot-notice"><b>Notice:</b> open <code>index.html</code> in your browser to check the hours. Then save this good state as a second snapshot. Exit the agent (or open a second terminal window in the same folder) and run:</p>
+          <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git add -A
+git commit -m "Organised and fixed hours"</pre></div>
+        </div>
+
+        <div class="aot-mission">
+          <div class="aot-mission-tag">Mission 4 · Break it, then undo it</div>
+          <p>You will only trust the undo button once you have pressed it. Start the agent again if you exited, and ask it to do something destructive on purpose:</p>
+          <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div><pre>This is a test of my undo button. Delete every .txt file in this folder and its subfolders.</pre></div>
+          <p>Approve it. Then exit the agent (or switch to your second terminal window) and look at the damage:</p>
+          <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git status</pre></div>
+          <p>Git lists every deleted file. Now bring them all back:</p>
+          <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git restore .</pre></div>
+          <p class="aot-notice"><b>Notice:</b> run <code>git status</code> again. It should say <code>nothing to commit, working tree clean</code>, and the files are back in the folder. The full stop at the end of <code>git restore .</code> means "everything in this folder". This only restores files that were in your last snapshot, which is why you snapshot before each mission.</p>
+        </div>
+
+        <!-- STEP 7 -->
+        <h3><span class="aot-step">7</span> Have the agent write your session report</h3>
+        <p>Start the agent again and paste this:</p>
+        <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy prompt</span></button></div><pre>Write SESSION-REPORT.md in this folder. Include: which agent and model you are; a short summary of each of the four missions we did; every file you created, moved or changed; the output of running git log --oneline; and one thing from this session that a careful person should double-check. Keep it under one page.</pre></div>
+        <p>Read the report. Correct anything that is wrong (you can ask the agent to fix it). Then take a final snapshot:</p>
+        <div class="cg-code-block"><div class="cg-code-header"><button type="button" class="cg-copy-btn" data-copy-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="cg-btn-text">Copy</span></button></div><pre>git add -A
+git commit -m "Session report"</pre></div>
+
+        <div class="cg-callout success">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> What you can now do</h4>
+          <p>You picked an agent, gave it a folder, watched it read, organise and fix real files, approved or refused its requests, and undid its work with one command. Every later Level 2 lesson builds on this: same folder habit, same restore points, whichever agent you use.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Submit Your Work</h2>
+          <span class="cg-session-meta">One public link to your SESSION-REPORT.md.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <p>Share your <code>SESSION-REPORT.md</code> as a public link. The quickest way: open <a href="https://gist.github.com" target="_blank" rel="noopener">gist.github.com</a> (you are already signed in to GitHub from Level 1), name the file <code>SESSION-REPORT.md</code>, paste the report in, and click <strong>Create public gist</strong>. A Google Doc or Notion page set to "anyone with the link" also works.</p>
+        <p>Your report must show the <code>git log --oneline</code> output with at least three snapshots. That is the proof you used restore points.</p>
+        <div class="cg-submit-box" data-exercise-submission="ai-on-terminal" data-submission-input="aotInput" data-submission-status="aotStatus" data-submission-btn="aotBtn" data-submission-validate="url" data-submission-card="aotSubmittedCard" data-submission-card-url="aotSubmittedUrl" data-submission-card-meta="aotSubmittedMeta" data-submission-form="aotFormWrap" data-submission-fab="aotSubmitFab" id="aotSubmitBox">
+          <div class="cg-submitted-card" id="aotSubmittedCard">
+            <div class="cg-submitted-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Your submission
+            </div>
+            <a class="cg-submitted-url" id="aotSubmittedUrl" href="#" target="_blank" rel="noopener"></a>
+            <div class="cg-submitted-meta" id="aotSubmittedMeta"></div>
+            <div class="cg-submitted-actions">
+              <button type="button" class="cg-submit-btn secondary" id="aotEditBtn" onclick="window.__aotEditSubmission&&window.__aotEditSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit / Resubmit
+              </button>
+              <button type="button" class="cg-submit-btn danger" id="aotDeleteBtn" onclick="window.__aotDeleteSubmission&&window.__aotDeleteSubmission()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>
+          <div id="aotFormWrap">
+            <span class="cg-submit-label">Public URL</span>
+            <div class="cg-submit-row">
+              <input type="url" class="cg-submit-input" id="aotInput" placeholder="https://gist.github.com/yourname/... or any public link" autocomplete="off" spellcheck="false">
+              <button class="cg-submit-btn" id="aotBtn" onclick="(window.submitExerciseUrl||window.__aotSubmit)({exerciseId:'ai-on-terminal',inputId:'aotInput',statusId:'aotStatus',btnId:'aotBtn',validate:'url'})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Submit
+              </button>
+            </div>
+            <div class="cg-submit-status" id="aotStatus" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div class="cg-session" onclick="this.classList.toggle('open')">
+      <div class="cg-session-header">
+        <div class="cg-session-number"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <div class="cg-session-info">
+          <h2>Troubleshooting</h2>
+          <span class="cg-session-meta">The problems learners hit most, and the fix for each.</span>
+        </div>
+        <span class="cg-session-toggle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="cg-session-content" onclick="event.stopPropagation()">
+        <div class="cg-callout info">
+          <h4><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Your agent can help</h4>
+          <p>Once an agent is running, it is the best troubleshooter you have. Paste the error and ask "what does this mean and what should I do?". Before that, paste it into ChatGPT, Claude or Gemini in the browser.</p>
+        </div>
+        <h3>"command not found" or "is not recognized"</h3>
+        <p>Close the terminal completely and open a new one. If it still fails, run the install line again and read its last few lines for an error.</p>
+        <h3>Windows: "running scripts is disabled on this system"</h3>
+        <p>Run this once, then try the install again: <code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></p>
+        <h3>git: "Please tell me who you are"</h3>
+        <p>You skipped the two <code>git config</code> lines in step 4. Run them, then repeat the commit.</p>
+        <h3>git: "not a git repository"</h3>
+        <p>Your terminal is not inside <code>driftwood-cafe</code>. Go back to step 3, open the terminal in the folder, and check with <code>ls</code>.</p>
+        <h3>The agent says you hit a limit, or the model is unavailable</h3>
+        <p>That is the free-route wall. Wait and try later, choose another free model (in OpenCode, type <code>/models</code>), or switch to another agent from the table. Your folder and snapshots do not care which agent you use.</p>
+        <h3>The agent changed something you did not want</h3>
+        <p>Exit the agent and run <code>git restore .</code> to return to your last snapshot. If it created new files you do not want, delete them in Finder or File Explorer; git restore only brings back files from the snapshot.</p>
+        <h3>The agent asks to sign in again and again</h3>
+        <p>Finish the sign-in in the browser tab it opens, all the way to the "you can close this page" message. If your browser blocks pop-ups, copy the link the agent prints into the browser yourself.</p>
+      </div>
+    </div>
+
+  </div>
+  <div class="cg-footer">
+    <span>AI Badge</span>
+    <span>&bull;</span>
+    <span>Victor del Rosal</span>
+  </div>
+</div>
+<script>
+(function(){
+  var t=localStorage.getItem('lesson-theme');
+  if(t==='light') document.querySelector('.cg-lesson').classList.add('light-mode');
+
+  // Delegated copy handler: any button with [data-copy-btn] inside a .cg-code-block
+  if (!window.__aibadgeCopyHandlerBound) {
+    window.__aibadgeCopyHandlerBound = true;
+    document.addEventListener('click', function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-copy-btn]');
+      if (!btn) return;
+      ev.stopPropagation();
+      var block = btn.closest('.cg-code-block');
+      var pre = block && block.querySelector('pre');
+      if (!pre) return;
+      var label = btn.querySelector('.cg-btn-text');
+      if (label && !label.dataset.orig) label.dataset.orig = label.textContent;
+      var text = pre.innerText;
+      var restore = function(ok){
+        if (label) {
+          label.textContent = ok ? 'Copied!' : 'Press Ctrl/Cmd+C';
+          if (ok) { label.style.color = '#00ff88'; label.style.fontWeight = '700'; }
+        }
+        setTimeout(function(){
+          if (label) { label.textContent = label.dataset.orig || 'Copy prompt'; label.style.color = ''; label.style.fontWeight = ''; }
+        }, 2000);
+      };
+      var fallback = function(){
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          restore(ok);
+        } catch(e2) { restore(false); }
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){ restore(true); }, fallback);
+        } else { fallback(); }
+      } catch(e) { fallback(); }
+    }, true);
+  }
+
+  var EXERCISE_ID = 'ai-on-terminal';
+  var URL_REGEX = /^https?:\/\/[^\s]{6,}$/i;
+
+  function setStatus(kind, html) {
+    var el = document.getElementById('aotStatus');
+    if (!el) return;
+    el.style.display = 'block';
+    el.className = 'cg-submit-status ' + (kind === 'ok' ? 'ok' : kind === 'err' ? 'err' : '');
+    el.innerHTML = html;
+  }
+
+  function validate(url) {
+    url = (url || '').trim();
+    if (!url) return { ok: false, msg: 'Please paste a public URL with your SKILL.md and proof it fired.' };
+    if (!/^https?:\/\//i.test(url)) {
+      return { ok: false, msg: 'URL must start with <code>https://</code>.' };
+    }
+    if (!URL_REGEX.test(url)) {
+      return { ok: false, msg: 'That does not look like a valid URL. Try a Gist, GitHub Pages, Notion, or published Google Doc link.' };
+    }
+    return { ok: true, value: url };
+  }
+
+  function fmtDate(ts) {
+    try {
+      var d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+      if (!d || isNaN(d.getTime())) return '';
+      return d.toLocaleString(undefined, { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    } catch(e) { return ''; }
+  }
+  function renderSubmitted(value, ts) {
+    var card = document.getElementById('aotSubmittedCard');
+    var urlA = document.getElementById('aotSubmittedUrl');
+    var meta = document.getElementById('aotSubmittedMeta');
+    var form = document.getElementById('aotFormWrap');
+    var fab  = document.getElementById('aotSubmitFab');
+    var status = document.getElementById('aotStatus');
+    if (card && urlA) { urlA.textContent = value; urlA.href = value; card.classList.add('visible'); }
+    if (meta) meta.textContent = ts ? ('Submitted ' + fmtDate(ts)) : 'Submitted';
+    if (form) form.style.display = 'none';
+    if (fab) fab.classList.remove('visible');
+    if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+  }
+  function renderEditing() {
+    var card = document.getElementById('aotSubmittedCard');
+    var form = document.getElementById('aotFormWrap');
+    var fab  = document.getElementById('aotSubmitFab');
+    if (card) card.classList.remove('visible');
+    if (form) form.style.display = '';
+    if (fab)  fab.classList.add('visible');
+  }
+
+  window.__aotScrollToSubmit = window.__aotScrollToSubmit || function() {
+    var box = document.getElementById('aotSubmitBox');
+    if (!box) return;
+    var session = box.closest('.cg-session');
+    if (session && !session.classList.contains('open')) session.classList.add('open');
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var input = document.getElementById('aotInput');
+    if (input) setTimeout(function(){ input.focus(); }, 400);
+  };
+  window.__aotEditSubmission = window.__aotEditSubmission || function() {
+    renderEditing();
+    var input = document.getElementById('aotInput');
+    if (input) { input.focus(); input.select && input.select(); }
+  };
+  window.__aotDeleteSubmission = window.__aotDeleteSubmission || async function() {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    try {
+      var out = await deleteSubmission(user.uid, EXERCISE_ID);
+      if (out && out.success) {
+        var input = document.getElementById('aotInput');
+        if (input) input.value = '';
+        renderEditing();
+        setStatus('ok', 'Submission deleted. You can submit a new URL any time.');
+        if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, EXERCISE_ID, false); } catch (e) {} }
+      } else {
+        alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      alert('Could not delete: ' + (e.message || 'unknown error'));
+    }
+  };
+
+  async function loadExisting() {
+    try {
+      var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+      if (!user || typeof getSubmission !== 'function') {
+        var fab = document.getElementById('aotSubmitFab');
+        if (fab) fab.classList.add('visible');
+        return;
+      }
+      var existing = await getSubmission(user.uid, EXERCISE_ID);
+      var input = document.getElementById('aotInput');
+      if (existing && existing.value) {
+        if (input) input.value = existing.value;
+        renderSubmitted(existing.value, existing.submittedAt);
+      } else {
+        var fab = document.getElementById('aotSubmitFab');
+        if (fab) fab.classList.add('visible');
+      }
+    } catch (e) { /* silent */ }
+  }
+
+  window.__aotSubmit = async function() {
+    var input = document.getElementById('aotInput');
+    var btn = document.getElementById('aotBtn');
+    var res = validate(input.value);
+    if (!res.ok) { setStatus('err', res.msg); return; }
+
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
+    if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh the page and try again.'); return; }
+
+    btn.disabled = true;
+    var original = btn.textContent;
+    btn.textContent = 'Submitting...';
+
+    try {
+      var out = await saveSubmission(user.uid, EXERCISE_ID, { type: 'url', value: res.value, status: 'submitted' });
+      if (out && out.success) {
+        setStatus('ok', 'Submitted! Your page: <a href="' + res.value + '" target="_blank" rel="noopener">' + res.value + '</a>');
+        renderSubmitted(res.value, new Date());
+        if (typeof saveTutorialCompletion === 'function') {
+          try { await saveTutorialCompletion(user.uid, EXERCISE_ID, true); } catch (e) {}
+        }
+      } else {
+        setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
+      }
+    } catch (e) {
+      setStatus('err', 'Could not save: ' + (e.message || 'unknown error'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  };
+
+  setTimeout(loadExisting, 400);
+  setTimeout(loadExisting, 1500);
+})();
+</script>
+</body>
+</html>
