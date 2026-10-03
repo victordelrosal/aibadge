@@ -3,14 +3,16 @@
 // email and writes badge_levels on the fiveinnolabs broker (D1 ai-reckoning-topics). The broker then
 // shows the gem and backfills badge_l1..lN XP on the person's next sign-in (filXp.hello in account-card.js),
 // whatever way they sign in. A level is only ever raised, never lowered.
-// Binding rule: the account must predate the credential, or the person must have typed the emailed code
-// for that address (certreq.emailProven), so nobody can claim someone else's level by signing up later
-// with their unverified address.
+// Binding rule: the person typed the emailed code for that address (certreq.emailProven). The one exception
+// is Victor's one-time vouch (3 Oct 2026, "Code = verified"): credentials issued up to VOUCH_CUTOFF bind to an
+// account that existed before the credential. After the cutoff an older account proves nothing (a squatter
+// could have registered the address first), so only the typed code counts.
 // Usage: node sync-levels.mjs [--dry-run]   -> prints one JSON summary line
 import { execFileSync } from "node:child_process";
 import { googleAccessToken, PROJECT, KV_NAMESPACE } from "./common.mjs";
 
 const DRY = process.argv.includes("--dry-run");
+const VOUCH_CUTOFF = "2026-10-03T23:59:59Z";
 const CERTS_KV = "9b8899effb804056a435ae5af6151966";
 const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== "CLOUDFLARE_API_TOKEN"));
 const wr = (args) => execFileSync("npx", ["wrangler", ...args], { env, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 16 << 20 });
@@ -47,7 +49,7 @@ for (const h of holders) {
   const a = accounts[h.email];
   if (!a) { skipped.noAccount.push(h.ucid); continue; }
   if (!/^[A-Za-z0-9_-]{6,128}$/.test(a.uid) || !/^[a-z0-9]{5}$/.test(h.ucid)) continue;
-  let bound = a.createdAt <= h.credAt;
+  let bound = h.credAt <= VOUCH_CUTOFF && a.createdAt <= h.credAt;
   if (!bound) {
     const req = JSON.parse(kvGet(KV_NAMESPACE, `certreq:${a.uid}`) || "{}");
     const p = req.emailProven;

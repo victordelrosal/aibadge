@@ -44,6 +44,7 @@
     '.fil-keep:hover{background:rgba(0,122,255,.13);border-color:rgba(0,122,255,.55)}.fil-keep:active{transform:scale(.96)}',
     '.fil-keep:focus-visible{outline:2px solid #007AFF;outline-offset:2px}.fil-keep[hidden]{display:none}',
     '.fil-keep .fil-pair{display:flex}.fil-keep .fil-pair i{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:0 0 0 1.5px #fff,0 1px 2px rgba(0,0,0,.15)}',
+    '.fil-keep .fil-pair i.li{background:#0A66C2}.fil-top-level{display:inline-flex;align-items:center}.fil-top-level[hidden]{display:none}',
     '.fil-keep .fil-pair i+i{margin-left:-6px;background:#0A66C2}.fil-keep .fil-pair svg{width:13px;height:13px;display:block}.fil-keep .fil-pair i+i svg{width:12px;height:12px}',
     /* phone: the pill stands in for the photo until something is linked (both open the same card) */
     '@media (max-width:600px){.fil-keep{padding:0 12px 0 7px;gap:6px}.fil-keep .fil-long{display:none}.fil-keep:not([hidden])+.fil-me{display:none}}',
@@ -65,7 +66,7 @@
   ].join('\n');
 
   var me = null, card = null, ways = null, user = null, via = '', level = null;
-  var keep = null, note = null, later = null, nci = false, kept = null, asking = false;
+  var keep = null, note = null, later = null, nci = false, kept = null, asking = false, topLevel = null;
   var ASKED = 'fil-keep-asked', WEEK = 7 * 864e5;
   var TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>';
 
@@ -90,6 +91,7 @@
   function paint() {
     if (!me) return;
     me.hidden = !user;
+    if (topLevel) topLevel.hidden = !user;
     if (!user) { close(); return; }
     me.replaceChildren.apply(me, [photo(user), tag(via)].filter(Boolean));
     var said = 'Your account' + (via ? ', signed in with ' + NAME[via] : '');
@@ -161,8 +163,12 @@
     note = document.createElement('p'); note.hidden = true; card.appendChild(note);
     keep = document.createElement('button'); keep.type = 'button'; keep.className = 'fil-keep'; keep.hidden = true;
     keep.title = 'Link your LinkedIn to keep your AI Badge after NCI';
-    keep.innerHTML = '<span class="fil-pair" aria-hidden="true"><i>' + TAG.linkedin + '</i></span><span>Link<span class="fil-long"> LinkedIn</span></span>';
+    keep.innerHTML = '<span class="fil-pair" aria-hidden="true"><i class="li">' + TAG.linkedin + '</i></span><span>Link<span class="fil-long"> LinkedIn</span></span>';
     me.parentNode.insertBefore(keep, me);
+    /* the AI Badge level gem and XP in the top bar, beside the photo, as on aireckon.ing (3 Oct 2026, Victor:
+       "these students MUST GET the XP ... must show in AI badge navbar"). <fil-level mine> fills itself from filXp. */
+    topLevel = document.createElement('fil-level'); topLevel.setAttribute('mine', ''); topLevel.className = 'fil-top-level'; topLevel.hidden = true;
+    me.parentNode.insertBefore(topLevel, keep);
     keep.addEventListener('click', function (e) { e.stopPropagation(); card.hidden ? open() : close(true); });
     ways = document.createElement('fil-ways'); ways.setAttribute('auth', 'firebase');
     ways.idToken = function () { return user ? user.getIdToken() : Promise.resolve(null); };
