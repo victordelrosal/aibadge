@@ -125,6 +125,9 @@ async function route(request, env) {
     if (path === "/api/cert-code/verify" && request.method === "POST") {
       return handleCertCodeVerify(request, env);
     }
+    if (path === "/api/cert-code/status" && request.method === "GET") {
+      return handleCertCodeStatus(request, env);
+    }
     // Grading write-back (1 Oct 2026). Verdicts live server-side only, never in a
     // learner-writable store. Resolve needs the grading key AND a recorded human approval.
     if (path === "/api/cert-resolve" && request.method === "POST") {
@@ -1014,9 +1017,7 @@ async function handleCertCheckout(request, env) {
     // A proof counts only for the address it proved: if the account email changed since, drop it.
     const prevRaw = await env.SLOTS.get(`certreq:${principal.uid}`);
     const prev = prevRaw ? JSON.parse(prevRaw) : null;
-    const asserted = googleAsserted(principal, email);
-    if (asserted) rec.emailProven = asserted;
-    else if (prev && prev.emailProven && !proofFor(prev, email)) rec.emailProven = null;
+    if (prev && prev.emailProven && !proofFor(prev, email)) rec.emailProven = null;
     const { record, isNew } = await writeCertRequest(env, rec);
     if (isNew) await sendCertAlert(env, record);
     return jsonResponse({ free: true, status: "comped", proofNeeded: !proofFor(record, email) });
@@ -1889,22 +1890,18 @@ function escapeHtml(str) {
 // ── Email-ownership proof (3 Oct 2026) ──────────────────────────────────────────
 // Unverified password accounts can claim any address, and ncirl.ie mail is pre-clicked by
 // Defender Safe Links, so a verification LINK proves nothing there. A typed code does: the
-// learner must read the mailbox and type the code into the dashboard. Only a Google sign-in
-// with a verified matching email is accepted without a code (Google asserts the address).
+// learner must read the mailbox and type the code into the dashboard. Every sign-in method
+// types the code: a token's email_verified + google.com provider is NOT proof, because a
+// password account on someone else's address can be link-verified by the scanner and then
+// linked to the attacker's own Google account (cold verifier, 3 Oct 2026).
 // Codes are stored as an HMAC under CERT_CODE_PEPPER, never in plaintext.
+// KV counters are not atomic: a parallel burst can overrun the limits below by a few, which the
+// 8-digit code space makes harmless. Hard limits would need a Durable Object.
 const CODE_TTL_S = 900, CODE_MAX_TRIES = 5, CODE_SENDS_HOUR = 3, CODE_SENDS_DAY = 10, CODE_LIFETIME_FAILS = 15;
-
-function googleAsserted(principal, email) {
-  if (principal && principal.provider === "google.com" && principal.emailVerified === true
-      && String(principal.email || "").toLowerCase() === email) {
-    return { at: new Date().toISOString(), method: "google", email };
-  }
-  return null;
-}
 
 function proofFor(req, email) {
   const p = req && req.emailProven;
-  return !!p && String(p.email || "").toLowerCase() === email;
+  return !!p && p.method === "code" && String(p.email || "").toLowerCase() === email;
 }
 
 async function codeHmac(env, uid, email, code) {
@@ -1949,17 +1946,16 @@ async function handleCertCodeSend(request, env) {
   if (c.err) return c.err;
   const { principal, email, req } = c;
   if (proofFor(req, email)) return jsonResponse({ proven: true });
-  const now = new Date();
-  const hourKey = `certcodesend:h:${email}:${now.toISOString().slice(0, 13)}`;
-  const dayKey = `certcodesend:d:${email}:${now.toISOString().slice(0, 10)}`;
-  const [h, d] = await Promise.all([env.SLOTS.get(hourKey), env.SLOTS.get(dayKey)]);
-  if (Number(h || 0) >= CODE_SENDS_HOUR || Number(d || 0) >= CODE_SENDS_DAY) {
+  // Rolling windows (not clock hours): the send times of the last 24 hours, one key per address.
+  const nowS = Math.floor(Date.now() / 1000);
+  const sendsKey = `certcodesends:${email}`;
+  let sends = []; try { sends = JSON.parse((await env.SLOTS.get(sendsKey)) || "[]"); } catch (e) {}
+  sends = (Array.isArray(sends) ? sends : []).filter((t) => typeof t === "number" && t > nowS - 86400);
+  if (sends.filter((t) => t > nowS - 3600).length >= CODE_SENDS_HOUR || sends.length >= CODE_SENDS_DAY) {
     return jsonResponse({ error: "Too many codes sent. Try again later." }, 429);
   }
-  await Promise.all([
-    env.SLOTS.put(hourKey, String(Number(h || 0) + 1), { expirationTtl: 3700 }),
-    env.SLOTS.put(dayKey, String(Number(d || 0) + 1), { expirationTtl: 90000 }),
-  ]);
+  sends.push(nowS);
+  await env.SLOTS.put(sendsKey, JSON.stringify(sends), { expirationTtl: 90000 });
   const code = eightDigits();
   const exp = Math.floor(Date.now() / 1000) + CODE_TTL_S;
   await env.SLOTS.put(`certcode:${email}`, JSON.stringify({ uid: principal.uid, hmac: await codeHmac(env, principal.uid, email, code), tries: 0, exp }), { expiration: exp });
@@ -1999,7 +1995,24 @@ async function handleCertCodeVerify(request, env) {
     return jsonResponse({ error: "That code is not right.", remaining: Math.max(0, CODE_MAX_TRIES - rec.tries) }, 400);
   }
   await env.SLOTS.delete(key);
-  req.emailProven = { at: new Date().toISOString(), method: "code", email };
-  await env.SLOTS.put(`certreq:${principal.uid}`, JSON.stringify(req));
+  // Re-read just before writing so a review decision made meanwhile is not overwritten.
+  const freshRaw = await env.SLOTS.get(`certreq:${principal.uid}`);
+  const fresh = freshRaw ? JSON.parse(freshRaw) : req;
+  fresh.emailProven = { at: new Date().toISOString(), method: "code", email };
+  await env.SLOTS.put(`certreq:${principal.uid}`, JSON.stringify(fresh));
   return jsonResponse({ proven: true });
+}
+
+// GET /api/cert-code/status  (signed-in learner): lets the dashboard restore the code step.
+async function handleCertCodeStatus(request, env) {
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  if (!idToken) return jsonResponse({ error: "Sign in." }, 401);
+  const principal = await verifyFirebaseToken(idToken, env);
+  if (!principal || !principal.uid) return jsonResponse({ error: "Your session expired. Sign in again." }, 401);
+  const email = String(principal.email || "").trim().toLowerCase();
+  const raw = await env.SLOTS.get(`certreq:${principal.uid}`);
+  const req = raw ? JSON.parse(raw) : null;
+  if (!req) return jsonResponse({ requested: false });
+  return jsonResponse({ requested: true, reviewStatus: req.reviewStatus || "pending", proven: proofFor(req, email) });
 }

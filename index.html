@@ -6187,6 +6187,8 @@ try{
                 if (completions[tutId].completed) self.progress[tutId] = true;
               });
             });
+            // A request still waiting for the email code comes back as the code step after a reload.
+            self._restoreCertState();
             // Returning from Stripe Checkout? Confirm the payment server-side.
             try {
               var sp = new URLSearchParams(location.search);
@@ -6225,6 +6227,19 @@ try{
           }
           this.certState = 'idle';
         } catch (e) { this.certState = 'idle'; this.certMsg = 'Network error. Try again.'; }
+      },
+
+      async _restoreCertState() {
+        try {
+          var token = await firebase.auth().currentUser.getIdToken();
+          var resp = await fetch(this._apiBase + '/cert-code/status', { headers: { 'Authorization': 'Bearer ' + token } });
+          if (!resp.ok) return;
+          var s = await resp.json();
+          if (!s.requested || s.reviewStatus !== 'pending' || this.certState !== 'idle') return;
+          if (s.proven) { this._certProven(); return; }
+          this.certState = 'code';
+          this.certCodeMsg = 'Your request is waiting for one step: confirm your email. Tap "Send a new code" if you no longer have the email.';
+        } catch (e) { /* the dashboard works without it */ }
       },
 
       // Email-ownership proof: the server emails a code (no link) and checks what the learner types.
@@ -6277,7 +6292,7 @@ try{
           var data = await resp.json();
           if (resp.ok && data.paid) {
             this.certState = 'paid';
-            this.certMsg = '🎉 Payment received! Victor will review your work and issue your verified certificate. You’ll hear within 72 hours.';
+            this.certMsg = '🎉 Payment received! Your work is marked against the published rubric; when it passes, your verified certificate is emailed to you, usually within 72 hours.';
           } else {
             this.certState = 'idle';
             this.certMsg = (data && data.error) ? data.error : 'We couldn’t confirm the payment yet. If you were charged, it will still be reviewed.';

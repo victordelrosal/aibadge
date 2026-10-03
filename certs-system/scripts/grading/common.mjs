@@ -49,13 +49,14 @@ export async function googleAccessToken() {
 }
 
 // Proof that a certificate requester controls their address (3 Oct 2026): the code they typed from
-// the email (certreq.emailProven, written by the worker), or a Google sign-in asserting that verified
-// address. A verified flag alone is not enough (ncirl.ie links are pre-clicked) and LinkedIn is not
-// treated as asserting. Returns "code", "google" or null.
+// the email (certreq.emailProven, written by the worker), or a linked Google identity whose OWN email
+// (providerUserInfo, read here with admin credentials) is that address. A verified flag is never
+// enough (ncirl.ie links are pre-clicked), a stored "google" claim is not trusted (a scanner-verified
+// account can link the attacker's own Google), and LinkedIn is not treated as asserting.
 export function emailProof(meta, acct, email) {
   const p = meta && meta.emailProven;
   // A proof counts only for the address it proved (the account email can change later).
-  if (p && (p.method === "code" || p.method === "google") && String(p.email || "").toLowerCase() === email) return p.method;
+  if (p && p.method === "code" && String(p.email || "").toLowerCase() === email) return "code";
   const u = acct && acct.users && acct.users[0];
   const google = !!u && u.emailVerified === true && String(u.email || "").toLowerCase() === email
     && (u.providerUserInfo || []).some((x) => x.providerId === "google.com" && String(x.email || "").toLowerCase() === email);
