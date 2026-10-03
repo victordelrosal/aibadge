@@ -594,6 +594,8 @@ async function apiRevoke(request, env) {
   await putRecord(env, rec);
   // Free the address so a corrected credential can be issued to the same person.
   await unindexEmail(env, rec.email, rec.ucid);
+  // But never by the machine path: a revoked person is re-issued only by the issuer, by hand.
+  if (rec.email) await env.CERTS_KV.put("noauto:" + String(rec.email).toLowerCase(), rec.ucid);
   return json({ ok: true });
 }
 
@@ -669,11 +671,17 @@ async function apiAutoIssue(request, env) {
   const body = { name: b.name, email: b.email, cohort: "", issuedDate: today, level: 1, sendEmail: true };
   const err = validateInput(body);
   if (err) return json({ error: err }, 400);
+  // Anyone who has ever held a credential here (live, revoked or deleted after revoke) is
+  // out of scope for the machine path. Details of the existing record are never returned.
+  const email = String(body.email).trim().toLowerCase();
+  if (await env.CERTS_KV.get("noauto:" + email)) return json({ error: "not_eligible" }, 409);
+  if ((await listRecords(env)).some((r) => String(r.email || "").toLowerCase() === email)) return json({ error: "not_eligible" }, 409);
   const capKey = "autoissue:count:" + today;
   const n = Number((await env.CERTS_KV.get(capKey)) || 0);
   if (n >= AUTO_DAILY_CAP) return json({ error: "daily_cap", cap: AUTO_DAILY_CAP }, 429);
   const res = await issueCore(env, new URL(request.url).host, body, "lars-auto (policy v1)");
-  if (res.status === 200) await env.CERTS_KV.put(capKey, String(n + 1), { expirationTtl: 3 * 86400 });
+  if (res.status !== 200) return json({ error: "issue_failed", status: res.status }, res.status);
+  await env.CERTS_KV.put(capKey, String(n + 1), { expirationTtl: 3 * 86400 });
   return res;
 }
 
@@ -681,5 +689,11 @@ async function apiAutoSend(request, env) {
   const denied = await autoGate(request, env);
   if (denied) return denied;
   const b = await request.json().catch(() => null);
-  return sendCore(env, new URL(request.url).host, { ucid: b && b.ucid });
+  const code = String((b && b.ucid) || "").toLowerCase();
+  if (!UCID_RE.test(code)) return json({ error: "invalid code" }, 400);
+  const rec = await getRecord(env, code);
+  // Legacy HELIOS records are never emailed (their originals were delivered by hand).
+  if (!rec || rec.legacy || rec.status !== "issued") return json({ error: "not_eligible" }, 409);
+  const res = await sendCore(env, new URL(request.url).host, { ucid: code });
+  return res.status === 200 ? res : json({ error: "send_refused", status: res.status }, res.status);
 }
