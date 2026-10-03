@@ -2974,10 +2974,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <!-- Email-ownership proof (3 Oct 2026): a typed code, because mail scanners pre-click links -->
           <div x-show="certState==='code'" x-cloak data-cert-code-step style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(184,134,11,0.22);">
             <div style="font:700 15px/1.3 -apple-system,sans-serif;color:#000036;">One last step: confirm your email</div>
-            <p class="lms-subheading" style="font-size:0.9rem;margin:4px 0 12px;">We emailed a 6-digit code to <strong x-text="certCodeTo || 'your email address'"></strong>. Type it here so your certificate goes to the right person. Check junk or quarantine if it is not in your inbox.</p>
+            <p class="lms-subheading" style="font-size:0.9rem;margin:4px 0 12px;">We emailed an 8-digit code to <strong x-text="certCodeTo || 'your email address'"></strong>. Type it here so your certificate goes to the right person. Check junk or quarantine if it is not in your inbox.</p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-              <input x-model="certCode" @keydown.enter="verifyCertCode()" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" aria-label="6-digit code"
-                     style="width:130px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(0,0,54,0.18);font:700 18px/1 ui-monospace,Menlo,monospace;letter-spacing:4px;text-align:center;">
+              <input x-model="certCode" @keydown.enter="verifyCertCode()" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="12345678" aria-label="8-digit code"
+                     style="width:160px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(0,0,54,0.18);font:700 18px/1 ui-monospace,Menlo,monospace;letter-spacing:4px;text-align:center;">
               <button @click="verifyCertCode()" :disabled="certCodeBusy" class="lms-invite-btn" style="border-radius:12px;padding:12px 18px;height:auto;font-weight:700;">Confirm</button>
               <a href="#" @click.prevent="sendCertCode()" style="color:#1d4d8c;font-weight:600;font-size:0.9rem;text-decoration:none;">Send a new code</a>
             </div>
@@ -6252,7 +6252,7 @@ try{
       },
       async verifyCertCode() {
         var code = String(this.certCode || '').replace(/\D/g, '');
-        if (code.length !== 6) { this.certCodeMsg = 'Enter the 6-digit code from the email.'; return; }
+        if (code.length !== 8) { this.certCodeMsg = 'Enter the 8-digit code from the email.'; return; }
         if (this.certCodeBusy) return;
         this.certCodeBusy = true; this.certCodeMsg = '';
         try {

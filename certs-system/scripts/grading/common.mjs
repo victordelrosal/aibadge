@@ -54,7 +54,8 @@ export async function googleAccessToken() {
 // treated as asserting. Returns "code", "google" or null.
 export function emailProof(meta, acct, email) {
   const p = meta && meta.emailProven;
-  if (p && (p.method === "code" || p.method === "google")) return p.method;
+  // A proof counts only for the address it proved (the account email can change later).
+  if (p && (p.method === "code" || p.method === "google") && String(p.email || "").toLowerCase() === email) return p.method;
   const u = acct && acct.users && acct.users[0];
   const google = !!u && u.emailVerified === true && String(u.email || "").toLowerCase() === email
     && (u.providerUserInfo || []).some((x) => x.providerId === "google.com" && String(x.email || "").toLowerCase() === email);

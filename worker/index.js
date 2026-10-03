@@ -1011,11 +1011,15 @@ async function handleCertCheckout(request, env) {
   // Free / comped: record the request now and alert Victor. No Stripe.
   if (price.cents === 0) {
     const rec = { uid: principal.uid, email, amountCents: 0, currency: CERT_CURRENCY, status: "comped", priceReason: price.reason };
+    // A proof counts only for the address it proved: if the account email changed since, drop it.
+    const prevRaw = await env.SLOTS.get(`certreq:${principal.uid}`);
+    const prev = prevRaw ? JSON.parse(prevRaw) : null;
     const asserted = googleAsserted(principal, email);
     if (asserted) rec.emailProven = asserted;
+    else if (prev && prev.emailProven && !proofFor(prev, email)) rec.emailProven = null;
     const { record, isNew } = await writeCertRequest(env, rec);
     if (isNew) await sendCertAlert(env, record);
-    return jsonResponse({ free: true, status: "comped", proofNeeded: !record.emailProven });
+    return jsonResponse({ free: true, status: "comped", proofNeeded: !proofFor(record, email) });
   }
 
   // Paid: create a Stripe Checkout Session (coupons honoured via promotion codes).
@@ -1893,9 +1897,14 @@ const CODE_TTL_S = 900, CODE_MAX_TRIES = 5, CODE_SENDS_HOUR = 3, CODE_SENDS_DAY 
 function googleAsserted(principal, email) {
   if (principal && principal.provider === "google.com" && principal.emailVerified === true
       && String(principal.email || "").toLowerCase() === email) {
-    return { at: new Date().toISOString(), method: "google" };
+    return { at: new Date().toISOString(), method: "google", email };
   }
   return null;
+}
+
+function proofFor(req, email) {
+  const p = req && req.emailProven;
+  return !!p && String(p.email || "").toLowerCase() === email;
 }
 
 async function codeHmac(env, uid, email, code) {
@@ -1911,9 +1920,11 @@ function sameHex(a, b) {
   return diff === 0;
 }
 
-function sixDigits() {
+// 8 digits (1e8): KV counters are not atomic, so a burst of parallel guesses can overrun the
+// per-code try limit; the code space keeps that burst harmless. Rejection sampling keeps it uniform.
+function eightDigits() {
   const buf = new Uint32Array(1);
-  for (;;) { crypto.getRandomValues(buf); if (buf[0] < 4294000000) return String(buf[0] % 1000000).padStart(6, "0"); }
+  for (;;) { crypto.getRandomValues(buf); if (buf[0] < 4200000000) return String(buf[0] % 100000000).padStart(8, "0"); }
 }
 
 async function codePrincipal(request, env) {
@@ -1937,7 +1948,7 @@ async function handleCertCodeSend(request, env) {
   const c = await codePrincipal(request, env);
   if (c.err) return c.err;
   const { principal, email, req } = c;
-  if (req.emailProven) return jsonResponse({ proven: true });
+  if (proofFor(req, email)) return jsonResponse({ proven: true });
   const now = new Date();
   const hourKey = `certcodesend:h:${email}:${now.toISOString().slice(0, 13)}`;
   const dayKey = `certcodesend:d:${email}:${now.toISOString().slice(0, 10)}`;
@@ -1949,7 +1960,7 @@ async function handleCertCodeSend(request, env) {
     env.SLOTS.put(hourKey, String(Number(h || 0) + 1), { expirationTtl: 3700 }),
     env.SLOTS.put(dayKey, String(Number(d || 0) + 1), { expirationTtl: 90000 }),
   ]);
-  const code = sixDigits();
+  const code = eightDigits();
   const exp = Math.floor(Date.now() / 1000) + CODE_TTL_S;
   await env.SLOTS.put(`certcode:${email}`, JSON.stringify({ uid: principal.uid, hmac: await codeHmac(env, principal.uid, email, code), tries: 0, exp }), { expiration: exp });
   // No link anywhere in this email: a link would be pre-clicked by mail scanners.
@@ -1969,10 +1980,10 @@ async function handleCertCodeVerify(request, env) {
   const c = await codePrincipal(request, env);
   if (c.err) return c.err;
   const { principal, email, req, fails } = c;
-  if (req.emailProven) return jsonResponse({ proven: true });
+  if (proofFor(req, email)) return jsonResponse({ proven: true });
   let body; try { body = await request.json(); } catch (e) { body = {}; }
   const code = String(body.code || "").trim();
-  if (!/^\d{6}$/.test(code)) return jsonResponse({ error: "Enter the 6-digit code." }, 400);
+  if (!/^\d{8}$/.test(code)) return jsonResponse({ error: "Enter the 8-digit code." }, 400);
   const key = `certcode:${email}`;
   const raw = await env.SLOTS.get(key);
   const rec = raw ? JSON.parse(raw) : null;
@@ -1988,7 +1999,7 @@ async function handleCertCodeVerify(request, env) {
     return jsonResponse({ error: "That code is not right.", remaining: Math.max(0, CODE_MAX_TRIES - rec.tries) }, 400);
   }
   await env.SLOTS.delete(key);
-  req.emailProven = { at: new Date().toISOString(), method: "code" };
+  req.emailProven = { at: new Date().toISOString(), method: "code", email };
   await env.SLOTS.put(`certreq:${principal.uid}`, JSON.stringify(req));
   return jsonResponse({ proven: true });
 }
