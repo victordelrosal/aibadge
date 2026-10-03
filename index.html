@@ -2971,6 +2971,18 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <span x-show="certState==='idle' && !certLaunched" style="display:inline-flex;align-items:center;gap:6px;padding:13px 18px;border-radius:12px;background:rgba(255,149,0,0.12);color:#9a5a00;font:700 13px/1 -apple-system,sans-serif;white-space:nowrap;">&#128197; Opens 17 June 2026</span>
             <span x-show="certState==='working'" class="lms-subheading" style="font-size:0.9rem;white-space:nowrap;">Starting&hellip;</span>
           </div>
+          <!-- Email-ownership proof (3 Oct 2026): a typed code, because mail scanners pre-click links -->
+          <div x-show="certState==='code'" x-cloak data-cert-code-step style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(184,134,11,0.22);">
+            <div style="font:700 15px/1.3 -apple-system,sans-serif;color:#000036;">One last step: confirm your email</div>
+            <p class="lms-subheading" style="font-size:0.9rem;margin:4px 0 12px;">We emailed a 6-digit code to <strong x-text="certCodeTo || 'your email address'"></strong>. Type it here so your certificate goes to the right person. Check junk or quarantine if it is not in your inbox.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <input x-model="certCode" @keydown.enter="verifyCertCode()" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" aria-label="6-digit code"
+                     style="width:130px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(0,0,54,0.18);font:700 18px/1 ui-monospace,Menlo,monospace;letter-spacing:4px;text-align:center;">
+              <button @click="verifyCertCode()" :disabled="certCodeBusy" class="lms-invite-btn" style="border-radius:12px;padding:12px 18px;height:auto;font-weight:700;">Confirm</button>
+              <a href="#" @click.prevent="sendCertCode()" style="color:#1d4d8c;font-weight:600;font-size:0.9rem;text-decoration:none;">Send a new code</a>
+            </div>
+            <p x-show="certCodeMsg" x-text="certCodeMsg" style="margin:10px 0 0;font:600 13px/1.45 -apple-system,sans-serif;color:#9a3412;"></p>
+          </div>
           <p x-show="certMsg" x-text="certMsg" style="margin:14px 0 0;font:600 14px/1.45 -apple-system,sans-serif;color:#1d6e36;"></p>
         </div>
       </div>
@@ -6131,8 +6143,9 @@ try{
   window.lmsDashboard = function() {
     return {
       progress: {},
-      certState: 'idle',   // idle | working | requested | paid
+      certState: 'idle',   // idle | working | code | requested | paid
       certMsg: '',
+      certCode: '', certCodeMsg: '', certCodeTo: '', certCodeBusy: false,
 
       tutorials: window._lmsTutorials.map(function(t) { return Object.assign({}, t); }),
 
@@ -6200,6 +6213,11 @@ try{
           var data = await resp.json();
           if (!resp.ok) { this.certState = 'idle'; this.certMsg = (data && data.error) || 'Could not start. Try again.'; return; }
           if (data.checkoutUrl) { window.location.href = data.checkoutUrl; return; }
+          if (data.free && data.proofNeeded) {
+            this.certState = 'code';
+            await this.sendCertCode();
+            return;
+          }
           if (data.free) {
             this.certState = 'requested';
             this.certMsg = '✅ Request received. AI marks your work against the published rubric; when it passes, your certificate is emailed to you, usually within 72 hours.';
@@ -6207,6 +6225,44 @@ try{
           }
           this.certState = 'idle';
         } catch (e) { this.certState = 'idle'; this.certMsg = 'Network error. Try again.'; }
+      },
+
+      // Email-ownership proof: the server emails a code (no link) and checks what the learner types.
+      async _certCodeCall(path, body) {
+        var token = await firebase.auth().currentUser.getIdToken();
+        var resp = await fetch(this._apiBase + path, {
+          method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body || {})
+        });
+        var data = {}; try { data = await resp.json(); } catch (e) {}
+        return { ok: resp.ok, data: data };
+      },
+      _certProven() {
+        this.certState = 'requested'; this.certCodeMsg = ''; this.certCode = '';
+        this.certMsg = '✅ Email confirmed and request received. AI marks your work against the published rubric; when it passes, your certificate is emailed to you, usually within 72 hours.';
+      },
+      async sendCertCode() {
+        this.certCodeMsg = '';
+        try {
+          var r = await this._certCodeCall('/cert-code/send');
+          if (r.data.proven) { this._certProven(); return; }
+          if (!r.ok) { this.certCodeMsg = r.data.error || 'Could not send the code. Try again.'; return; }
+          this.certCodeTo = r.data.to || '';
+        } catch (e) { this.certCodeMsg = 'Network error. Try again.'; }
+      },
+      async verifyCertCode() {
+        var code = String(this.certCode || '').replace(/\D/g, '');
+        if (code.length !== 6) { this.certCodeMsg = 'Enter the 6-digit code from the email.'; return; }
+        if (this.certCodeBusy) return;
+        this.certCodeBusy = true; this.certCodeMsg = '';
+        try {
+          var r = await this._certCodeCall('/cert-code/verify', { code: code });
+          if (r.data.proven) { this._certProven(); }
+          else {
+            this.certCodeMsg = (r.data.error || 'That did not work.') + (typeof r.data.remaining === 'number' ? ' ' + r.data.remaining + ' tries left for this code.' : '');
+          }
+        } catch (e) { this.certCodeMsg = 'Network error. Try again.'; }
+        this.certCodeBusy = false;
       },
 
       async confirmCert(cs) {

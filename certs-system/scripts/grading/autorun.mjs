@@ -9,7 +9,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync, appendFileSync, rmSync, statSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { GRADING_HOME, PROJECT, WORKER, ensureDir, keychain, googleAccessToken, sha256 } from "./common.mjs";
+import { GRADING_HOME, PROJECT, WORKER, ensureDir, keychain, googleAccessToken, sha256, emailProof } from "./common.mjs";
 
 const DRY = process.argv.includes("--dry-run");
 const HERE = new URL(".", import.meta.url).pathname;
@@ -42,9 +42,6 @@ async function post(url, headers, body) {
   return { status: r.status, body: j };
 }
 
-// The NCI roster ships inside the LMS bundle as plain and SHA-256-hashed addresses.
-const ROSTER_SRC = readFileSync(new URL("../../../assets/js/firebase-app.js", import.meta.url), "utf8");
-const onNciRoster = (e) => /@(student\.)?ncirl\.ie$/.test(e) && (ROSTER_SRC.includes(JSON.stringify(e)) || ROSTER_SRC.includes("'" + e + "'") || ROSTER_SRC.includes(sha256(e)));
 
 const actions = [], waiting = [];
 try {
@@ -102,14 +99,14 @@ try {
     if (!builds.length) why.push("no passing build artifact (ai-interviews-you or five-innovators)");
     for (const e of notPassed) why.push(`${e.exerciseId} ${e.verdict}${e.reasons && e.reasons.length ? ": " + e.reasons.join("; ") : ""}${e.feedback ? " :: " + e.feedback : ""}`);
 
-    // 3b. Identity (security review, 3 Oct 2026): L1 requests accept unverified sign-ups, so anyone could
-    //     register someone else's address. Auto-issue only to a verified email or an address on the NCI
-    //     roster; anything else waits for Victor.
+    // 3b. Identity (security review, 3 Oct 2026): unverified sign-ups can claim any address, and a
+    //     verification link proves nothing on ncirl.ie (Safe Links pre-clicks it). Auto-issue only when
+    //     the learner typed the emailed code (certreq.emailProven) or signed in with Google on that
+    //     verified address. The NCI roster is public and guessable, so it is not proof.
     const acct = await (await fetch(`https://identitytoolkit.googleapis.com/v1/projects/${PROJECT}/accounts:lookup`, {
       method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "application/json", "x-goog-user-project": PROJECT },
       body: JSON.stringify({ localId: [uid] }) })).json();
-    const verified = !!(acct.users && acct.users[0] && acct.users[0].emailVerified && String(acct.users[0].email).toLowerCase() === email);
-    if (!verified && !onNciRoster(email)) why.push("email not verified and not on the NCI roster");
+    if (!emailProof(JSON.parse(readFileSync(join(batch, uid, "meta.json"), "utf8")), acct, email)) why.push("email not proven (learner has not typed the emailed code)");
 
     // 4. Name on the credential = the learner's own profile name.
     const user = await (await fetch(`${fs}/users/${uid}`, { headers: { Authorization: "Bearer " + token } })).json();

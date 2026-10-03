@@ -118,6 +118,13 @@ async function route(request, env) {
     if (path === "/api/cert-pricing" && request.method === "POST") {
       return handleCertPricing(request, env);
     }
+    // Email-ownership proof for autonomous L1 issuance (3 Oct 2026).
+    if (path === "/api/cert-code/send" && request.method === "POST") {
+      return handleCertCodeSend(request, env);
+    }
+    if (path === "/api/cert-code/verify" && request.method === "POST") {
+      return handleCertCodeVerify(request, env);
+    }
     // Grading write-back (1 Oct 2026). Verdicts live server-side only, never in a
     // learner-writable store. Resolve needs the grading key AND a recorded human approval.
     if (path === "/api/cert-resolve" && request.method === "POST") {
@@ -1003,12 +1010,12 @@ async function handleCertCheckout(request, env) {
 
   // Free / comped: record the request now and alert Victor. No Stripe.
   if (price.cents === 0) {
-    const { record, isNew } = await writeCertRequest(env, {
-      uid: principal.uid, email, amountCents: 0, currency: CERT_CURRENCY,
-      status: "comped", priceReason: price.reason,
-    });
+    const rec = { uid: principal.uid, email, amountCents: 0, currency: CERT_CURRENCY, status: "comped", priceReason: price.reason };
+    const asserted = googleAsserted(principal, email);
+    if (asserted) rec.emailProven = asserted;
+    const { record, isNew } = await writeCertRequest(env, rec);
     if (isNew) await sendCertAlert(env, record);
-    return jsonResponse({ free: true, status: "comped" });
+    return jsonResponse({ free: true, status: "comped", proofNeeded: !record.emailProven });
   }
 
   // Paid: create a Stripe Checkout Session (coupons honoured via promotion codes).
@@ -1322,7 +1329,8 @@ async function verifyFirebaseToken(idToken, env) {
 
     // emailVerified travels with the principal (identity audit F04, 2 Oct 2026): anything that trusts the
     // address (admin, a price waiver) must require it, because unverified password accounts can claim any email.
-    return { uid: sub, email: payload.email || "", name: payload.name || "", emailVerified: payload.email_verified === true, authTime: payload.auth_time, idToken };
+    return { uid: sub, email: payload.email || "", name: payload.name || "", emailVerified: payload.email_verified === true, authTime: payload.auth_time,
+      provider: (payload.firebase && payload.firebase.sign_in_provider) || "", idToken };
   } catch (e) {
     return null;
   }
@@ -1872,4 +1880,115 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+// ── Email-ownership proof (3 Oct 2026) ──────────────────────────────────────────
+// Unverified password accounts can claim any address, and ncirl.ie mail is pre-clicked by
+// Defender Safe Links, so a verification LINK proves nothing there. A typed code does: the
+// learner must read the mailbox and type the code into the dashboard. Only a Google sign-in
+// with a verified matching email is accepted without a code (Google asserts the address).
+// Codes are stored as an HMAC under CERT_CODE_PEPPER, never in plaintext.
+const CODE_TTL_S = 900, CODE_MAX_TRIES = 5, CODE_SENDS_HOUR = 3, CODE_SENDS_DAY = 10, CODE_LIFETIME_FAILS = 15;
+
+function googleAsserted(principal, email) {
+  if (principal && principal.provider === "google.com" && principal.emailVerified === true
+      && String(principal.email || "").toLowerCase() === email) {
+    return { at: new Date().toISOString(), method: "google" };
+  }
+  return null;
+}
+
+async function codeHmac(env, uid, email, code) {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.CERT_CODE_PEPPER || ""), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(uid + "|" + email + "|" + code));
+  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function sameHex(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function sixDigits() {
+  const buf = new Uint32Array(1);
+  for (;;) { crypto.getRandomValues(buf); if (buf[0] < 4294000000) return String(buf[0] % 1000000).padStart(6, "0"); }
+}
+
+async function codePrincipal(request, env) {
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  if (!idToken) return { err: jsonResponse({ error: "Sign in." }, 401) };
+  const principal = await verifyFirebaseToken(idToken, env);
+  if (!principal || !principal.uid) return { err: jsonResponse({ error: "Your session expired. Sign in again." }, 401) };
+  if (!env.CERT_CODE_PEPPER || env.CERT_CODE_PEPPER.length < 32) return { err: jsonResponse({ error: "Not available yet." }, 503) };
+  const email = String(principal.email || "").trim().toLowerCase();
+  const raw = await env.SLOTS.get(`certreq:${principal.uid}`);
+  const req = raw ? JSON.parse(raw) : null;
+  if (!req || String(req.email || "").toLowerCase() !== email) return { err: jsonResponse({ error: "Request your certificate first." }, 409) };
+  const fails = Number((await env.SLOTS.get(`certcodefail:${email}`)) || 0);
+  if (fails >= CODE_LIFETIME_FAILS) return { err: jsonResponse({ error: "Too many wrong codes. Victor will check your request by hand.", locked: true }, 423) };
+  return { principal, email, req, fails };
+}
+
+// POST /api/cert-code/send  (signed-in learner with a certificate request)
+async function handleCertCodeSend(request, env) {
+  const c = await codePrincipal(request, env);
+  if (c.err) return c.err;
+  const { principal, email, req } = c;
+  if (req.emailProven) return jsonResponse({ proven: true });
+  const now = new Date();
+  const hourKey = `certcodesend:h:${email}:${now.toISOString().slice(0, 13)}`;
+  const dayKey = `certcodesend:d:${email}:${now.toISOString().slice(0, 10)}`;
+  const [h, d] = await Promise.all([env.SLOTS.get(hourKey), env.SLOTS.get(dayKey)]);
+  if (Number(h || 0) >= CODE_SENDS_HOUR || Number(d || 0) >= CODE_SENDS_DAY) {
+    return jsonResponse({ error: "Too many codes sent. Try again later." }, 429);
+  }
+  await Promise.all([
+    env.SLOTS.put(hourKey, String(Number(h || 0) + 1), { expirationTtl: 3700 }),
+    env.SLOTS.put(dayKey, String(Number(d || 0) + 1), { expirationTtl: 90000 }),
+  ]);
+  const code = sixDigits();
+  const exp = Math.floor(Date.now() / 1000) + CODE_TTL_S;
+  await env.SLOTS.put(`certcode:${email}`, JSON.stringify({ uid: principal.uid, hmac: await codeHmac(env, principal.uid, email, code), tries: 0, exp }), { expiration: exp });
+  // No link anywhere in this email: a link would be pre-clicked by mail scanners.
+  const text = `Your AI Badge certificate code is ${code}\n\nType it into your AI Badge dashboard to confirm this is your email address. It expires in 15 minutes.\n\nIf you did not request an AI Badge certificate, ignore this email.\n\nfiveinnolabs`;
+  const html = `<!DOCTYPE html><html><body style="margin:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;"><div style="max-width:480px;margin:0 auto;padding:24px;"><div style="background:#fff;border-radius:18px;padding:30px 26px;"><p style="font-size:15px;color:#3a3f4a;margin:0 0 14px;">Your AI Badge certificate code is</p><p style="font-size:34px;letter-spacing:8px;font-weight:700;color:#000036;margin:0 0 18px;">${code}</p><p style="font-size:14px;line-height:1.5;color:#3a3f4a;margin:0 0 10px;">Type it into your AI Badge dashboard to confirm this is your email address. It expires in 15 minutes.</p><p style="font-size:13px;color:#8a8f98;margin:0;">If you did not request an AI Badge certificate, ignore this email.</p></div></div></body></html>`;
+  const r = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: env.FROM_EMAIL, to: email, subject: "Your AI Badge certificate code", text, html }),
+  });
+  if (!r.ok) return jsonResponse({ error: "Could not send the email. Try again." }, 502);
+  return jsonResponse({ sent: true, to: email, expiresInMinutes: CODE_TTL_S / 60 });
+}
+
+// POST /api/cert-code/verify  { code }
+async function handleCertCodeVerify(request, env) {
+  const c = await codePrincipal(request, env);
+  if (c.err) return c.err;
+  const { principal, email, req, fails } = c;
+  if (req.emailProven) return jsonResponse({ proven: true });
+  let body; try { body = await request.json(); } catch (e) { body = {}; }
+  const code = String(body.code || "").trim();
+  if (!/^\d{6}$/.test(code)) return jsonResponse({ error: "Enter the 6-digit code." }, 400);
+  const key = `certcode:${email}`;
+  const raw = await env.SLOTS.get(key);
+  const rec = raw ? JSON.parse(raw) : null;
+  if (!rec || rec.exp <= Math.floor(Date.now() / 1000)) return jsonResponse({ error: "That code has expired. Send a new one." }, 410);
+  if (rec.uid !== principal.uid) return jsonResponse({ error: "Send a new code." }, 409);
+  if (rec.tries >= CODE_MAX_TRIES) { await env.SLOTS.delete(key); return jsonResponse({ error: "Too many tries. Send a new code." }, 429); }
+  if (!sameHex(await codeHmac(env, principal.uid, email, code), rec.hmac)) {
+    rec.tries += 1;
+    await Promise.all([
+      env.SLOTS.put(key, JSON.stringify(rec), { expiration: rec.exp }),
+      env.SLOTS.put(`certcodefail:${email}`, String(fails + 1)),
+    ]);
+    return jsonResponse({ error: "That code is not right.", remaining: Math.max(0, CODE_MAX_TRIES - rec.tries) }, 400);
+  }
+  await env.SLOTS.delete(key);
+  req.emailProven = { at: new Date().toISOString(), method: "code" };
+  await env.SLOTS.put(`certreq:${principal.uid}`, JSON.stringify(req));
+  return jsonResponse({ proven: true });
 }

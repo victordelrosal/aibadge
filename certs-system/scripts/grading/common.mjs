@@ -47,3 +47,16 @@ export async function googleAccessToken() {
   if (!r.ok) throw new Error("token exchange failed: " + r.status + " (run `firebase login`)");
   return (await r.json()).access_token;
 }
+
+// Proof that a certificate requester controls their address (3 Oct 2026): the code they typed from
+// the email (certreq.emailProven, written by the worker), or a Google sign-in asserting that verified
+// address. A verified flag alone is not enough (ncirl.ie links are pre-clicked) and LinkedIn is not
+// treated as asserting. Returns "code", "google" or null.
+export function emailProof(meta, acct, email) {
+  const p = meta && meta.emailProven;
+  if (p && (p.method === "code" || p.method === "google")) return p.method;
+  const u = acct && acct.users && acct.users[0];
+  const google = !!u && u.emailVerified === true && String(u.email || "").toLowerCase() === email
+    && (u.providerUserInfo || []).some((x) => x.providerId === "google.com" && String(x.email || "").toLowerCase() === email);
+  return google ? "google" : null;
+}

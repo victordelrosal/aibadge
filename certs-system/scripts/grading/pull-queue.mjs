@@ -32,6 +32,6 @@ for (const rec of pending) {
     writeFileSync(file, text, { mode: 0o600 });
     exercises.push({ exerciseId, type, awaitingFreeze, submissionSha256: sha256(text), bytes: Buffer.byteLength(text), submittedAt: fv(f.submittedAt), url: awaitingFreeze ? String(value) : undefined });
   }
-  writeFileSync(join(dir, "meta.json"), JSON.stringify({ uid: rec.uid, email: rec.email, status: rec.status, priceReason: rec.priceReason, exercises }, null, 2), { mode: 0o600 });
+  writeFileSync(join(dir, "meta.json"), JSON.stringify({ uid: rec.uid, email: rec.email, status: rec.status, priceReason: rec.priceReason, emailProven: rec.emailProven || null, exercises }, null, 2), { mode: 0o600 });
 }
 console.log(JSON.stringify({ batch, learners: pending.length }));
