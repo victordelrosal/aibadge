@@ -138,6 +138,16 @@ try {
   if (!DRY) writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), { mode: 0o600 });
 }
 
+// Every run, issued or not: navbar level gem + level XP for every bound credential holder, and the
+// verified flag for holders and code-provers, so the XP broker accepts their NCI accounts.
+if (!DRY) {
+  try {
+    const sync = JSON.parse(step("sync-levels.mjs"));
+    log("sync-levels " + JSON.stringify(sync));
+    if (sync.written || sync.markedVerified) actions.push(`navbar levels: ${sync.written} written, ${sync.markedVerified} accounts marked verified`);
+  } catch (e) { waiting.push("sync-levels failed: " + String(e.message).split("\n")[0].slice(0, 200)); }
+}
+
 for (const a of actions) log("ACTION " + a);
 for (const w of waiting) log("WAITING " + w);
 if (!DRY && (actions.length || waiting.length)) {

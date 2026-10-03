@@ -96,20 +96,21 @@
     me.title = said; me.setAttribute('aria-label', said);
     paintKeep();
   }
-  /* NCI only: the pill shows until Google or LinkedIn is linked; the note says why, or that it is done */
+  /* NCI only (3 Oct 2026, Victor: "nudge them to link linkedin to their nci student acct"): the pill shows until
+     LinkedIn is linked; the note says why, or that it is done. Google alone no longer ends the nudge. */
   function paintKeep() {
     keep.hidden = !(user && nci && kept === false);
     note.hidden = !(user && nci && kept !== null);
     if (note.hidden) return;
     note.className = 'fil-note' + (kept ? ' kept' : '');
     note.innerHTML = kept
-      ? TICK + '<span>Linked. You keep your AI Badge after you leave NCI.</span>'
-      : '<b>Keep your AI Badge after NCI</b>Link your Google or LinkedIn, or both. Either one will open this account when your NCI email is gone.';
+      ? TICK + '<span>LinkedIn linked. Your AI Badge, level and XP stay yours after you leave NCI.</span>'
+      : '<b>Link your LinkedIn</b>One tap. When your NCI email is gone, LinkedIn will still open this account, with your level and XP.';
     later.textContent = kept ? 'Done' : 'Not now';
   }
   function linkedNow(d) {
     var m = (d && d.methods) || {};
-    return !!(m.google || m.linkedin || (d && (d.current === 'google' || d.current === 'linkedin')));
+    return !!(m.linkedin || (d && d.current === 'linkedin'));
   }
   /* once a week at most, after sign-in, when the top bar is on screen and no sheet is open */
   function maybeAsk() {
@@ -159,8 +160,8 @@
     card.innerHTML = '<div class="fil-head"></div>';
     note = document.createElement('p'); note.hidden = true; card.appendChild(note);
     keep = document.createElement('button'); keep.type = 'button'; keep.className = 'fil-keep'; keep.hidden = true;
-    keep.title = 'Link Google or LinkedIn to keep your AI Badge after NCI';
-    keep.innerHTML = '<span class="fil-pair" aria-hidden="true"><i>' + TAG.google + '</i><i>' + TAG.linkedin + '</i></span><span>Link<span class="fil-long"> accounts</span></span>';
+    keep.title = 'Link your LinkedIn to keep your AI Badge after NCI';
+    keep.innerHTML = '<span class="fil-pair" aria-hidden="true"><i>' + TAG.linkedin + '</i></span><span>Link<span class="fil-long"> LinkedIn</span></span>';
     me.parentNode.insertBefore(keep, me);
     keep.addEventListener('click', function (e) { e.stopPropagation(); card.hidden ? open() : close(true); });
     ways = document.createElement('fil-ways'); ways.setAttribute('auth', 'firebase');
@@ -210,11 +211,8 @@
       if (window.filXp) { if (u) filXp.hello(u.uid); else filXp.reset(); }
       if (!same) { kept = null; nci = !!(u && typeof isNciEmail === 'function' && isNciEmail(u.email)); }
       if (!u) return paint();
-      /* NCI: learn now whether a personal way in is linked (Google shows on the user; LinkedIn needs the broker) */
-      if (nci && !same) {
-        if ((u.providerData || []).some(function (p) { return p && p.providerId === 'google.com'; })) kept = true;
-        else ways.refresh();
-      }
+      /* NCI: learn now whether LinkedIn is linked (only the broker knows) */
+      if (nci && !same) ways.refresh();
       u.getIdTokenResult().then(function (r) {
         var p = r.signInProvider;
         via = p === 'google.com' ? 'google' : (p === 'custom' && r.claims.li) ? 'linkedin' : (p === 'password' || p === 'emailLink') ? 'email' : '';
