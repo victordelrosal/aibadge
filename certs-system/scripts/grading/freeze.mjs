@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { createRequire } from "node:module";
+import { lookup } from "node:dns/promises";
 import { sha256 } from "./common.mjs";
 
 const batch = process.argv[2];
@@ -24,6 +25,21 @@ function publicHttpsUrl(u) {
   return url;
 }
 
+// A public name can still resolve to a private address (security review, 3 Oct 2026).
+function privateIp(ip) {
+  const v4 = ip.replace(/^::ffff:/i, "");
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(v4)) {
+    const [a, b] = v4.split(".").map(Number);
+    return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224;
+  }
+  const v6 = ip.toLowerCase();
+  return v6 === "::" || v6 === "::1" || /^f[cd]/.test(v6) || /^fe[89ab]/.test(v6);
+}
+async function resolvesPublic(url) {
+  try { const addrs = await lookup(url.hostname, { all: true }); return addrs.length > 0 && addrs.every((a) => !privateIp(a.address)); }
+  catch (e) { return false; }
+}
+
 function visibleText(html) {
   const title = (html.match(/<title[^>]*>([^<]*)/i) || [, ""])[1].trim();
   const body = html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ")
@@ -35,6 +51,7 @@ function visibleText(html) {
 async function fetchText(start) {
   let url = publicHttpsUrl(start);
   for (let hop = 0; url && hop < 4; hop++) {
+    if (!(await resolvesPublic(url))) return { error: "refused: resolves to a private address" };
     const r = await fetch(url, { redirect: "manual", headers: { "User-Agent": "Mozilla/5.0 AI-Badge-review" }, signal: AbortSignal.timeout(20000) });
     if (r.status >= 300 && r.status < 400 && r.headers.get("location")) { url = publicHttpsUrl(new URL(r.headers.get("location"), url).href); continue; }
     if (!r.ok) return { error: "http " + r.status };
@@ -50,7 +67,10 @@ async function renderText(u) {
     browser = await chromium.launch({ headless: true });
   }
   const ctx = await browser.newContext({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36" });
-  await ctx.route("**/*", (route) => (publicHttpsUrl(route.request().url()) ? route.continue() : route.abort()));
+  await ctx.route("**/*", async (route) => {
+    const u = publicHttpsUrl(route.request().url());
+    return u && (await resolvesPublic(u)) ? route.continue() : route.abort();
+  });
   try {
     const p = await ctx.newPage();
     try { await p.goto(u.href, { waitUntil: "networkidle", timeout: 45000 }); } catch (e) {}
