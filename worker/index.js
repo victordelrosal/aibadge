@@ -1895,9 +1895,10 @@ function escapeHtml(str) {
 // password account on someone else's address can be link-verified by the scanner and then
 // linked to the attacker's own Google account (cold verifier, 3 Oct 2026).
 // Codes are stored as an HMAC under CERT_CODE_PEPPER, never in plaintext.
-// KV counters are not atomic: a parallel burst can overrun the limits below by a few, which the
-// 8-digit code space makes harmless. Hard limits would need a Durable Object.
+// Every counter lives in the CodeGuard Durable Object (one per address, one per IP), which runs one
+// request at a time, so the limits are hard: a guess is reserved before it is checked.
 const CODE_TTL_S = 900, CODE_MAX_TRIES = 5, CODE_SENDS_HOUR = 3, CODE_SENDS_DAY = 10, CODE_LIFETIME_FAILS = 15;
+const CODE_LOCK_S = 7 * 86400, IP_SENDS_DAY = 10;
 
 function proofFor(req, email) {
   const p = req && req.emailProven;
@@ -1917,8 +1918,8 @@ function sameHex(a, b) {
   return diff === 0;
 }
 
-// 8 digits (1e8): KV counters are not atomic, so a burst of parallel guesses can overrun the
-// per-code try limit; the code space keeps that burst harmless. Rejection sampling keeps it uniform.
+// 8 digits (1e8), uniform by rejection sampling. With at most 15 guesses per 7 days per address,
+// the chance of guessing a code is about 1.5 in 10 million per lock period.
 function eightDigits() {
   const buf = new Uint32Array(1);
   for (;;) { crypto.getRandomValues(buf); if (buf[0] < 4200000000) return String(buf[0] % 100000000).padStart(8, "0"); }
@@ -1935,9 +1936,21 @@ async function codePrincipal(request, env) {
   const raw = await env.SLOTS.get(`certreq:${principal.uid}`);
   const req = raw ? JSON.parse(raw) : null;
   if (!req || String(req.email || "").toLowerCase() !== email) return { err: jsonResponse({ error: "Request your certificate first." }, 409) };
-  const fails = Number((await env.SLOTS.get(`certcodefail:${email}`)) || 0);
-  if (fails >= CODE_LIFETIME_FAILS) return { err: jsonResponse({ error: "Too many wrong codes. Victor will check your request by hand.", locked: true }, 423) };
-  return { principal, email, req, fails };
+  return { principal, email, req };
+}
+
+async function guard(env, name, body) {
+  const stub = env.CODE_GUARD.get(env.CODE_GUARD.idFromName(name));
+  const r = await stub.fetch("https://code-guard/", { method: "POST", body: JSON.stringify({ ...body, now: Math.floor(Date.now() / 1000) }) });
+  return r.json();
+}
+
+function guardRefusal(g) {
+  if (g.status === 423) {
+    const until = new Date(g.lockedUntil * 1000).toISOString().slice(0, 10);
+    return jsonResponse({ error: `Too many wrong codes. You can try again from ${until}.`, locked: true }, 423);
+  }
+  return jsonResponse({ error: g.status === 429 && g.reason === "tries" ? "Too many tries. Send a new code." : "Too many codes sent. Try again later." }, 429);
 }
 
 // POST /api/cert-code/send  (signed-in learner with a certificate request)
@@ -1946,19 +1959,16 @@ async function handleCertCodeSend(request, env) {
   if (c.err) return c.err;
   const { principal, email, req } = c;
   if (proofFor(req, email)) return jsonResponse({ proven: true });
-  // Rolling windows (not clock hours): the send times of the last 24 hours, one key per address.
-  const nowS = Math.floor(Date.now() / 1000);
-  const sendsKey = `certcodesends:${email}`;
-  let sends = []; try { sends = JSON.parse((await env.SLOTS.get(sendsKey)) || "[]"); } catch (e) {}
-  sends = (Array.isArray(sends) ? sends : []).filter((t) => typeof t === "number" && t > nowS - 86400);
-  if (sends.filter((t) => t > nowS - 3600).length >= CODE_SENDS_HOUR || sends.length >= CODE_SENDS_DAY) {
-    return jsonResponse({ error: "Too many codes sent. Try again later." }, 429);
-  }
-  sends.push(nowS);
-  await env.SLOTS.put(sendsKey, JSON.stringify(sends), { expirationTtl: 90000 });
+  // Rolling 1h/24h windows per address, plus a per-IP daily cap so new accounts on other people's
+  // addresses cannot turn this into a mailer.
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const gi = await guard(env, "ip:" + ip, { op: "ipsend" });
+  if (!gi.ok) return guardRefusal(gi);
+  const g = await guard(env, "email:" + email, { op: "send" });
+  if (!g.ok) return guardRefusal(g);
   const code = eightDigits();
   const exp = Math.floor(Date.now() / 1000) + CODE_TTL_S;
-  await env.SLOTS.put(`certcode:${email}`, JSON.stringify({ uid: principal.uid, hmac: await codeHmac(env, principal.uid, email, code), tries: 0, exp }), { expiration: exp });
+  const hmac = await codeHmac(env, principal.uid, email, code);
   // No link anywhere in this email: a link would be pre-clicked by mail scanners.
   const text = `Your AI Badge certificate code is ${code}\n\nType it into your AI Badge dashboard to confirm this is your email address. It expires in 15 minutes.\n\nIf you did not request an AI Badge certificate, ignore this email.\n\nfiveinnolabs`;
   const html = `<!DOCTYPE html><html><body style="margin:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;"><div style="max-width:480px;margin:0 auto;padding:24px;"><div style="background:#fff;border-radius:18px;padding:30px 26px;"><p style="font-size:15px;color:#3a3f4a;margin:0 0 14px;">Your AI Badge certificate code is</p><p style="font-size:34px;letter-spacing:8px;font-weight:700;color:#000036;margin:0 0 18px;">${code}</p><p style="font-size:14px;line-height:1.5;color:#3a3f4a;margin:0 0 10px;">Type it into your AI Badge dashboard to confirm this is your email address. It expires in 15 minutes.</p><p style="font-size:13px;color:#8a8f98;margin:0;">If you did not request an AI Badge certificate, ignore this email.</p></div></div></body></html>`;
@@ -1968,6 +1978,8 @@ async function handleCertCodeSend(request, env) {
     body: JSON.stringify({ from: env.FROM_EMAIL, to: email, subject: "Your AI Badge certificate code", text, html }),
   });
   if (!r.ok) return jsonResponse({ error: "Could not send the email. Try again." }, 502);
+  // Stored only once the email went out, so a failed send leaves the previous code working.
+  await env.SLOTS.put(`certcode:${email}`, JSON.stringify({ uid: principal.uid, hmac, exp }), { expiration: exp });
   return jsonResponse({ sent: true, to: email, expiresInMinutes: CODE_TTL_S / 60 });
 }
 
@@ -1975,7 +1987,7 @@ async function handleCertCodeSend(request, env) {
 async function handleCertCodeVerify(request, env) {
   const c = await codePrincipal(request, env);
   if (c.err) return c.err;
-  const { principal, email, req, fails } = c;
+  const { principal, email, req } = c;
   if (proofFor(req, email)) return jsonResponse({ proven: true });
   let body; try { body = await request.json(); } catch (e) { body = {}; }
   const code = String(body.code || "").trim();
@@ -1985,15 +1997,15 @@ async function handleCertCodeVerify(request, env) {
   const rec = raw ? JSON.parse(raw) : null;
   if (!rec || rec.exp <= Math.floor(Date.now() / 1000)) return jsonResponse({ error: "That code has expired. Send a new one." }, 410);
   if (rec.uid !== principal.uid) return jsonResponse({ error: "Send a new code." }, 409);
-  if (rec.tries >= CODE_MAX_TRIES) { await env.SLOTS.delete(key); return jsonResponse({ error: "Too many tries. Send a new code." }, 429); }
+  // Reserve the guess BEFORE checking it: parallel requests queue on the Durable Object.
+  const g = await guard(env, "email:" + email, { op: "attempt" });
+  if (!g.ok) return guardRefusal(g);
   if (!sameHex(await codeHmac(env, principal.uid, email, code), rec.hmac)) {
-    rec.tries += 1;
-    await Promise.all([
-      env.SLOTS.put(key, JSON.stringify(rec), { expiration: rec.exp }),
-      env.SLOTS.put(`certcodefail:${email}`, String(fails + 1)),
-    ]);
-    return jsonResponse({ error: "That code is not right.", remaining: Math.max(0, CODE_MAX_TRIES - rec.tries) }, 400);
+    const f = await guard(env, "email:" + email, { op: "fail" });
+    if (f.lockedUntil) return guardRefusal({ status: 423, lockedUntil: f.lockedUntil });
+    return jsonResponse({ error: "That code is not right.", remaining: g.remaining }, 400);
   }
+  await guard(env, "email:" + email, { op: "success" });
   await env.SLOTS.delete(key);
   // Re-read just before writing so a review decision made meanwhile is not overwritten.
   const freshRaw = await env.SLOTS.get(`certreq:${principal.uid}`);
@@ -2015,4 +2027,41 @@ async function handleCertCodeStatus(request, env) {
   const req = raw ? JSON.parse(raw) : null;
   if (!req) return jsonResponse({ requested: false });
   return jsonResponse({ requested: true, reviewStatus: req.reviewStatus || "pending", proven: proofFor(req, email) });
+}
+
+// Hard counters for the email code (3 Oct 2026). One instance per "email:<addr>" or "ip:<ip>".
+// A Durable Object handles one request at a time and storage writes are gated, so every
+// read-modify-write below is atomic: N parallel guesses get exactly the allowed number.
+export class CodeGuard {
+  constructor(state) { this.state = state; }
+  async fetch(request) {
+    const { op, now } = await request.json();
+    const s = (await this.state.storage.get("s")) || { tries: 0, fails: 0, lockedUntil: 0, sends: [] };
+    s.sends = (s.sends || []).filter((t) => t > now - 86400);
+    const reply = (o) => new Response(JSON.stringify(o), { headers: { "Content-Type": "application/json" } });
+    const save = () => this.state.storage.put("s", s);
+    if (op === "ipsend") {
+      if (s.sends.length >= IP_SENDS_DAY) return reply({ ok: false, status: 429, reason: "ip" });
+      s.sends.push(now); await save(); return reply({ ok: true });
+    }
+    if (s.lockedUntil > now) return reply({ ok: false, status: 423, lockedUntil: s.lockedUntil });
+    if (op === "send") {
+      if (s.sends.filter((t) => t > now - 3600).length >= CODE_SENDS_HOUR || s.sends.length >= CODE_SENDS_DAY) {
+        return reply({ ok: false, status: 429, reason: "sends" });
+      }
+      s.sends.push(now); s.tries = 0; await save(); return reply({ ok: true });
+    }
+    if (op === "attempt") {
+      if (s.tries >= CODE_MAX_TRIES) return reply({ ok: false, status: 429, reason: "tries" });
+      s.tries += 1; await save(); return reply({ ok: true, remaining: CODE_MAX_TRIES - s.tries });
+    }
+    if (op === "fail") {
+      s.fails += 1;
+      // The lock expires by itself; the request stays pending and shows in Victor's digest.
+      if (s.fails >= CODE_LIFETIME_FAILS) { s.lockedUntil = now + CODE_LOCK_S; s.fails = 0; }
+      await save(); return reply({ ok: true, lockedUntil: s.lockedUntil > now ? s.lockedUntil : 0 });
+    }
+    if (op === "success") { s.tries = 0; s.fails = 0; await save(); return reply({ ok: true }); }
+    return reply({ ok: false, status: 400 });
+  }
 }

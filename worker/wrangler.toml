@@ -13,5 +13,14 @@ FIREBASE_PROJECT_ID = "ai-badge-2026"
 binding = "SLOTS"
 id = "e11a3cbfa9df4a52b4b41091db6e4250"
 
+# Hard counters for the certificate email code (3 Oct 2026).
+[[durable_objects.bindings]]
+name = "CODE_GUARD"
+class_name = "CodeGuard"
+
+[[migrations]]
+tag = "v1-code-guard"
+new_sqlite_classes = ["CodeGuard"]
+
 [triggers]
 crons = ["0 * * * *"]

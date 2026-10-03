@@ -2956,7 +2956,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </template>
 
         <!-- Certificate CTA: appears once every Level 1 tutorial is complete -->
-        <div x-show="allComplete || certMsg" x-transition
+        <div x-show="allComplete || certMsg || certState==='code'" x-transition
              style="margin-top:24px;border-radius:18px;padding:20px 22px;background:linear-gradient(135deg,rgba(184,134,11,0.10),rgba(245,231,160,0.18));border:1px solid rgba(184,134,11,0.28);">
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
             <div style="font-size:2rem;line-height:1;">&#127891;</div>
