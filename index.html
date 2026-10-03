@@ -4258,13 +4258,15 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         Continue with LinkedIn
       </button>
 
+      <!-- NCI free-access hint (Victor, 3 Oct 2026): NCI staff and students keep their one-tap NCI login; tapping opens the
+           email form under "Other ways" and puts the cursor in it. Federated access is encouraged, never required. -->
+      <button type="button" @click="$store.ui.signinMore = true; $nextTick(() => $root.querySelector('input[type=email]').focus())"
+              style="display:block;width:100%;text-align:left;cursor:pointer;margin-top:10px;background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.25);border-radius:10px;padding:10px 14px;margin-bottom:16px;font:500 13px/1.5 -apple-system,sans-serif;color:#1d6e36;">
+        <strong>NCI staff &amp; students:</strong> sign in with your <code style="background:rgba(52,199,89,0.15);padding:1px 6px;border-radius:4px;">@ncirl.ie</code> email plus the class code Victor shares in lecture. Free instant access, no email verification needed.
+        <span style="display:block;margin-top:6px;font-weight:700;text-decoration:underline;text-underline-offset:3px;">Sign in with your NCI email &rsaquo;</span>
+      </button>
       <details class="more-ways" :open="$store.ui.signinMore" @toggle="$store.ui.signinMore = $el.open">
         <summary x-show="!isNciEmailLive">Other ways to sign in</summary>
-
-      <!-- NCI free-access hint -->
-      <div style="background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.25);border-radius:10px;padding:10px 14px;margin-bottom:16px;font:500 13px/1.5 -apple-system,sans-serif;color:#1d6e36;">
-        <strong>NCI staff &amp; students:</strong> sign in with your <code style="background:rgba(52,199,89,0.15);padding:1px 6px;border-radius:4px;">@ncirl.ie</code> email plus the class code Victor shares in lecture. Free instant access, no email verification needed.
-      </div>
 
       <!-- Google Sign-In (hidden once an NCI email is typed: keep flows distinct) -->
       <button x-show="!isNciEmailLive" @click="handleGoogle()" :disabled="submitting"
