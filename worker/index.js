@@ -1898,7 +1898,7 @@ function escapeHtml(str) {
 // Every counter lives in the CodeGuard Durable Object (one per address, one per IP), which runs one
 // request at a time, so the limits are hard: a guess is reserved before it is checked.
 const CODE_TTL_S = 900, CODE_MAX_TRIES = 5, CODE_SENDS_HOUR = 3, CODE_SENDS_DAY = 10, CODE_LIFETIME_FAILS = 15;
-const CODE_LOCK_S = 7 * 86400, IP_SENDS_DAY = 10;
+const CODE_LOCK_S = 7 * 86400, IP_SENDS_DAY = 100;
 
 function proofFor(req, email) {
   const p = req && req.emailProven;
@@ -1959,13 +1959,13 @@ async function handleCertCodeSend(request, env) {
   if (c.err) return c.err;
   const { principal, email, req } = c;
   if (proofFor(req, email)) return jsonResponse({ proven: true });
-  // Rolling 1h/24h windows per address, plus a per-IP daily cap so new accounts on other people's
-  // addresses cannot turn this into a mailer.
+  // Rolling 1h/24h windows per address first, then a coarse per-IP daily brake. The IP cap is high
+  // because a whole NCI class can share one campus address.
+  const g = await guard(env, "email:" + email, { op: "send" });
+  if (!g.ok) return guardRefusal(g);
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const gi = await guard(env, "ip:" + ip, { op: "ipsend" });
   if (!gi.ok) return guardRefusal(gi);
-  const g = await guard(env, "email:" + email, { op: "send" });
-  if (!g.ok) return guardRefusal(g);
   const code = eightDigits();
   const exp = Math.floor(Date.now() / 1000) + CODE_TTL_S;
   const hmac = await codeHmac(env, principal.uid, email, code);
@@ -1978,8 +1978,10 @@ async function handleCertCodeSend(request, env) {
     body: JSON.stringify({ from: env.FROM_EMAIL, to: email, subject: "Your AI Badge certificate code", text, html }),
   });
   if (!r.ok) return jsonResponse({ error: "Could not send the email. Try again." }, 502);
-  // Stored only once the email went out, so a failed send leaves the previous code working.
+  // Stored only once the email went out, so a failed send leaves the previous code (and its used
+  // tries) as they were. The try counter resets only for a code that was actually delivered.
   await env.SLOTS.put(`certcode:${email}`, JSON.stringify({ uid: principal.uid, hmac, exp }), { expiration: exp });
+  await guard(env, "email:" + email, { op: "delivered" });
   return jsonResponse({ sent: true, to: email, expiresInMinutes: CODE_TTL_S / 60 });
 }
 
@@ -2049,8 +2051,9 @@ export class CodeGuard {
       if (s.sends.filter((t) => t > now - 3600).length >= CODE_SENDS_HOUR || s.sends.length >= CODE_SENDS_DAY) {
         return reply({ ok: false, status: 429, reason: "sends" });
       }
-      s.sends.push(now); s.tries = 0; await save(); return reply({ ok: true });
+      s.sends.push(now); await save(); return reply({ ok: true });
     }
+    if (op === "delivered") { s.tries = 0; await save(); return reply({ ok: true }); }
     if (op === "attempt") {
       if (s.tries >= CODE_MAX_TRIES) return reply({ ok: false, status: 429, reason: "tries" });
       s.tries += 1; await save(); return reply({ ok: true, remaining: CODE_MAX_TRIES - s.tries });
@@ -2058,7 +2061,8 @@ export class CodeGuard {
     if (op === "fail") {
       s.fails += 1;
       // The lock expires by itself; the request stays pending and shows in Victor's digest.
-      if (s.fails >= CODE_LIFETIME_FAILS) { s.lockedUntil = now + CODE_LOCK_S; s.fails = 0; }
+      // Rounded up to the next UTC midnight so "try again from <date>" is exactly true.
+      if (s.fails >= CODE_LIFETIME_FAILS) { s.lockedUntil = Math.ceil((now + CODE_LOCK_S) / 86400) * 86400; s.fails = 0; }
       await save(); return reply({ ok: true, lockedUntil: s.lockedUntil > now ? s.lockedUntil : 0 });
     }
     if (op === "success") { s.tries = 0; s.fails = 0; await save(); return reply({ ok: true }); }

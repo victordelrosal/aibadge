@@ -2974,7 +2974,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <!-- Email-ownership proof (3 Oct 2026): a typed code, because mail scanners pre-click links -->
           <div x-show="certState==='code'" x-cloak data-cert-code-step style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(184,134,11,0.22);">
             <div style="font:700 15px/1.3 -apple-system,sans-serif;color:#000036;">One last step: confirm your email</div>
-            <p class="lms-subheading" style="font-size:0.9rem;margin:4px 0 12px;">We emailed an 8-digit code to <strong x-text="certCodeTo || 'your email address'"></strong>. Type it here so your certificate goes to the right person. Check junk or quarantine if it is not in your inbox.</p>
+            <p class="lms-subheading" style="font-size:0.9rem;margin:4px 0 12px;"><span x-show="certCodeTo">We emailed an 8-digit code to <strong x-text="certCodeTo"></strong>. </span><span x-show="!certCodeTo">We email you an 8-digit code (tap &ldquo;Send a new code&rdquo; if you do not have one). </span>Type it here so your certificate goes to the right person. Check junk or quarantine if it is not in your inbox.</p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
               <input x-model="certCode" @keydown.enter="verifyCertCode()" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="12345678" aria-label="8-digit code"
                      style="width:160px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(0,0,54,0.18);font:700 18px/1 ui-monospace,Menlo,monospace;letter-spacing:4px;text-align:center;">
