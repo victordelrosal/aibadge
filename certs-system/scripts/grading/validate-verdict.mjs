@@ -2,7 +2,8 @@
 // A PASS survives only if: the JSON is well formed; confidence is HIGH; the evidence quote appears
 // verbatim in the submission; the feedback is short plain text (no links, emails, markup); the
 // grader did not suspect injection; and the submission trips none of the deterministic wires.
-// Anything else becomes ESCALATE (Victor looks) or REPEAT. Nothing here can award a PASS on its own.
+// Both independent grading runs must agree. Anything else becomes ESCALATE or REPEAT. Nothing here
+// can award a PASS on its own.
 // Usage: node validate-verdict.mjs <batch>   -> writes <batch>/<uid>/decision.json and <batch>/REVIEW.md
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -18,10 +19,12 @@ const WIRES = [
   [/\b(system|developer) (prompt|message|override)\b/i, "system prompt language"],
   [/\byou are now\b|\bact as\b|\badmin mode\b|\bjailbreak\b/i, "role hijack phrase"],
   [/\b(grader|marker|assessor|reviewer|AI model|language model|Claude|ChatGPT)\b[^.]{0,80}\b(must|should|will|output|award|give|mark)\b/i, "addresses the grader"],
-  [/\b(verdict|confidence|injection_suspected|evidence_quote)\b/i, "grading vocabulary"],
+  // Grading-JSON keys only: "Confidence" and "verdict" are ordinary words in learner chats (3 Oct 2026).
+  [/\b(injection_suspected|evidence_quote)\b|["'](verdict|confidence)["']\s*:/i, "grading vocabulary"],
   [/[​-‏‪-‮⁠-⁤﻿\u{E0000}-\u{E007F}]/u, "invisible or bidi characters"],
   [/[A-Za-z0-9+/]{120,}={0,2}/, "long encoded blob"],
-  [/curl\s|wget\s|\bnc\s|base64 -d|\$\(|`[^`]*`|~\/\.ssh|\.aws\/|keychain|security find-/i, "shell or secret-hunting text"],
+  // No bare backticks: markdown code fences are normal in chat shares (3 Oct 2026).
+  [/curl\s|wget\s|\bnc\s|base64 -d|\$\(|~\/\.ssh|\.aws\/|keychain|security find-/i, "shell or secret-hunting text"],
   [/SUBMISSION_[0-9a-f]{6,}/, "delimiter spoofing"],
 ];
 const BAD_FEEDBACK = /https?:\/\/|www\.|[\w.+-]+@[\w-]+\.[\w.]+|<[a-z!\/]|```|\[[^\]]*\]\(/i;
@@ -53,14 +56,15 @@ function judge(text, raw) {
   const quote = norm(g.evidence_quote);
   const quoteOk = quote.length >= 12 && quote.length <= 220 && norm(text).includes(quote);
   if (verdict === "PASS") {
-    if (g.confidence !== "HIGH") reasons.push("PASS without HIGH confidence");
+    // Policy v1.1 (3 Oct 2026): two independent PASS runs at HIGH or MEDIUM; LOW is held.
+    if (!["HIGH", "MEDIUM"].includes(g.confidence)) reasons.push("PASS at LOW confidence");
     if (!quoteOk) reasons.push("evidence quote not found verbatim in the submission");
   }
   if (reasons.length) return { verdict: "ESCALATE", graderSaid: verdict, confidence: g.confidence, feedback, quote, reasons };
   return { verdict, confidence: g.confidence, feedback, quote, reasons: [] };
 }
 
-const lines = ["# AI Badge review batch", "", "Victor approves every decision before it is final (Anthropic Usage Policy: qualified human review). Nothing below is sent until resolve.mjs is run with your approval.", ""];
+const lines = ["# AI Badge review batch", "", "Decisions from two independent no-tool grading runs plus the deterministic checks above. autorun.mjs applies the policy; resolve.mjs remains for a manual decision.", ""];
 let counts = { PASS: 0, REPEAT: 0, ESCALATE: 0 };
 for (const uid of readdirSync(batch)) {
   const dir = join(batch, uid); const metaPath = join(dir, "meta.json");
@@ -68,11 +72,19 @@ for (const uid of readdirSync(batch)) {
   const meta = JSON.parse(readFileSync(metaPath, "utf8"));
   const exercises = [];
   for (const ex of meta.exercises) {
-    if (ex.awaitingFreeze) { exercises.push({ exerciseId: ex.exerciseId, verdict: "ESCALATE", reasons: ["submitted as a live link; awaiting freeze, not graded"], submissionSha256: ex.submissionSha256 }); continue; }
+    if (ex.awaitingFreeze) { exercises.push({ exerciseId: ex.exerciseId, verdict: "ESCALATE", reasons: ["live link could not be frozen: " + (ex.freezeError || "not attempted")], submissionSha256: ex.submissionSha256 }); continue; }
     const text = readFileSync(join(dir, ex.exerciseId + ".txt"), "utf8");
-    const rawPath = join(dir, "raw", ex.exerciseId + ".json");
-    const raw = existsSync(rawPath) ? JSON.parse(readFileSync(rawPath, "utf8")) : null;
-    exercises.push({ exerciseId: ex.exerciseId, submissionSha256: ex.submissionSha256, ...judge(text, raw) });
+    const runs = [1, 2].map((n) => {
+      const rawPath = join(dir, "raw", `${ex.exerciseId}.${n}.json`);
+      return judge(text, existsSync(rawPath) ? JSON.parse(readFileSync(rawPath, "utf8")) : null);
+    });
+    const [a, b] = runs;
+    const agreed = a.verdict === b.verdict && a.verdict !== "ESCALATE";
+    exercises.push({
+      exerciseId: ex.exerciseId, submissionSha256: ex.submissionSha256,
+      verdict: agreed ? a.verdict : "ESCALATE", confidence: a.confidence, feedback: a.feedback || b.feedback, quote: a.quote,
+      reasons: agreed ? [] : ["runs disagree or failed a check: " + runs.map((r) => r.verdict + (r.reasons.length ? " (" + r.reasons.join("; ") + ")" : "")).join(" | ")],
+    });
   }
   const recommend = exercises.length && exercises.every((e) => e.verdict === "PASS") ? "RECOMMEND PASS"
     : exercises.some((e) => e.verdict === "ESCALATE") ? "ESCALATE" : "RECOMMEND REPEAT";

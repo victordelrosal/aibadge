@@ -1,25 +1,22 @@
 // grade.mjs: the ONLY step where an AI reads learner text, and it has NO tools: no shell, no files,
 // no web, no MCP, no memory, run from an empty folder. The worst a hidden instruction can do is
-// argue for a wrong grade, which validate-verdict.mjs and Victor then catch.
-// Usage: node grade.mjs <batch> [--dev-test]
-//   Production marking must use an Anthropic API key (Commercial Terms); the Consumer Terms that
-//   cover Pro/Max subscriptions forbid business use. --dev-test allows the subscription ONLY for
-//   synthetic test submissions (red-team), never for real learners.
+// argue for a wrong grade, which validate-verdict.mjs then catches.
+// Usage: node grade.mjs <batch>
+//   Each exercise is graded twice, independently; validate-verdict.mjs passes it only if both agree.
+//   Runs on Victor's Claude Code login (his decision, 3 Oct 2026: terminal only, no API key, so it
+//   runs only while the laptop is open). If ANTHROPIC_API_KEY is set, that is used instead.
 import { readFileSync, writeFileSync, readdirSync, mkdtempSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { RUBRIC, REAL_CLAUDE, ensureDir } from "./common.mjs";
+import { RUBRIC, REAL_CLAUDE, GRADING_HOME, ensureDir, sha256 } from "./common.mjs";
 
 const batch = process.argv[2];
-const devTest = process.argv.includes("--dev-test");
-if (!batch || !existsSync(batch)) { console.error("usage: node grade.mjs <batch> [--dev-test]"); process.exit(2); }
+if (!batch || !existsSync(batch)) { console.error("usage: node grade.mjs <batch>"); process.exit(2); }
 const apiKey = process.env.ANTHROPIC_API_KEY || "";
-if (!apiKey && !devTest) {
-  console.error("Refusing: real learners must be graded under an Anthropic API key (Commercial Terms). Set ANTHROPIC_API_KEY, or use --dev-test for synthetic submissions only.");
-  process.exit(3);
-}
+const RUNS = 2;
+const CACHE = ensureDir(join(GRADING_HOME, "cache"));               // learners left pending are not regraded hourly
 const rubric = readFileSync(RUBRIC, "utf8");
 
 function gradeOne(exerciseId, text) {
@@ -55,8 +52,16 @@ for (const uid of readdirSync(batch)) {
   for (const ex of meta.exercises) {
     if (ex.awaitingFreeze || !ex.bytes) continue;
     const text = readFileSync(join(dir, ex.exerciseId + ".txt"), "utf8");
-    writeFileSync(join(rawDir, ex.exerciseId + ".json"), JSON.stringify(gradeOne(ex.exerciseId, text), null, 2), { mode: 0o600 });
-    n++;
+    const key = sha256(rubric + "\0" + ex.exerciseId + "\0" + text);
+    for (let run = 1; run <= RUNS; run++) {
+      const out = join(rawDir, `${ex.exerciseId}.${run}.json`);
+      const cached = join(CACHE, `${key}.${run}.json`);
+      if (existsSync(cached)) { writeFileSync(out, readFileSync(cached), { mode: 0o600 }); continue; }
+      const res = gradeOne(ex.exerciseId, text);
+      writeFileSync(out, JSON.stringify(res, null, 2), { mode: 0o600 });
+      if (res.exit === 0) writeFileSync(cached, JSON.stringify(res, null, 2), { mode: 0o600 }); // failures retry next run
+      n++;
+    }
   }
 }
-console.log(JSON.stringify({ graded: n, mode: apiKey ? "api" : "dev-test-subscription" }));
+console.log(JSON.stringify({ graded: n, mode: apiKey ? "api" : "claude-code-login" }));
