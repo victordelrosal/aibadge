@@ -24,12 +24,20 @@ export function keychain(service) {
 }
 
 const wranglerEnv = () => Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== "CLOUDFLARE_API_TOKEN"));
+// launchd can fire seconds after wake, before the network is back (5 Oct 2026 08:30 run died on
+// "fetch failed"). Retry each wrangler call 3 times, 30s apart, before letting the run fail.
+function wrangler(args) {
+  for (let i = 1; ; i++) {
+    try { return execFileSync("npx", ["wrangler", ...args], { env: wranglerEnv() }).toString(); }
+    catch (e) { if (i >= 3) throw e; Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 30000); }
+  }
+}
 export function kvList(prefix) {
-  const out = execFileSync("npx", ["wrangler", "kv", "key", "list", "--namespace-id", KV_NAMESPACE, "--remote", "--prefix", prefix], { env: wranglerEnv() }).toString();
+  const out = wrangler(["kv", "key", "list", "--namespace-id", KV_NAMESPACE, "--remote", "--prefix", prefix]);
   return JSON.parse(out.slice(out.indexOf("[")));
 }
 export function kvGet(key) {
-  return execFileSync("npx", ["wrangler", "kv", "key", "get", "--namespace-id", KV_NAMESPACE, "--remote", key], { env: wranglerEnv() }).toString();
+  return wrangler(["kv", "key", "get", "--namespace-id", KV_NAMESPACE, "--remote", key]);
 }
 
 // Firestore read access through the Firebase CLI's existing Google login (owner, read-only use here).
