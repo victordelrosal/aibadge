@@ -29,7 +29,11 @@ function learnerItems(ex) {
     const base = { exerciseId: e.exerciseId, submissionSha256: e.submissionSha256 };
     const r = (e.reasons || []).join(" ");
     if (e.verdict === "PASS") return { ...base, verdict: "PASS", feedback: e.feedback || "" };
-    if (e.verdict === "REPEAT") return { ...base, verdict: "REPEAT", feedback: e.feedback || "This one needs another go. Re-read the exercise brief in the lesson, then resubmit." };
+    if (e.verdict === "REPEAT") {
+      let f = e.feedback || "This one needs another go. Re-read the exercise brief in the lesson, then resubmit.";
+      if (/\bpaste\b/i.test(f)) f += " Note: the lesson accepts a public https link only, so share the conversation as a link.";
+      return { ...base, verdict: "REPEAT", feedback: f };
+    }
     if (/not a public https address/.test(r)) return { ...base, verdict: "REPEAT", feedback: "What you submitted is not a web address we can open. Paste the full public link, starting with https:// (for a GitHub Gist, the gist.github.com address), then resubmit." };
     if (/could not be frozen/.test(r)) return { ...base, verdict: "REVIEW", feedback: "We could not open this page when we checked. Make sure it opens in a private browser window without signing in. It is checked again with your next review." };
     return { ...base, verdict: "REVIEW", feedback: "A person is checking this one. Nothing to do for now." };
