@@ -136,6 +136,9 @@ async function route(request, env) {
     if (path === "/api/my-verdict" && request.method === "GET") {
       return handleMyVerdict(request, env);
     }
+    if (path === "/api/cert-rereview" && request.method === "POST") {
+      return handleCertRereview(request, env);
+    }
 
     // ── Legacy: report mailer (POST to root) ──
     if (request.method === "POST" && (path === "/" || path === "")) {
@@ -1789,7 +1792,9 @@ function cleanText(s, max) {
 
 // POST /api/cert-resolve  (grading key only)
 // body: { uid, outcome: "pass"|"repeat", humanApproval: { by, at }, exercises: [
-//   { exerciseId, verdict: "PASS"|"REPEAT", feedback, submissionSha256 } ] }
+//   { exerciseId, verdict: "PASS"|"REPEAT"|"REVIEW", feedback, submissionSha256 } ], notes: [string] }
+// REVIEW (5 Oct 2026) = a person is checking that item; the learner has nothing to do for it.
+// notes = learner-facing to-dos that are not about one submission (lessons, name, email code).
 async function handleCertResolve(request, env) {
   if (!gradingKeyOk(request, env)) return jsonResponse({ error: "Forbidden" }, 403);
   let body; try { body = await request.json(); } catch (e) { return jsonResponse({ error: "Invalid JSON" }, 400); }
@@ -1808,13 +1813,14 @@ async function handleCertResolve(request, env) {
   }
 
   const list = Array.isArray(body.exercises) ? body.exercises : [];
-  if ((outcome !== "superseded" && !list.length) || list.length > 40) return jsonResponse({ error: "1 to 40 exercises required" }, 400);
+  const hasNotes = Array.isArray(body.notes) && body.notes.length > 0;
+  if ((outcome !== "superseded" && !list.length && !(outcome === "repeat" && hasNotes)) || list.length > 40) return jsonResponse({ error: "1 to 40 exercises required" }, 400);
   const exercises = [];
   for (const ex of list) {
     const exerciseId = String(ex.exerciseId || "");
     if (!/^[A-Za-z0-9_.:-]{1,80}$/.test(exerciseId)) return jsonResponse({ error: "Bad exerciseId" }, 400);
-    const verdict = ex.verdict === "PASS" ? "PASS" : ex.verdict === "REPEAT" ? "REPEAT" : null;
-    if (!verdict) return jsonResponse({ error: "verdict must be PASS or REPEAT" }, 400);
+    const verdict = ["PASS", "REPEAT", "REVIEW"].includes(ex.verdict) ? ex.verdict : null;
+    if (!verdict) return jsonResponse({ error: "verdict must be PASS, REPEAT or REVIEW" }, 400);
     const sha = String(ex.submissionSha256 || "");
     if (!/^[a-f0-9]{64}$/.test(sha)) return jsonResponse({ error: "submissionSha256 required" }, 400);
     exercises.push({ exerciseId, verdict, feedback: cleanText(ex.feedback, 600), submissionSha256: sha });
@@ -1825,7 +1831,8 @@ async function handleCertResolve(request, env) {
   }
 
   const resolvedAt = new Date().toISOString();
-  const record = { uid, outcome, exercises, approvedBy, approvedAt, resolvedAt, aiAssisted: true, note: cleanText(body.note, 200) };
+  const notes = (Array.isArray(body.notes) ? body.notes : []).slice(0, 6).map(n => cleanText(n, 300)).filter(Boolean);
+  const record = { uid, outcome, exercises, notes, approvedBy, approvedAt, resolvedAt, aiAssisted: true, note: cleanText(body.note, 200) };
   // Keep history: the latest verdict plus an append-only log entry.
   await env.SLOTS.put(`verdict:${uid}`, JSON.stringify(record));
   await env.SLOTS.put(`verdictlog:${uid}:${resolvedAt}`, JSON.stringify(record));
@@ -1860,7 +1867,30 @@ async function handleMyVerdict(request, env) {
     aiAssisted: true,
     reviewedBy: v.approvedBy,
     exercises: v.exercises.map(e => ({ exerciseId: e.exerciseId, verdict: e.verdict, feedback: e.feedback })),
+    notes: v.notes || [],
+    rereviewAt: req ? req.rereviewAt || null : null,
   });
+}
+
+// POST /api/cert-rereview  (the signed-in learner, own request only)
+// After feedback (reviewStatus "repeat"), the learner fixes things and asks again: the request
+// goes back to "pending" and the next autonomous run marks it afresh. Nothing else changes.
+async function handleCertRereview(request, env) {
+  const authz = request.headers.get("Authorization") || "";
+  const idToken = authz.startsWith("Bearer ") ? authz.slice(7).trim() : "";
+  if (!idToken) return jsonResponse({ error: "Sign in." }, 401);
+  const principal = await verifyFirebaseToken(idToken, env);
+  if (!principal || !principal.uid) return jsonResponse({ error: "Your session expired. Sign in again." }, 401);
+  const key = `certreq:${principal.uid}`;
+  const raw = await env.SLOTS.get(key);
+  if (!raw) return jsonResponse({ error: "No certificate request found." }, 404);
+  const req = JSON.parse(raw);
+  if (req.reviewStatus === "repeat") {
+    req.reviewStatus = "pending";
+    req.rereviewAt = new Date().toISOString();
+    await env.SLOTS.put(key, JSON.stringify(req));
+  }
+  return jsonResponse({ ok: true, reviewStatus: req.reviewStatus, rereviewAt: req.rereviewAt || null });
 }
 
 function corsHeaders() {

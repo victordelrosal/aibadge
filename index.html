@@ -2416,6 +2416,13 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           </template>
         </div>
       </div>
+      <!-- Certificate feedback: something to fix before the certificate can be issued (5 Oct 2026) -->
+      <button class="cert-pill review-pill" x-show="$store.auth.isLoggedIn && $store.review.needsAction" style="display:none;"
+              @click="$store.ui.showModal('review')" title="Feedback on your certificate request" aria-label="Feedback on your certificate request">
+        <span class="cert-pill-dot" aria-hidden="true"></span>
+        <span class="cert-pill-text" x-text="$store.review.toFix ? 'Certificate feedback: ' + $store.review.toFix + ' to fix' : 'Certificate feedback: ready for review'"></span>
+        <span class="cert-pill-go" aria-hidden="true">&rarr;</span>
+      </button>
       <!-- Certificate ready: the in-app announcement, and the fallback if a mail filter eats the email -->
       <a class="cert-pill" x-show="$store.cert.found && !$store.cert.dismissed"
          :href="$store.cert.data && $store.cert.data.url" target="_blank" rel="noopener"
@@ -2433,7 +2440,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
          title="Your AI Badge certificate" aria-label="Your AI Badge certificate">
         <span style="font-size:17px;line-height:1;">🎓</span>
       </a>
-      <button class="lms-tree-btn" x-show="$store.auth.isLoggedIn && !$store.cert.found" @click="$store.ui.showModal('cert')" title="AI Badge Certificate" aria-label="AI Badge Certificate">
+      <button class="lms-tree-btn" x-show="$store.auth.isLoggedIn && !$store.cert.found" :class="{ 'review-hide-phone': $store.review.needsAction }" @click="$store.ui.showModal('cert')" title="AI Badge Certificate" aria-label="AI Badge Certificate">
         <span style="font-size:17px;line-height:1;">🎓</span>
       </button>
       <button class="lms-tree-btn" x-show="$store.auth.isLoggedIn" @click="$store.ui.showModal('tree')" title="Your Tree" aria-label="Your Tree">
@@ -2510,6 +2517,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         font:400 15px/1 -apple-system,sans-serif; padding:2px 4px; border-radius:6px; }
       .cert-pill-x:hover { opacity:0.9; background:rgba(120,90,20,0.10); }
       .cert-btn-lit { box-shadow:0 0 0 2px rgba(184,134,11,0.35); }
+      .review-pill { cursor:pointer; font:inherit; background:linear-gradient(100deg,#FFF1E6 0%,#FFE0C7 45%,#FFF1E6 100%); border-color:rgba(194,65,12,0.38); color:#9a3412; }
+      .review-pill .cert-pill-dot { background:#C2410C; animation-name:reviewPulse; }
+      @keyframes reviewPulse { 0% { box-shadow:0 0 0 0 rgba(194,65,12,0.55); } 70%,100% { box-shadow:0 0 0 7px rgba(194,65,12,0); } }
+      @media (max-width:820px) { .review-hide-phone { display:none !important; } }
       @media (max-width:820px) { .cert-pill-text { display:none; } .cert-pill { padding:6px 8px; } }
       @media (prefers-reduced-motion:reduce) { .cert-pill::after, .cert-pill-dot { animation:none; } }
       #view-dashboard.lms-dark .cert-pill, .lms-dark .cert-pill {
@@ -2956,7 +2967,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </template>
 
         <!-- Certificate CTA: appears once every Level 1 tutorial is complete -->
-        <div x-show="allComplete || certMsg || certState==='code'" x-transition
+        <div x-show="allComplete || certMsg || certState==='code' || $store.review.needsAction" x-transition
              style="margin-top:24px;border-radius:18px;padding:20px 22px;background:linear-gradient(135deg,rgba(184,134,11,0.10),rgba(245,231,160,0.18));border:1px solid rgba(184,134,11,0.28);">
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
             <div style="font-size:2rem;line-height:1;">&#127891;</div>
@@ -2984,6 +2995,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <p x-show="certCodeMsg" x-text="certCodeMsg" style="margin:10px 0 0;font:600 13px/1.45 -apple-system,sans-serif;color:#9a3412;"></p>
           </div>
           <p x-show="certMsg" x-text="certMsg" style="margin:14px 0 0;font:600 14px/1.45 -apple-system,sans-serif;color:#1d6e36;"></p>
+          <div x-show="$store.review.needsAction" style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(184,134,11,0.22);display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;font:600 14px/1.45 -apple-system,sans-serif;color:#9a3412;">Your work was marked and needs a few changes before the certificate can be issued.</div>
+            <button @click="$store.ui.showModal('review')" class="lms-invite-btn" style="border-radius:12px;padding:12px 18px;height:auto;font-weight:700;white-space:nowrap;">See the feedback &rarr;</button>
+          </div>
+          <p x-show="$store.review.status === 'pending' && $store.review.data && $store.review.data.rereviewAt" style="margin:14px 0 0;font:600 14px/1.45 -apple-system,sans-serif;color:#1d4d8c;">Your fixes are in the queue to be marked again.</p>
         </div>
       </div>
     </template>
@@ -4113,6 +4129,49 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   </div>
 </div>
 
+<!-- ===================== CERTIFICATE FEEDBACK MODAL (5 Oct 2026) ===================== -->
+<div x-show="$store.ui.activeModal === 'review'" x-transition.opacity.duration.200ms
+     @keydown.escape.window="$store.ui.closeModal()"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"
+     @click.self="$store.ui.closeModal()">
+  <div class="modal-scroll review-modal" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;max-width:520px;width:calc(100% - 32px);max-height:88vh;overflow:hidden auto;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,0.32);">
+    <button @click="$store.ui.closeModal()" aria-label="Close" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;background:rgba(0,0,0,0.06);border-radius:50%;cursor:pointer;font-size:18px;line-height:1;color:#3a3f4a;">&times;</button>
+    <div style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#9a3412;margin-bottom:8px;">Your certificate request</div>
+    <h2 style="font:700 21px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 8px;padding-right:36px;">A few things to fix, then you are there</h2>
+    <p class="lms-subheading" style="font-size:0.92rem;margin:0 0 18px;line-height:1.5;">AI marked your work against the published rubric. Fix the items below, resubmit in each lesson (your new link replaces the old one), and your request is marked again.</p>
+    <template x-for="n in $store.review.notes" :key="n">
+      <div class="review-item"><span class="review-tag todo">To do</span><p x-text="n"></p></div>
+    </template>
+    <template x-for="e in $store.review.items" :key="e.exerciseId">
+      <div class="review-item">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <strong style="font:700 15px/1.3 -apple-system,sans-serif;color:#000036;" x-text="$store.review.title(e.exerciseId)"></strong>
+          <span class="review-tag" :class="e.fixed ? 'done' : (e.verdict === 'REPEAT' ? 'todo' : 'wait')"
+                x-text="e.fixed ? 'Resubmitted' : (e.verdict === 'REPEAT' ? 'Resubmit' : 'Being checked')"></span>
+        </div>
+        <p x-text="e.feedback"></p>
+        <a href="#" x-show="e.verdict === 'REPEAT' && !e.fixed" @click.prevent="$store.review.go(e.exerciseId)" class="review-go">Open the lesson to resubmit &rarr;</a>
+      </div>
+    </template>
+    <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(0,0,54,0.1);">
+      <p class="lms-subheading" style="font-size:0.88rem;margin:0 0 12px;line-height:1.5;">Once every resubmit item is done, your request goes back in the queue by itself. Fixed something else, like a lesson or your profile name? Ask for a fresh review here.</p>
+      <button @click="$store.review.rereview()" :disabled="$store.review.busy" class="lms-invite-btn" style="border-radius:12px;padding:12px 18px;height:auto;font-weight:700;" x-text="$store.review.busy ? 'Sending...' : 'I have fixed it: review my work again'"></button>
+      <p x-show="$store.review.msg" x-text="$store.review.msg" style="margin:10px 0 0;font:600 13px/1.45 -apple-system,sans-serif;color:#1d6e36;"></p>
+    </div>
+  </div>
+</div>
+<style>
+  .review-item { padding:14px 16px; border-radius:14px; background:rgba(0,0,54,0.035); margin-bottom:10px; }
+  .review-item p { margin:0; font:400 14px/1.5 -apple-system,sans-serif; color:#3a3f4a; }
+  .review-tag { display:inline-block; padding:3px 9px; border-radius:999px; font:700 11px/1.4 -apple-system,sans-serif; letter-spacing:0.02em; margin-bottom:6px; }
+  .review-tag.todo { background:#FFE7D6; color:#9a3412; }
+  .review-tag.wait { background:rgba(29,77,140,0.10); color:#1d4d8c; }
+  .review-tag.done { background:rgba(29,110,54,0.12); color:#1d6e36; }
+  .review-go { display:inline-block; margin-top:8px; color:#1d4d8c; font:600 14px/1.3 -apple-system,sans-serif; text-decoration:none; }
+  .review-note { margin:0 0 12px; padding:12px 14px; border-radius:12px; background:#FFF1E6; border:1px solid rgba(194,65,12,0.25); font:400 14px/1.5 -apple-system,sans-serif; color:#3a3f4a; }
+  .review-note strong { color:#9a3412; display:block; margin-bottom:4px; }
+</style>
+
 <!-- ===================== CERTIFICATE MODAL (notice + VdR proof + policy) ===================== -->
 <div x-show="$store.ui.activeModal === 'cert'"
      x-transition:enter="transition ease-out duration-300"
@@ -5085,6 +5144,63 @@ try{
       }
     });
 
+    // Certificate review feedback (5 Oct 2026). The server keeps the verdict; the learner reads it
+    // here, fixes things, and asks for a fresh review. A resubmission counts as "fixed" when it was
+    // saved after the verdict.
+    Alpine.store('review', {
+      data: null, subs: {}, busy: false, msg: '',
+      get status() { return this.data ? this.data.reviewStatus : 'none'; },
+      get needsAction() { return this.status === 'repeat'; },
+      get items() {
+        var self = this, at = this.data && this.data.resolvedAt ? Date.parse(this.data.resolvedAt) : 0;
+        return ((this.data && this.data.exercises) || []).filter(function(e){ return e.verdict !== 'PASS'; }).map(function(e){
+          var s = self.subs[e.exerciseId], t = s && s.submittedAt ? (s.submittedAt.toDate ? s.submittedAt.toDate().getTime() : Date.parse(s.submittedAt)) : 0;
+          return Object.assign({ fixed: !!(t && t > at) }, e);
+        });
+      },
+      get notes() { return (this.data && this.data.notes) || []; },
+      get toFix() { return this.items.filter(function(e){ return e.verdict === 'REPEAT' && !e.fixed; }).length + this.notes.length; },
+      item(id) { return this.items.filter(function(e){ return e.exerciseId === id; })[0] || null; },
+      title(id) { var t = (window._lmsTutorials || []).filter(function(x){ return x.id === id; })[0]; return t ? t.title : id; },
+      go(id) {
+        var t = (window._lmsTutorials || []).filter(function(x){ return x.id === id; })[0];
+        Alpine.store('ui').closeModal();
+        if (t) { window.location.hash = '#/lesson/' + t.moduleId + '/' + t.id; window.scrollTo(0, 0); }
+      },
+      async load() {
+        try {
+          var u = (window.firebase && firebase.auth().currentUser) || null;
+          if (!u) return;
+          var token = await u.getIdToken();
+          var res = await fetch('https://aibadge-report-mailer.victordelrosal.workers.dev/api/my-verdict', { headers: { Authorization: 'Bearer ' + token } });
+          if (res.ok) this.data = await res.json();
+          if (this.needsAction && typeof getSubmissions === 'function') this.subs = await getSubmissions(u.uid);
+          // A lesson opened before this finished loading gets its note now.
+          document.querySelectorAll('[data-exercise-submission]').forEach(function(b){ window.__renderReviewNote && window.__renderReviewNote(b.getAttribute('data-exercise-submission')); });
+        } catch (e) { /* the dashboard works without it */ }
+      },
+      async rereview() {
+        if (this.busy) return;
+        this.busy = true; this.msg = '';
+        try {
+          var token = await firebase.auth().currentUser.getIdToken();
+          var res = await fetch('https://aibadge-report-mailer.victordelrosal.workers.dev/api/cert-rereview', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
+          var j = {}; try { j = await res.json(); } catch (e) {}
+          if (!res.ok) throw new Error(j.error || 'Could not ask for a review.');
+          await this.load();
+          this.msg = 'Done. Your work goes back in the queue and is marked again, usually within a day. You will see the result here.';
+        } catch (e) { this.msg = e.message || 'Network error. Try again.'; }
+        this.busy = false;
+      },
+      // Called after any resubmission: once every item to fix has a newer submission and there are
+      // no other to-dos, ask for the fresh review automatically.
+      async afterResubmit() {
+        if (!this.needsAction) return;
+        await this.load();
+        if (this.needsAction && this.toFix === 0) await this.rereview();
+      }
+    });
+
     Alpine.store('ui', {
       view: 'landing',
       activeModal: null,
@@ -5239,6 +5355,7 @@ try{
         auth.setUser({ uid: user.uid, email: user.email });
         Alpine.store('cert').init();
         Alpine.store('cert').load();
+        Alpine.store('review').load();
         var profile = null;
         try {
           profile = await Promise.race([
@@ -6913,6 +7030,49 @@ try{
     }
   };
 
+  // 5 Oct 2026: six lessons defined Edit/Delete only in their own inline script, which x-html never
+  // runs, so a submitted link could not be changed. One generic pair, driven by the box's data-* ids.
+  async function __genericDeleteSubmission(exerciseId) {
+    if (!confirm('Delete your submission? The record is archived (not lost), but the tutorial will no longer show it as submitted.')) return;
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user || typeof deleteSubmission !== 'function') { alert('Please sign in first.'); return; }
+    var box = __findSubmitBox(exerciseId);
+    try {
+      var out = await deleteSubmission(user.uid, exerciseId);
+      if (!out || !out.success) { alert('Could not delete: ' + (out && out.error ? out.error : 'unknown error')); return; }
+      var input = box && document.getElementById(box.getAttribute('data-submission-input'));
+      if (input) input.value = '';
+      __renderEditing(exerciseId);
+      var status = box && document.getElementById(box.getAttribute('data-submission-status'));
+      if (status) { status.style.display = 'block'; status.className = 'cg-submit-status ok'; status.innerHTML = 'Submission deleted. You can submit a new URL any time.'; }
+      if (typeof saveTutorialCompletion === 'function') { try { await saveTutorialCompletion(user.uid, exerciseId, false); } catch (e) {} }
+    } catch (e) { alert('Could not delete: ' + (e.message || 'unknown error')); }
+  }
+  [['af', 'ai-foundations'], ['euaa', 'eu-ai-act'], ['tp', 'thinking-partner'], ['yat', 'your-ai-team'], ['ywk', 'your-ai-workspace'], ['yfs', 'your-first-skill']].forEach(function(p) {
+    window['__' + p[0] + 'EditSubmission'] = function() {
+      __renderEditing(p[1]);
+      var box = __findSubmitBox(p[1]);
+      var input = box && document.getElementById(box.getAttribute('data-submission-input'));
+      if (input) { input.focus(); input.select && input.select(); }
+    };
+    window['__' + p[0] + 'DeleteSubmission'] = function() { return __genericDeleteSubmission(p[1]); };
+  });
+
+  // Feedback for this exercise from the latest certificate review, shown above its submit box.
+  window.__renderReviewNote = function(exerciseId) {
+    var box = __findSubmitBox(exerciseId);
+    if (!box || !window.Alpine) return;
+    var old = box.querySelector('.review-note'); if (old) old.remove();
+    var e = Alpine.store('review').item(exerciseId);
+    if (!Alpine.store('review').needsAction || !e || e.fixed || e.verdict === 'PASS') return;
+    var d = document.createElement('div'); d.className = 'review-note';
+    var h = document.createElement('strong'); h.textContent = e.verdict === 'REPEAT' ? 'Feedback on your submission: please fix and resubmit' : 'Being checked: nothing to do for now';
+    var t = document.createElement('span'); t.textContent = e.feedback || '';
+    d.appendChild(h); d.appendChild(t);
+    box.insertBefore(d, box.firstChild);
+    if (e.verdict === 'REPEAT') __renderEditing(exerciseId);
+  };
+
   window.submitExerciseUrl = async function(opts) {
     opts = opts || {};
     var input  = document.getElementById(opts.inputId);
@@ -6943,6 +7103,12 @@ try{
       }
     }
 
+    // Every exercise is a public web page or share link (5 Oct 2026: text like "user/gist" got through).
+    if (opts.validate !== 'github.io' && !/^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+([\/?#]\S*)?$/i.test(url)) {
+      setStatus('err', 'Paste the full public link to your page or shared chat. It starts with <code>https://</code>.');
+      return;
+    }
+
     var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
     if (!user) { setStatus('err', 'Please sign in first, then submit again.'); return; }
     if (typeof saveSubmission !== 'function') { setStatus('err', 'Submission system not loaded. Refresh and try again.'); return; }
@@ -6956,6 +7122,15 @@ try{
         if (typeof saveTutorialCompletion === 'function') {
           try { await saveTutorialCompletion(user.uid, opts.exerciseId, true); } catch (e) {}
         }
+        try {
+          var rv = Alpine.store('review');
+          if (rv.needsAction) {
+            await rv.afterResubmit();
+            window.__renderReviewNote(opts.exerciseId);
+            if (rv.status === 'pending') setStatus('ok', 'Submitted! Everything you were asked to fix is in, so your work goes back to be marked again.');
+            else if (rv.toFix) setStatus('ok', 'Submitted! ' + rv.toFix + ' more to fix before your work is marked again. See Certificate feedback in the top bar.');
+          }
+        } catch (e) {}
       } else {
         setStatus('err', 'Could not save: ' + (out && out.error ? out.error : 'unknown error'));
       }
@@ -6981,6 +7156,7 @@ try{
       } else {
         __updateFab(opts.exerciseId, false);
       }
+      window.__renderReviewNote(opts.exerciseId);
     } catch (e) { /* silent */ }
   };
 </script>

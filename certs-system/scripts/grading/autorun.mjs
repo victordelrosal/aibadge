@@ -18,6 +18,23 @@ const CERTS_KV = "9b8899effb804056a435ae5af6151966";
 const L1_LESSONS = ["what-is-html", "hello-world-2", "ai-foundations", "retro-game", "deploy-github", "ai-interviews-you", "five-innovators", "thinking-partner", "eu-ai-act"];
 const BUILDS = ["ai-interviews-you", "five-innovators"];
 const POLICY = "Lars, automated policy v1";
+const TITLES = { "what-is-html": "Hello World", "hello-world-2": "Hello World 2", "ai-foundations": "AI Foundations 101", "retro-game": "Retro Game",
+  "deploy-github": "Deploy to GitHub", "ai-interviews-you": "AI Interviews You", "five-innovators": "The Five Innovators", "thinking-partner": "Thinking Partner", "eu-ai-act": "The EU AI Act" };
+
+// Learner-facing feedback (Victor, 5 Oct 2026: "they cannot be left in a limbo without feedback").
+// REPEAT = the learner fixes and resubmits; REVIEW = a person or a later check handles it, nothing to do.
+// The grader's own feedback text already passed validate-verdict's no-links/no-markup check.
+function learnerItems(ex) {
+  return ex.map((e) => {
+    const base = { exerciseId: e.exerciseId, submissionSha256: e.submissionSha256 };
+    const r = (e.reasons || []).join(" ");
+    if (e.verdict === "PASS") return { ...base, verdict: "PASS", feedback: e.feedback || "" };
+    if (e.verdict === "REPEAT") return { ...base, verdict: "REPEAT", feedback: e.feedback || "This one needs another go. Re-read the exercise brief in the lesson, then resubmit." };
+    if (/not a public https address/.test(r)) return { ...base, verdict: "REPEAT", feedback: "What you submitted is not a web address we can open. Paste the full public link, starting with https:// (for a GitHub Gist, the gist.github.com address), then resubmit." };
+    if (/could not be frozen/.test(r)) return { ...base, verdict: "REVIEW", feedback: "We could not open this page when we checked. Make sure it opens in a private browser window without signing in. It is checked again with your next review." };
+    return { ...base, verdict: "REVIEW", feedback: "A person is checking this one. Nothing to do for now." };
+  });
+}
 
 ensureDir(GRADING_HOME);
 const LOCK = join(GRADING_HOME, "autorun.lock");
@@ -52,8 +69,10 @@ try {
   const fs = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
   const autoKey = keychain("aibadge-certs-auto-issue-key");
   const resolveKey = keychain("aibadge-grading-resolve-key");
-  const resolve = (uid, outcome, exercises, note) => DRY ? { status: 0 } : post(WORKER + "/api/cert-resolve", { "X-Grading-Key": resolveKey },
-    { uid, outcome, note, humanApproval: { by: POLICY, at: new Date().toISOString() }, exercises });
+  const resolve = (uid, outcome, exercises, note, notes) => DRY ? { status: 0 } : post(WORKER + "/api/cert-resolve", { "X-Grading-Key": resolveKey },
+    { uid, outcome, note, notes, humanApproval: { by: POLICY, at: new Date().toISOString() }, exercises });
+  // Off until Victor authorises learner-facing feedback; while off, feedback is staged for him to read.
+  const feedbackOn = certsKvGet("config:autofeedback") === "on";
   const uids = () => readdirSync(batch).filter((u) => existsSync(join(batch, u, "meta.json")));
 
   // 1. Already credentialed: close, deliver the existing credential if it never went out, and
@@ -106,14 +125,37 @@ try {
     const acct = await (await fetch(`https://identitytoolkit.googleapis.com/v1/projects/${PROJECT}/accounts:lookup`, {
       method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "application/json", "x-goog-user-project": PROJECT },
       body: JSON.stringify({ localId: [uid] }) })).json();
-    if (!emailProof(JSON.parse(readFileSync(join(batch, uid, "meta.json"), "utf8")), acct, email)) why.push("email not proven (learner has not typed the emailed code)");
+    const emailOk = emailProof(JSON.parse(readFileSync(join(batch, uid, "meta.json"), "utf8")), acct, email);
+    if (!emailOk) why.push("email not proven (learner has not typed the emailed code)");
 
     // 4. Name on the credential = the learner's own profile name.
     const user = await (await fetch(`${fs}/users/${uid}`, { headers: { Authorization: "Bearer " + token } })).json();
     const name = String((user.fields && user.fields.displayName && user.fields.displayName.stringValue) || "").normalize("NFC").trim();
-    if (name.length < 2 || name.length > 80 || name.includes("@")) why.push("no usable profile name");
+    const nameOk = !(name.length < 2 || name.length > 80 || name.includes("@"));
+    if (!nameOk) why.push("no usable profile name");
 
     if (why.length) {
+      // Tell the learner what to fix. Only when there is something they can do: a request whose
+      // only open items are REVIEW stays pending and is checked again next run.
+      const items = learnerItems(ex);
+      const notes = [];
+      if (missing.length) notes.push("Mark these lessons complete: " + missing.map((t) => TITLES[t] || t).join(", ") + ".");
+      if (!ex.some((e) => BUILDS.includes(e.exerciseId))) notes.push("Submit your live page for AI Interviews You or The Five Innovators. At least one build has to pass.");
+      if (!emailOk) notes.push("Confirm your email: on your dashboard, type the 8-digit code we emailed you.");
+      if (!nameOk) notes.push("Add your full name to your profile. It is the name printed on your certificate.");
+      const toFix = items.filter((i) => i.verdict === "REPEAT").length + notes.length;
+      if (toFix) {
+        const fb = { uid, email, items, notes, at: new Date().toISOString() };
+        if (DRY) actions.push(`${email}: WOULD POST feedback (${toFix} to fix)`);
+        else if (feedbackOn) {
+          const r = await resolve(uid, "repeat", items, "feedback to learner", notes);
+          actions.push(`${email}: feedback posted to the learner, ${toFix} to fix [resolve ${r.status}]`);
+          if (r.status === 200) { delete state.reported[uid]; continue; }
+        } else {
+          writeFileSync(join(ensureDir(join(GRADING_HOME, "staged-feedback")), uid + ".json"), JSON.stringify(fb, null, 2), { mode: 0o600 });
+          why.push("feedback STAGED, not shown to the learner (config:autofeedback is off)");
+        }
+      }
       const sig = sha256(JSON.stringify(why));
       if (state.reported[uid] !== sig) { waiting.push(`${email}: ${why.join(" | ")}`); if (!DRY) state.reported[uid] = sig; }
       continue;
