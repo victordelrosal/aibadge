@@ -21,22 +21,25 @@ const POLICY = "Lars, automated policy v1";
 const TITLES = { "what-is-html": "Hello World", "hello-world-2": "Hello World 2", "ai-foundations": "AI Foundations 101", "retro-game": "Retro Game",
   "deploy-github": "Deploy to GitHub", "ai-interviews-you": "AI Interviews You", "five-innovators": "The Five Innovators", "thinking-partner": "Thinking Partner", "eu-ai-act": "The EU AI Act" };
 
-// Learner-facing feedback (Victor, 5 Oct 2026: "they cannot be left in a limbo without feedback").
-// REPEAT = the learner fixes and resubmits; REVIEW = a person or a later check handles it, nothing to do.
-// The grader's own feedback text already passed validate-verdict's no-links/no-markup check.
+// Learner-facing feedback (Victor, 5 Oct 2026: "they cannot be left in a limbo without feedback";
+// and: no "a person is checking this", the loop is automated). Every item that is not a PASS goes
+// back to the learner as a resubmit request for something the grader can read. Readable, as tested
+// against freeze.mjs on 5 Oct 2026: a live page, a GitHub file page (code included), a gist, a
+// ChatGPT/Claude/Gemini share. Not readable: Notion, Google Docs/Drive, sign-in pages, a repo's
+// front page (README and file names only).
+const READABLE = "Submit a link we can read: your live github.io page, the GitHub link to the file itself (not the repo front page), or a public ChatGPT, Claude or Gemini share. Notion and Google Docs cannot be read.";
 function learnerItems(ex) {
   return ex.map((e) => {
     const base = { exerciseId: e.exerciseId, submissionSha256: e.submissionSha256 };
-    const r = (e.reasons || []).join(" ");
     if (e.verdict === "PASS") return { ...base, verdict: "PASS", feedback: e.feedback || "" };
-    if (e.verdict === "REPEAT") {
-      let f = e.feedback || "This one needs another go. Re-read the exercise brief in the lesson, then resubmit.";
-      if (/\bpaste\b/i.test(f)) f += " Note: the lesson accepts a public https link only, so share the conversation as a link.";
-      return { ...base, verdict: "REPEAT", feedback: f };
-    }
-    if (/not a public https address/.test(r)) return { ...base, verdict: "REPEAT", feedback: "What you submitted is not a web address we can open. Paste the full public link, starting with https:// (for a GitHub Gist, the gist.github.com address), then resubmit." };
-    if (/could not be frozen/.test(r)) return { ...base, verdict: "REVIEW", feedback: "We could not open this page when we checked. Make sure it opens in a private browser window without signing in. It is checked again with your next review." };
-    return { ...base, verdict: "REVIEW", feedback: "A person is checking this one. Nothing to do for now." };
+    const r = (e.reasons || []).join(" ");
+    let f;
+    if (/not a public https address/.test(r)) f = "What you submitted is not a web address we can open.";
+    else if (/could not be frozen/.test(r)) f = "We could not read any text at this link. It may need a sign-in, or JavaScript to load.";
+    else if (e.verdict === "REPEAT" && e.feedback) f = e.feedback;
+    else f = (e.feedback ? e.feedback + " " : "") + "Your link did not show enough of your own work to mark it with confidence. Resubmit a link that shows the work itself in full.";
+    if (/\bpaste\b/i.test(f)) f += " The lesson takes a link only, so share it as a link.";
+    return { ...base, verdict: "REPEAT", feedback: f.slice(0, 380) + " " + READABLE };
   });
 }
 
@@ -139,8 +142,7 @@ try {
     if (!nameOk) why.push("no usable profile name");
 
     if (why.length) {
-      // Tell the learner what to fix. Only when there is something they can do: a request whose
-      // only open items are REVIEW stays pending and is checked again next run.
+      // Tell the learner what to fix; every open item is something they can resubmit.
       const items = learnerItems(ex);
       const notes = [];
       if (missing.length) notes.push("Mark these lessons complete: " + missing.map((t) => TITLES[t] || t).join(", ") + ".");
