@@ -81,6 +81,7 @@ const data = {
   events: ev, manual, runs, names,
 };
 const html = readFileSync(join(HERE, "dashboard.template.html"), "utf8")
-  .replace("/*__DATA__*/null", JSON.stringify(data).replace(/</g, "\\u003c"));
+  // Function replacement: learner text can contain "$'" or "$&", which a string replacement would expand.
+  .replace("/*__DATA__*/null", () => JSON.stringify(data).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029"));
 writeFileSync(OUT, html);
 console.log(JSON.stringify({ out: OUT, creds: data.creds.length, requests: data.requests.length, verdicts: data.verdicts.length, manual: manual.length, eventRows: ev.length }));
