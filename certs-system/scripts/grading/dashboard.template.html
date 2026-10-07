@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Credential Ledger</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0c0e'/%3E%3Cpath d='M32 10l18 12v20L32 54 14 42V22z' fill='none' stroke='%23f5ce34' stroke-width='4'/%3E%3Cpath d='M24 32l6 6 11-12' fill='none' stroke='%23f5ce34' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Jost:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--space:#0b0c0e;--ink:#f2efe8;--ink2:#bdb9b0;--ink3:#86827a;--line:rgba(242,239,232,.10);--line2:rgba(242,239,232,.20);--gold:#d8b25a;
+--y:245,206,52;--o:255,92,34;--b:47,120,255;--g:46,200,110;--p:150,80,225;
+--disp:"Jost",Futura,"Century Gothic",sans-serif;--sans:"IBM Plex Sans",-apple-system,system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}html{background:var(--space);overflow-x:clip;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--ink);font:15.5px/1.6 var(--sans);overflow-x:clip;
+background:radial-gradient(900px 520px at 12% -8%,rgba(var(--y),.10),transparent 60%),radial-gradient(800px 600px at 100% 0%,rgba(var(--b),.12),transparent 62%),radial-gradient(700px 500px at 50% 110%,rgba(var(--p),.08),transparent 60%),var(--space);background-attachment:fixed}
+a{color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 clamp(16px,3vw,40px)}
+/* top bar */
+.top{position:sticky;top:0;z-index:30;backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);background:rgba(11,12,14,.62);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;height:62px}
+.mark{width:30px;height:30px;flex:none}
+.brand{font:600 17px/1 var(--disp);letter-spacing:.01em}.brand span{color:var(--ink3);font-weight:500}
+.top .sp{flex:1}
+.chip{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;padding:7px 10px;border-radius:999px;border:1px solid var(--line2);color:var(--ink2);white-space:nowrap}
+.chip i{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px;vertical-align:1px;background:rgb(var(--o));box-shadow:0 0 10px rgb(var(--o))}
+.chip.on i{background:rgb(var(--g));box-shadow:0 0 10px rgb(var(--g))}
+/* hero */
+.hero{padding:clamp(40px,7vw,84px) 0 28px}
+.kick{font:500 11px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:rgb(var(--y));opacity:0;animation:rise .8s .05s cubic-bezier(.2,.8,.2,1) forwards}
+h1{font:600 clamp(40px,6.4vw,78px)/1.02 var(--disp);letter-spacing:-.025em;margin:16px 0 14px;opacity:0;animation:rise .9s .18s cubic-bezier(.2,.8,.2,1) forwards}
+h1 em{font-style:normal;background:linear-gradient(100deg,rgb(var(--y)),rgb(var(--o)) 55%,rgb(var(--p)));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{max-width:640px;color:var(--ink2);font-size:17px;margin:0;opacity:0;animation:rise .9s .32s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+/* glass card (Moonshots .blk grammar) */
+.glass{position:relative;isolation:isolate;overflow:hidden;border-radius:22px;
+background:radial-gradient(130% 90% at 0% 0%,rgba(var(--bc),.22),transparent 52%),radial-gradient(90% 70% at 100% 115%,rgba(var(--bc),.12),transparent 62%),linear-gradient(165deg,rgba(255,255,255,.08),rgba(255,255,255,.015) 42%,rgba(0,0,0,.28)),rgba(12,13,16,.74);
+border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.11),inset 0 -1px 0 rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.5),0 26px 50px -30px rgba(0,0,0,.95);
+backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
+transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));transition:transform .55s cubic-bezier(.2,.8,.2,1),box-shadow .45s,border-color .45s;
+animation:rise .75s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 55ms)}
+.glass::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,rgb(var(--bc)),rgba(var(--bc),.35) 45%,transparent 80%);box-shadow:0 0 18px rgba(var(--bc),.6)}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(140deg,rgba(var(--bc),.95),rgba(255,255,255,.18) 38%,transparent 60%,rgba(var(--bc),.55));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .45s}
+.glass .glow{position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity .45s;background:radial-gradient(340px circle at var(--mx,30%) var(--my,0%),rgba(var(--bc),.26),transparent 62%)}
+.glass .num{position:absolute;right:12px;bottom:-30px;z-index:-1;pointer-events:none;font:700 138px/1 var(--disp);letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px rgba(var(--bc),.26);transition:transform .7s cubic-bezier(.2,.8,.2,1),-webkit-text-stroke-color .45s}
+.hov:hover{--ty:-5px;border-color:transparent;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 34px 64px -30px rgba(var(--bc),.6),0 0 0 1px rgba(var(--bc),.12)}
+.hov:hover::after,.hov:focus-visible::after{opacity:1}.hov:hover .glow{opacity:1}.hov:hover .num{transform:translateY(-8px);-webkit-text-stroke-color:rgba(var(--bc),.55)}
+.hov:focus-visible{outline:none}
+.pill{display:inline-flex;align-items:center;gap:6px;font:500 10.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;padding:6px 10px 6px 11px;border-radius:999px;background:rgba(var(--bc),.14);color:rgb(var(--bc));box-shadow:inset 0 0 0 1px rgba(var(--bc),.38),0 0 16px -4px rgba(var(--bc),.5);white-space:nowrap}
+.y{--bc:var(--y)}.o{--bc:var(--o)}.b{--bc:var(--b)}.g{--bc:var(--g)}.p{--bc:var(--p)}
+/* KPI row */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(12px,1.4vw,20px);margin:8px 0 38px}
+.kpi{padding:20px 20px 18px;min-height:150px;cursor:pointer;text-align:left;color:inherit;font:inherit;display:flex;flex-direction:column}
+.kpi .v{font:600 52px/1 var(--disp);letter-spacing:-.03em;margin-top:auto}
+.kpi .l{font:400 13.5px/1.4 var(--sans);color:var(--ink2);margin-top:8px}
+.kpi .num{font-size:118px;bottom:-26px}.kpi .pill{align-self:flex-start}
+/* tabs */
+.tabs{display:inline-flex;gap:4px;padding:5px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-bottom:22px;max-width:100%;overflow-x:auto}
+.tab{font:500 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);background:none;border:0;padding:11px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:color .3s,background .3s}
+.tab[aria-selected=true]{color:var(--space);background:rgb(var(--y));box-shadow:0 0 22px -4px rgba(var(--y),.7)}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:-6px 0 22px}
+.search{flex:1;min-width:220px;font:400 15px/1 var(--sans);color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--line2);border-radius:999px;padding:12px 18px;outline:none;transition:border-color .3s,box-shadow .3s}
+.search:focus{border-color:rgba(var(--y),.6);box-shadow:0 0 0 4px rgba(var(--y),.08)}
+.filt{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;padding:9px 12px;border-radius:999px;border:1px solid var(--line2);background:none;color:var(--ink3);cursor:pointer}
+.filt[aria-pressed=true]{color:rgb(var(--bc));border-color:rgba(var(--bc),.6);background:rgba(var(--bc),.1)}
+.h2{font:600 24px/1.2 var(--disp);margin:34px 0 4px;letter-spacing:-.01em}.h2s{color:var(--ink3);font-size:14px;margin:0 0 16px}
+/* decision cards */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.5vw,22px)}
+.dc{display:flex;flex-direction:column;padding:22px 22px 18px;min-height:260px;cursor:pointer;color:inherit;font:inherit;text-align:left;border:1px solid rgba(255,255,255,.09)}
+.dc .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dc h3{font:600 23px/1.14 var(--disp);margin:14px 0 4px;letter-spacing:.005em}
+.dc .meta{font:400 12px/1.5 var(--mono);color:var(--ink3);letter-spacing:.02em}
+.dc .why{font:400 14.5px/1.55 var(--sans);color:var(--ink2);margin:12px 0 0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.dc .who{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:16px;font:500 10.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:rgb(var(--bc))}
+.dc .who svg{width:14px;height:14px;transition:transform .45s cubic-bezier(.2,.8,.2,1)}.dc:hover .who svg{transform:translateX(5px)}
+.score{font:600 13px/1 var(--mono);color:var(--ink)}
+.eng{display:flex;gap:14px;margin-top:12px;font:400 12px/1 var(--mono);color:var(--ink3)}.eng b{color:var(--ink);font-weight:500}
+.alt:nth-child(even){background:radial-gradient(130% 90% at 0% 0%,rgba(var(--bc),.16),transparent 52%),linear-gradient(165deg,rgba(255,255,255,.11),rgba(255,255,255,.03) 42%,rgba(0,0,0,.2)),rgba(20,21,25,.78)}
+/* people */
+.people{display:grid;gap:10px}
+.pr{display:grid;grid-template-columns:44px minmax(0,1.4fr) minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 18px;border-radius:16px;cursor:pointer;color:inherit;font:inherit;text-align:left;width:100%}
+.pr .num{display:none}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:600 16px/1 var(--disp);color:rgb(var(--bc));background:radial-gradient(circle at 30% 25%,rgba(var(--bc),.35),rgba(var(--bc),.08));box-shadow:inset 0 0 0 1px rgba(var(--bc),.5),0 0 18px -6px rgba(var(--bc),.8)}
+.pr .n{font:600 17px/1.25 var(--disp)}.pr .e{font:400 12px/1.4 var(--mono);color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pr .last{font:400 13px/1.4 var(--sans);color:var(--ink2)}
+/* audit timeline */
+.tl{position:relative;margin:6px 0 0;padding:0 0 0 30px;list-style:none}
+.tl::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:1px;background:linear-gradient(var(--line2),var(--line) 70%,transparent)}
+.tl li{position:relative;padding:0 0 18px;animation:rise .6s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 18ms)}
+.tl li::before{content:"";position:absolute;left:-26px;top:6px;width:11px;height:11px;border-radius:50%;background:rgb(var(--bc));box-shadow:0 0 0 4px rgba(var(--bc),.14),0 0 14px rgba(var(--bc),.7)}
+.tl .t{font:400 11.5px/1.4 var(--mono);color:var(--ink3);letter-spacing:.04em}
+.tl .w{font:500 15px/1.45 var(--sans);color:var(--ink)}.tl .w a{color:rgb(var(--bc));text-decoration:none;border-bottom:1px solid rgba(var(--bc),.4);cursor:pointer}
+.tl .d{font:400 13.5px/1.55 var(--sans);color:var(--ink2);margin-top:2px;max-width:76ch}
+.day{font:500 10.5px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:18px 0 14px}
+.empty{padding:40px;text-align:center;color:var(--ink3);border:1px dashed var(--line2);border-radius:18px}
+/* drawer: focus by subtraction */
+.veil{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .35s}
+.veil.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:50;width:min(720px,100vw);overflow-y:auto;overscroll-behavior:contain;transform:translateX(104%);transition:transform .5s cubic-bezier(.2,.8,.2,1);border-radius:24px 0 0 24px;padding:28px clamp(18px,3vw,36px) 60px;animation:none}
+.drawer.on{transform:none}
+.drawer .x{position:absolute;top:18px;right:18px;width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;background:rgba(var(--y),.14);color:rgb(var(--y));box-shadow:inset 0 0 0 1px rgba(var(--y),.45);font:500 18px/1 var(--sans)}
+.drawer h2{font:600 clamp(28px,4vw,40px)/1.05 var(--disp);margin:16px 0 6px;letter-spacing:-.02em;padding-right:44px}
+.drawer h4{font:500 10.5px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:30px 0 12px}
+.why-box{border-radius:18px;padding:18px 20px;background:linear-gradient(165deg,rgba(var(--bc),.12),rgba(255,255,255,.02));box-shadow:inset 0 0 0 1px rgba(var(--bc),.28)}
+.why-box p{margin:0 0 8px;color:var(--ink2)}.why-box .hl{font:600 18px/1.35 var(--disp);color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+.stat b{display:block;font:600 26px/1 var(--disp)}.stat span{font:400 11px/1.3 var(--mono);color:var(--ink3);letter-spacing:.06em}
+.ex{border-top:1px solid var(--line);padding:12px 0}.ex .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.ex .row b{font:600 15px/1.3 var(--sans)}
+.ex p{margin:6px 0 0;font-size:14px;color:var(--ink2)}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font:500 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;padding:12px 16px;border-radius:999px;color:var(--space);background:rgb(var(--y));box-shadow:0 10px 30px -12px rgba(var(--y),.8)}
+.btn.ghost{background:none;color:rgb(var(--y));box-shadow:inset 0 0 0 1px rgba(var(--y),.5)}
+.foot{color:var(--ink3);font:400 12px/1.6 var(--mono);padding:50px 0 40px;letter-spacing:.02em}
+@media (max-width:1080px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi .v{font-size:42px}.kpi{min-height:128px}.kpi:last-child{grid-column:1/-1}
+.pr{grid-template-columns:40px minmax(0,1fr) auto}.pr .last{display:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.top .chip.cfg{display:none}.drawer{border-radius:0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;transition-duration:1ms!important}.glass{transform:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l22 14v24L32 58 10 44V20z" fill="rgba(245,206,52,.12)" stroke="rgb(245,206,52)" stroke-width="3"/><path d="M23 32l7 7 12-13" fill="none" stroke="rgb(245,206,52)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="brand">AI Badge <span>· Credential Ledger</span></div>
+  <div class="sp"></div>
+  <span class="chip cfg" id="cfg-issue"></span><span class="chip cfg" id="cfg-fb"></span>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="kick">Approvals · People · Audit trail</div>
+    <h1 id="h1"></h1>
+    <p class="sub" id="sub"></p>
+  </section>
+  <section class="kpis" id="kpis"></section>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-t="decisions">Decisions</button>
+    <button class="tab" role="tab" data-t="people">People</button>
+    <button class="tab" role="tab" data-t="audit">Audit trail</button>
+  </nav>
+  <div class="tools"><input class="search" id="q" type="search" placeholder="Search a name, email or cert code" autocomplete="off"><span id="filters"></span></div>
+  <section id="view"></section>
+  <div class="foot" id="foot"></div>
+</main>
+
+<div class="veil" id="veil"></div>
+<aside class="drawer glass" id="drawer" aria-hidden="true" role="dialog" aria-label="Learner history"></aside>
+
+<script>
+const D=/*__DATA__*/null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=s=>{if(!s)return"";const d=new Date(s);return isNaN(d)?String(s):d.toLocaleString("en-IE",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Dublin"})};
+const fday=s=>{if(!s)return"";const d=new Date(s);return isNaN(d)?String(s):d.toLocaleDateString("en-IE",{weekday:"long",day:"numeric",month:"long",year:"numeric",timeZone:"Europe/Dublin"})};
+const arrow='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const EX={"ai-foundations":"AI Foundations 101","ai-interviews-you":"AI Interviews You","five-innovators":"The Five Innovators","thinking-partner":"Thinking Partner","eu-ai-act":"The EU AI Act","ai-on-terminal":"AI on Terminal","your-ai-team":"Your AI Team","your-first-skill":"Your First Skill","your-ai-workspace":"Your AI Workspace"};
+const CERTS="https://certs.fiveinnolabs.com/";
+
+/* ---------- join everything per person (key = email) ---------- */
+const P={};const person=e=>{e=String(e||"").toLowerCase();return P[e]||(P[e]={email:e,creds:[],req:null,verdicts:[],manual:[],runs:[],uid:null,name:""})};
+const uidEmail={};
+D.requests.forEach(r=>{const p=person(r.email);p.req=r;p.uid=r.uid;uidEmail[r.uid]=p.email});
+D.creds.forEach(c=>{const p=person(c.email);p.creds.push(c);if(!p.name)p.name=c.name});
+D.verdicts.forEach(v=>{const e=uidEmail[v.uid];if(e)person(e).verdicts.push(v)});
+D.manual.forEach(m=>person(m.email).manual.push(m));
+Object.entries(D.runs).forEach(([uid,rs])=>{const e=uidEmail[uid];if(e)person(e).runs.push(...rs)});
+const ENG={};D.events.forEach(r=>{(ENG[r.ucid]||(ENG[r.ucid]={}))[r.event]={n:r.n,first:r.first,last:r.last}});
+Object.values(P).forEach(p=>{p.verdicts.sort((a,b)=>a.resolvedAt<b.resolvedAt?-1:1);p.creds.sort((a,b)=>a.createdAt<b.createdAt?-1:1);
+  if(!p.name){const m=p.manual.find(m=>m.name);p.name=m?m.name:(p.uid&&D.names[p.uid])||p.email.split("@")[0]}});
+const lvl=c=>c.legacy?"legacy":(c.level||1);
+const tone=c=>c.legacy?"p":lvl(c)==2?"b":"y";
+const lvlLabel=c=>c.legacy?"HELIOS legacy":"Level "+lvl(c);
+const initials=n=>String(n).split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+
+/* why each credential was approved: the strongest evidence on file, never invented */
+function reason(c){
+  const p=person(c.email);
+  const m=p.manual.find(m=>m.ucid===c.ucid);
+  if(m)return{by:"Victor del Rosal · manual review",how:"manual",score:m.score,headline:m.headline,why:m.why,notes:m.notes};
+  const v=[...p.verdicts].reverse().find(v=>v.outcome==="pass");
+  if(c.createdBy&&c.createdBy.startsWith("lars-auto"))return{by:"Lars · automated policy v1",how:"auto",headline:"Both grading runs passed every submission, with all nine Level 1 lessons complete and the email code typed.",why:v?v.exercises.map(e=>(EX[e.exerciseId]||e.exerciseId)+": "+e.feedback).join(" "):"",notes:[]};
+  if(c.legacy)return{by:"Imported",how:"legacy",headline:"HELIOS credential imported from the original programme ("+(c.cohort||"no cohort")+"). The original was delivered by hand.",why:"",notes:[]};
+  if(/H9CEAI/.test(c.cohort||""))return{by:"Victor del Rosal · /issue",how:"cohort",headline:"Issued under the H9CEAI route of the Level 2 criteria.",why:"Cohort: "+c.cohort+".",notes:[]};
+  return{by:"Victor del Rosal · /issue",how:"hand",headline:"Issued by hand from the Google-gated /issue dashboard.",why:c.cohort?"Cohort: "+c.cohort+".":"",notes:[]};
+}
+
+/* every dated thing that happened, as one stream */
+function trail(){
+  const ev=[];const add=(at,kind,tone,p,what,detail)=>at&&ev.push({at,kind,tone,p,what,detail});
+  Object.values(P).forEach(p=>{
+    const r=p.req;
+    if(r){add(r.requestedAt,"request","g",p,"requested a certificate","");
+      if(r.emailProven)add(r.emailProven.at,"request","g",p,"proved their email ("+r.emailProven.method+")","");
+      if(r.rereviewAt)add(r.rereviewAt,"request","g",p,"resubmitted and asked for re-review","")}
+    p.verdicts.forEach(v=>{const fails=v.exercises.filter(e=>e.verdict!=="PASS");
+      const t=v.outcome==="pass"?"y":v.outcome==="repeat"?"o":"p";
+      add(v.resolvedAt,"decision",t,p,(v.outcome==="repeat"&&/^held/.test(v.note||"")?"held for an admin step":{pass:"passed",repeat:"sent back to resubmit",superseded:"closed: already holds a credential"}[v.outcome])+" · by "+v.approvedBy,
+        v.outcome==="repeat"?[...fails.map(e=>(EX[e.exerciseId]||e.exerciseId)+": "+e.feedback),...(v.notes||[])].join(" "):(v.note||""))});
+    p.creds.forEach(c=>{add(c.createdAt,"issue",tone(c),p,"issued "+lvlLabel(c)+" · "+c.ucid+" · by "+(c.createdBy||"?"),c.cohort?"Cohort: "+c.cohort:"");
+      if(c.emailedAt)add(c.emailedAt,"email",tone(c),p,"credential emailed"+(c.emailCount>1?" ("+c.emailCount+" sends)":""),"");
+      if(c.revokedAt)add(c.revokedAt,"issue","o",p,"credential "+c.ucid+" revoked","");
+      const li=(ENG[c.ucid]||{}).linkedin;if(li)add(li.first,"engage","b",p,"added "+c.ucid+" to LinkedIn"+(li.n>1?" ("+li.n+" clicks)":""),"")});
+  });
+  return ev.sort((a,b)=>a.at<b.at?1:-1);
+}
+const TRAIL=trail();
+
+/* ---------- header, KPIs ---------- */
+const live=D.creds.filter(c=>c.status!=="revoked");
+const pend=Object.values(P).filter(p=>p.req&&(p.req.reviewStatus||"pending")==="pending");
+const held=p=>{const v=p.verdicts[p.verdicts.length-1];return!!(v&&/^held/.test(v.note||""))};
+const back=Object.values(P).filter(p=>p.req&&p.req.reviewStatus==="repeat");
+$("#h1").innerHTML=`${live.length} credentials.<br><em>Every one with a reason.</em>`;
+$("#sub").textContent=`Who was approved, why, by whom and when, with every request, verdict, email and LinkedIn add on one trail. Built ${fmt(D.generatedAt)}.`;
+const cf=(id,label,v)=>{const el=$(id);el.className="chip cfg"+(v==="on"?" on":"");el.innerHTML=`<i></i>${label} ${v==="on"?"on":"off"}`};
+cf("#cfg-issue","Auto-issue",D.config.autoissue);cf("#cfg-fb","Auto-feedback",D.config.autofeedback);
+const K=[["y",live.length,"credentials live","decisions"],["o",live.filter(c=>!c.legacy&&lvl(c)==1).length,"Level 1 · AI Literate","decisions"],
+ ["b",live.filter(c=>!c.legacy&&lvl(c)==2).length,"Level 2 · Agent Operator","decisions"],["g",pend.length,"awaiting your decision","decisions"],["p",back.length,"sent back to resubmit","decisions"]];
+$("#kpis").innerHTML=K.map(([t,v,l,go],i)=>`<button class="glass hov kpi ${t}" style="--i:${i}" data-go="${go}" data-k="${i}"><span class="glow"></span><span class="num">${v}</span><span class="pill">${["Ledger","Level 1","Level 2","Pending","Resubmit"][i]}</span><span class="v">${v}</span><span class="l">${l}</span></button>`).join("");
+
+/* ---------- views ---------- */
+let TAB="decisions",FILTER=null;
+function card(c,i){const r=reason(c),e=ENG[c.ucid]||{},p=person(c.email);
+  return`<button class="glass hov dc alt ${tone(c)}" style="--i:${i}" data-email="${esc(c.email)}"><span class="glow"></span><span class="num">${esc(c.ucid.slice(0,2).toUpperCase())}</span>
+  <span class="row"><span class="pill">${esc(lvlLabel(c))}</span>${r.score!=null?`<span class="score">${r.score}/10</span>`:""}</span>
+  <h3>${esc(c.name)}</h3><span class="meta">${esc(c.ucid)} · ${esc(fmt(c.createdAt)||c.issuedDate)}</span>
+  <span class="why">${esc(r.headline)}</span>
+  <span class="eng"><span><b>${(e.view||{}).n||0}</b> views</span><span><b>${(e.pdf||{}).n||0}</b> PDF</span><span><b>${(e.linkedin||{}).n||0}</b> LinkedIn</span></span>
+  <span class="who">${esc(r.by)} ${arrow}</span></button>`}
+function pcard(p,i,t,label,line){return`<button class="glass hov dc alt ${t}" style="--i:${i}" data-email="${esc(p.email)}"><span class="glow"></span><span class="num">${esc(initials(p.name))}</span>
+  <span class="row"><span class="pill">${label}</span></span><h3>${esc(p.name)}</h3><span class="meta">${esc(p.email)}</span><span class="why">${esc(line)}</span><span class="who">Open history ${arrow}</span></button>`}
+const match=(p,q)=>!q||[p.name,p.email,...p.creds.map(c=>c.ucid)].join(" ").toLowerCase().includes(q);
+function decisions(q){
+  const lastBack=p=>{const v=[...p.verdicts].reverse().find(v=>v.outcome==="repeat");if(!v)return"";const f=v.exercises.filter(e=>e.verdict!=="PASS");return[...f.map(e=>(EX[e.exerciseId]||e.exerciseId)+": "+e.feedback),...(v.notes||[])].join(" ")};
+  const cs=live.filter(c=>match(person(c.email),q)&&(!FILTER||FILTER===tone(c))).sort((a,b)=>a.createdAt<b.createdAt?1:-1);
+  const pd=pend.filter(p=>match(p,q)),bk=back.filter(p=>match(p,q));
+  let h="";
+  if(pd.length&&(!FILTER||FILTER==="g"))h+=`<div class="h2">Awaiting your decision</div><p class="h2s">Run the manual review to build a ranked review page for these.</p><div class="grid">${pd.map((p,i)=>pcard(p,i,"g","Pending","Requested "+fmt(p.req.requestedAt)+(p.req.emailProven?" · email proven":" · email not proven yet"))).join("")}</div>`;
+  if(bk.length&&(!FILTER||FILTER==="o"))h+=`<div class="h2">Sent back</div><p class="h2s">They can see this feedback on their dashboard and resubmit.</p><div class="grid">${bk.map((p,i)=>pcard(p,i,"o",held(p)?"Held · admin step":"Resubmit",lastBack(p))).join("")}</div>`;
+  h+=`<div class="h2">Approved</div><p class="h2s">Newest first. Each card says who approved it and why.</p>`;
+  h+=cs.length?`<div class="grid">${cs.map(card).join("")}</div>`:`<div class="empty">No credentials match.</div>`;
+  return h}
+function people(q){
+  const ps=Object.values(P).filter(p=>match(p,q)).sort((a,b)=>last(b)<last(a)?-1:1);
+  return ps.length?`<div class="people">${ps.map((p,i)=>{const c=p.creds[p.creds.length-1];const t=c?tone(c):p.req&&p.req.reviewStatus==="repeat"?"o":"g";const lt=TRAIL.find(e=>e.p===p);
+  return`<button class="glass hov pr ${t}" style="--i:${Math.min(i,20)}" data-email="${esc(p.email)}"><span class="glow"></span><span class="av">${esc(initials(p.name))}</span>
+  <span><div class="n">${esc(p.name)}</div><div class="e">${esc(p.email)}</div></span><span class="last">${lt?esc(lt.what.split(" · by")[0])+" · "+esc(fmt(lt.at)):""}</span>
+  <span class="pill">${c?esc(lvlLabel(c)):p.req?(held(p)?"held":esc(p.req.reviewStatus==="repeat"?"resubmit":p.req.reviewStatus||"pending")):"none"}</span></button>`}).join("")}</div>`:`<div class="empty">Nobody matches.</div>`}
+const last=p=>{const e=TRAIL.find(e=>e.p===p);return e?e.at:""};
+function timeline(list,showWho){let h="",day="";
+  list.forEach((e,i)=>{const d=fday(e.at);if(d!==day){h+=`${day?"</ol>":""}<div class="day">${esc(d)}</div><ol class="tl">`;day=d}
+    h+=`<li class="${e.tone}" style="--i:${Math.min(i,40)}"><div class="t">${esc(fmt(e.at))}</div><div class="w">${showWho?`<a data-email="${esc(e.p.email)}">${esc(e.p.name)}</a> `:""}${esc(e.what)}</div>${e.detail?`<div class="d">${esc(e.detail)}</div>`:""}</li>`});
+  return h?h+"</ol>":`<div class="empty">Nothing on the trail matches.</div>`}
+function audit(q){return timeline(TRAIL.filter(e=>match(e.p,q)&&(!FILTER||FILTER===e.kind)),true)}
+
+const FILTERS={decisions:[["y","Level 1"],["b","Level 2"],["p","Legacy"],["g","Pending"],["o","Sent back"]],people:[],audit:[["request","Requests"],["decision","Decisions"],["issue","Issued"],["email","Emails"],["engage","LinkedIn"]]};
+const ftone={request:"g",decision:"o",issue:"y",email:"b",engage:"p"};
+function render(){
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.t===TAB));
+  $("#filters").innerHTML=FILTERS[TAB].map(([k,l])=>`<button class="filt ${ftone[k]||k}" data-f="${k}" aria-pressed="${FILTER===k}">${l}</button>`).join("");
+  const q=$("#q").value.trim().toLowerCase();
+  $("#view").innerHTML=TAB==="decisions"?decisions(q):TAB==="people"?people(q):audit(q);
+  try{localStorage.setItem("certdash-tab",TAB)}catch(e){}
+}
+
+/* ---------- drawer: one person's whole story ---------- */
+function open(email){const p=P[email];if(!p)return;const dr=$("#drawer");
+  const c=p.creds[p.creds.length-1],t=c?tone(c):p.req&&p.req.reviewStatus==="repeat"?"o":"g";
+  dr.className="drawer glass "+t;
+  const mine=TRAIL.filter(e=>e.p===p);
+  let h=`<button class="x" aria-label="Close">×</button><span class="pill">${c?esc(lvlLabel(c)):p.req?(held(p)?"held · admin step":esc(p.req.reviewStatus==="repeat"?"resubmit":p.req.reviewStatus||"pending")):"no request"}</span><h2>${esc(p.name)}</h2><div style="font:400 12.5px/1.5 var(--mono);color:var(--ink3);overflow-wrap:anywhere">${esc(p.email)}${p.uid?" · uid "+esc(p.uid):""}</div>`;
+  if(c){const r=reason(c),e=ENG[c.ucid]||{};
+    h+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><a class="btn" href="${CERTS+esc(c.ucid)}" target="_blank" rel="noopener">Open ${esc(c.ucid)} ${arrow.replace('<svg','<svg width="14" height="14"')}</a></div>
+    <h4>Why approved</h4><div class="why-box"><p class="hl">${esc(r.headline)}</p>${r.why?`<p>${esc(r.why)}</p>`:""}${r.notes&&r.notes.length?`<p><b style="color:var(--ink)">Advice sent with it:</b> ${esc(r.notes.join(" "))}</p>`:""}<p style="font:400 11.5px/1.4 var(--mono);color:var(--ink3);margin:10px 0 0">${esc(r.by)}${r.score!=null?" · scored "+r.score+"/10":""} · issued ${esc(fmt(c.createdAt)||c.issuedDate)}${c.emailedAt?" · emailed "+esc(fmt(c.emailedAt)):" · not emailed"}</p></div>
+    <h4>Engagement</h4><div class="stats">${[["view","page views"],["pdf","PDF downloads"],["linkedin","LinkedIn adds"],["open","email opens*"]].map(([k,l])=>`<div class="stat"><b>${(e[k]||{}).n||0}</b><span>${l}</span></div>`).join("")}</div>
+    <p style="font-size:12px;color:var(--ink3);margin:8px 0 0">*NCI mail is pre-opened by Microsoft Safe Links, so email opens are inflated for ncirl.ie addresses.</p>`;
+    if(p.creds.length>1)h+=`<p style="color:var(--ink2)">Also holds: ${p.creds.slice(0,-1).map(x=>`<a href="${CERTS+esc(x.ucid)}" target="_blank" rel="noopener">${esc(x.ucid)}</a> (${esc(lvlLabel(x))})`).join(", ")}</p>`}
+  const v=p.verdicts[p.verdicts.length-1];
+  if(v&&v.exercises.length){h+=`<h4>Latest verdict per submission</h4>`+v.exercises.map(e=>`<div class="ex"><div class="row"><span class="pill ${e.verdict==="PASS"?"g":"o"}">${esc(e.verdict)}</span><b>${esc(EX[e.exerciseId]||e.exerciseId)}</b></div>${e.feedback?`<p>${esc(e.feedback)}</p>`:""}</div>`).join("");
+    if(v.notes&&v.notes.length)h+=`<div class="ex"><div class="row"><span class="pill y">Note</span></div><p>${esc(v.notes.join(" "))}</p></div>`}
+  if(p.runs.length){const seen=new Set();h+=`<h4>Grading runs (${p.runs.length})</h4>`+p.runs.filter(r=>{const k=JSON.stringify(r.items);if(seen.has(k))return false;seen.add(k);return true}).map(r=>`<div class="ex"><div class="row"><b style="font:500 12px/1 var(--mono)">${esc(r.batch.slice(0,16).replace("T"," ").replace(/-(\d\d)$/,":$1"))} UTC</b><span class="pill ${/PASS/.test(r.recommend)?"g":/REPEAT/.test(r.recommend)?"o":"p"}">${esc(r.recommend)}</span></div><p>${r.items.map(i=>esc(EX[i.id]||i.id)+" <b style='color:var(--ink)'>"+esc(i.v)+"</b>"+(i.c?" "+esc(i.c):"")+(i.why?" <span style='color:var(--ink3)'>("+esc(i.why)+")</span>":"")).join(" · ")}</p></div>`).join("")+`<p style="font-size:12px;color:var(--ink3)">Identical consecutive runs are collapsed. Runs are internal and were not all shown to the learner.</p>`}
+  h+=`<h4>Audit trail</h4>`+timeline(mine,false);
+  dr.innerHTML=h;dr.scrollTop=0;dr.classList.add("on");dr.setAttribute("aria-hidden","false");$("#veil").classList.add("on");
+  dr.querySelector(".x").onclick=close;dr.querySelector(".x").focus({preventScroll:true});
+  try{history.replaceState(null,"","#"+encodeURIComponent(email))}catch(e){}}
+function close(){$("#drawer").classList.remove("on");$("#drawer").setAttribute("aria-hidden","true");$("#veil").classList.remove("on");try{history.replaceState(null,"",location.pathname)}catch(e){}}
+
+/* ---------- interactions ---------- */
+document.addEventListener("click",e=>{
+  const tab=e.target.closest(".tab");if(tab){TAB=tab.dataset.t;FILTER=null;render();return}
+  const f=e.target.closest(".filt");if(f){FILTER=FILTER===f.dataset.f?null:f.dataset.f;render();return}
+  const k=e.target.closest(".kpi");if(k){TAB="decisions";FILTER=[null,"y","b","g","o"][+k.dataset.k];render();$("#tabs").scrollIntoView({behavior:"smooth",block:"start"});return}
+  const o=e.target.closest("[data-email]");if(o&&!e.target.closest("a[href]")){open(o.dataset.email);return}
+  if(e.target.id==="veil")close();
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")close();if(e.key==="/"&&document.activeElement!==$("#q")){e.preventDefault();$("#q").focus()}});
+$("#q").addEventListener("input",render);
+/* pointer glow + slight tilt, desktop only, skipped for reduced motion */
+const fine=matchMedia("(hover:hover) and (pointer:fine)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches;
+if(fine)document.addEventListener("pointermove",e=>{const g=e.target.closest(".hov");if(!g)return;const r=g.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+  g.style.setProperty("--mx",x*100+"%");g.style.setProperty("--my",y*100+"%");if(!g.classList.contains("pr")){g.style.setProperty("--ry",(x-.5)*5+"deg");g.style.setProperty("--rx",(.5-y)*5+"deg")}});
+document.addEventListener("pointerout",e=>{const g=e.target.closest(".hov");if(g&&!g.contains(e.relatedTarget)){g.style.removeProperty("--rx");g.style.removeProperty("--ry")}});
+try{const t=localStorage.getItem("certdash-tab");if(["decisions","people","audit"].includes(t))TAB=t}catch(e){}
+$("#foot").textContent=`${D.creds.length} credentials · ${D.requests.length} requests · ${D.verdicts.length} recorded decisions · ${D.manual.length} manual reviews. Local file: it names learners, so it never goes to the public repo. Rebuild: node certs-system/scripts/grading/dashboard.mjs`;
+render();
+if(location.hash.length>1){const em=decodeURIComponent(location.hash.slice(1));if(P[em])open(em)}
+</script>
+</body>
+</html>

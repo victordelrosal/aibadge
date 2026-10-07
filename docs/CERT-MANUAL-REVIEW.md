@@ -51,7 +51,11 @@ because approving a learner emails them a credential. A pasted decision block on
    - The results go to `<batch>/APPLIED.json`.
 3. Verify each `https://certs.fiveinnolabs.com/<code>` returns 200 with the right name, `config:autoissue`
    reads `off`, and each `certreq:<uid>` shows passed or repeat.
-4. Report the cert URLs to Victor.
+4. Rebuild the approval dashboard: `node dashboard.mjs`, then `open ../../../reports/cert-dashboard.html`.
+   It shows every credential with the reason it was approved and who approved it, each person's full
+   history, and one audit trail of requests, decisions, issues, emails and LinkedIn adds. It is local only,
+   because it names learners.
+5. Report the cert URLs to Victor.
 
 ## Rules that do not bend
 - Automation stays off (launchd plist `.disabled`, KV `config:autoissue` and `config:autofeedback` off) until
