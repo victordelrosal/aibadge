@@ -5,7 +5,8 @@
 // decisions.json: { "approvedBy": "Victor del Rosal", "learners": [ {
 //   "uid": "...", "decision": "approve" | "resubmit" | "hold",
 //   "items": { "<exerciseId>": { "verdict": "PASS"|"REPEAT", "feedback": "..." } | "drop" },
-//   "notes": ["learner-facing to-do", ...] } ] }
+//   "notes": ["learner-facing to-do", ...],
+//   "name": "...", "nameSource": "..." (optional: only used when the profile has no name) } ] }
 //
 // approve  -> issue Level 1 on certs (emails the learner), then cert-resolve "pass".
 //             Every kept item must be PASS; "drop" leaves an item out of the record.
@@ -67,7 +68,9 @@ try {
       if (exercises.some((x) => x.verdict !== "PASS")) { r.error = "approve needs every kept item PASS (override or drop)"; results.push(r); continue; }
       if (!(meta.emailProven && meta.emailProven.method === "code" && String(meta.emailProven.email).toLowerCase() === email)) { r.error = "email not proven"; results.push(r); continue; }
       const user = await (await fetch(`${fs}/users/${l.uid}`, { headers: { Authorization: "Bearer " + token } })).json();
-      const name = String(user.fields?.displayName?.stringValue || "").normalize("NFC").trim();
+      // l.name overrides an empty profile name; l.nameSource must say where it came from (the learner's own page).
+      const name = String(user.fields?.displayName?.stringValue || (l.nameSource ? l.name : "") || "").normalize("NFC").trim();
+      if (l.name && !user.fields?.displayName?.stringValue) r.nameSource = l.nameSource;
       if (name.length < 2 || name.includes("@")) { r.error = "no usable profile name"; results.push(r); continue; }
       r.name = name;
       if (DRY) { r.wouldIssue = true; results.push(r); continue; }
