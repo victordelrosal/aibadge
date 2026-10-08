@@ -2861,6 +2861,88 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       #view-admin.lms-dark .amx-foot td, #view-admin.lms-dark .amx-foot .amx-td-name { background:#0a1230; }
       #view-admin.lms-dark .amx-detail-row td { background:#070c22; }
       #view-admin.lms-dark .amx-sub-item { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.07); }
+
+      /* ---- Badges + matrix polish (2026-10-08). L1 = innovator blue, L2 = innovator yellow. ---- */
+      #view-admin { --l1:47,120,255; --l2:245,206,52; }
+      .amx-kicker { display:block; font:600 0.62rem/1 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing:0.16em; text-transform:uppercase; color:rgb(var(--l1)); margin-bottom:6px; }
+      .amx-matrix-card { position:relative; overflow:hidden; }
+      .amx-matrix-card::before { content:''; position:absolute; inset:0 0 auto 0; height:2px; background:linear-gradient(90deg, rgba(var(--l1),0.9), rgba(var(--l1),0.25) 55%, rgba(var(--l2),0.9)); }
+      #view-admin.lms-dark .amx-matrix-card { background:radial-gradient(120% 70% at 0% 0%, rgba(var(--l1),0.10), transparent 55%), radial-gradient(80% 60% at 100% 0%, rgba(var(--l2),0.06), transparent 60%), rgba(255,255,255,0.035); box-shadow:0 20px 60px -30px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05); }
+      .amx-legend { display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; font-size:0.74rem; opacity:0.8; margin:0 0 12px; }
+      .amx-legend > span { display:inline-flex; align-items:center; gap:6px; }
+      .amx-legend i { font-style:normal; }
+      /* ticks */
+      .amx-tick { display:inline-grid; place-items:center; width:20px; height:20px; border-radius:7px; font-size:0.72rem; font-weight:800; color:#1f5fd6; background:rgba(var(--l1),0.13); box-shadow:inset 0 0 0 1px rgba(var(--l1),0.32); }
+      .amx-tick-2 { color:#8a6400; background:rgba(var(--l2),0.20); box-shadow:inset 0 0 0 1px rgba(var(--l2),0.55); }
+      #view-admin.lms-dark .amx-tick-1 { color:#8fb6ff; background:rgba(var(--l1),0.18); box-shadow:inset 0 0 0 1px rgba(var(--l1),0.45), 0 0 10px -2px rgba(var(--l1),0.45); }
+      #view-admin.lms-dark .amx-tick-2 { color:#ffe27a; background:rgba(var(--l2),0.14); box-shadow:inset 0 0 0 1px rgba(var(--l2),0.45), 0 0 10px -2px rgba(var(--l2),0.4); }
+      .amx-table thead tr.amx-group-row th.amx-group-l1 { color:rgb(var(--l1)); }
+      #view-admin.lms-dark .amx-table thead tr.amx-group-row th.amx-group-l2 { color:rgb(var(--l2)); }
+      /* hex gems */
+      .amx-gem { display:inline-grid; place-items:center; width:28px; height:31px; clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); font:700 0.8rem/1 'Inter',-apple-system,sans-serif; color:#fff; text-decoration:none; transition:transform 0.18s ease, filter 0.18s ease; }
+      .amx-gem-1 { background:linear-gradient(150deg, #8db4ff 0%, rgb(var(--l1)) 45%, #1840a8 100%); filter:drop-shadow(0 0 6px rgba(var(--l1),0.55)); }
+      .amx-gem-2 { background:linear-gradient(150deg, #fff1a8 0%, rgb(var(--l2)) 45%, #b07d00 100%); color:#3a2a00; filter:drop-shadow(0 0 6px rgba(var(--l2),0.5)); }
+      .amx-gem-legacy { opacity:0.7; }
+      a.amx-gem:hover { transform:scale(1.18) rotate(-4deg); filter:drop-shadow(0 0 10px rgba(255,255,255,0.35)) brightness(1.1); }
+      .amx-gem-sm { width:18px; height:20px; font-size:0.6rem; }
+      .amx-gem-ready { display:inline-block; width:24px; height:27px; clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); background:rgba(var(--l1),0.55); position:relative; vertical-align:middle; }
+      .amx-gem-ready::after { content:''; position:absolute; inset:2px; clip-path:inherit; background:#fff; }
+      .amx-gem-ready-2 { background:rgba(var(--l2),0.7); }
+      .amx-gem-ready.amx-gem-sm { width:16px; height:18px; }
+      @media (prefers-reduced-motion:no-preference) { .amx-gem-ready { animation:amxReady 2.4s ease-in-out infinite; } }
+      @keyframes amxReady { 50% { opacity:0.45; } }
+      .amx-table th.amx-th-badge, .amx-table td.amx-td-badge { padding:6px 10px; background:rgba(var(--l1),0.05); box-shadow:inset 1px 0 rgba(var(--l1),0.18), inset -1px 0 rgba(var(--l1),0.18); }
+      .amx-table th.amx-th-badge.amx-l2, .amx-table td.amx-td-badge.amx-l2 { background:rgba(var(--l2),0.07); box-shadow:inset 1px 0 rgba(var(--l2),0.25), inset -1px 0 rgba(var(--l2),0.25); }
+      .amx-table thead th.amx-th-badge { background:#eaf0ff; }
+      .amx-table thead th.amx-th-badge.amx-l2 { background:#f8f1d8; }
+      #view-admin.lms-dark .amx-table thead th.amx-th-badge { background:#0d1a45 !important; }
+      #view-admin.lms-dark .amx-table thead th.amx-th-badge.amx-l2 { background:#1d1a24 !important; }
+      #view-admin.lms-dark .amx-gem-ready::after { background:#0a1028; }
+      .amx-foot-badge-1 { color:rgb(var(--l1)); opacity:1 !important; }
+      .amx-foot-badge-2 { color:#a87b00; opacity:1 !important; }
+      #view-admin.lms-dark .amx-foot-badge-2 { color:rgb(var(--l2)); }
+      /* completion bar */
+      .amx-td-pct strong { display:block; }
+      .amx-pct-bar { display:block; width:42px; height:3px; margin:3px auto 0; border-radius:3px; background:rgba(128,128,140,0.18); overflow:hidden; }
+      .amx-pct-bar span { display:block; height:100%; border-radius:3px; background:linear-gradient(90deg, rgb(var(--l1)), rgb(var(--l2))); }
+      /* KPI badge card */
+      .amx-kpi-badge { position:relative; overflow:hidden; box-shadow:inset 0 2px 0 rgba(var(--l2),0.85); }
+      #view-admin.lms-dark .amx-kpi-badge { background:radial-gradient(120% 90% at 100% 0%, rgba(var(--l2),0.14), transparent 60%), rgba(255,255,255,0.05); }
+      .amx-kpi-split { display:flex; gap:6px; justify-content:center; margin-top:6px; }
+      .amx-pip { font:600 0.62rem/1 ui-monospace,Menlo,monospace; letter-spacing:0.06em; padding:3px 6px; border-radius:999px; }
+      .amx-pip-1 { color:#1f5fd6; background:rgba(var(--l1),0.13); }
+      .amx-pip-2 { color:#8a6400; background:rgba(var(--l2),0.22); }
+      #view-admin.lms-dark .amx-pip-1 { color:#9cc0ff; background:rgba(var(--l1),0.2); }
+      #view-admin.lms-dark .amx-pip-2 { color:#ffe27a; background:rgba(var(--l2),0.15); }
+      /* credential cards in the drill-down */
+      .amx-detail { text-align:left; white-space:normal; }
+      .amx-detail .admin-detail-title { margin-top:6px; }
+      #view-admin.lms-dark .amx-detail .admin-stat { background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03)); }
+      #view-admin.lms-dark .amx-detail .admin-stat-value { font-size:1.35rem; letter-spacing:-0.01em; }
+      .amx-creds { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin:16px 0 4px; }
+      .amx-cred { --c:var(--l1); position:relative; display:flex; flex-direction:column; gap:6px; min-height:128px; padding:16px 18px 14px; border-radius:16px; overflow:hidden; text-decoration:none; color:inherit; isolation:isolate;
+        background:radial-gradient(140% 120% at 0% 0%, rgba(var(--c),0.22), transparent 55%), rgba(255,255,255,0.75); border:1px solid rgba(var(--c),0.28); box-shadow:inset 0 2px 0 rgba(var(--c),0.9), 0 12px 30px -18px rgba(var(--c),0.7); transition:transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+      .amx-cred-2 { --c:var(--l2); }
+      #view-admin.lms-dark .amx-cred { background:radial-gradient(140% 120% at 0% 0%, rgba(var(--c),0.20), transparent 55%), rgba(12,18,48,0.7); }
+      a.amx-cred:hover { transform:translateY(-3px); border-color:rgba(var(--c),0.6); box-shadow:inset 0 2px 0 rgba(var(--c),1), 0 18px 40px -16px rgba(var(--c),0.85); }
+      .amx-cred-num { position:absolute; right:-6px; bottom:-34px; z-index:-1; font:800 9rem/1 'Inter',-apple-system,sans-serif; color:transparent; -webkit-text-stroke:2px rgba(var(--c),0.28); pointer-events:none; }
+      .amx-cred-kicker { align-self:flex-start; font:600 0.6rem/1 ui-monospace,Menlo,monospace; letter-spacing:0.14em; text-transform:uppercase; padding:4px 8px; border-radius:999px; background:rgba(var(--c),0.16); color:rgb(var(--c)); }
+      .amx-cred-2 .amx-cred-kicker { color:#8a6400; }
+      #view-admin.lms-dark .amx-cred-2 .amx-cred-kicker { color:rgb(var(--l2)); }
+      .amx-cred-title { font:700 1.25rem/1.15 'Playfair Display',serif; margin-top:2px; }
+      .amx-cred-meta { display:flex; flex-wrap:wrap; gap:4px 12px; font-size:0.76rem; opacity:0.75; }
+      .amx-cred-code { font-family:ui-monospace,Menlo,monospace; font-weight:700; opacity:1; }
+      .amx-cred-cta { margin-top:auto; font:600 0.7rem/1 ui-monospace,Menlo,monospace; letter-spacing:0.08em; text-transform:uppercase; color:rgb(var(--c)); }
+      .amx-cred-2 .amx-cred-cta { color:#a87b00; }
+      #view-admin.lms-dark .amx-cred-2 .amx-cred-cta { color:rgb(var(--l2)); }
+      .amx-cred-cta b { display:inline-block; transition:transform 0.2s ease; }
+      a.amx-cred:hover .amx-cred-cta b { transform:translateX(5px); }
+      .amx-cred-ghost { background:rgba(128,128,140,0.05) !important; border:1px dashed rgba(var(--c),0.35); box-shadow:none; }
+      .amx-cred-ghost .amx-cred-title { opacity:0.55; }
+      .amx-cred-ghost .amx-cred-num { -webkit-text-stroke-color:rgba(var(--c),0.12); }
+      .amx-cred-track { display:block; margin-top:auto; height:4px; border-radius:4px; background:rgba(128,128,140,0.18); overflow:hidden; }
+      .amx-cred-track span { display:block; height:100%; background:rgb(var(--c)); border-radius:4px; }
+      @media (prefers-reduced-motion:reduce) { .amx-cred, .amx-gem, .amx-cred-cta b { transition:none; } }
     </style>
 
     <!-- Tutorial cards (each tutorial = its own card). Visible to every
@@ -3715,6 +3797,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.avgCompletion + '%'"></div><div class="amx-kpi-lab">Avg completion</div></div>
       <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.submissions"></div><div class="amx-kpi-lab">Submissions</div></div>
       <div class="amx-kpi"><div class="amx-kpi-val" x-text="kpis.engaged"></div><div class="amx-kpi-lab">Engaged time</div></div>
+      <div class="amx-kpi amx-kpi-badge" :title="credStats ? 'Learners holding an issued AI Badge credential' : 'Loading credentials from certs.fiveinnolabs.com'">
+        <div class="amx-kpi-val"><span x-text="credStats ? badgeHolders(0) : '…'"></span></div>
+        <div class="amx-kpi-lab">Badge holders</div>
+        <div class="amx-kpi-split" x-show="credStats"><span class="amx-pip amx-pip-1" x-text="'L1 ' + badgeHolders(1)"></span><span class="amx-pip amx-pip-2" x-text="'L2 ' + badgeHolders(2)"></span></div>
+      </div>
     </div>
 
     <!-- Controls -->
@@ -3813,10 +3900,21 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     </div>
 
     <!-- Completion matrix -->
-    <div class="amx-card" x-show="!loading && users.length > 0">
+    <div class="amx-card amx-matrix-card" x-show="!loading && users.length > 0">
       <div class="amx-card-head">
-        <h2 class="amx-card-title">Completion matrix</h2>
-        <span class="amx-card-sub" x-text="allTutorials.length + ' tutorials · Level 1 then Level 2 (tinted) · click a row for full detail'"></span>
+        <div>
+          <span class="amx-kicker">Progress &amp; credentials</span>
+          <h2 class="amx-card-title">Completion matrix</h2>
+        </div>
+        <span class="amx-card-sub" x-text="allTutorials.length + ' tutorials · each level ends in its badge · click a row for full detail'"></span>
+      </div>
+      <div class="amx-legend">
+        <span><i class="amx-tick amx-tick-1">✓</i> Level 1 tutorial done</span>
+        <span><i class="amx-tick amx-tick-2">✓</i> Level 2 tutorial done</span>
+        <span><i class="amx-gem amx-gem-1 amx-gem-sm">1</i><i class="amx-gem amx-gem-2 amx-gem-sm">2</i> credential issued (opens it)</span>
+        <span><i class="amx-gem-ready amx-gem-ready-1 amx-gem-sm"></i> level complete, no credential yet</span>
+        <span x-show="credLoading" class="amx-card-sub">loading credentials…</span>
+        <span x-show="credError" style="color:#FF6B5E;" x-text="'Credentials: ' + credError"></span>
       </div>
       <div class="amx-scroll">
         <table class="amx-table">
@@ -3824,16 +3922,21 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <tr class="amx-group-row">
               <th class="amx-sticky"></th>
               <th></th>
-              <th class="amx-group-l1" :colspan="allTutorials.filter(t => t.track === 1).length">Level 1 · Foundations</th>
-              <th class="amx-group-l2" :colspan="allTutorials.filter(t => t.track === 2).length">Level 2 · Terminal</th>
+              <th class="amx-group-l1" :colspan="l1Tuts.length + 1">Level 1 · Foundations</th>
+              <th class="amx-group-l2" :colspan="l2Tuts.length + 1">Level 2 · Terminal</th>
               <th colspan="5"></th>
             </tr>
             <tr>
               <th class="amx-sticky amx-th-name" @click="setSort('name')">Learner <span x-show="sortKey==='name'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
               <th class="amx-th-id" @click="setSort('studentId')">ID</th>
-              <template x-for="(t, ti) in allTutorials" :key="t.id">
-                <th class="amx-th-tut" :class="{ 'amx-l2': t.track === 2, 'amx-l2-start': t.track === 2 && (ti === 0 || allTutorials[ti-1].track !== 2) }" :title="t.title + (t.track === 2 ? '  ·  Level 2' : '  ·  Level 1')"><span x-text="t.icon || '•'"></span></th>
+              <template x-for="t in l1Tuts" :key="t.id">
+                <th class="amx-th-tut" :title="t.title + '  ·  Level 1'"><span x-text="t.icon || '•'"></span></th>
               </template>
+              <th class="amx-th-badge" @click="setSort('badge')" title="Level 1 credential · click to sort by badge"><i class="amx-gem amx-gem-1 amx-gem-sm">1</i></th>
+              <template x-for="(t, ti) in l2Tuts" :key="t.id">
+                <th class="amx-th-tut amx-l2" :class="{ 'amx-l2-start': ti === 0 }" :title="t.title + '  ·  Level 2'"><span x-text="t.icon || '•'"></span></th>
+              </template>
+              <th class="amx-th-badge amx-l2" @click="setSort('badge')" title="Level 2 credential · click to sort by badge"><i class="amx-gem amx-gem-2 amx-gem-sm">2</i></th>
               <th class="amx-th-num" @click="setSort('completion')">% <span x-show="sortKey==='completion'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
               <th class="amx-th-num" @click="setSort('logins')">Logins <span x-show="sortKey==='logins'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
               <th class="amx-th-num" @click="setSort('engaged')">Engaged <span x-show="sortKey==='engaged'" x-text="sortDir==='asc'?'▲':'▼'"></span></th>
@@ -3849,13 +3952,29 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                   <span class="amx-name" x-text="displayName(u)"></span>
                 </td>
                 <td class="amx-td-id" x-text="u.studentId || '—'"></td>
-                <template x-for="(t, ti) in allTutorials" :key="t.id">
-                  <td class="amx-cell" :class="{ 'amx-l2': t.track === 2, 'amx-l2-start': t.track === 2 && (ti === 0 || allTutorials[ti-1].track !== 2) }">
-                    <span x-show="completionInfo(u.id, t.id)" class="amx-tick" :title="formatDateTime(completionInfo(u.id, t.id) && completionInfo(u.id, t.id).completedAt)">✓</span>
+                <template x-for="t in l1Tuts" :key="t.id">
+                  <td class="amx-cell">
+                    <span x-show="completionInfo(u.id, t.id)" class="amx-tick amx-tick-1" :title="t.title + ' · ' + formatDateTime(completionInfo(u.id, t.id) && completionInfo(u.id, t.id).completedAt)">✓</span>
                     <span x-show="!completionInfo(u.id, t.id)" class="amx-blank">·</span>
                   </td>
                 </template>
-                <td class="amx-td-num"><strong x-text="userCompletionPct(u) + '%'"></strong></td>
+                <td class="amx-cell amx-td-badge">
+                  <a x-show="badge(u, 1)" class="amx-gem amx-gem-1" :class="badge(u, 1) && badge(u, 1).legacy ? 'amx-gem-legacy' : ''" :href="badge(u, 1) ? 'https://certs.fiveinnolabs.com/' + badge(u, 1).ucid : '#'" target="_blank" rel="noopener" @click.stop :title="badgeTitle(badge(u, 1))">1</a>
+                  <span x-show="!badge(u, 1) && levelDone(u, 1) === l1Tuts.length && l1Tuts.length > 0" class="amx-gem-ready amx-gem-ready-1" title="All Level 1 tutorials done, no credential issued yet"></span>
+                  <span x-show="!badge(u, 1) && !(levelDone(u, 1) === l1Tuts.length && l1Tuts.length > 0)" class="amx-blank">·</span>
+                </td>
+                <template x-for="(t, ti) in l2Tuts" :key="t.id">
+                  <td class="amx-cell amx-l2" :class="ti === 0 ? 'amx-l2-start' : ''">
+                    <span x-show="completionInfo(u.id, t.id)" class="amx-tick amx-tick-2" :title="t.title + ' · ' + formatDateTime(completionInfo(u.id, t.id) && completionInfo(u.id, t.id).completedAt)">✓</span>
+                    <span x-show="!completionInfo(u.id, t.id)" class="amx-blank">·</span>
+                  </td>
+                </template>
+                <td class="amx-cell amx-td-badge amx-l2">
+                  <a x-show="badge(u, 2)" class="amx-gem amx-gem-2" :class="badge(u, 2) && badge(u, 2).legacy ? 'amx-gem-legacy' : ''" :href="badge(u, 2) ? 'https://certs.fiveinnolabs.com/' + badge(u, 2).ucid : '#'" target="_blank" rel="noopener" @click.stop :title="badgeTitle(badge(u, 2))">2</a>
+                  <span x-show="!badge(u, 2) && levelDone(u, 2) === l2Tuts.length && l2Tuts.length > 0" class="amx-gem-ready amx-gem-ready-2" title="All Level 2 tutorials done, no credential issued yet"></span>
+                  <span x-show="!badge(u, 2) && !(levelDone(u, 2) === l2Tuts.length && l2Tuts.length > 0)" class="amx-blank">·</span>
+                </td>
+                <td class="amx-td-num amx-td-pct"><strong x-text="userCompletionPct(u) + '%'"></strong><span class="amx-pct-bar"><span :style="'width:' + userCompletionPct(u) + '%'"></span></span></td>
                 <td class="amx-td-num" x-text="u.loginCount || 0"></td>
                 <td class="amx-td-num" x-text="engagedLabel(u.totalEngagedMs)"></td>
                 <td class="amx-td-num" x-text="relativeLast(u)"></td>
@@ -3883,6 +4002,37 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                           <span style="font-size:0.78rem;font-weight:600;" :style="'color:' + (u.enrolled ? '#34C759' : 'rgba(142,142,147,0.9)')" x-text="u.enrolled ? 'Enrolled' : 'Pending'"></span>
                           <button class="admin-toggle" :class="u.enrolled ? 'admin-toggle-on' : ''" @click.stop="toggleEnrolled(u)" :disabled="u.toggling"><span class="admin-toggle-knob"></span></button>
                         </div>
+                      </div>
+
+                      <!-- Credentials: one card per level -->
+                      <div class="amx-creds">
+                        <template x-for="lv in [1, 2]" :key="lv">
+                          <div class="amx-cred-wrap">
+                            <template x-if="badge(u, lv)">
+                              <a class="amx-cred" :class="'amx-cred-' + lv" :href="'https://certs.fiveinnolabs.com/' + badge(u, lv).ucid" target="_blank" rel="noopener" @click.stop>
+                                <span class="amx-cred-num" x-text="lv"></span>
+                                <span class="amx-cred-kicker" x-text="'Level ' + lv + ' · issued ' + (badge(u, lv).issuedDate || '') + (badge(u, lv).legacy ? ' · legacy' : '')"></span>
+                                <span class="amx-cred-title" x-text="lv === 2 ? 'Agent Operator' : 'AI Builder'"></span>
+                                <span class="amx-cred-meta">
+                                  <span class="amx-cred-code" x-text="badge(u, lv).ucid"></span>
+                                  <span x-text="credEv(badge(u, lv), 'view') + ' views'"></span>
+                                  <span x-text="(credEv(badge(u, lv), 'linkedin') + credEv(badge(u, lv), 'share') + credEv(badge(u, lv), 'copy')) + ' shares'"></span>
+                                  <span x-text="(credEv(badge(u, lv), 'pdf') + credEv(badge(u, lv), 'png')) + ' downloads'"></span>
+                                </span>
+                                <span class="amx-cred-cta">Open credential <b>&rarr;</b></span>
+                              </a>
+                            </template>
+                            <template x-if="!badge(u, lv)">
+                              <div class="amx-cred amx-cred-ghost" :class="'amx-cred-' + lv">
+                                <span class="amx-cred-num" x-text="lv"></span>
+                                <span class="amx-cred-kicker" x-text="'Level ' + lv + ' · ' + (credStats ? 'not issued' : 'loading')"></span>
+                                <span class="amx-cred-title" x-text="lv === 2 ? 'Agent Operator' : 'AI Builder'"></span>
+                                <span class="amx-cred-meta"><span x-text="levelDone(u, lv) + ' of ' + (lv === 2 ? l2Tuts : l1Tuts).length + ' tutorials done' + (levelDone(u, lv) === (lv === 2 ? l2Tuts : l1Tuts).length ? ' · ready' : '')"></span></span>
+                                <span class="amx-cred-track"><span :style="'width:' + Math.round(100 * levelDone(u, lv) / Math.max(1, (lv === 2 ? l2Tuts : l1Tuts).length)) + '%'"></span></span>
+                              </div>
+                            </template>
+                          </div>
+                        </template>
                       </div>
 
                       <!-- Quick stats -->
@@ -3960,9 +4110,14 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <tr class="amx-foot">
               <td class="amx-sticky amx-td-name">Completed</td>
               <td></td>
-              <template x-for="(t, ti) in allTutorials" :key="t.id">
-                <td class="amx-cell" :class="{ 'amx-l2': t.track === 2, 'amx-l2-start': t.track === 2 && (ti === 0 || allTutorials[ti-1].track !== 2) }" x-text="tutorialDoneCount(t.id)"></td>
+              <template x-for="t in l1Tuts" :key="t.id">
+                <td class="amx-cell" x-text="tutorialDoneCount(t.id)"></td>
               </template>
+              <td class="amx-cell amx-td-badge amx-foot-badge-1" x-text="credStats ? badgeHolders(1) : ''"></td>
+              <template x-for="(t, ti) in l2Tuts" :key="t.id">
+                <td class="amx-cell amx-l2" :class="ti === 0 ? 'amx-l2-start' : ''" x-text="tutorialDoneCount(t.id)"></td>
+              </template>
+              <td class="amx-cell amx-td-badge amx-l2 amx-foot-badge-2" x-text="credStats ? badgeHolders(2) : ''"></td>
               <td colspan="5"></td>
             </tr>
           </tbody>
@@ -5526,6 +5681,8 @@ try{
       credSortKey: 'lastTs',
       credSortDir: 'desc',
       credOnlyActive: false,
+      // Issued AI Badge credentials per learner uid: { uid: { 1: cred, 2: cred } }.
+      badgesByUid: {},
       search: '',
       cohortFilter: '',
       sortKey: 'lastSeen',
@@ -5539,6 +5696,8 @@ try{
         { key: 'toolFluency', label: 'Tool Fluency' }
       ],
       allTutorials: (window._lmsTutorials || []).filter(function(t) { return !t.pending; }),
+      get l1Tuts() { return this.allTutorials.filter(function(t) { return t.track !== 2; }); },
+      get l2Tuts() { return this.allTutorials.filter(function(t) { return t.track === 2; }); },
       init() {
         var self = this;
         initFirebase();
@@ -5628,6 +5787,7 @@ try{
         }
         this.loading = false;
         if (this.users.length) this.loadMatrix();
+        if (this.users.length) { if (this.credStats) this.rebuildBadges(); else this.loadCredStats(); }
       },
       async loadMatrix() {
         this.matrixLoading = true;
@@ -5770,6 +5930,7 @@ try{
             case 'logins': va = a.loginCount || 0; vb = b.loginCount || 0; break;
             case 'engaged': va = a.totalEngagedMs || 0; vb = b.totalEngagedMs || 0; break;
             case 'submissions': va = self.userSubmissionCount(a); vb = self.userSubmissionCount(b); break;
+            case 'badge': va = self.badgeTop(a) * 1000 + self.userCompletionPct(a); vb = self.badgeTop(b) * 1000 + self.userCompletionPct(b); break;
             case 'lastSeen': default:
               va = self.lastSeenDate(a) ? self.lastSeenDate(a).getTime() : 0;
               vb = self.lastSeenDate(b) ? self.lastSeenDate(b).getTime() : 0;
@@ -5822,6 +5983,7 @@ try{
           if (res.status === 401) throw new Error('This account is not the credential issuer.');
           if (!res.ok) throw new Error('certs API returned ' + res.status);
           this.credStats = await res.json();
+          this.rebuildBadges();
         } catch (e) {
           this.credError = e.message || String(e);
         } finally {
@@ -5829,6 +5991,43 @@ try{
         }
       },
       credEv(c, k) { return (c.events && c.events[k]) || 0; },
+      // Join issued credentials to learner accounts: by email first; by exact full
+      // name only when exactly one account carries that name (credentials issued to
+      // a personal address while the learner signed in with a student one).
+      rebuildBadges() {
+        var self = this, map = {}, byEmail = {}, byName = {};
+        var norm = function(x) { return String(x || '').normalize('NFC').trim().toLowerCase().replace(/\s+/g, ' '); };
+        this.users.forEach(function(u) {
+          if (u.email) byEmail[norm(u.email)] = u;
+          var n = norm(self.displayName(u));
+          if (n && n.indexOf('@') === -1) (byName[n] = byName[n] || []).push(u);
+        });
+        ((this.credStats && this.credStats.credentials) || []).forEach(function(c) {
+          if (c.status && c.status !== 'issued') return;
+          var u = c.email && byEmail[norm(c.email)], how = 'email';
+          if (!u) { var m = byName[norm(c.name)]; if (m && m.length === 1) { u = m[0]; how = 'name'; } }
+          if (!u) return;
+          var lv = Number(c.level || 1), slot = (map[u.id] = map[u.id] || {});
+          if (!slot[lv] || (slot[lv].legacy && !c.legacy)) slot[lv] = Object.assign({ matchedBy: how }, c);
+        });
+        this.badgesByUid = map;
+      },
+      badge(u, lv) { var b = this.badgesByUid[u.id]; return (b && b[lv]) || null; },
+      badgeTop(u) { var b = this.badgesByUid[u.id]; return b ? (b[2] ? 2 : (b[1] ? 1 : 0)) : 0; },
+      userBadges(u) { var b = this.badgesByUid[u.id] || {}; return [1, 2].filter(function(l) { return b[l]; }).map(function(l) { return b[l]; }); },
+      badgeTitle(c) {
+        if (!c) return '';
+        return 'Level ' + (c.level || 1) + (c.level === 2 ? ' · Agent Operator' : ' · AI Builder') + '  ·  ' + c.ucid +
+          '  ·  issued ' + (c.issuedDate || '?') + (c.legacy ? '  ·  legacy' : '') + (c.matchedBy === 'name' ? '  ·  matched by name' : '');
+      },
+      badgeHolders(lv) {
+        var self = this;
+        return this.users.filter(function(u) { return lv ? !!self.badge(u, lv) : self.badgeTop(u) > 0; }).length;
+      },
+      levelDone(u, track) {
+        var self = this, list = track === 2 ? this.l2Tuts : this.l1Tuts;
+        return list.filter(function(t) { return self.completionInfo(u.id, t.id); }).length;
+      },
       // Click any column to sort by it. First click gives the most interesting
       // end of that column (biggest number, most recent, A first for names).
       credSort(key) {
@@ -5906,7 +6105,7 @@ try{
       },
       exportCsv() {
         var self = this;
-        var headers = ['Name', 'Student ID', 'Email', 'Cohort', 'Programme', 'Enrolled', 'Logins', 'Engaged (min)', 'Last active', 'Completion %', 'Tutorials done', 'Submissions'];
+        var headers = ['Name', 'Student ID', 'Email', 'Cohort', 'Programme', 'Enrolled', 'Logins', 'Engaged (min)', 'Last active', 'Completion %', 'Tutorials done', 'Submissions', 'L1 credential', 'L2 credential'];
         var tutTitles = this.allTutorials.map(function(t) { return t.title; });
         headers = headers.concat(tutTitles);
         var esc = function(v) { v = (v === null || v === undefined) ? '' : String(v); return '"' + v.replace(/"/g, '""') + '"'; };
@@ -5917,7 +6116,8 @@ try{
             self.displayName(u), u.studentId || '', u.email || '', u.cohort || '', u.programme || '',
             u.enrolled ? 'yes' : 'no', u.loginCount || 0,
             Math.round((u.totalEngagedMs || 0) / 60000),
-            d ? d.toISOString() : '', self.userCompletionPct(u), self.userDoneCount(u), self.userSubmissionCount(u)
+            d ? d.toISOString() : '', self.userCompletionPct(u), self.userDoneCount(u), self.userSubmissionCount(u),
+            self.badge(u, 1) ? self.badge(u, 1).ucid : '', self.badge(u, 2) ? self.badge(u, 2).ucid : ''
           ];
           self.allTutorials.forEach(function(t) {
             var info = self.completionInfo(u.id, t.id);
