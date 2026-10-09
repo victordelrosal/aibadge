@@ -57,6 +57,9 @@
     '@media (max-width:400px){.lms-topbar > div:has(> .fil-keep:not([hidden])) > .lms-theme-toggle{display:none}}',
     '.fil-note{margin:0 0 14px;padding:11px 12px;border-radius:12px;background:rgba(0,122,255,.07);font-size:13px;line-height:1.45;color:#000036}',
     '.fil-note b{display:block;font-size:13.5px;margin-bottom:2px}',
+    '.fil-golink{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:42px;margin-top:10px;border:0;border-radius:10px;background:#0A66C2;color:#fff;font:600 14px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;cursor:pointer}',
+    '.fil-golink:hover{background:#004182}.fil-golink:focus-visible{outline:2px solid #007AFF;outline-offset:2px}.fil-golink svg{width:15px;height:15px}.fil-golink[aria-busy]{opacity:.75;cursor:progress}',
+    '.fil-keep[aria-busy]{opacity:.75;cursor:progress}',
     '.fil-note.kept{background:rgba(52,199,89,.1);display:flex;gap:8px;align-items:center}.fil-note.kept svg{flex:none;width:16px;height:16px;color:#1f9d47}',
     '.fil-later{display:block;margin:12px auto 0;padding:8px 14px;min-height:36px;border:0;background:none;border-radius:999px;font:600 13px/1 -apple-system,BlinkMacSystemFont,sans-serif;color:rgba(60,60,67,.6);cursor:pointer}',
     '.fil-later:hover{background:rgba(120,120,128,.1);color:#000036}.fil-later[hidden]{display:none}',
@@ -112,9 +115,20 @@
     if (note.hidden) return;
     note.className = 'fil-note' + (kept ? ' kept' : '');
     note.innerHTML = kept
-      ? TICK + '<span>LinkedIn linked. Your AI Badge, level and XP stay yours after you leave NCI.</span>'
-      : '<b>Link your LinkedIn</b>One tap. When your NCI email is gone, LinkedIn will still open this account, with your level and XP.';
+      ? TICK + '<span>LinkedIn linked. Your AI Badge, level and XP stay yours after you leave NCI, and LinkedIn opens the same account on aireckon.ing.</span>'
+      : '<b>Link your LinkedIn</b>One tap. When your NCI email is gone, LinkedIn will still open this account, with your level and XP, here and on aireckon.ing.' +
+        '<button type="button" class="fil-golink">' + TAG.linkedin + '<span>Link LinkedIn</span></button>';
+    var go = note.querySelector('.fil-golink'); if (go) go.addEventListener('click', function (e) { e.stopPropagation(); linkNow(go); });
     later.textContent = kept ? 'Done' : 'Not now';
+  }
+  /* one tap (9 Oct 2026, Victor: "make it easy for people to link their nci student account with linkedin"): the pill and
+     the note's button go straight to LinkedIn through the card's own <fil-ways> (the broker's one link flow) and come back
+     linked. If the page is still here a moment later something stopped it, so the card opens to show why. */
+  function linkNow(el) {
+    if (!user || !ways || typeof ways.connect !== 'function') { open(); return; }
+    if (el) { el.setAttribute('aria-busy', 'true'); var sp = el.querySelector('span:last-child'); if (sp) sp.textContent = 'Opening LinkedIn\u2026'; }
+    ways.connect('linkedin');
+    setTimeout(function () { if (el) { el.removeAttribute('aria-busy'); var sp2 = el.querySelector('span:last-child'); if (sp2) sp2.textContent = 'Link LinkedIn'; } if (card.hidden) open(); }, 4000);
   }
   function linkedNow(d) {
     var m = (d && d.methods) || {};
@@ -169,13 +183,13 @@
     note = document.createElement('p'); note.hidden = true; card.appendChild(note);
     keep = document.createElement('button'); keep.type = 'button'; keep.className = 'fil-keep'; keep.hidden = true;
     keep.title = 'Link your LinkedIn to keep your AI Badge after NCI';
-    keep.innerHTML = '<span class="fil-pair" aria-hidden="true"><i class="li">' + TAG.linkedin + '</i></span><span>Link<span class="fil-long"> LinkedIn</span></span>';
+    keep.innerHTML = '<span class="fil-pair" aria-hidden="true"><i class="li">' + TAG.linkedin + '</i></span><span>Link LinkedIn</span>';
     me.parentNode.insertBefore(keep, me);
     /* the AI Badge level gem and XP in the top bar, beside the photo, as on aireckon.ing (3 Oct 2026, Victor:
        "these students MUST GET the XP ... must show in AI badge navbar"). <fil-level mine> fills itself from filXp. */
     topLevel = document.createElement('fil-level'); topLevel.setAttribute('mine', ''); topLevel.className = 'fil-top-level'; topLevel.hidden = true;
     me.parentNode.insertBefore(topLevel, keep);
-    keep.addEventListener('click', function (e) { e.stopPropagation(); card.hidden ? open() : close(true); });
+    keep.addEventListener('click', function (e) { e.stopPropagation(); linkNow(keep); });
     ways = document.createElement('fil-ways'); ways.setAttribute('auth', 'firebase');
     ways.idToken = function () { return user ? user.getIdToken() : Promise.resolve(null); };
     ways.connectGoogle = function () {
