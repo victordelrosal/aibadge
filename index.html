@@ -5507,7 +5507,7 @@ try{
           var _lid = parsed.params[1];
           var _tut = (window._lmsTutorials || []).filter(function(t){ return t.id === _lid; })[0];
           var _canView = auth.isEnrolled || auth.isAdmin || auth.isNci || (Date.now() < ACCESS_AMNESTY_UNTIL) || (_tut && _tut.free === true);
-          if (_canView && parsed.params[0] && parsed.params[1]) {
+          if (_canView && parsed.params[0] && parsed.params[1] && !(_tut && _tut.pending)) {
             ui.view = 'lesson'; ui.activeModuleId = parsed.params[0]; ui.activeLessonId = parsed.params[1];
           } else { ui.view = 'dashboard'; }
           break;
