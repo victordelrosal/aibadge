@@ -2633,40 +2633,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .lms-new-pill { display:inline-block; margin-left:6px; padding:2px 8px; border-radius:999px; background:#FF3B30; color:#fff; font:700 10px/16px -apple-system,sans-serif; letter-spacing:0.04em; text-transform:uppercase; vertical-align:2px; }
       @media (max-width:600px) { .news-panel { position:fixed; top:62px; left:12px; right:12px; width:auto; max-width:none; } }
 
-      .news-gate { position:fixed; inset:0; z-index:10050; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,30,0.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
-      .news-gate-card { width:100%; max-width:440px; max-height:calc(100vh - 32px); overflow:auto; background:#fff; border-radius:22px; padding:28px 26px 22px; box-shadow:0 30px 80px rgba(0,0,40,0.35); font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif; color:#1c1c1e; }
-      .news-gate-tag { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px; background:rgba(255,59,48,0.1); color:#d70015; font:700 11px/1 -apple-system,sans-serif; letter-spacing:0.06em; text-transform:uppercase; }
-      .news-gate-tag i { width:7px; height:7px; border-radius:50%; background:#FF3B30; display:inline-block; animation:newsDot 1.4s ease-in-out infinite; }
-      @keyframes newsDot { 50% { opacity:0.25; } }
-      .news-gate-card h2 { font:700 26px/1.2 -apple-system,BlinkMacSystemFont,sans-serif; color:#000036; margin:14px 0 6px; letter-spacing:-0.01em; }
-      .news-gate-blurb { font:400 15px/1.5 -apple-system,sans-serif; color:rgba(60,60,67,0.78); margin:0 0 18px; }
-      .news-steps { list-style:none; margin:0 0 20px; padding:0; counter-reset:ns; }
-      .news-steps li { position:relative; padding:0 0 14px 42px; counter-increment:ns; }
-      .news-steps li:last-child { padding-bottom:0; }
-      .news-steps li::before { content:counter(ns); position:absolute; left:0; top:-2px; width:28px; height:28px; border-radius:50%; background:#F2F2F7; color:#000036; font:700 13px/28px -apple-system,sans-serif; text-align:center; }
-      .news-steps li:not(:last-child)::after { content:''; position:absolute; left:13.5px; top:28px; bottom:2px; width:1px; background:rgba(60,60,67,0.15); }
-      .news-steps li.now::before { background:#000036; color:#fff; }
-      .news-steps li.done::before { content:'\2713'; background:#34C759; color:#fff; }
-      .news-steps b { display:block; font:600 15px/1.35 -apple-system,sans-serif; color:#1c1c1e; }
-      .news-steps span { display:block; font:400 13px/1.45 -apple-system,sans-serif; color:rgba(60,60,67,0.65); }
-      .news-gate-cta { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:52px; border:none; border-radius:14px; cursor:pointer; background:#000036; color:#fff; font:700 16px/1 -apple-system,sans-serif; box-shadow:0 8px 24px rgba(0,0,54,0.28); transition:transform .14s, box-shadow .2s; }
-      .news-gate-cta:hover { transform:translateY(-1px); box-shadow:0 12px 30px rgba(0,0,54,0.34); }
-      .news-gate-cta:active { transform:scale(0.98); }
-      .news-gate-foot { font:400 12.5px/1.45 -apple-system,sans-serif; color:rgba(60,60,67,0.55); text-align:center; margin:12px 0 0; }
-
-      .news-ack { margin:2rem 0 1rem; text-align:center; scroll-margin-top:80px; }
-      .news-ack h3 { margin:0.4rem 0 0.4rem; font-size:1.3rem; }
-      .news-ack p { margin:0 auto 1rem; max-width:34rem; }
-      .news-ack-row { display:flex; gap:0.6rem; max-width:22rem; margin:0 auto; }
-      .news-ack-row .cg-submit-input { text-align:center; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; }
-      .news-ack-row .cg-submit-btn:disabled { opacity:0.45; cursor:not-allowed; }
-      .news-ack-err { color:#ef4444; font-size:0.85rem; margin-top:0.6rem !important; }
-      .news-ack-done-icon { width:52px; height:52px; border-radius:50%; background:#22c55e; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:26px; font-weight:700; }
-      .news-ack-back { display:inline-flex; align-items:center; gap:6px; margin-top:0.25rem; padding:0.7rem 1.2rem; border-radius:0.6rem; background:var(--cg-electric,#0066FF); color:#fff !important; text-decoration:none !important; font-weight:600; }
-      .news-pill { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:150; display:flex; align-items:center; gap:8px; padding:11px 18px; border-radius:999px; border:none; cursor:pointer; background:#000036; color:#fff; font:600 14px/1.2 -apple-system,sans-serif; box-shadow:0 10px 30px rgba(0,0,54,0.35); white-space:nowrap; max-width:calc(100vw - 32px); pointer-events:none; }
-      .news-pill i { width:8px; height:8px; border-radius:50%; background:#FF3B30; display:inline-block; flex:0 0 auto; }
-      @media (max-width:600px) { .news-pill { font-size:13px; padding:10px 14px; bottom:14px; } }
-      @media (prefers-reduced-motion: reduce) { .news-bell.news-live, .news-bell.news-live svg, .news-gate-tag i { animation:none; } }
+      @media (prefers-reduced-motion: reduce) { .news-bell.news-live, .news-bell.news-live svg { animation:none; } }
 
       /* Pending modules */
       .lms-pending { opacity:0.45; }
@@ -3741,35 +3708,6 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <!-- Dynamic lesson content -->
     <div x-show="!lessonLoading && !lessonError" x-html="lessonContent"></div>
 
-    <!-- Required reading: confirmation at the very end of the lesson (3 Oct 2026) -->
-    <template x-if="!lessonLoading && !lessonError && $store.news.mustRead($store.ui.activeLessonId)">
-      <div id="news-ack" class="news-ack cg-submit-box">
-        <template x-if="!$store.news.isAcked($store.ui.activeLessonId)">
-          <div>
-            <h3>You reached the end</h3>
-            <p>One click confirms you have read this lesson. The hands-on missions can wait until you are ready.</p>
-            <form class="news-ack-row" @submit.prevent="$store.news.ack($store.ui.activeLessonId)">
-              <button type="submit" class="cg-submit-btn" :disabled="$store.news.saving" x-text="$store.news.saving ? 'Saving\u2026' : 'I\u2019ve read it \u2713'"></button>
-            </form>
-            <p class="news-ack-err" x-show="$store.news.error" x-text="$store.news.error"></p>
-          </div>
-        </template>
-        <template x-if="$store.news.isAcked($store.ui.activeLessonId)">
-          <div>
-            <div class="news-ack-done-icon">&#10003;</div>
-            <h3>Confirmed. Thank you.</h3>
-            <p>Your dashboard is unlocked. Come back to this lesson any time for the hands-on missions.</p>
-            <a href="#/dashboard" class="news-ack-back">Back to dashboard &rarr;</a>
-          </div>
-        </template>
-      </div>
-    </template>
-    <div class="news-pill" role="status" x-data="{ near: false }"
-            @scroll.window.throttle.150ms="near = (window.innerHeight + window.scrollY) > (document.documentElement.scrollHeight - 500)"
-            x-show="!lessonLoading && $store.news.mustRead($store.ui.activeLessonId) && !$store.news.isAcked($store.ui.activeLessonId) && !near"
-            x-transition.opacity style="display:none;">
-      <i></i>Read to the end, then confirm &darr;
-    </div>
 
   </div>
 
@@ -4425,27 +4363,6 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 </div>
 
 <!-- ===================== UPGRADE MODAL (freemium lock) ===================== -->
-<!-- Required-reading gate: cannot be dismissed; hides while the learner is in the lesson (3 Oct 2026) -->
-<div class="news-gate" x-show="$store.news.gateVisible" x-transition.opacity.duration.250ms style="display:none;"
-     x-effect="document.documentElement.style.overflow = $store.news.gateVisible ? 'hidden' : ''"
-     role="dialog" aria-modal="true" aria-labelledby="newsGateTitle">
-  <template x-if="$store.news.gateItem">
-    <div class="news-gate-card">
-      <span class="news-gate-tag"><i></i>New lesson &middot; please read</span>
-      <h2 id="newsGateTitle" x-text="$store.news.gateItem.title"></h2>
-      <p class="news-gate-blurb" x-text="$store.news.gateItem.blurb"></p>
-      <ol class="news-steps">
-        <li :class="$store.news.wasOpened($store.news.gateItem.id) ? 'done' : 'now'"><b>Open the lesson</b><span x-text="$store.news.gateItem.tag"></span></li>
-        <li :class="$store.news.wasOpened($store.news.gateItem.id) ? 'now' : ''"><b>Read it to the very end</b><span>Scroll down and open each section as you go.</span></li>
-        <li><b>Press &ldquo;I&rsquo;ve read it&rdquo;</b><span>The button is at the bottom of the lesson. This message then goes away for good.</span></li>
-      </ol>
-      <button type="button" class="news-gate-cta" @click="$store.news.openItem($store.news.gateItem)">
-        <span x-text="$store.news.wasOpened($store.news.gateItem.id) ? 'Continue reading' : 'Open the lesson'"></span><span aria-hidden="true">&rarr;</span>
-      </button>
-      <p class="news-gate-foot">Reading takes about 10 minutes. The hands-on missions can wait.</p>
-    </div>
-  </template>
-</div>
 
 <div x-show="$store.ui.activeModal === 'upgrade'"
      x-transition:enter="transition ease-out duration-300"
@@ -5406,14 +5323,13 @@ try{
       closeModal() { this.activeModal = null; document.body.style.overflow = ''; }
     });
 
-    // New lessons (bell) and required reading (gate). Add an item here to announce a lesson;
-    // mustRead: true blocks the dashboard until the learner types OK at the end of that lesson.
-    // Seen/opened are per-device conveniences (localStorage); the confirmation is saved on the
-    // learner's user doc as acks.<id> so it follows them to every device.
+    // New lessons (bell). Add an item here to announce a lesson. Seen/opened are per-device
+    // conveniences (localStorage). The required-reading gate was removed 11 Oct 2026 (Victor);
+    // old confirmations on users.acks.<id> still mark an item as read.
     window._lmsNews = [
       { id: 'ai-on-terminal', title: 'AI on the Terminal', tag: 'Level 2 \u00b7 new written lesson',
         blurb: 'Run an AI agent on your own computer, safely, with any tool. Includes the honest answer to "can I do this for free?" (checked 3 October 2026).',
-        route: '#/lesson/ai-on-terminal/ai-on-terminal', mustRead: true }
+        route: '#/lesson/ai-on-terminal/ai-on-terminal' }
     ];
     var _newsRead = function(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } };
     var _newsWrite = function(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
@@ -5422,11 +5338,8 @@ try{
       panelOpen: false,
       seen: _newsRead('aibadge-news-seen'),
       opened: _newsRead('aibadge-news-opened'),
-      saving: false,
-      error: '',
       isAcked(id) { var p = Alpine.store('auth').profile; return !!(p && p.acks && p.acks[id]); },
       isNew(id) { return this.items.some(function(i){ return i.id === id; }) && !this.isAcked(id); },
-      mustRead(id) { return this.items.some(function(i){ return i.id === id && i.mustRead; }); },
       wasOpened(id) { return this.opened.indexOf(id) !== -1; },
       get unseenCount() {
         var self = this;
@@ -5450,41 +5363,6 @@ try{
         window.location.hash = i.route;
         window.scrollTo(0, 0);
       },
-      // Only learners who can open the lesson are gated; free-tier users get the bell only.
-      get gateItem() {
-        var auth = Alpine.store('auth');
-        if (auth.loading || !auth.isLoggedIn || !auth.profile) return null;
-        var self = this, tuts = window._lmsTutorials || [];
-        return this.items.filter(function(i){
-          if (!i.mustRead || self.isAcked(i.id)) return false;
-          var t = tuts.filter(function(x){ return x.id === i.id; })[0];
-          return !!(t && auth.canAccessTutorial(t));
-        })[0] || null;
-      },
-      get gateVisible() {
-        var g = this.gateItem;
-        if (!g) return false;
-        var ui = Alpine.store('ui');
-        return !(ui.view === 'lesson' && ui.activeLessonId === g.id);
-      },
-      async ack(id) {
-        var auth = Alpine.store('auth');
-        if (!auth.user || this.saving) return;
-        this.saving = true; this.error = '';
-        var when = new Date().toISOString(), patch = { acks: {} };
-        patch.acks[id] = when;
-        try {
-          var out = (typeof updateUserProfile === 'function') ? await updateUserProfile(auth.user.uid, patch) : { success: false, error: 'not ready' };
-          if (!out || !out.success) throw new Error(out && out.error ? out.error : 'save failed');
-          var p = Object.assign({}, auth.profile || {});
-          p.acks = Object.assign({}, p.acks || {}); p.acks[id] = when;
-          auth.setProfile(p);
-        } catch (e) {
-          this.error = 'Could not save just now. Check your connection and press the button again.';
-        } finally {
-          this.saving = false;
-        }
-      }
     });
   }
 
