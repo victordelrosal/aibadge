@@ -3721,14 +3721,13 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
     <!-- Required reading: confirmation at the very end of the lesson (3 Oct 2026) -->
     <template x-if="!lessonLoading && !lessonError && $store.news.mustRead($store.ui.activeLessonId)">
-      <div id="news-ack" class="news-ack cg-submit-box" x-data="{ v: '' }">
+      <div id="news-ack" class="news-ack cg-submit-box">
         <template x-if="!$store.news.isAcked($store.ui.activeLessonId)">
           <div>
             <h3>You reached the end</h3>
-            <p>Type <strong>OK</strong> and press Submit to confirm you have read this lesson. The hands-on missions can wait until you are ready.</p>
+            <p>One click confirms you have read this lesson. The hands-on missions can wait until you are ready.</p>
             <form class="news-ack-row" @submit.prevent="$store.news.ack($store.ui.activeLessonId)">
-              <input class="cg-submit-input" x-model="v" placeholder="Type OK" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Type OK to confirm">
-              <button type="submit" class="cg-submit-btn" :disabled="v.trim().toUpperCase() !== 'OK' || $store.news.saving" x-text="$store.news.saving ? 'Saving\u2026' : 'Submit'"></button>
+              <button type="submit" class="cg-submit-btn" :disabled="$store.news.saving" x-text="$store.news.saving ? 'Saving\u2026' : 'I\u2019ve read it \u2713'"></button>
             </form>
             <p class="news-ack-err" x-show="$store.news.error" x-text="$store.news.error"></p>
           </div>
@@ -3747,7 +3746,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             @scroll.window.throttle.150ms="near = (window.innerHeight + window.scrollY) > (document.documentElement.scrollHeight - 500)"
             x-show="!lessonLoading && $store.news.mustRead($store.ui.activeLessonId) && !$store.news.isAcked($store.ui.activeLessonId) && !near"
             x-transition.opacity style="display:none;">
-      <i></i>Read to the end, then type OK &darr;
+      <i></i>Read to the end, then confirm &darr;
     </div>
 
   </div>
@@ -4416,7 +4415,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <ol class="news-steps">
         <li :class="$store.news.wasOpened($store.news.gateItem.id) ? 'done' : 'now'"><b>Open the lesson</b><span x-text="$store.news.gateItem.tag"></span></li>
         <li :class="$store.news.wasOpened($store.news.gateItem.id) ? 'now' : ''"><b>Read it to the very end</b><span>Scroll down and open each section as you go.</span></li>
-        <li><b>Type OK and press Submit</b><span>The box is at the bottom of the lesson. This message then goes away for good.</span></li>
+        <li><b>Press &ldquo;I&rsquo;ve read it&rdquo;</b><span>The button is at the bottom of the lesson. This message then goes away for good.</span></li>
       </ol>
       <button type="button" class="news-gate-cta" @click="$store.news.openItem($store.news.gateItem)">
         <span x-text="$store.news.wasOpened($store.news.gateItem.id) ? 'Continue reading' : 'Open the lesson'"></span><span aria-hidden="true">&rarr;</span>
@@ -5459,7 +5458,7 @@ try{
           p.acks = Object.assign({}, p.acks || {}); p.acks[id] = when;
           auth.setProfile(p);
         } catch (e) {
-          this.error = 'Could not save just now. Check your connection and press Submit again.';
+          this.error = 'Could not save just now. Check your connection and press the button again.';
         } finally {
           this.saving = false;
         }
