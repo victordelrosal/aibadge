@@ -3048,6 +3048,28 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           </div>
         </template>
 
+        <!-- ===== LEVEL 3 · Full Stack with Your Agent (coming soon; all rows pending, unclickable) ===== -->
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:30px 0 14px;padding-top:22px;border-top:1px solid rgba(0,0,54,0.08);">
+          <div>
+            <span style="display:inline-block;font:700 11px/1 -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#030A6E;margin-bottom:6px;">Level 3 &middot; coming soon</span>
+            <h2 class="lms-heading" style="font-size:1.25rem;margin:0;">Full Stack with Your Agent</h2>
+            <p class="lms-subheading" style="font-size:0.85rem;margin:3px 0 0;max-width:52ch;">Give your terminal agent the keys to publish for you, add a real backend, and build two full-stack projects. Builds on Level 2.</p>
+          </div>
+        </div>
+        <template x-for="tut in tutorials.filter(t => t.track === 3)" :key="tut.id">
+          <div class="lms-module-card lms-pending" aria-disabled="true">
+            <div class="lms-module-header">
+              <div class="lms-module-icon" :style="'background:' + tut.iconBg">
+                <span x-text="tut.icon"></span>
+              </div>
+              <div class="lms-module-info">
+                <div class="lms-module-title"><span x-text="tut.title"></span></div>
+                <div class="lms-module-meta"><span x-text="tut.part"></span><span class="dot">&#183;</span><span>Coming soon</span></div>
+              </div>
+            </div>
+          </div>
+        </template>
+
         <!-- Certificate CTA: appears once every Level 1 tutorial is complete -->
         <div x-show="allComplete || certMsg || certState==='code' || $store.review.needsAction" x-transition
              style="margin-top:24px;border-radius:18px;padding:20px 22px;background:linear-gradient(135deg,rgba(184,134,11,0.10),rgba(245,231,160,0.18));border:1px solid rgba(184,134,11,0.28);">
@@ -6453,6 +6475,7 @@ try{
   // ---------- LMS Dashboard Component ----------
   // track: 1 = Level 1 (Foundations, no terminal), required for the Level 1 certificate (free since 2 Oct 2026).
   // track: 2 = Level 2 (AI on the Terminal: OpenCode / Claude Code) — optional, not required for the certificate.
+  // track: 3 = Level 3 (Full Stack with Your Agent), shown greyed as "Coming soon" while pending.
   window._lmsTutorials = [
     // ----- Level 1: Foundations -----
     { id: 'what-is-html', moduleId: 'hello-world', title: 'Hello World', icon: '🖥️', iconBg: 'rgba(0,122,255,0.12)', level: 'beginner', track: 1, durationMinutes: 7, type: 'video', lessonPath: 'tutorials/hello-world/hello-world.html', free: true },
@@ -6470,7 +6493,16 @@ try{
     { id: 'your-ai-workspace', moduleId: 'your-ai-workspace', title: 'Your AI Workspace', icon: '🗂️', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 2, durationMinutes: 7, type: 'video', lessonPath: 'tutorials/your-ai-workspace/your-ai-workspace.html' },
     { id: 'your-ai-team', moduleId: 'your-ai-team', title: 'Your AI Team', icon: '👥', iconBg: 'rgba(94,200,229,0.12)', level: 'beginner', track: 2, durationMinutes: 19, type: 'video', lessonPath: 'tutorials/your-ai-team/your-ai-team.html' },
     { id: 'your-first-skill', moduleId: 'your-first-skill', title: 'Your First Skill', icon: '🧰', iconBg: 'rgba(255,159,10,0.12)', level: 'beginner', track: 2, durationMinutes: 17, type: 'video', lessonPath: 'tutorials/your-first-skill/your-first-skill.html' },
-    { id: 'the-harness', moduleId: 'the-harness', title: 'The Harness', icon: '🐎', iconBg: 'rgba(255,159,10,0.12)', level: 'intermediate', track: 2, durationMinutes: 20, type: 'video', lessonPath: 'tutorials/the-harness/the-harness.html' }
+    { id: 'the-harness', moduleId: 'the-harness', title: 'The Harness', icon: '🐎', iconBg: 'rgba(255,159,10,0.12)', level: 'intermediate', track: 2, durationMinutes: 20, type: 'video', lessonPath: 'tutorials/the-harness/the-harness.html' },
+    // ----- Level 3: Full Stack with Your Agent (pending until each lesson is recorded) -----
+    { id: 'l3-keys', moduleId: 'l3-keys', title: 'Keys to the Agent', icon: '🔑', iconBg: 'rgba(3,10,110,0.10)', track: 3, part: 'Empower your agent', pending: true },
+    { id: 'l3-ship', moduleId: 'l3-ship', title: 'Ship It Hands-Free', icon: '🚀', iconBg: 'rgba(3,10,110,0.10)', track: 3, part: 'Empower your agent', pending: true },
+    { id: 'l3-backend', moduleId: 'l3-backend', title: 'Your First Backend', icon: '🗄️', iconBg: 'rgba(3,10,110,0.10)', track: 3, part: 'Backend', pending: true },
+    { id: 'l3-rules', moduleId: 'l3-rules', title: 'Lock the Doors', icon: '🛡️', iconBg: 'rgba(3,10,110,0.10)', track: 3, part: 'Backend', pending: true },
+    { id: 'l3-signin', moduleId: 'l3-signin', title: 'Sign In with Google', icon: '👤', iconBg: 'rgba(3,10,110,0.10)', track: 3, part: 'Backend', pending: true },
+    { id: 'l3-secrets', moduleId: 'l3-secrets', title: 'Secrets Stay Server-Side', icon: '🤫', iconBg: 'rgba(3,10,110,0.10)', track: 3, part: 'Backend', pending: true },
+    { id: 'l3-build-waitlist', moduleId: 'l3-build-waitlist', title: 'Build: The Waitlist App', icon: '🧱', iconBg: 'rgba(3,10,110,0.10)', track: 3, part: 'Project build', pending: true },
+    { id: 'l3-build-chat', moduleId: 'l3-build-chat', title: 'Build: Chat with Your Data', icon: '💬', iconBg: 'rgba(3,10,110,0.10)', track: 3, part: 'Project build', pending: true }
   ];
 
   window.lmsDashboard = function() {
