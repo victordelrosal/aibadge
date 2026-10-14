@@ -13,8 +13,7 @@
   var API = 'https://aibadge-report-mailer.victordelrosal.workers.dev/api/fair';
   var state = window.__fairStatus || { show: false };
   if (!state.show) return;
-  var SUGGESTED = state.suggestedCents || 2490, FLOOR = state.floorCents || 500, MAX = state.maxCents || 50000;
-  var CHIPS = [500, 1200, 2490];
+  var SUGGESTED = state.suggestedCents || 2490, FLOOR = state.floorCents || 249, MAX = state.maxCents || 2490;
 
   function money(c) { return '\u20ac' + (c % 100 === 0 ? String(c / 100) : (c / 100).toFixed(2)); }
   function dateStr(v) { return v ? new Date(v).toLocaleDateString('en-IE', { day: 'numeric', month: 'short' }) : ''; }
@@ -43,15 +42,16 @@
     '.fm-eyebrow{font:700 11px/1 -apple-system,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9a6b00;margin:0 0 10px}',
     '.fm-h{font:700 26px/1.15 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.02em;margin:0 0 8px}',
     '.fm-sub{font:400 15px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,.75);margin:0 0 20px}',
-    '.fm-chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 10px}',
-    '.fm-chip{position:relative;min-height:56px;border-radius:14px;border:1.5px solid rgba(60,60,67,.16);background:#fff;color:#000036;font:600 16px/1.1 -apple-system,sans-serif;cursor:pointer;padding:8px 4px;transition:border-color .15s,box-shadow .15s,transform .12s}',
-    '.fm-chip:hover{border-color:rgba(0,122,255,.5)}.fm-chip:active{transform:scale(.97)}',
-    '.fm-chip[aria-pressed="true"]{border-color:#007AFF;box-shadow:0 0 0 3px rgba(0,122,255,.14);background:rgba(0,122,255,.04)}',
-    '.fm-chip small{display:block;margin-top:4px;font:600 10px/1 -apple-system,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#9a6b00}',
-    '.fm-other{display:none;align-items:center;gap:8px;margin:0 0 10px;padding:0 14px;height:52px;border-radius:14px;border:1.5px solid #007AFF;box-shadow:0 0 0 3px rgba(0,122,255,.14)}',
-    '.fm-other.on{display:flex}.fm-other span{font:600 18px -apple-system,sans-serif;color:#3c3c43}',
-    '.fm-other input{flex:1;border:none;outline:none;font:600 18px -apple-system,sans-serif;color:#000036;background:transparent;min-width:0}',
-    '.fm-total{display:flex;align-items:baseline;gap:6px;margin:14px 0 18px}',
+    '.fm-range{-webkit-appearance:none;appearance:none;width:100%;height:36px;margin:2px 0 0;background:transparent;cursor:pointer;--fill:100%}',
+    '.fm-range:focus{outline:none}',
+    '.fm-range::-webkit-slider-runnable-track{height:8px;border-radius:999px;background:linear-gradient(90deg,#B8860B,#D4AF37 var(--fill),rgba(60,60,67,.14) var(--fill))}',
+    '.fm-range::-moz-range-track{height:8px;border-radius:999px;background:rgba(60,60,67,.14)}.fm-range::-moz-range-progress{height:8px;border-radius:999px;background:linear-gradient(90deg,#B8860B,#D4AF37)}',
+    '.fm-range::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-10px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,54,.12);box-shadow:0 3px 10px rgba(0,0,40,.22);transition:transform .12s}',
+    '.fm-range::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,54,.12);box-shadow:0 3px 10px rgba(0,0,40,.22)}',
+    '.fm-range:active::-webkit-slider-thumb{transform:scale(1.08)}',
+    '.fm-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(0,122,255,.25),0 3px 10px rgba(0,0,40,.22)}',
+    '.fm-ends{display:flex;justify-content:space-between;margin:2px 2px 20px;font:500 12.5px/1 -apple-system,sans-serif;color:rgba(60,60,67,.6)}',
+    '.fm-total{display:flex;align-items:baseline;gap:6px;margin:4px 0 6px}',
     '.fm-total b{font:700 34px/1 -apple-system,"SF Pro Display",sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums}',
     '.fm-total span{font:400 15px -apple-system,sans-serif;color:rgba(60,60,67,.7)}',
     '.fm-promises{list-style:none;margin:0 0 16px;padding:14px 16px;border-radius:16px;background:#f5f6fa;display:grid;gap:10px}',
@@ -98,7 +98,6 @@
     '.fm-hero-note{margin:14px 0 0;font:500 12.5px/1.4 -apple-system,sans-serif;color:#E8C766}',
     '.fm-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:10001;background:#000036;color:#fff;padding:13px 18px;border-radius:14px;font:500 15px/1.4 -apple-system,sans-serif;box-shadow:0 12px 40px rgba(0,0,40,.3);max-width:calc(100% - 32px);animation:fm-rise .2s ease-out}',
     '.lms-dark .fm-card{background:#1c1c24;border-color:rgba(255,255,255,.08);color:#f5f5f5}.lms-dark .fm-card p{color:rgba(235,235,245,.65)}',
-    '@media (max-width:420px){.fm-sheet{padding:26px 18px 18px}.fm-h{font-size:23px}.fm-chips{grid-template-columns:repeat(2,1fr)}}'
   ].join('\n');
   document.head.appendChild(css);
 
@@ -134,34 +133,29 @@
   }
   function escClose(e) { if (e.key === 'Escape') closeSheet(); }
 
-  /* price picker shared by join and change */
+  /* price slider shared by join and change (14 Oct, Victor: "a slider from 2.49/mo to 24.90/mo").
+     Stops: 2.49, 2.99 ... 24.49 in 50-cent steps, then 24.90 at the top. */
+  var STOPS = [];
+  for (var c0 = FLOOR; c0 < MAX; c0 += 50) STOPS.push(c0);
+  if (STOPS[STOPS.length - 1] !== MAX) STOPS.push(MAX);
+  function nearest(c) { var best = 0; STOPS.forEach(function (v, i) { if (Math.abs(v - c) < Math.abs(STOPS[best] - c)) best = i; }); return best; }
   function pickerHtml(current) {
-    var custom = CHIPS.indexOf(current) < 0;
-    return '<div class="fm-chips" role="group" aria-label="Your monthly price">' +
-      CHIPS.map(function (c) {
-        return '<button type="button" class="fm-chip" data-c="' + c + '" aria-pressed="' + (!custom && c === current) + '">' + money(c) + (c === SUGGESTED ? '<small>Suggested</small>' : '') + '</button>';
-      }).join('') +
-      '<button type="button" class="fm-chip" data-c="other" aria-pressed="' + custom + '">Other</button></div>' +
-      '<label class="fm-other' + (custom ? ' on' : '') + '"><span>\u20ac</span><input inputmode="decimal" aria-label="Your own monthly price in euro" placeholder="Your price" value="' + (custom ? (current / 100).toFixed(2) : '') + '"></label>' +
-      '<div class="fm-total" aria-live="polite"><b class="fm-amt">' + money(current) + '</b><span>a month</span></div>';
+    var i = nearest(current);
+    return '<div class="fm-total" aria-live="polite"><b class="fm-amt">' + money(STOPS[i]) + '</b><span>a month</span></div>' +
+      '<input type="range" class="fm-range" min="0" max="' + (STOPS.length - 1) + '" step="1" value="' + i + '" aria-label="Your monthly price" aria-valuetext="' + money(STOPS[i]) + ' a month">' +
+      '<div class="fm-ends"><span>' + money(FLOOR) + '</span><span>' + money(MAX) + (MAX === SUGGESTED ? ' \u00b7 suggested' : '') + '</span></div>';
   }
   function wirePicker(root, initial, onChange) {
-    var cents = initial;
-    var other = root.querySelector('.fm-other'), input = other.querySelector('input'), amt = root.querySelector('.fm-amt');
-    function set(c) { cents = c; amt.textContent = c ? money(c) : '\u20ac \u2013'; onChange(c); }
-    root.querySelectorAll('.fm-chip').forEach(function (b) {
-      b.onclick = function () {
-        root.querySelectorAll('.fm-chip').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
-        if (b.dataset.c === 'other') { other.classList.add('on'); input.focus(); readInput(); }
-        else { other.classList.remove('on'); set(Number(b.dataset.c)); }
-      };
-    });
-    function readInput() {
-      var v = Math.round(parseFloat(String(input.value).replace(',', '.')) * 100);
-      set(Number.isFinite(v) && v >= FLOOR && v <= MAX ? v : 0);
+    var r = root.querySelector('.fm-range'), amt = root.querySelector('.fm-amt');
+    function paint() {
+      var c = STOPS[Number(r.value)];
+      amt.textContent = money(c);
+      r.setAttribute('aria-valuetext', money(c) + ' a month');
+      r.style.setProperty('--fill', (Number(r.value) / (STOPS.length - 1) * 100) + '%');
+      onChange(c);
     }
-    input.addEventListener('input', readInput);
-    onChange(cents);
+    r.addEventListener('input', paint);
+    paint();
   }
 
   /* ---------- the join sheet (replaces "Unlock the full path") ---------- */
@@ -178,7 +172,7 @@
         '<li>' + ICON.door + '<span><b>XP is earned, never bought.</b> It comes from your quests, exercises and builds. Your badges stay yours.</span></li>' +
       '</ul>' +
       '<details class="fm-how"><summary>How it works</summary><ul>' +
-        '<li>Billed monthly by Stripe at the price you choose, from \u20ac5 to \u20ac500.</li>' +
+        '<li>Billed monthly by Stripe at the price you choose, from ' + money(FLOOR) + ' to ' + money(MAX) + '.</li>' +
         '<li>No lesson opened for 30 days: billing pauses and we email you. When you come back, you decide whether to resume.</li>' +
         '<li>Price changes start from your next payment and only happen when you confirm them. About once a quarter we may suggest a change, up or down, based on how much you used AI Badge.</li>' +
         '<li>Cancel from your dashboard at any time. Access runs to the end of the month you paid for.</li>' +
@@ -193,7 +187,7 @@
         var cta = root.querySelector('.fm-cta'), ok = root.querySelector('.fm-ok'), err = root.querySelector('.fm-err');
         function sync() {
           cta.disabled = !(cents && ok.checked);
-          cta.textContent = cents ? 'Continue \u00b7 ' + money(cents) + ' a month' : 'Choose \u20ac5 to \u20ac500';
+          cta.textContent = cents ? 'Continue \u00b7 ' + money(cents) + ' a month' : 'Choose a price';
         }
         wirePicker(root, cents, function (c) { cents = c; sync(); });
         ok.onchange = sync;
@@ -223,7 +217,7 @@
         wirePicker(root, cents, function (c) {
           cents = c;
           cta.disabled = !c || c === member.amountCents;
-          cta.textContent = !c ? 'Choose \u20ac5 to \u20ac500' : (c === member.amountCents ? 'That is your price now' : 'Confirm ' + money(c) + ' a month');
+          cta.textContent = !c ? 'Choose a price' : (c === member.amountCents ? 'That is your price now' : 'Confirm ' + money(c) + ' a month');
         });
         root.querySelector('.fm-later').onclick = closeSheet;
         cta.onclick = async function () {
