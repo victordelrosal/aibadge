@@ -90,11 +90,6 @@
     '.fm-hero-row span{font:400 13px/1.4 -apple-system,sans-serif;color:rgba(255,255,255,.62)}',
     '.fm-hero-cta{display:inline-block;width:auto;padding:13px 22px;min-height:48px}',
     '.fm-hero-note{margin:14px 0 0;font:500 12.5px/1.4 -apple-system,sans-serif;color:#E8C766}',
-    '.fm-nav{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;margin-right:8px;border-radius:999px;border:1.5px solid #D4AF37;background:linear-gradient(135deg,rgba(212,175,55,.16),rgba(245,231,160,.22));color:#7a5600;font:700 13.5px/1 -apple-system,sans-serif;cursor:pointer;white-space:nowrap;transition:transform .12s,box-shadow .15s}',
-    '.fm-nav:hover{box-shadow:0 4px 16px rgba(212,175,55,.35)}.fm-nav:active{transform:scale(.96)}',
-    '.fm-nav i{width:7px;height:7px;border-radius:50%;background:#D4AF37;box-shadow:0 0 0 3px rgba(212,175,55,.25)}',
-    '.lms-dark .fm-nav,body.dark .fm-nav{color:#F5E7A0}',
-    '.fm-nav .fm-s{display:none}@media (max-width:640px){.fm-nav .fm-l{display:none}.fm-nav .fm-s{display:inline}.fm-nav{padding:0 11px;gap:6px}}',
     '.fm-toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:10001;background:#000036;color:#fff;padding:13px 18px;border-radius:14px;font:500 15px/1.4 -apple-system,sans-serif;box-shadow:0 12px 40px rgba(0,0,40,.3);max-width:calc(100% - 32px);animation:fm-rise .2s ease-out}',
     '.lms-dark .fm-card{background:#1c1c24;border-color:rgba(255,255,255,.08);color:#f5f5f5}.lms-dark .fm-card p{color:rgba(235,235,245,.65)}',
     '@media (max-width:420px){.fm-sheet{padding:26px 18px 18px}.fm-h{font-size:23px}.fm-chips{grid-template-columns:repeat(2,1fr)}}'
@@ -291,31 +286,22 @@
           : (m.status === 'paused' ? '<button class="fm-ghost" data-a="resume">Resume</button>' : '') +
             '<button class="fm-ghost" data-a="change">Change price</button><button class="fm-ghost red" data-a="cancel">Cancel</button>') + '</div></div>';
     }
-    navPill();
+    menuEntry();
     s.querySelectorAll('[data-a]').forEach(function (b) {
       b.onclick = function () { act(b.dataset.a, b); };
     });
   }
 
 
-  /* ---------- navbar pill: makes the membership obvious ---------- */
-  function navPill() {
+  /* ---------- an entry in the top bar's More menu (topbar-tidy.js) ---------- */
+  function menuEntry() {
     var auth = window.Alpine && Alpine.store('auth');
     var want = state.show && (state.member || state.preview || (auth && auth.isFreeTier));
-    document.querySelectorAll('.lms-signout-btn').forEach(function (so) {
-      var pill = so.previousElementSibling && so.previousElementSibling.classList.contains('fm-nav') ? so.previousElementSibling : null;
-      if (!want) { if (pill) pill.remove(); return; }
-      if (!pill) {
-        pill = document.createElement('button'); pill.type = 'button'; pill.className = 'fm-nav';
-        pill.onclick = function () {
-          if (state.member) { location.hash = '#/dashboard'; setTimeout(function () { var x = slot(); if (x) x.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); }
-          else openJoin();
-        };
-        so.parentNode.insertBefore(pill, so);
-      }
-      pill.innerHTML = '<i></i><span class="fm-l">' + (state.member ? 'Member \u00b7 ' + money(state.member.amountCents) + '/mo' : 'Membership') + '</span><span class="fm-s">' + (state.member ? 'Member' : 'Join') + '</span>';
-      pill.setAttribute('aria-label', state.member ? 'Your membership' : 'AI Badge membership: pay what is fair');
-    });
+    window.__fairMenu = want ? function () {
+      return state.member
+        ? { label: 'Membership \u00b7 ' + money(state.member.amountCents) + '/mo', run: function () { location.hash = '#/dashboard'; setTimeout(function () { var x = slot(); if (x) x.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); } }
+        : { label: 'Membership: pay what\u2019s fair', run: openJoin };
+    } : null;
   }
 
   async function act(a, btn) {
@@ -381,7 +367,7 @@
   // Signed out: remove everything this module drew.
   setInterval(function () {
     var auth = window.Alpine && Alpine.store('auth');
-    if (auth && !auth.user) { var s = slot(); if (s) s.innerHTML = ''; closeSheet(); state = { show: false }; navPill(); }
+    if (auth && !auth.user) { var s = slot(); if (s) s.innerHTML = ''; closeSheet(); state = { show: false }; window.__fairMenu = null; }
   }, 2000);
 
   apply(state.member);

@@ -5153,6 +5153,7 @@ try{
 <script src="https://aireckon.ing/fil/account.js?v=c8782b64"></script>
 <script src="assets/js/account-card.js?v=9"></script>
 <script src="assets/js/campus-bridge.js?v=1"></script>
+<script src="assets/js/topbar-tidy.js?v=1"></script>
 
 <!-- SPA Init -->
 <script>
@@ -7631,7 +7632,7 @@ try{
       var j = await r.json();
       if (!j || j.show !== true) return;
       window.__fairStatus = j;
-      var s = document.createElement('script'); s.src = 'assets/js/fair-membership.js?v=3'; document.body.appendChild(s);
+      var s = document.createElement('script'); s.src = 'assets/js/fair-membership.js?v=4'; document.body.appendChild(s);
     } catch (e) {}
   }, 500);
 })();
