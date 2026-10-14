@@ -2466,6 +2466,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <fil-level mine x-show="$store.auth.user && !$store.auth.loading" style="zoom:1.18"></fil-level>
     </div>
     <p class="lms-subheading" x-text="$store.auth.loading ? 'Loading...' : ($store.auth.isEnrolled ? 'Continue where you left off.' : '')"></p>
+    <!-- fair membership card: filled only by assets/js/fair-membership.js, which never loads for NCI accounts -->
+    <div id="fair-slot"></div>
 
     <!-- Not enrolled (legacy loading race only): refresh button.
          Free-tier users skip this and see the tutorial list directly. -->
@@ -5183,20 +5185,21 @@ try{
       user: null,
       profile: null,
       loading: true,
+      fairMember: false, // set by assets/js/fair-membership.js (14 Oct 2026); never true for NCI accounts
       firstTime: false, // true only for a fresh first-time greeting this session
       get isLoggedIn() { return !!this.user; },
       get isEnrolled() { return this.profile?.enrolled === true; },
       get isAdmin() { return ['victor@fiveinnolabs.com','victordelrosal@gmail.com'].includes(this.user?.email); },
       get isNci() { return !!(this.user && typeof isNciEmail === 'function' && isNciEmail(this.user.email)); },
       get plan() { return this.profile?.plan || (this.isEnrolled ? 'full' : null); },
-      get isFreeTier() { return this.isLoggedIn && !this.isEnrolled && !this.isAdmin; },
+      get isFreeTier() { return this.isLoggedIn && !this.isEnrolled && !this.isAdmin && !this.fairMember; },
       // Freemium gate: full-access users (NCI, paid, admin) see everything;
       // free-tier users see only tutorials flagged free:true.
       // isNci is checked directly so an NCI login can never be locked out by a
       // stale/failed profile read (2026-07-29 incident: enrolled doc, locked UI).
       canAccessTutorial(tut) {
         if (!tut) return false;
-        if (this.isAdmin || this.isEnrolled || this.isNci) return true;
+        if (this.isAdmin || this.isEnrolled || this.isNci || this.fairMember) return true;
         if (Date.now() < ACCESS_AMNESTY_UNTIL) return true;
         return tut.free === true;
       },
@@ -7601,5 +7604,37 @@ try{
 })();
 </script>
 
+<script>
+/* Fair membership loader (14 Oct 2026). Asks the worker whether THIS account may see the offer, and only then
+   loads assets/js/fair-membership.js. Skipped outright for NCI accounts and on any device that has used an NCI
+   class code or NCI sign-in, so active NCI students never request the file. The worker is the real gate. */
+(function () {
+  function nciDevice() {
+    try {
+      if (typeof HUB_CLASS_CODE === 'string' && HUB_CLASS_CODE) return true;
+      if (sessionStorage.getItem('nci-class-code')) return true;
+      for (var i = 0; i < localStorage.length; i++) { if ((localStorage.key(i) || '').indexOf('aibadge.nci.seen.') === 0) return true; }
+    } catch (e) {}
+    return false;
+  }
+  var tries = 0, asked = false;
+  var t = setInterval(async function () {
+    if (++tries > 120) return clearInterval(t);
+    var a = window.Alpine && Alpine.store && Alpine.store('auth');
+    if (!a || a.loading || !a.user || asked) return;
+    clearInterval(t); asked = true;
+    if (a.isNci || nciDevice()) return;
+    try {
+      var u = firebase.auth().currentUser; if (!u) return;
+      var preview = /[?&]fairpreview=1/.test(location.search) ? '?preview=1' : '';
+      var r = await fetch('https://aibadge-report-mailer.victordelrosal.workers.dev/api/fair/status' + preview, { headers: { Authorization: 'Bearer ' + await u.getIdToken() } });
+      var j = await r.json();
+      if (!j || j.show !== true) return;
+      window.__fairStatus = j;
+      var s = document.createElement('script'); s.src = 'assets/js/fair-membership.js?v=1'; document.body.appendChild(s);
+    } catch (e) {}
+  }, 500);
+})();
+</script>
 </body>
 </html>
