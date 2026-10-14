@@ -7624,7 +7624,7 @@ try{
     var a = window.Alpine && Alpine.store && Alpine.store('auth');
     if (!a || a.loading || !a.user || asked) return;
     clearInterval(t); asked = true;
-    var preview = /[?&]fairpreview=1/.test(location.search);
+    var preview = /[?&]fairpreview=1/.test(location.search) || a.isAdmin;   // Victor always sees it; the worker checks it is him
     if (a.isNci || (!preview && nciDevice())) return;   // preview: Victor only, checked by the worker
     try {
       var u = firebase.auth().currentUser; if (!u) return;
