@@ -250,10 +250,10 @@
     var auth = window.Alpine && Alpine.store('auth');
     if (!m) {
       // Invite only for free-tier accounts; anyone already enrolled sees nothing.
-      if (!auth || !auth.isFreeTier) { s.innerHTML = ''; return; }
+      if (!auth || !(auth.isFreeTier || state.preview)) { s.innerHTML = ''; return; }
       s.innerHTML = '<div class="fm-card"><div class="fm-invite"><div><p class="fm-eyebrow">Membership</p><h3>Open every lesson. Pay what&rsquo;s fair.</h3>' +
         '<p>Suggested ' + money(SUGGESTED) + ' a month, from ' + money(FLOOR) + '. Pauses by itself if you stop learning.</p></div>' +
-        '<button class="fm-blue" data-a="join">See how it works</button></div></div>';
+        '<button class="fm-blue" data-a="join">See how it works</button></div></div>' + (state.preview ? '<p style="margin-top:10px;font-size:12.5px;color:#9a5a00">Admin preview: learners see this card only on the free tier.</p>' : '');
     } else if (m.welcomeBack) {
       s.innerHTML = '<div class="fm-card"><p class="fm-eyebrow">Welcome back</p><h3>Resume at ' + money(m.amountCents) + ' a month?</h3>' +
         '<p>Your membership paused while you were away, and nothing was charged. Resume when it suits you.</p>' +
