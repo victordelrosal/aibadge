@@ -7623,15 +7623,15 @@ try{
     var a = window.Alpine && Alpine.store && Alpine.store('auth');
     if (!a || a.loading || !a.user || asked) return;
     clearInterval(t); asked = true;
-    if (a.isNci || nciDevice()) return;
+    var preview = /[?&]fairpreview=1/.test(location.search);
+    if (a.isNci || (!preview && nciDevice())) return;   // preview: Victor only, checked by the worker
     try {
       var u = firebase.auth().currentUser; if (!u) return;
-      var preview = /[?&]fairpreview=1/.test(location.search) ? '?preview=1' : '';
-      var r = await fetch('https://aibadge-report-mailer.victordelrosal.workers.dev/api/fair/status' + preview, { headers: { Authorization: 'Bearer ' + await u.getIdToken() } });
+      var r = await fetch('https://aibadge-report-mailer.victordelrosal.workers.dev/api/fair/status' + (preview ? '?preview=1' : ''), { headers: { Authorization: 'Bearer ' + await u.getIdToken() } });
       var j = await r.json();
       if (!j || j.show !== true) return;
       window.__fairStatus = j;
-      var s = document.createElement('script'); s.src = 'assets/js/fair-membership.js?v=2'; document.body.appendChild(s);
+      var s = document.createElement('script'); s.src = 'assets/js/fair-membership.js?v=3'; document.body.appendChild(s);
     } catch (e) {}
   }, 500);
 })();
