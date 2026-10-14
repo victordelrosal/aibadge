@@ -8,7 +8,7 @@
     '#view-dashboard .lms-topbar a[href="explore.html"],#view-dashboard .lms-topbar a[href="#/admin"],',
     '#view-dashboard .lms-topbar button[title="Your Tree"],#view-dashboard .lms-topbar .cb-oct,',
     '#view-dashboard .lms-topbar .lms-theme-toggle,#view-dashboard .lms-topbar .lms-signout-btn,',
-    '#view-dashboard .lms-topbar .lms-invite-input,#view-dashboard .lms-topbar .fm-nav{display:none !important}',
+    '#view-dashboard .lms-topbar .lms-invite-input{display:none !important}',
     '#view-dashboard .lms-topbar .lms-invite-btn{border-radius:999px}',
     '.tb-more{position:relative;flex:0 0 auto}',
     '.tb-more-btn{width:40px;height:40px;border-radius:50%;border:1px solid rgba(60,60,67,.14);background:#fff;color:#3c3c43;display:grid;place-items:center;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05);transition:border-color .2s,transform .12s}',

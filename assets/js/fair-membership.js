@@ -81,6 +81,12 @@
     '.fm-pill.paused{background:rgba(120,120,128,.14);color:#3c3c43}.fm-pill.ending{background:rgba(255,149,0,.15);color:#9a5a00}',
     '.fm-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px;align-items:center}',
     '.fm-invite{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}',
+    '.fm-nav{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;border:1.5px solid #D4AF37;background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(245,231,160,.10));color:#F5E7A0;font:700 14px/1 -apple-system,sans-serif;cursor:pointer;white-space:nowrap;flex:0 0 auto;transition:transform .12s,box-shadow .15s}',
+    '.fm-nav:hover{box-shadow:0 0 0 4px rgba(212,175,55,.18),0 6px 20px rgba(212,175,55,.3)}.fm-nav:active{transform:scale(.96)}',
+    '.fm-nav i{width:8px;height:8px;border-radius:50%;background:#D4AF37;box-shadow:0 0 0 3px rgba(212,175,55,.28);animation:fm-pulse 2.4s ease-in-out infinite}',
+    '@keyframes fm-pulse{50%{box-shadow:0 0 0 6px rgba(212,175,55,0)}}@media (prefers-reduced-motion:reduce){.fm-nav i{animation:none}}',
+    '#view-dashboard:not(.lms-dark) .fm-nav{color:#7a5600;background:linear-gradient(135deg,rgba(212,175,55,.16),rgba(245,231,160,.30))}',
+    '.fm-nav .fm-s{display:none}@media (max-width:640px){.fm-nav .fm-l{display:none}.fm-nav .fm-s{display:inline}.fm-nav{padding:0 12px;gap:6px}}',
     '.fm-hero{margin:22px 0 8px;border-radius:22px;padding:2px;background:linear-gradient(135deg,#D4AF37,#F5E7A0 40%,#B8860B);box-shadow:0 18px 50px rgba(0,0,54,.18);animation:fm-rise .25s ease-out}',
     '.fm-hero-in{border-radius:20px;padding:26px 24px 22px;color:#fff;background:radial-gradient(120% 140% at 100% 0%,rgba(212,175,55,.22),transparent 55%),linear-gradient(160deg,#0A0E5A 0%,#000036 70%);font-family:-apple-system,BlinkMacSystemFont,sans-serif}',
     '.fm-hero-eye{margin:0 0 10px;font:700 11px/1 -apple-system,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#E8C766}',
@@ -258,13 +264,14 @@
     var m = state.member;
     var auth = window.Alpine && Alpine.store('auth');
     if (!m) {
-      // Invite only for free-tier accounts; anyone already enrolled sees nothing.
-      if (!auth || !(auth.isFreeTier || state.preview)) { s.innerHTML = ''; return; }
+      // Every eligible account sees it (14 Oct, Victor: expected it on a non-NCI account with full access).
+      var free = !!(auth && auth.isFreeTier);
       s.innerHTML = '<div class="fm-hero"><div class="fm-hero-in"><p class="fm-hero-eye">AI Badge membership</p>' +
-        '<h3>Open every lesson. Pay what&rsquo;s fair.</h3>' +
-        '<p>You choose the price. Suggested ' + money(SUGGESTED) + ' a month, from ' + money(FLOOR) + '. If you stop learning for 30 days, billing pauses by itself.</p>' +
+        '<h3>' + (free ? 'Open every lesson. Pay what&rsquo;s fair.' : 'Back AI Badge. Pay what&rsquo;s fair.') + '</h3>' +
+        '<p>' + (free ? 'You choose the price.' : 'You already have every lesson. If AI Badge is worth something to you, you choose the price.') +
+        ' Suggested ' + money(SUGGESTED) + ' a month, from ' + money(FLOOR) + '. If you stop learning for 30 days, billing pauses by itself.</p>' +
         '<div class="fm-hero-row"><button class="fm-cta fm-hero-cta" data-a="join">Choose your price</button><span>Cancel anytime. XP is earned, never bought.</span></div>' +
-        (state.preview ? '<p class="fm-hero-note">Admin preview. Learners see this on the free tier, and never on NCI accounts.</p>' : '') +
+        (state.preview ? '<p class="fm-hero-note">Admin preview. Never shown on NCI accounts.</p>' : '') +
         '</div></div>';
     } else if (m.welcomeBack) {
       s.innerHTML = '<div class="fm-card"><p class="fm-eyebrow">Welcome back</p><h3>Resume at ' + money(m.amountCents) + ' a month?</h3>' +
@@ -287,6 +294,7 @@
             '<button class="fm-ghost" data-a="change">Change price</button><button class="fm-ghost red" data-a="cancel">Cancel</button>') + '</div></div>';
     }
     menuEntry();
+    navPill();
     s.querySelectorAll('[data-a]').forEach(function (b) {
       b.onclick = function () { act(b.dataset.a, b); };
     });
@@ -296,13 +304,34 @@
   /* ---------- an entry in the top bar's More menu (topbar-tidy.js) ---------- */
   function menuEntry() {
     var auth = window.Alpine && Alpine.store('auth');
-    var want = state.show && (state.member || state.preview || (auth && auth.isFreeTier));
+    var want = !!state.show;
     window.__fairMenu = want ? function () {
       return state.member
         ? { label: 'Membership \u00b7 ' + money(state.member.amountCents) + '/mo', run: function () { location.hash = '#/dashboard'; setTimeout(function () { var x = slot(); if (x) x.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); } }
         : { label: 'Membership: pay what\u2019s fair', run: openJoin };
     } : null;
   }
+
+
+  /* ---------- navbar pill (14 Oct, Victor: "expecting [it] prominently in navbar") ---------- */
+  function navPill() {
+    var b = document.querySelector('#view-dashboard .lms-topbar');
+    var anchor = b && (b.querySelector('.fil-me') || b.querySelector('.tb-more'));
+    var pill = b && b.querySelector('.fm-nav');
+    if (!state.show) { if (pill) pill.remove(); return; }
+    if (!anchor) return;
+    if (!pill) {
+      pill = document.createElement('button'); pill.type = 'button'; pill.className = 'fm-nav';
+      pill.onclick = function () {
+        if (state.member) { location.hash = '#/dashboard'; setTimeout(function () { var x = slot(); if (x) x.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); }
+        else openJoin();
+      };
+    }
+    if (pill.nextElementSibling !== anchor) anchor.parentNode.insertBefore(pill, anchor);
+    pill.innerHTML = '<i></i><span class="fm-l">' + (state.member ? 'Member \u00b7 ' + money(state.member.amountCents) + '/mo' : 'Membership') + '</span><span class="fm-s">' + (state.member ? 'Member' : 'Join') + '</span>';
+    pill.setAttribute('aria-label', state.member ? 'Your membership' : 'AI Badge membership: pay what is fair');
+  }
+  setInterval(navPill, 1500);   // the photo and More menu mount after sign-in; keep the pill beside them
 
   async function act(a, btn) {
     var m = state.member;
