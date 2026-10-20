@@ -44,6 +44,21 @@ function learnerItems(ex) {
 }
 
 ensureDir(GRADING_HOME);
+// Network first (20 Oct 2026, Victor: "maybe confirm first that WiFi is working"). The 07:30 run fires as the laptop
+// wakes, often before Wi-Fi is back: 16 of 18 errors in launchd.err.log were DNS ENOTFOUND. Check every 15 s for up
+// to 5 min; if it never comes up, skip quietly (no lock taken) and leave the queue to the next scheduled run.
+async function networkUp() {
+  try { await fetch("https://oauth2.googleapis.com/", { method: "HEAD", signal: AbortSignal.timeout(5000) }); return true; }
+  catch (e) { return false; }
+}
+{
+  const t0 = Date.now(), note = (m) => appendFileSync(join(GRADING_HOME, "runs.log"), new Date().toISOString() + " " + m + "\n");
+  let up = await networkUp();
+  while (!up && Date.now() - t0 < 5 * 60e3) { await new Promise((r) => setTimeout(r, 15e3)); up = await networkUp(); }
+  if (!up) { note("no network after 5 min (Wi-Fi not back after wake?): run skipped, the next scheduled run picks up the queue"); process.exit(0); }
+  if (Date.now() - t0 > 2000) note(`network up after ${Math.round((Date.now() - t0) / 1000)} s`);
+}
+
 const LOCK = join(GRADING_HOME, "autorun.lock");
 if (existsSync(LOCK) && Date.now() - statSync(LOCK).mtimeMs < 2 * 3600e3) { console.log("another run holds the lock"); process.exit(0); }
 writeFileSync(LOCK, String(process.pid));
