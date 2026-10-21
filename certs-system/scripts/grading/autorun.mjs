@@ -32,14 +32,23 @@ function learnerItems(ex) {
   return ex.map((e) => {
     const base = { exerciseId: e.exerciseId, submissionSha256: e.submissionSha256 };
     if (e.verdict === "PASS") return { ...base, verdict: "PASS", feedback: e.feedback || "" };
+    // Extra explicit (Victor, 21 Oct 2026: "be extra explicit in the feedback"). A learner resubmitted a
+    // praised Thinking Partner page four times because a tripwire held it and the note said only "not
+    // enough of your own work". Each case now names the cause and the one change that clears it.
     const r = (e.reasons || []).join(" ");
-    let f;
-    if (/not a public https address/.test(r)) f = "What you submitted is not a web address we can open.";
-    else if (/could not be frozen/.test(r)) f = "We could not read any text at this link. It may need a sign-in, or JavaScript to load.";
-    else if (e.verdict === "REPEAT" && e.feedback) f = e.feedback;
-    else f = (e.feedback ? e.feedback + " " : "") + "Your link did not show enough of your own work to mark it with confidence. Resubmit a link that shows the work itself in full.";
+    const said = e.feedback ? "What the marker said: " + e.feedback + " " : "";
+    let f, link = false;
+    if (/not a public https address/.test(r)) { f = "What you submitted is not a web address we can open."; link = true; }
+    else if (/could not be frozen/.test(r)) { f = "We could not read any text at this link. It may need a sign-in, or JavaScript to load."; link = true; }
+    else if (/role hijack phrase/.test(r)) f = "Your work is fine; one phrase held it back. Our safety check stops pages with role instructions such as \"act as\" or \"you are now\". THE FIX: reword those lines in your own words (\"I asked it to play a sceptical investor\"), keep everything else, resubmit. " + said;
+    else if (/addresses the grader/.test(r)) f = "Your work is fine; one sentence held it back. Our safety check stops sentences that read like orders to an AI, such as \"ChatGPT should...\" or \"the model must...\". THE FIX: reword them as what happened (\"ChatGPT gave me...\", \"it got this wrong\"), resubmit. " + said;
+    else if (/tripwire/.test(r)) f = "Your work was held by our safety check, which stops pages that look like instructions to the marker. THE FIX: remove any line written to an AI rather than about it, resubmit. " + said;
+    else if (e.verdict === "REPEAT" && e.feedback) f = "THE FIX: " + e.feedback;
+    else f = "The two AI markers did not agree, so this is not a pass yet. THE FIX: make the work itself visible on the page in full (your prompts, the AI's actual replies, your own pushback), resubmit. " + said;
     if (/\bpaste\b/i.test(f)) f += " The lesson takes a link only, so share it as a link.";
-    return { ...base, verdict: "REPEAT", feedback: f.slice(0, 380) + " " + READABLE };
+    f = f.trim();
+    if (link) f += " " + READABLE;
+    return { ...base, verdict: "REPEAT", feedback: f.length > 590 ? f.slice(0, 587) + "..." : f };
   });
 }
 

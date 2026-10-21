@@ -2423,6 +2423,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <span class="cert-pill-text" x-text="$store.review.toFix ? 'Certificate feedback: ' + $store.review.toFix + ' to fix' : 'Certificate feedback: ready for review'"></span>
         <span class="cert-pill-go" aria-hidden="true">&rarr;</span>
       </button>
+      <!-- (!) Read before you resubmit (21 Oct 2026, Victor: "please read before re-submitting ... helpful advice and tips") -->
+      <button class="lms-tree-btn tips-btn" x-show="$store.auth.isLoggedIn" style="display:none;" :class="{ 'tips-lit': $store.review.needsAction }"
+              @click="$store.ui.showModal('tips')" title="Please read before you resubmit" aria-label="Please read before you resubmit">
+        <span aria-hidden="true">!</span>
+      </button>
       <!-- Certificate ready: the in-app announcement, and the fallback if a mail filter eats the email -->
       <a class="cert-pill" x-show="$store.cert.found && !$store.cert.dismissed"
          :href="$store.cert.data && $store.cert.data.url" target="_blank" rel="noopener"
@@ -4403,6 +4408,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <div style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#9a3412;margin-bottom:8px;">Your certificate request</div>
     <h2 style="font:700 21px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 8px;padding-right:36px;">A few things to fix, then you are there</h2>
     <p class="lms-subheading" style="font-size:0.92rem;margin:0 0 14px;line-height:1.5;">AI marked your work against the published rubric. Fix the items below, resubmit in each lesson (your new link replaces the old one), and your request is marked again.</p>
+    <a href="#" class="tips-link" @click.prevent="$store.ui.showModal('tips')"><span class="tips-link-mark" aria-hidden="true">!</span> Please read before you resubmit: seven tips that get most work through</a>
     <div class="review-readable">
       <strong>Every link must be one we can read</strong>
       <ul>
@@ -4432,7 +4438,38 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     </div>
   </div>
 </div>
+<!-- ===================== READ BEFORE YOU RESUBMIT (21 Oct 2026) ===================== -->
+<div x-show="$store.ui.activeModal === 'tips'" x-transition.opacity.duration.200ms
+     @keydown.escape.window="$store.ui.closeModal()"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"
+     @click.self="$store.ui.closeModal()">
+  <div class="modal-scroll review-modal" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;max-width:540px;width:calc(100% - 32px);max-height:88vh;overflow:hidden auto;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,0.32);">
+    <button @click="$store.ui.closeModal()" aria-label="Close" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;background:rgba(0,0,0,0.06);border-radius:50%;cursor:pointer;font-size:18px;line-height:1;color:#3a3f4a;">&times;</button>
+    <div style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#9a3412;margin-bottom:8px;">Please read before you resubmit</div>
+    <h2 style="font:700 21px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 8px;padding-right:36px;">Seven tips that get most work through</h2>
+    <p class="lms-subheading" style="font-size:0.92rem;margin:0 0 14px;line-height:1.5;">An AI marker reads your link against the published rubric. Most resubmits come from one of the issues below, not from the quality of the work.</p>
+    <ol class="tips-list">
+      <li><strong>Open your link in a private window first.</strong> If you cannot see your work there without signing in, the marker cannot see it either.</li>
+      <li><strong>Send a link the marker can read.</strong> A page you built: its live <code>github.io</code> link. Files you wrote: the GitHub link to the file itself (it contains <code>/blob/</code>). An AI conversation: a public ChatGPT, Claude or Gemini <em>share</em> link (a plain <code>chatgpt.com/c/...</code> link opens an empty page for everyone else). Notion, Google Docs and Drive cannot be read.</li>
+      <li><strong>Write about the AI, never to it.</strong> Our safety check holds any page with role lines such as &ldquo;act as&rdquo; or &ldquo;you are now&rdquo;, or sentences that give an AI orders (&ldquo;ChatGPT should&hellip;&rdquo;, &ldquo;the model must&hellip;&rdquo;). Describe them instead: &ldquo;I asked it to play a sceptical investor&rdquo;, &ldquo;ChatGPT gave me three options&rdquo;.</li>
+      <li><strong>Show the work, not a summary of it.</strong> For a conversation, keep your prompts, the AI&rsquo;s actual replies and your own pushback. For a build, the live page itself.</li>
+      <li><strong>Read &ldquo;THE FIX&rdquo; in each note and change that one thing.</strong> If the marker praised your work, keep it as it is. Rebuilding from scratch can bring in new problems.</li>
+      <li><strong>Tidy the leftovers.</strong> Remove <code>[cite: 4]</code> markers, codes such as <code>&amp;ldquo;</code> and any placeholder text before you submit.</li>
+      <li><strong>Resubmit in the lesson itself.</strong> Your new link replaces the old one. When every item has been resubmitted, your request goes back in the queue by itself and is marked again, usually within a day.</li>
+    </ol>
+    <p class="lms-subheading" style="font-size:0.85rem;margin:14px 0 0;line-height:1.5;">Still stuck after two tries? <a href="mailto:victor@fiveinnolabs.com?subject=AI%20Badge%20resubmit%20help">Email Victor</a> with the lesson name and your link.</p>
+  </div>
+</div>
 <style>
+  .tips-btn > span { font:800 16px/1 -apple-system,sans-serif; color:#9a3412; }
+  .tips-btn.tips-lit { background:#FFE7D6; box-shadow:0 0 0 2px rgba(154,52,18,0.35); }
+  .tips-link { display:flex; align-items:center; gap:8px; margin:0 0 14px; padding:10px 14px; border-radius:12px; background:#FFF4EC; color:#9a3412; font:600 13.5px/1.4 -apple-system,sans-serif; text-decoration:none; }
+  .tips-link:hover { background:#FFE7D6; }
+  .tips-link-mark { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:#9a3412; color:#fff; font:800 12px/1 -apple-system,sans-serif; flex:none; }
+  .tips-list { margin:0; padding-left:22px; }
+  .tips-list li { margin:0 0 10px; font:400 14px/1.5 -apple-system,sans-serif; color:#3a3f4a; }
+  .tips-list li strong { color:#000036; }
+  .tips-list code { font-size:12.5px; background:rgba(0,0,54,0.06); padding:1px 5px; border-radius:5px; }
   .review-item { padding:14px 16px; border-radius:14px; background:rgba(0,0,54,0.035); margin-bottom:10px; }
   .review-item p { margin:0; font:400 14px/1.5 -apple-system,sans-serif; color:#3a3f4a; }
   .review-tag { display:inline-block; padding:3px 9px; border-radius:999px; font:700 11px/1.4 -apple-system,sans-serif; letter-spacing:0.02em; margin-bottom:6px; }
@@ -7443,7 +7480,10 @@ try{
     var d = document.createElement('div'); d.className = 'review-note';
     var h = document.createElement('strong'); h.textContent = 'Feedback on your submission: please fix and resubmit';
     var t = document.createElement('span'); t.textContent = e.feedback || '';
-    d.appendChild(h); d.appendChild(t);
+    var tl = document.createElement('a'); tl.href = '#'; tl.className = 'tips-link'; tl.style.margin = '10px 0 0';
+    tl.innerHTML = '<span class="tips-link-mark" aria-hidden="true">!</span> Please read before you resubmit';
+    tl.addEventListener('click', function(ev){ ev.preventDefault(); Alpine.store('ui').showModal('tips'); });
+    d.appendChild(h); d.appendChild(t); d.appendChild(tl);
     box.insertBefore(d, box.firstChild);
     __renderEditing(exerciseId);
   };
