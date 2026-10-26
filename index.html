@@ -24,12 +24,45 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.14.8/dist/cdn.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
-<style>[x-cloak]{display:none !important}/* LinkedIn-first sign-in (3 Oct 2026): the quiet "Other ways to sign in" link */
-.more-ways{margin-top:12px}
-.more-ways>summary{cursor:pointer;list-style:none;text-align:center;font:400 14px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);padding:10px 0;min-height:44px;box-sizing:border-box;text-decoration:underline;text-underline-offset:3px}
-.more-ways>summary::-webkit-details-marker{display:none}
-.more-ways>summary:hover{color:#000036}
-.more-ways[open]>summary{margin-bottom:12px}
+<style>[x-cloak]{display:none !important}/* Start-free sheet (26 Oct 2026, Victor: Google, LinkedIn and email "as equal", "quickest sign up experience ... joyful") */
+.sx-veil{position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,30,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.sx-card{position:relative;width:100%;max-width:440px;max-height:92vh;overflow-y:auto;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -24px 70px rgba(0,0,40,.4);font-family:'Inter',-apple-system,sans-serif;animation:sxUp .46s cubic-bezier(.2,.9,.25,1) both}
+@media(min-width:640px){.sx-veil{align-items:center}.sx-card{border-radius:24px;box-shadow:0 30px 90px rgba(0,0,40,.5)}}
+.sx-head{position:relative;padding:26px 28px 26px;text-align:center;color:#fff;overflow:hidden;background:radial-gradient(90% 120% at 0% 0%,rgba(64,128,255,.42),transparent 60%),radial-gradient(70% 90% at 100% 100%,rgba(227,200,120,.16),transparent 60%),linear-gradient(160deg,#000036 0%,#02066F 100%)}
+.sx-handle{width:38px;height:5px;border-radius:3px;background:rgba(255,255,255,.3);margin:-12px auto 16px}
+@media(min-width:640px){.sx-handle{display:none}}
+.sx-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);font-size:20px;line-height:36px;cursor:pointer}
+.sx-x:hover{background:rgba(255,255,255,.2);color:#fff}
+.sx-kick{font:600 11px/1 'Inter',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.62);margin:0}
+.sx-title{font:700 31px/1.1 'Playfair Display',Georgia,serif;letter-spacing:-.015em;margin:12px 0 8px;color:#fff}
+.sx-title em{font-style:italic;color:#E3C878;text-shadow:0 0 24px rgba(227,200,120,.45)}
+.sx-lede{font:400 14.5px/1.5 'Inter',sans-serif;color:rgba(255,255,255,.76);margin:0 auto;max-width:30em}
+.sx-head>*{animation:sxRise .5s cubic-bezier(.2,.9,.25,1) both}
+.sx-head>.sx-kick{animation-delay:.05s}.sx-head>.sx-title{animation-delay:.12s}.sx-head>.sx-lede{animation-delay:.19s}
+.sx-body{padding:22px 24px 26px}
+.sx-way{display:flex;align-items:center;gap:14px;width:100%;height:58px;padding:0 18px 0 12px;margin:0 0 10px;border:1px solid rgba(0,0,54,.14);border-radius:16px;background:#fff;color:#000036;font:600 16px/1 'Inter',sans-serif;cursor:pointer;text-align:left;transition:transform .2s,box-shadow .2s,border-color .2s;animation:sxRise .5s cubic-bezier(.2,.9,.25,1) both}
+.sx-way:nth-of-type(1){animation-delay:.22s}.sx-way:nth-of-type(2){animation-delay:.29s}.sx-way:nth-of-type(3){animation-delay:.36s}
+.sx-way:hover{border-color:rgba(0,0,54,.38);box-shadow:0 10px 26px -14px rgba(0,0,54,.55);transform:translateY(-1px)}
+.sx-way:focus-visible{outline:2px solid #a9761f;outline-offset:2px}
+.sx-way:disabled{opacity:.55;cursor:wait}
+.sx-way[aria-expanded="true"]{border-color:#000036;box-shadow:0 0 0 3px rgba(0,0,54,.07)}
+.sx-ico{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#F2F4FA;flex:0 0 auto}
+.sx-ico svg{width:20px;height:20px}
+.sx-go{margin-left:auto;color:rgba(0,0,54,.32);font-size:20px;transition:transform .2s,color .2s}
+.sx-way:hover .sx-go{transform:translateX(3px);color:#000036}
+.sx-way[aria-expanded="true"] .sx-go{transform:rotate(90deg)}
+.sx-email{padding:6px 14px 18px;margin:0 -14px -14px}
+.sx-hint{font:400 12.5px/1.5 'Inter',sans-serif;color:rgba(60,60,67,.62);margin:-10px 0 16px}
+.sx-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:34px;padding:0 10px;border:0;border-radius:8px;background:none;color:rgba(0,0,54,.55);font:600 12.5px/1 'Inter',sans-serif;cursor:pointer}
+.sx-eye:hover{background:#F2F4FA;color:#000036}
+.sx-nci{display:block;width:100%;margin:6px 0 0;padding:10px 12px;border:0;border-radius:12px;background:rgba(52,199,89,.08);color:#1d6e36;font:500 13px/1.45 'Inter',sans-serif;text-align:center;cursor:pointer}
+.sx-nci:hover{background:rgba(52,199,89,.14)}
+.sx-fine{font:400 12px/1.5 'Inter',sans-serif;color:rgba(60,60,67,.55);text-align:center;margin:16px 0 0}
+.sx-fine a{color:inherit}
+.sx-done{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:rgba(227,200,120,.18);color:#5a3f08;font:600 14px/1.4 'Inter',sans-serif;margin-bottom:14px}
+@keyframes sxUp{from{transform:translateY(48px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sxRise{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.sx-card,.sx-head>*,.sx-way{animation:none}}
 </style>
 
 <style>
@@ -1397,12 +1430,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 #view-landing .lx-lede{font-size:clamp(1.05rem,1.4vw,1.2rem);line-height:1.65;color:rgba(255,255,255,0.76);max-width:33em;margin:0}
 #view-landing .lx-cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
 #view-landing .lx-center-row{justify-content:center}
-#view-landing .lx-start{display:grid;grid-template-columns:auto auto;align-items:center;justify-content:start;column-gap:18px;row-gap:16px;margin-top:34px}
+#view-landing .lx-start{display:grid;grid-template-columns:auto;align-items:center;justify-content:start;row-gap:14px;margin-top:34px}
 #view-landing .lx-start-label{font-size:15px;font-weight:500;color:rgba(255,255,255,0.7)}
 #view-landing .lx-start-pills{display:flex;gap:12px}
-#view-landing .lx-start-pills .lx-btn{min-width:150px}
-#view-landing .lx-start-email{grid-column:2;justify-self:start;padding-left:4px;font-size:13.5px;color:rgba(255,255,255,0.45);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);text-underline-offset:4px}
-#view-landing .lx-start-email:hover{color:rgba(255,255,255,0.8)}
+#view-landing .lx-start-pills{flex-wrap:wrap}
+#view-landing .lx-start-pills .lx-btn{min-width:142px}
 #view-landing .lx-start-center{justify-content:center;margin-top:36px}
 
 #view-landing .lx-facts{list-style:none;display:flex;flex-wrap:wrap;gap:0;margin:44px 0 0;padding:0;color:rgba(255,255,255,0.58);font-size:13.5px}
@@ -1629,7 +1661,6 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   #view-landing .lx-lede{margin:0 auto}
   #view-landing .lx-cta-row{justify-content:center}
   #view-landing .lx-start{grid-template-columns:1fr;justify-content:center;justify-items:center;row-gap:12px}
-  #view-landing .lx-start-email{grid-column:1;justify-self:center;padding-left:0}
 
   #view-landing .lx-facts{justify-content:center}
   #view-landing .lx-steps{grid-template-columns:1fr 1fr;row-gap:44px}
@@ -1649,7 +1680,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   #view-landing .lx-wrap{padding:0 16px}
   #view-landing .lx-cta-row .lx-btn{width:100%}
   #view-landing .lx-start-pills{width:100%}
-  #view-landing .lx-start-pills .lx-btn{flex:1;min-width:0;padding:0 14px}
+  #view-landing .lx-start-pills{flex-direction:column;gap:10px}
+  #view-landing .lx-start-pills .lx-btn{width:100%;min-width:0;padding:0 14px}
 
   #view-landing .lx-facts li{padding:0 14px}
   #view-landing .lx-facts strong{font-size:16px}
@@ -1702,8 +1734,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <li><a href="#" class="nav-signin" @click.prevent="$store.ui.showModal('signin')">Sign in</a></li>
     </ul>
     <div class="lx-nav-right">
-          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="signInWithLinkedIn()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>LinkedIn</a>
-      <a href="#" class="lx-btn lx-btn-light lx-btn-sm" @click.prevent="navGoogleSignup()">Start free</a>
+      <a href="#" class="lx-btn lx-btn-light lx-btn-sm" @click.prevent="$store.ui.showModal('signin')">Start free</a>
       <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
         <span></span><span></span><span></span>
       </button>
@@ -1729,8 +1760,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <span class="lx-start-label">Start free with</span>
         <div class="lx-start-pills">
           <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="navGoogleSignup()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Google</a>
+          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="signInWithLinkedIn()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>LinkedIn</a>
+          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="startEmailSignup()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#000036" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></span>Email</a>
         </div>
-        <a href="#" class="lx-start-email" @click.prevent="$store.ui.signinMore = true; $store.ui.showModal('signin')">or use your email</a>
       </div>
 
       <a href="#frameworks" class="lx-mapped fade-in" aria-label="Mapped to six competency frameworks: see how">
@@ -2092,8 +2124,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <li>Resubmit as often as you need</li>
           <li>Signed, verifiable Level&nbsp;1 certificate</li>
         </ul>
-          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="signInWithLinkedIn()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>LinkedIn</a>
-        <a href="#" class="lx-btn lx-btn-dark lx-btn-block" @click.prevent="navGoogleSignup()">Start free</a>
+        <a href="#" class="lx-btn lx-btn-dark lx-btn-block" @click.prevent="$store.ui.showModal('signin')">Start free</a>
       </article>
 
       <article class="lx-plan">
@@ -2105,7 +2136,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <li>Reviews and resubmissions at no cost</li>
           <li>Signed, verifiable Level&nbsp;2 certificate</li>
         </ul>
-        <a href="#" class="lx-btn lx-btn-outline lx-btn-block" @click.prevent="navGoogleSignup()">Start with Level 1</a>
+        <a href="#" class="lx-btn lx-btn-outline lx-btn-block" @click.prevent="$store.ui.showModal('signin')">Start with Level 1</a>
       </article>
     </div>
     <p class="lx-fine lx-center fade-in">Training a team? <a href="mailto:victor@fiveinnolabs.com">Email Victor</a> about group access and invoice-based payment.</p>
@@ -2204,8 +2235,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <span class="lx-start-label">Start free with</span>
         <div class="lx-start-pills">
           <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="navGoogleSignup()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Google</a>
+          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="signInWithLinkedIn()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>LinkedIn</a>
+          <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="startEmailSignup()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#000036" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></span>Email</a>
         </div>
-        <a href="#" class="lx-start-email" @click.prevent="$store.ui.signinMore = true; $store.ui.showModal('signin')">or use your email</a>
       </div>
   </div>
 </section>
@@ -4571,35 +4603,28 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   </div>
 </div>
 
-<div x-show="$store.ui.activeModal === 'signin'"
-     x-transition:enter="transition ease-out duration-300"
-     x-transition:enter-start="opacity-0"
-     x-transition:enter-end="opacity-100"
+<div x-show="$store.ui.activeModal === 'signin'" class="sx-veil"
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      @keydown.escape.window="$store.ui.closeModal()"
-     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"
+     style="display:none;"
      @click.self="$store.ui.closeModal()">
 
-  <!-- Sheet -->
-  <div x-show="$store.ui.activeModal === 'signin'"
-       x-transition:enter="transition ease-out duration-300"
-       x-transition:enter-start="translate-y-full"
-       x-transition:enter-end="translate-y-0"
-       style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:14px 14px 0 0;padding:0 24px 40px;max-width:420px;margin:0 auto;max-height:90vh;overflow-y:auto;"
-       x-data="signinForm()">
+  <!-- Start-free card (26 Oct 2026, Victor: Google, LinkedIn and email "as equal ... quickest sign up experience") -->
+  <div class="sx-card" role="dialog" aria-modal="true" aria-labelledby="sx-title" x-data="signinForm()">
 
-    <!-- Grab handle -->
-    <div style="display:flex;justify-content:center;padding:12px 0 20px;">
-      <div style="width:36px;height:5px;border-radius:3px;background:rgba(60,60,67,0.3);"></div>
+    <div class="sx-head">
+      <div class="sx-handle" aria-hidden="true"></div>
+      <button type="button" class="sx-x" @click="$store.ui.closeModal()" aria-label="Close">&times;</button>
+      <p class="sx-kick" x-text="isNciEmailLive ? 'NCI free access' : 'AI Badge &middot; Level 1 is free'">AI Badge &middot; Level 1 is free</p>
+      <h2 class="sx-title" id="sx-title" x-html="isNciEmailLive ? (nciRequestMode ? 'Request <em>access</em>' : 'Welcome, <em>NCI</em>') : 'Start <em>free</em>, in seconds'">Start <em>free</em>, in seconds</h2>
+      <p class="sx-lede" x-text="isNciEmailLive ? (nciRequestMode ? 'Confirm your details and the class code to get in.' : 'Add the class code Victor shared in lecture.') : 'New here or coming back, pick any way in. Same account, same progress.'">New here or coming back, pick any way in. Same account, same progress.</p>
     </div>
 
-    <!-- Title -->
-    <h2 style="font:700 22px/1.25 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;text-align:center;margin-bottom:4px;"
-        x-text="isNciEmailLive ? (nciRequestMode ? 'Request access' : 'NCI free access') : (isRegister ? 'Create Account' : 'Sign In')"></h2>
-    <p style="font:400 15px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);text-align:center;margin-bottom:24px;"
-       x-text="isNciEmailLive ? (nciRequestMode ? 'Confirm your details and the class code to get in.' : 'Enter the class code Victor shared in lecture.') : (isRegister ? 'Create your AI Badge account' : 'Sign in to your AI Badge account')"></p>
+    <div class="sx-body">
+
+    <div x-show="done" class="sx-done" style="display:none;"><span aria-hidden="true">&#10024;</span><span x-text="done === 'new' ? 'You are in. Your first tutorial is waiting.' : 'Welcome back. Taking you to your path.'"></span></div>
 
     <!-- Error -->
     <div x-show="error" x-text="error"
@@ -4615,45 +4640,24 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <div>
 
       <!-- Microsoft (NCI) Sign-In removed 2026-05-12: no usable Azure tenant. -->
-
-      <!-- LinkedIn Sign-In (2 Oct 2026): one account across AI Badge, aireckon.ing and the other fiveinnolabs estates.
-           LinkedIn first (3 Oct 2026, Victor); everything else sits under "Other ways to sign in". -->
-      <button x-show="!isNciEmailLive" @click="handleLinkedIn()" :disabled="submitting"
-              style="width:100%;padding:12px 14px;border:1px solid #0A66C2;border-radius:12px;font:600 17px/1.3 -apple-system,sans-serif;cursor:pointer;min-height:50px;background:#0A66C2;color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;"
-              @mouseenter="$el.style.background='#004182'" @mouseleave="$el.style.background='#0A66C2'">
-        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
-        Continue with LinkedIn
+      <!-- Three equal ways in. Google and LinkedIn land on the same Firebase account (linkedin-signin.js);
+           email signs in or creates the account in one step (handleEmail). -->
+      <button type="button" class="sx-way" x-show="!isNciEmailLive" @click="handleGoogle()" :disabled="submitting">
+        <span class="sx-ico"><svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Continue with Google<span class="sx-go" aria-hidden="true">&rsaquo;</span>
+      </button>
+      <button type="button" class="sx-way" x-show="!isNciEmailLive" @click="handleLinkedIn()" :disabled="submitting">
+        <span class="sx-ico"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>Continue with LinkedIn<span class="sx-go" aria-hidden="true">&rsaquo;</span>
+      </button>
+      <button type="button" class="sx-way" x-show="!isNciEmailLive" @click="openEmail()" :aria-expanded="$store.ui.signinMore ? 'true' : 'false'">
+        <span class="sx-ico"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#000036" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></span>Continue with email<span class="sx-go" aria-hidden="true">&rsaquo;</span>
       </button>
 
-      <!-- NCI free-access hint (Victor, 3 Oct 2026): NCI staff and students keep their one-tap NCI login; tapping opens the
-           email form under "Other ways" and puts the cursor in it. Federated access is encouraged, never required. -->
-      <button type="button" @click="$store.ui.signinMore = true; $nextTick(() => $root.querySelector('input[type=email]').focus())"
-              style="display:block;width:100%;text-align:left;cursor:pointer;margin-top:10px;background:rgba(52,199,89,0.08);border:1px solid rgba(52,199,89,0.25);border-radius:10px;padding:10px 14px;margin-bottom:16px;font:500 13px/1.5 -apple-system,sans-serif;color:#1d6e36;">
-        <strong>NCI staff &amp; students:</strong> sign in with your <code style="background:rgba(52,199,89,0.15);padding:1px 6px;border-radius:4px;">@ncirl.ie</code> email plus the class code Victor shares in lecture. Free instant access, no email verification needed.
-        <span style="display:block;margin-top:6px;font-weight:700;text-decoration:underline;text-underline-offset:3px;">Sign in with your NCI email &rsaquo;</span>
-      </button>
-      <details class="more-ways" :open="$store.ui.signinMore" @toggle="$store.ui.signinMore = $el.open">
-        <summary x-show="!isNciEmailLive">Other ways to sign in</summary>
-
-      <!-- Google Sign-In (hidden once an NCI email is typed: keep flows distinct) -->
-      <button x-show="!isNciEmailLive" @click="handleGoogle()" :disabled="submitting"
-              style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:12px;font:600 17px/1.3 -apple-system,sans-serif;cursor:pointer;min-height:50px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;"
-              @mouseenter="$el.style.background='#F2F2F7'" @mouseleave="$el.style.background='#fff'">
-        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Continue with Google
-      </button>
-
-      <div x-show="!isNciEmailLive"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
-        <div style="flex:1;height:1px;background:rgba(60,60,67,0.18);"></div>
-        <span style="font:400 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);">or</span>
-        <div style="flex:1;height:1px;background:rgba(60,60,67,0.18);"></div>
-      </div></div>
-
-      <form @submit.prevent="isNciEmailLive ? (nciRequestMode ? handleNciAccessRequest() : handleNciClassCode()) : (isRegister ? handleRegister() : handleSignIn())">
+      <div class="sx-email" x-show="$store.ui.signinMore || isNciEmailLive" x-collapse>
+      <form @submit.prevent="isNciEmailLive ? (nciRequestMode ? handleNciAccessRequest() : handleNciClassCode()) : handleEmail()">
         <div style="margin-bottom:16px;">
           <label style="display:block;font:600 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Email</label>
-          <input type="email" x-model="email" required autocomplete="email" placeholder="you@ncirl.ie"
-                 @input="notOnRoster = false; nciRequestMode = false; checkRosterCode();"
+          <input type="email" x-model="email" required autocomplete="email" inputmode="email" placeholder="you@example.com"
+                 @input="error = ''; notOnRoster = false; nciRequestMode = false; checkRosterCode();"
                  style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:400 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;"
                  @focus="$el.style.borderColor='#007AFF';$el.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
                  @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
@@ -4731,32 +4735,35 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
         <div x-show="!isNciEmailLive" style="margin-bottom:20px;">
           <label style="display:block;font:600 13px/1.4 -apple-system,sans-serif;color:rgba(60,60,67,0.6);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Password</label>
-          <input type="password" x-model="password" :required="!isNciEmailLive" autocomplete="current-password" placeholder="Your password"
-                 style="width:100%;padding:12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:400 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;"
+          <div style="position:relative;">
+          <input :type="showPw ? 'text' : 'password'" x-model="password" :required="!isNciEmailLive" autocomplete="current-password" placeholder="6 characters or more"
+                 style="width:100%;padding:12px 64px 12px 14px;border:1px solid rgba(60,60,67,0.18);border-radius:10px;font:400 17px/1.47 -apple-system,sans-serif;background:#fff;outline:none;min-height:44px;"
                  @focus="$el.style.borderColor='#007AFF';$el.style.boxShadow='0 0 0 3px rgba(0,122,255,0.12)'"
                  @blur="$el.style.borderColor='rgba(60,60,67,0.18)';$el.style.boxShadow='none'">
+          <button type="button" class="sx-eye" @click="showPw = !showPw" :aria-label="showPw ? 'Hide password' : 'Show password'" x-text="showPw ? 'Hide' : 'Show'">Show</button>
+          </div>
         </div>
+        <p x-show="!isNciEmailLive" class="sx-hint">New here? This creates your account. Been here before? It signs you in.</p>
         <button type="submit" :disabled="submitting"
                 x-show="!(isNciEmailLive && notOnRoster && !nciRequestMode)"
                 style="width:100%;padding:14px;border:none;border-radius:12px;font:600 17px/1.3 -apple-system,sans-serif;cursor:pointer;min-height:50px;background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%);color:#0A0E27;box-shadow:0 4px 20px rgba(212,175,55,0.4);"
-                x-text="submitting ? (isNciEmailLive ? 'Checking...' : (isRegister ? 'Creating...' : 'Signing in...')) : (isNciEmailLive ? (nciRequestMode ? 'Request access &amp; enter' : 'Get free access') : (isRegister ? 'Create Account' : 'Sign In'))"></button>
+                x-text="done ? 'You\u2019re in \u2713' : submitting ? (isNciEmailLive ? 'Checking...' : 'One moment...') : (isNciEmailLive ? (nciRequestMode ? 'Request access &amp; enter' : 'Get free access') : 'Continue')"></button>
         <div x-show="isNciEmailLive && nciRequestMode" style="text-align:center;margin-top:12px;">
           <button type="button" @click="nciRequestMode = false; error = '';"
                   style="font:500 14px/1.4 -apple-system,sans-serif;color:#007AFF;background:none;border:none;cursor:pointer;padding:8px;min-height:44px;">Back</button>
         </div>
       </form>
 
-      <div x-show="!isNciEmailLive" style="text-align:center;margin-top:16px;">
-        <button x-show="!isRegister" @click.prevent="handleForgotPassword()" style="font:500 15px/1.4 -apple-system,sans-serif;color:#007AFF;background:none;border:none;cursor:pointer;padding:8px;min-height:44px;">Forgot password?</button>
+      <div x-show="!isNciEmailLive" style="text-align:center;margin-top:6px;">
+        <button type="button" @click.prevent="handleForgotPassword()" style="font:500 14px/1.4 'Inter',sans-serif;color:#02066F;background:none;border:none;cursor:pointer;padding:8px;min-height:44px;">Forgot password?</button>
       </div>
-      <div x-show="!isNciEmailLive" style="text-align:center;margin-top:8px;">
-        <button @click.prevent="isRegister = !isRegister; error = ''; success = '';"
-                style="font:500 15px/1.4 -apple-system,sans-serif;color:#007AFF;background:none;border:none;cursor:pointer;padding:8px;min-height:44px;"
-                x-text="isRegister ? 'Already have an account? Sign In' : 'Don\u2019t have an account? Create one'"></button>
       </div>
-      </details>
+
+      <button type="button" class="sx-nci" x-show="!isNciEmailLive" @click="openEmail()">NCI student or staff? Use your <b>@ncirl.ie</b> email for free full access &rsaquo;</button>
+      <p class="sx-fine" x-show="!isNciEmailLive">By continuing you agree to the <a href="terms.html" target="_blank" rel="noopener">terms</a> and <a href="privacy.html" target="_blank" rel="noopener">privacy notice</a>.</p>
 
     </div>
+    </div><!-- /sx-body -->
   </div>
 </div>
 
@@ -5534,7 +5541,8 @@ try{
       activeLessonId: null,
       treeCount: 0,
       /* "Other ways to sign in" starts open when LinkedIn is unavailable or a class hub handed over an NCI code */
-      signinMore: typeof signInWithLinkedIn !== 'function' || !!(typeof HUB_CLASS_CODE === 'string' && HUB_CLASS_CODE),
+      /* the email form starts open only when a class hub handed over an NCI code */
+      signinMore: !!(typeof HUB_CLASS_CODE === 'string' && HUB_CLASS_CODE),
       showModal(name) { this.activeModal = name; document.body.style.overflow = 'hidden'; },
       closeModal() { this.activeModal = null; document.body.style.overflow = ''; }
     });
@@ -5618,6 +5626,14 @@ try{
   // On success, onAuthStateChanged assigns the free tier and routes to the
   // dashboard. If the popup is dismissed/blocked, or the user wants email,
   // we fall back to the sign-in sheet (which has both Google and email).
+  // Landing "Email" pill: open the sheet with the email form showing and the cursor in it.
+  window.startEmailSignup = function() {
+    var ui = Alpine.store('ui');
+    ui.signinMore = true;
+    ui.showModal('signin');
+    setTimeout(function () { var i = document.querySelector('.sx-email input[type=email]'); if (i) i.focus(); }, 320);
+  };
+
   window.navGoogleSignup = async function() {
     try {
       if (typeof signInWithGoogle !== 'function') { Alpine.store('ui').showModal('signin'); return; }
@@ -6282,7 +6298,8 @@ try{
       error: '',
       success: '',
       submitting: false,
-      isRegister: false,
+      showPw: false,
+      done: '',
       notOnRoster: false,
       needName: false,
       fullName: '',
@@ -6450,11 +6467,8 @@ try{
         if (result.success) {
           // Freemium: everyone is welcome. onAuthStateChanged assigns the
           // right tier (full for admin/NCI/paid, free for everyone else).
-          var maxWait = 80;
-          while (Alpine.store('auth').loading && maxWait-- > 0) {
-            await new Promise(r => setTimeout(r, 100));
-          }
-          Alpine.store('ui').closeModal();
+          var u = result.user, m = u && u.metadata;
+          await this._celebrateAndClose(m && m.creationTime === m.lastSignInTime ? 'new' : 'back');
         } else {
           this.error = result.error;
           this.submitting = false;
@@ -6499,54 +6513,58 @@ try{
         }
       },
 
-      async handleRegister() {
-        this.error = '';
-        this.success = '';
-        if (!this.email || !this.password) {
-          this.error = 'Please enter your email and password.';
-          return;
-        }
-        if (this.password.length < 6) {
-          this.error = 'Password must be at least 6 characters.';
-          return;
-        }
-        this.submitting = true;
-        // Freemium: anyone can create an account. onAuthStateChanged assigns
-        // the tier (full for admin/NCI/paid, free for everyone else).
-        const result = await createAccount(this.email, this.password);
-        if (result.success) {
-          Alpine.store('ui').closeModal();
-          this.email = '';
-          this.password = '';
-          this.isRegister = false;
-        } else {
-          this.error = result.error;
-        }
-        this.submitting = false;
+      openEmail() {
+        Alpine.store('ui').signinMore = true;
+        var root = this.$root;
+        setTimeout(function () { var i = root.querySelector('.sx-email input[type=email]'); if (i) i.focus(); }, 260);
       },
 
-      async handleSignIn() {
+      async _celebrateAndClose(kind) {
+        this.done = kind;
+        var maxWait = 80;
+        while (Alpine.store('auth').loading && maxWait-- > 0) {
+          await new Promise(r => setTimeout(r, 100));
+        }
+        await new Promise(r => setTimeout(r, 700));
+        Alpine.store('ui').closeModal();
+        this.done = '';
+        this.submitting = false;
+        this.email = '';
+        this.password = '';
+        this.showPw = false;
+      },
+
+      /* One form for new and returning people (26 Oct 2026): try to create the account; if the email
+         already has one, sign in with the same password. Nobody has to choose "sign in" or "register". */
+      async handleEmail() {
         this.error = '';
         this.success = '';
-        if (!this.email || !this.password) {
-          this.error = 'Please enter your email and password.';
-          return;
-        }
+        var email = (this.email || '').trim();
+        var pw = this.password || '';
+        if (!email || !pw) { this.error = 'Add your email and a password, then press Continue.'; return; }
+        if (pw.length < 6) { this.error = 'Passwords need at least 6 characters.'; return; }
         this.submitting = true;
-        const result = await signIn(this.email, this.password);
-        if (result.success) {
-          // Wait for onAuthStateChanged to finish loading the profile
-          var maxWait = 80;
-          while (Alpine.store('auth').loading && maxWait-- > 0) {
-            await new Promise(r => setTimeout(r, 100));
+        initFirebase();
+        var kind = 'new';
+        try {
+          await firebase.auth().createUserWithEmailAndPassword(email, pw);
+        } catch (e) {
+          if (!e || e.code !== 'auth/email-already-in-use') {
+            this.error = _friendlyAuthError(e); this.submitting = false; return;
           }
-          Alpine.store('ui').closeModal();
-          this.email = '';
-          this.password = '';
-        } else {
-          this.error = result.error;
-          this.submitting = false;
+          kind = 'back';
+          try {
+            var cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
+            try { await updateLastActive(cred.user.uid); logLogin(cred.user.uid); } catch (_) {}
+          } catch (e2) {
+            this.error = (e2 && (e2.code === 'auth/invalid-credential' || e2.code === 'auth/wrong-password'))
+              ? 'That email already has an account and the password did not match. Try again, tap Forgot password, or use Google or LinkedIn if that is how you joined.'
+              : _friendlyAuthError(e2);
+            this.submitting = false;
+            return;
+          }
         }
+        await this._celebrateAndClose(kind);
       },
 
       async handleForgotPassword() {
