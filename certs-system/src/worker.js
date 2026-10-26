@@ -159,7 +159,7 @@ async function route(request, env, ctx) {
     const rec = await getRecord(env, codeMatch[1]);
     if (!rec) {
       const mx = await getMx(env, codeMatch[1]);
-      if (mx) return html(botonPage(mx, host));
+      if (mx) return html(botonPage(mx, host, await mxBack(env, mx.slug)));
       return html(notFoundPage(host, codeMatch[1]), 404);
     }
     track(env, ctx, request, rec.ucid, "view", "page");
@@ -716,6 +716,14 @@ async function apiAutoSend(request, env) {
 async function getMx(env, code) {
   const raw = await env.CERTS_KV.get(MX_KEY(code));
   return raw ? JSON.parse(raw) : null;
+}
+
+// The engraved back of each botón (R2 assets/mexnet/back/<slug>.svg, placeholder "Nombre Apellido"): the page
+// cuts the holder's own name into it (Victor, 26 Oct 2026: "each person's own name on the back of their botón").
+async function mxBack(env, slug) {
+  if (!BOTONES[slug]) return null;
+  const o = await env.CERTS_R2.get(`assets/mexnet/back/${slug}.svg`).catch(() => null);
+  return o ? await o.text() : null;
 }
 
 async function mxGate(request, env) {

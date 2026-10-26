@@ -17,7 +17,31 @@ export const KEY_MIRRORS = [
   "https://raw.githubusercontent.com/victordelrosal/aibadge/main/certs-system/issuer-key/issuer-public.json",
 ];
 
-export function botonPage(rec, host) {
+// The back face with the holder's name engraved: every "Nombre Apellido" in the template becomes the name, and the
+// script size shrinks for long names so they stay inside the rim.
+export function engravedBack(svg, name) {
+  name = String(name).trim().replace(/\s+/g, " ");
+  const words = name.split(" ");
+  // past 20 characters the name goes on two lines, split at the space nearest the middle
+  let lines = [name];
+  if (name.length > 20 && words.length > 1) {
+    let best = 1;
+    for (let i = 1; i < words.length; i++)
+      if (Math.abs(words.slice(0, i).join(" ").length - name.length / 2) < Math.abs(words.slice(0, best).join(" ").length - name.length / 2)) best = i;
+    lines = [words.slice(0, best).join(" "), words.slice(best).join(" ")];
+  }
+  const longest = Math.max(...lines.map((l) => [...l].length));
+  const size = Math.min(46, Math.round((46 * 15) / Math.max(15, longest)));
+  return svg
+    .replace(/(<text[^>]*?\bx="([0-9.]+)"[^>]*>)Nombre Apellido(<\/text>)/g, (m, open, x, close) =>
+      open + (lines.length === 1 ? esc(lines[0])
+        : `<tspan x="${x}" dy="-0.5em">${esc(lines[0])}</tspan><tspan x="${x}" dy="1.05em">${esc(lines[1])}</tspan>`) + close)
+    .split("Nombre Apellido").join(esc(name))
+    .replace(/font-size="46"/g, `font-size="${size}"`)
+    .replace(/aria-label="Reverso grabado: [^"]*"/, `aria-label="Reverso grabado: ${esc(name)}"`);
+}
+
+export function botonPage(rec, host, backSvg) {
   const b = BOTONES[rec.slug];
   const title = botonTitle(rec.slug);
   const url = `https://${host}/${rec.ucid}`;
@@ -27,6 +51,7 @@ export function botonPage(rec, host) {
   return `<!doctype html><html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)} · ${esc(rec.name)}</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap">
 <meta name="description" content="${esc(desc)}">
 <meta property="og:type" content="website"><meta property="og:url" content="${url}">
 <meta property="og:title" content="${esc(rec.name)} · ${esc(title)}">
@@ -41,6 +66,15 @@ body{min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%,rgba(2
 .wrap{max-width:560px;margin:0 auto;padding:28px 20px 48px;text-align:center}
 .kick{font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa)}
 .medal{width:min(300px,72vw);height:auto;margin:22px auto 8px;display:block;filter:drop-shadow(0 24px 40px rgba(0,0,0,.55))}
+.coin{display:block;margin:22px auto 4px;padding:0;border:0;background:none;cursor:pointer;width:min(300px,72vw);perspective:1200px;-webkit-tap-highlight-color:transparent}
+.coin .medal{margin:0;width:100%}
+.flip{position:relative;display:block;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.7,.2,1)}
+.face{display:block;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face.back{position:absolute;inset:0;transform:rotateY(180deg)}.face.back svg{width:100%;height:100%;display:block;filter:drop-shadow(0 24px 40px rgba(0,0,0,.55))}
+.coin.turned .flip{transform:rotateY(180deg)}
+.coin:focus-visible{outline:2px solid #ff4fae;outline-offset:6px;border-radius:50%}
+.hint{font-size:12.5px;color:var(--muted);margin:2px 0 6px}
+@media (prefers-reduced-motion:reduce){.flip{transition:none}.face.back{transform:none;opacity:0}.coin.turned .face.back{opacity:1}.coin.turned .face.front{opacity:0}}
 h1{font-family:Georgia,serif;font-weight:400;font-size:32px;line-height:1.2;margin:10px 0 4px}
 .who{font-family:Georgia,serif;font-style:italic;font-size:22px;color:var(--gold);margin:14px 0 2px}
 .meta{color:var(--muted);font-size:14px}
@@ -55,7 +89,8 @@ button{padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(
 .foot{margin-top:26px;font-size:12px;color:var(--muted);line-height:1.6}.foot a{color:var(--muted)}
 </style></head><body><div class="wrap">
 <div class="kick">Constancia digital de participación</div>
-<img class="medal" src="${img}" alt="${esc(title)}, ${esc(b.metal)}" width="300" height="300">
+${backSvg ? `<button type="button" class="coin" id="coin" aria-pressed="false" aria-label="Girar el botón para ver el nombre grabado"><span class="flip"><span class="face front"><img class="medal" src="${img}" alt="${esc(title)}, ${esc(b.metal)}" width="300" height="300"></span><span class="face back">${engravedBack(backSvg, rec.name)}</span></span></button>
+<div class="hint">Toca el botón para girarlo: tu nombre va grabado al reverso.</div>` : `<img class="medal" src="${img}" alt="${esc(title)}, ${esc(b.metal)}" width="300" height="300">`}
 <h1>${esc(title)}</h1>
 <div class="meta">${esc(b.meeting)} · ${where} · ${esc(b.metal)}</div>
 <div class="who">${esc(rec.name)}</div>
@@ -70,6 +105,7 @@ button{padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(
 <div class="links"><a href="/${esc(rec.ucid)}/credential.json">credential.json</a> · <a href="/.well-known/issuer-public.json">clave pública</a> · <a href="${KEY_MIRRORS[0]}">copia de la clave</a></div>
 <div class="foot">Firmado con Ed25519 (Open Badges 3.0, W3C Verifiable Credentials). Emitido por fiveinnolabs para<br>RGMX Irlanda · Red Global MX Capítulo Irlanda · <a href="https://mexnet.pages.dev/ie/">mexnet.pages.dev</a></div>
 </div>
+<script>{const c=document.getElementById('coin');if(c)c.addEventListener('click',()=>{const t=c.classList.toggle('turned');c.setAttribute('aria-pressed',t?'true':'false');});}</script>
 <script type="module">
   import { verifyCredential, multikeyToPublicKey } from '/lib/crypto-core.js';
   const CRED_ID = ${JSON.stringify(rec.ucid)};
