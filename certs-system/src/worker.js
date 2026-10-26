@@ -710,7 +710,7 @@ async function apiAutoSend(request, env) {
 }
 
 /* ------------------------------------------------- MexNet botones ----- */
-// The eight NextGen botones (src/lib/mexnet.js). Stored under "mx:" so they never enter the AI Badge
+// The eight RGMX Irlanda botones (src/lib/mexnet.js). Stored under "mx:" so they never enter the AI Badge
 // list, duplicate guard or auto-issue checks. Machine access: X-MexNet-Key (MEXNET_ISSUE_KEY, 32+
 // chars) plus kill switch config:mexnet = "on". Victor's issuer sign-in also works. Scope: botones only.
 async function getMx(env, code) {

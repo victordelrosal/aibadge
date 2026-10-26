@@ -1,4 +1,4 @@
-// mexnet.js — the eight NextGen botones (MexNet, Capítulo Irlanda de la Red Global MX), issued by
+// mexnet.js — the eight RGMX Irlanda botones (MexNet, Capítulo Irlanda de la Red Global MX), issued by
 // fiveinnolabs as Open Badges 3.0 credentials with the same Ed25519 key as the AI Badge.
 // Victor, 26 Oct 2026: durable, usable, valuable, portable and non-transferable. So every botón is
 // bound to its holder by a salted SHA-256 of their email (OB 3.0 IdentityObject, spec section 9.3),
@@ -15,7 +15,7 @@ export const MX_IDX = (slug, emailHash) => "mxidx:" + slug + ":" + emailHash;
 const CREATOR = {
   id: "https://mexnet.pages.dev/ie/",
   type: ["Profile"],
-  name: "NextGen · Capítulo Irlanda de la Red Global MX",
+  name: "RGMX Irlanda · Red Global MX Capítulo Irlanda",
 };
 
 // series: emb = en la Embajada (in person), onl = en línea. Metal order per series (Victor,
@@ -45,10 +45,10 @@ export function botonAchievement(slug) {
     achievementType: "Badge",
     name: botonTitle(slug),
     description:
-      `Constancia digital de participación de NextGen, Capítulo Irlanda de la Red Global MX. ` +
+      `Constancia digital de participación de RGMX Irlanda (Red Global MX Capítulo Irlanda). ` +
       `Botón ${b.num} · ${b.name}, en ${b.metal}.`,
     criteria: {
-      narrative: `Se otorga a quien ${how} ${b.meeting} de NextGen, Capítulo Irlanda de la Red Global MX.`,
+      narrative: `Se otorga a quien ${how} ${b.meeting} de RGMX Irlanda (Red Global MX Capítulo Irlanda).`,
     },
     image: { id: `https://certs.fiveinnolabs.com/assets/mexnet/${slug}.svg`, type: "Image" },
     creator: CREATOR,

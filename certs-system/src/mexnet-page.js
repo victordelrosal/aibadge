@@ -1,4 +1,4 @@
-// mexnet-page.js — the public page for one NextGen botón (Spanish). Like the AI Badge page, it checks
+// mexnet-page.js — the public page for one RGMX Irlanda botón (Spanish). Like the AI Badge page, it checks
 // the Ed25519 signature live in the visitor's browser, and adds the holder check: anyone who knows the
 // holder's email can confirm the botón was issued to that address, without the address being published.
 import { BOTONES, botonTitle } from "./lib/mexnet.js";
@@ -23,7 +23,7 @@ export function botonPage(rec, host) {
   const url = `https://${host}/${rec.ucid}`;
   const img = `/assets/mexnet/${rec.slug}.svg`;
   const where = b.series === "emb" ? "En la Embajada" : "En línea";
-  const desc = `${rec.name} recibió el ${title} (${b.metal}) de NextGen, Capítulo Irlanda de la Red Global MX. Constancia verificable emitida por fiveinnolabs.`;
+  const desc = `${rec.name} recibió el ${title} (${b.metal}) de RGMX Irlanda (Red Global MX Capítulo Irlanda). Constancia verificable emitida por fiveinnolabs.`;
   return `<!doctype html><html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)} · ${esc(rec.name)}</title>
@@ -68,7 +68,7 @@ button{padding:10px 14px;border-radius:10px;border:0;background:linear-gradient(
   <div id="own" aria-live="polite"></div>
 </div>
 <div class="links"><a href="/${esc(rec.ucid)}/credential.json">credential.json</a> · <a href="/.well-known/issuer-public.json">clave pública</a> · <a href="${KEY_MIRRORS[0]}">copia de la clave</a></div>
-<div class="foot">Firmado con Ed25519 (Open Badges 3.0, W3C Verifiable Credentials). Emitido por fiveinnolabs para<br>NextGen · Capítulo Irlanda de la Red Global MX · <a href="https://mexnet.pages.dev/ie/">mexnet.pages.dev</a></div>
+<div class="foot">Firmado con Ed25519 (Open Badges 3.0, W3C Verifiable Credentials). Emitido por fiveinnolabs para<br>RGMX Irlanda · Red Global MX Capítulo Irlanda · <a href="https://mexnet.pages.dev/ie/">mexnet.pages.dev</a></div>
 </div>
 <script type="module">
   import { verifyCredential, multikeyToPublicKey } from '/lib/crypto-core.js';
