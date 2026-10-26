@@ -1,0 +1,18 @@
+{
+    "@context": [
+        "https://w3id.org/security/multikey/v1"
+    ],
+    "id": "https://certs.fiveinnolabs.com/issuer#key-1",
+    "type": "Multikey",
+    "controller": "https://certs.fiveinnolabs.com/issuer",
+    "publicKeyMultibase": "z6Mkndn7gwQiwEpr5wvUJiuHK7SN5aKRBNdV1J5HVRf4UK8h",
+    "jwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "alg": "Ed25519",
+        "x": "eY9N8-Hd_LKnz71sjiqi1csf50OFr6Alexpu3ogl5W4",
+        "key_ops": [
+            "verify"
+        ]
+    }
+}

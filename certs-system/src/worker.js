@@ -16,6 +16,8 @@ import { sendBadgeEmail } from "./lib/email.js";
 import { getRecord, putRecord, listRecords, exists, putArtifact, getArtifact, artifactKeys, deleteRecord, deleteArtifact, findByEmail, indexEmail, unindexEmail } from "./lib/store.js";
 import { landingPage, credentialPage, fmtDate } from "./pages.js";
 import { dashboardPage } from "./dashboard.js";
+import { botonPage, KEY_MIRRORS } from "./mexnet-page.js";
+import { BOTONES, MX_KEY, MX_IDX, buildBotonCredential, identityHash, emailKey, newSalt } from "./lib/mexnet.js";
 import { track, readStats, emailEvidence, CLIENT_EVENTS } from "./lib/stats.js";
 
 const json = (obj, status = 200, extra = {}) =>
@@ -78,6 +80,8 @@ async function route(request, env, ctx) {
   if (path === "/assets/emblem.png") return serveR2(env, "assets/emblem.png", "image/png", request);
   if (path === "/assets/logo-white.png") return serveR2(env, "assets/logo-white.png", "image/png", request);
   if (path === "/assets/logo-dark.png") return serveR2(env, "assets/logo-dark.png", "image/png", request);
+  const mxArt = path.match(/^\/assets\/mexnet\/([a-z0-9-]+)\.svg$/);
+  if (mxArt && BOTONES[mxArt[1]]) return serveR2(env, `assets/mexnet/${mxArt[1]}.svg`, "image/svg+xml", request);
   if (path === "/lib/crypto-core.js") return serveR2(env, "lib/crypto-core.js", "application/javascript; charset=utf-8", request);
 
   // ---- APIs ----------------------------------------------------------------
@@ -92,6 +96,9 @@ async function route(request, env, ctx) {
   if (path === "/api/delete" && method === "POST") return apiDelete(request, env);
   if (path === "/api/auto-issue" && method === "POST") return apiAutoIssue(request, env);
   if (path === "/api/auto-send" && method === "POST") return apiAutoSend(request, env);
+  if (path === "/api/mexnet/issue" && method === "POST") return apiMxIssue(request, env);
+  if (path === "/api/mexnet/revoke" && method === "POST") return apiMxRevoke(request, env);
+  if (path === "/api/mexnet/delete" && method === "POST") return apiMxDelete(request, env);
 
   // ---- engagement tracking -------------------------------------------------
   // The graduation email's badge <img> points here. It records the open and then
@@ -150,7 +157,11 @@ async function route(request, env, ctx) {
   const codeMatch = path.match(/^\/([a-z][0-9][a-z][0-9]{2})$/);
   if (codeMatch) {
     const rec = await getRecord(env, codeMatch[1]);
-    if (!rec) return html(notFoundPage(host, codeMatch[1]), 404);
+    if (!rec) {
+      const mx = await getMx(env, codeMatch[1]);
+      if (mx) return html(botonPage(mx, host));
+      return html(notFoundPage(host, codeMatch[1]), 404);
+    }
     track(env, ctx, request, rec.ucid, "view", "page");
     return html(credentialPage(rec, host));
   }
@@ -249,7 +260,7 @@ function levelOf(b) {
 async function uniqueUcid(env) {
   for (let i = 0; i < 30; i++) {
     const c = generateUcid();
-    if (!(await exists(env, c))) return c;
+    if (!(await exists(env, c)) && !(await getMx(env, c))) return c;
   }
   throw new Error("could not allocate UCID");
 }
@@ -258,7 +269,7 @@ async function uniqueUcid(env) {
 async function apiVerify(env, code) {
   if (!UCID_RE.test(code)) return json({ found: false }, 200, cors());
   const rec = await getRecord(env, code);
-  if (!rec) return json({ found: false }, 200, cors());
+  if (!rec) return apiMxVerify(env, code);
   const vcObj = await getArtifact(env, artifactKeys(code).vc);
   const credential = vcObj ? JSON.parse(await vcObj.text()) : null;
   return json(
@@ -696,4 +707,97 @@ async function apiAutoSend(request, env) {
   if (!rec || rec.legacy || rec.status !== "issued") return json({ error: "not_eligible" }, 409);
   const res = await sendCore(env, new URL(request.url).host, { ucid: code });
   return res.status === 200 ? res : json({ error: "send_refused", status: res.status }, res.status);
+}
+
+/* ------------------------------------------------- MexNet botones ----- */
+// The eight NextGen botones (src/lib/mexnet.js). Stored under "mx:" so they never enter the AI Badge
+// list, duplicate guard or auto-issue checks. Machine access: X-MexNet-Key (MEXNET_ISSUE_KEY, 32+
+// chars) plus kill switch config:mexnet = "on". Victor's issuer sign-in also works. Scope: botones only.
+async function getMx(env, code) {
+  const raw = await env.CERTS_KV.get(MX_KEY(code));
+  return raw ? JSON.parse(raw) : null;
+}
+
+async function mxGate(request, env) {
+  if (await requireIssuer(request, env)) return null;
+  const got = request.headers.get("X-MexNet-Key") || "";
+  const want = env.MEXNET_ISSUE_KEY || "";
+  let ok = want.length >= 32 && got.length === want.length;
+  for (let i = 0; ok && i < want.length; i++) if (got.charCodeAt(i) !== want.charCodeAt(i)) ok = false;
+  if (!ok) return json({ error: "unauthorised" }, 401);
+  if ((await env.CERTS_KV.get("config:mexnet")) !== "on") return json({ error: "mexnet_off" }, 403);
+  return null;
+}
+
+async function apiMxVerify(env, code) {
+  const rec = await getMx(env, code);
+  if (!rec) return json({ found: false }, 200, cors());
+  const vcObj = await getArtifact(env, artifactKeys(code).vc);
+  return json({
+    found: true, kind: "mexnet", status: rec.status, name: rec.name, issuedDate: rec.issuedDate, boton: rec.slug,
+    credential: vcObj ? JSON.parse(await vcObj.text()) : null,
+    publicKeyMultikey: env.ISSUER_PUBLIC_MULTIKEY, keyMirrors: KEY_MIRRORS,
+  }, 200, cors());
+}
+
+// body: { slug, name, email, issuedDate }. Idempotent: the same holder and botón returns the
+// existing credential instead of a second one. Never emails anyone.
+async function apiMxIssue(request, env) {
+  const denied = await mxGate(request, env);
+  if (denied) return denied;
+  const b = await request.json().catch(() => null);
+  if (!b || !BOTONES[b.slug]) return json({ error: "invalid botón" }, 400);
+  const name = nfc(b.name).trim();
+  const email = String(b.email || "").trim().toLowerCase();
+  if (name.length < 2 || name.length > 80) return json({ error: "name length" }, 400);
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: "invalid email" }, 400);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(b.issuedDate || ""))) return json({ error: "invalid date" }, 400);
+  const host = new URL(request.url).host;
+  const idx = MX_IDX(b.slug, await emailKey(email));
+  const prior = await env.CERTS_KV.get(idx);
+  if (prior) {
+    const p = await getMx(env, prior);
+    if (p && p.status !== "revoked") return json({ ok: true, existing: true, ucid: prior, url: `https://${host}/${prior}` });
+  }
+  const ucid = await uniqueUcid(env);
+  const salt = newSalt();
+  const rec = {
+    ucid, kind: "mexnet", slug: b.slug, name, issuedDate: b.issuedDate, salt,
+    identityHash: await identityHash(email, salt), status: "issued", createdAt: new Date().toISOString(),
+  };
+  const signed = await signCredential(buildBotonCredential(rec), await getPrivateKey(env), {
+    created: new Date().toISOString(), verificationMethod: VERIFICATION_METHOD,
+  });
+  await putArtifact(env, artifactKeys(ucid).vc, JSON.stringify(signed), "application/json");
+  await env.CERTS_KV.put(idx, ucid);
+  // The email is not stored in the record; only the salted hash in the signed credential and the
+  // unsalted index key above (a SHA-256, never published).
+  await env.CERTS_KV.put(MX_KEY(ucid), JSON.stringify(rec));
+  return json({ ok: true, ucid, url: `https://${host}/${ucid}` });
+}
+
+async function apiMxRevoke(request, env) {
+  const denied = await mxGate(request, env);
+  if (denied) return denied;
+  const b = await request.json().catch(() => null);
+  const code = String((b && b.ucid) || "").toLowerCase();
+  const rec = UCID_RE.test(code) ? await getMx(env, code) : null;
+  if (!rec) return json({ error: "not_found" }, 404);
+  rec.status = "revoked";
+  rec.revokedAt = new Date().toISOString();
+  await env.CERTS_KV.put(MX_KEY(code), JSON.stringify(rec));
+  return json({ ok: true, ucid: code, status: "revoked" });
+}
+
+async function apiMxDelete(request, env) {
+  const denied = await mxGate(request, env);
+  if (denied) return denied;
+  const b = await request.json().catch(() => null);
+  const code = String((b && b.ucid) || "").toLowerCase();
+  const rec = UCID_RE.test(code) ? await getMx(env, code) : null;
+  if (!rec) return json({ error: "not_found" }, 404);
+  if (rec.status !== "revoked") return json({ error: "must_revoke_first" }, 409);
+  await deleteArtifact(env, artifactKeys(code).vc);
+  await env.CERTS_KV.delete(MX_KEY(code));
+  return json({ ok: true, ucid: code, deleted: true });
 }
