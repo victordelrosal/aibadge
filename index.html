@@ -5344,6 +5344,7 @@ try{
 <script src="assets/js/linkedin-signin.js?v=4"></script>
 <script src="https://aireckon.ing/fil/account.js?v=dbd2c865"></script>
 <script src="assets/js/account-card.js?v=9"></script>
+<script src="assets/js/level-celebrate.js?v=1"></script>
 <script src="assets/js/campus-bridge.js?v=1"></script>
 <script src="assets/js/topbar-tidy.js?v=2"></script>
 <script>
@@ -5471,6 +5472,8 @@ try{
             var j = await res.json();
             this.found = !!j.found;
             this.data = j.found ? j : null;
+            // Level-up celebration in the navbar for the next 3 visits (31 Oct 2026)
+            if (this.found && window.lvMaybeCelebrate) window.lvMaybeCelebrate(this.data);
           }
         } catch (e) { /* the dashboard works fine without it */ }
         this.loading = false;
