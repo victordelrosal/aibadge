@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="assets/js/nci-guard.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Badge: Get good at AI, then prove it</title>
 <meta property="og:type" content="website">
@@ -1730,7 +1731,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <li><a href="#how-it-works">How it works</a></li>
       <li><a href="#curriculum">Curriculum</a></li>
       <li><a href="#credential">Credential</a></li>
-      <li><a href="#pricing-v2">Pricing</a></li>
+      <li class="aib-price"><a href="#pricing-v2">Pricing</a></li>
       <li><a href="#" class="nav-signin" @click.prevent="$store.ui.showModal('signin')">Sign in</a></li>
     </ul>
     <div class="lx-nav-right">
@@ -1942,7 +1943,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <p class="lx-track-k">Level 2 &middot; optional</p>
             <h3>AI on the terminal</h3>
           </div>
-          <span class="lx-tag">&euro;49 certificate</span>
+          <span class="lx-tag aib-price">&euro;49 certificate</span>
         </header>
         <ol class="lx-syllabus" data-lx="track2">
           <li><span class="i">01</span><span class="t">Install OpenCode</span><span class="d">8 min</span></li>
@@ -2104,7 +2105,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 </section>
 
 <!-- ===================== PRICING ===================== -->
-<section class="lx-section lx-tint" id="pricing-v2">
+<section class="lx-section lx-tint aib-price" id="pricing-v2">
   <div class="lx-wrap">
     <div class="lx-head fade-in">
       <p class="lx-eyebrow">Pricing</p>
@@ -2168,7 +2169,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <div class="faq-icon">+</div>
         </div>
         <div class="faq-answer">
-          <p>Yes, Level&nbsp;1 is free for everyone, including the review, the signed credential (Open Badges 3.0, Ed25519) and its permanent public link. The Level&nbsp;2 certificate for the terminal track is &euro;49, paid once when it is issued.</p>
+          <p>Yes, Level&nbsp;1 is free for everyone, including the review, the signed credential (Open Badges 3.0, Ed25519) and its permanent public link. <span class="aib-price">The Level&nbsp;2 certificate for the terminal track is &euro;49, paid once when it is issued.</span></p>
         </div>
       </div>
 
@@ -2212,7 +2213,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         </div>
       </div>
 
-      <div class="faq-item">
+      <div class="faq-item aib-price">
         <div class="faq-question" role="button" tabindex="0">
           <h3>Can my employer sponsor this?</h3>
           <div class="faq-icon">+</div>
@@ -2248,7 +2249,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
      (Victor enrols manually via /#/admin, or NCI emails auto-enrol via Microsoft sign-in).
      Kept in DOM (display:none) so we can revive when re-introducing paid coaching tier.
 ================================================================================================= -->
-<section class="section section-light" id="pricing" style="display:none" aria-hidden="true" data-deprecated="2026-05-12">
+<section class="section section-light aib-price" id="pricing" style="display:none" aria-hidden="true" data-deprecated="2026-05-12">
   <div class="container">
     <h2 class="section-title text-center fade-in">Investment</h2>
 
@@ -2290,7 +2291,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 </section>
 
 <!-- Payment Modal (DEPRECATED 2026-05-12: DIY pivot, hidden) -->
-<div class="payment-overlay" id="paymentModal" data-deprecated="2026-05-12" style="display:none !important" aria-hidden="true" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="payment-overlay aib-price" id="paymentModal" data-deprecated="2026-05-12" style="display:none !important" aria-hidden="true" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="payment-modal">
     <button class="payment-modal-close" onclick="document.getElementById('paymentModal').classList.remove('active')" aria-label="Close">&times;</button>
     <h3>Book Your Slot</h3>
@@ -4423,7 +4424,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <span style="font-size:16px;">&#127807;</span>
           <span class="lms-tree-link" style="flex:1;min-width:0;font:500 14px/1.3 -apple-system,sans-serif;color:#1c1c1e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" x-text="r.referredEmail || 'A new learner'"></span>
           <span x-show="subtree[r.referredId] > 0" style="font-size:11px;font-weight:600;color:#1d4d8c;background:rgba(29,77,140,0.10);padding:2px 8px;border-radius:999px;white-space:nowrap;" x-text="'+' + subtree[r.referredId] + ' grew'" title="Learners who joined through this person"></span>
-          <span style="font-size:11px;font-weight:600;color:#1d6e36;background:rgba(52,199,89,0.12);padding:2px 8px;border-radius:999px;" x-text="r.status === 'paid' ? 'Paid' : 'Joined'"></span>
+          <span style="font-size:11px;font-weight:600;color:#1d6e36;background:rgba(52,199,89,0.12);padding:2px 8px;border-radius:999px;" x-text="(r.status === 'paid' && !$store.auth.isNci && !(window.aibNciDevice && aibNciDevice())) ? 'Paid' : 'Joined'"></span>
         </div>
       </template>
       <p x-show="query.trim() && filteredReferrals.length === 0" class="lms-subheading" style="font-size:0.82rem;margin:12px 0 0;color:rgba(60,60,67,0.55);">No learners match &ldquo;<span x-text="query.trim()"></span>&rdquo;.</p>
@@ -4599,7 +4600,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <div style="background:#F2F2F7;border-radius:16px;padding:18px 18px 6px;">
       <h3 style="font:700 15px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 12px;">How review works</h3>
       <template x-for="(step, i) in steps" :key="i">
-        <div style="display:flex;gap:12px;padding-bottom:14px;">
+        <div :class="step.indexOf('€') > -1 ? 'aib-price' : ''" style="display:flex;gap:12px;padding-bottom:14px;">
           <div style="flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#1d4d8c;color:#fff;font:700 13px/24px -apple-system,sans-serif;text-align:center;" x-text="i + 1"></div>
           <p style="flex:1;font:400 13.5px/1.45 -apple-system,sans-serif;color:rgba(60,60,67,0.85);margin:1px 0 0;" x-html="step"></p>
         </div>

@@ -2,6 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
+<script src="assets/js/nci-guard.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Competency Explorer | AI Badge</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23000036'/><stop offset='100%25' stop-color='%2302066F'/></linearGradient></defs><polygon points='50,3 93,28 93,72 50,97 7,72 7,28' fill='url(%23g)' rx='6'/><text x='50' y='58' text-anchor='middle' font-family='Inter,sans-serif' font-size='36' font-weight='700' fill='%23D4AF37'>AI</text></svg>">
@@ -1081,7 +1082,7 @@ footer a:hover { text-decoration: underline; }
       <h3>Your Report</h3>
       <p>A copy will be sent to <strong id="confirmedEmail"></strong>.</p>
       <div id="reportContent"></div>
-      <div class="coaching-cta" style="margin-top:24px;">
+      <div class="coaching-cta aib-price" style="margin-top:24px;">
         <h4>Ready to level up?</h4>
         <p>AI Badge is a 6-week one-to-one coaching programme. Every session is personalised to your profile and goals. Start from &euro;90/week.</p>
         <a href="https://aibadge.fiveinnolabs.com/#pricing" class="coaching-cta-btn">See Plans &amp; Enrol</a>
@@ -2083,8 +2084,10 @@ function generateReport(v, email) {
   r += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
   r += `WHAT'S NEXT?\n`;
   r += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+  if (!(window.aibNciDevice && aibNciDevice())) {
   r += `AI Badge is a 6-week one-to-one coaching programme. Every session is personalised to your profile and goals. Start from €90/week.\n\n`;
   r += `See plans and enrol: https://aibadge.fiveinnolabs.com/#pricing\n\n`;
+  }
   r += `—\nAI Badge by Victor del Rosal | fiveinnolabs.com\n`;
 
   return r;
