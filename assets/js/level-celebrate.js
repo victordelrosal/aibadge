@@ -14,6 +14,10 @@
   };
   var CSS = [
     '.lv-in{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}',
+    // 2 Nov 2026 (Victor: "fix this clutter"): the celebration takes real room in the row instead of floating over
+    // the name, and while the earned pill shows, the duplicate "certificate is ready" pill and the name step aside
+    '.lv-space{flex:none;display:inline-block;height:1px;pointer-events:none}',
+    '.lms-topbar.lv-pill-on .lms-topbar-identity,.lms-topbar.lv-pill-on a.cert-pill{display:none!important}',
     '.lms-topbar.lv-on>*:not(.lv-in):not(.lv-pill){position:relative;z-index:1}',
     '.lv-rim{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;opacity:0;animation:lvIn .6s .1s ease-out forwards}',
     '.lv-rim i{position:absolute;inset:0 -100% 0 0;background:linear-gradient(90deg,transparent,#c27c4a 22%,#e3c878 40%,#fff6dc 50%,#e3c878 60%,#c27c4a 78%,transparent);animation:lvSlide 7s linear infinite}',
@@ -51,8 +55,8 @@
   }
 
   function clear(bar) {
-    bar.classList.remove('lv-on');
-    bar.querySelectorAll('.lv-in,.lv-pill,.lv-glint').forEach(function (el) { el.remove(); });
+    bar.classList.remove('lv-on', 'lv-pill-on');
+    bar.querySelectorAll('.lv-in,.lv-pill,.lv-glint,.lv-space').forEach(function (el) { el.remove(); });
   }
 
   // first: whether this is the first paint of this visit (glint, sparkles and entrance only then)
@@ -73,6 +77,23 @@
     if (phone) bar.querySelectorAll('a,button').forEach(function (el) {
       var r = el.getBoundingClientRect(); if (r.width && (!anchor || r.right > anchor.getBoundingClientRect().right)) anchor = el; });
     if (!anchor) return;
+    var count = [0, 3, 2, 1][n], gap = 15, lifts = [4, 0, 8];
+    var cluster = count ? 13 + (count - 1) * gap + 14 : 0;   // balloons plus their margin to the gem
+    var pill = null;
+    if (n < 3 && !phone) {
+      bar.classList.add('lv-pill-on');
+      pill = document.createElement('a'); pill.className = 'lv-pill';
+      pill.href = url; pill.target = '_blank'; pill.rel = 'noopener';
+      pill.innerHTML = '<b></b> earned <span>Certificate →</span>';
+      pill.querySelector('b').textContent = 'Level ' + level;
+      if (!first) pill.style.animationDelay = '0s';
+      bar.append(pill);
+    }
+    if (!phone) {
+      var sp = document.createElement('span'); sp.className = 'lv-space'; sp.setAttribute('aria-hidden', 'true');
+      sp.style.width = (cluster + (pill ? 14 + pill.offsetWidth : 0)) + 'px';
+      gem.parentNode.insertBefore(sp, gem);
+    }
     var br = bar.getBoundingClientRect(), ar = anchor.getBoundingClientRect();
     var right = ar.left - br.left - 14;
 
@@ -80,7 +101,6 @@
       var g = document.createElement('i'); g.className = 'lv-glint';
       var host = gem.firstElementChild || gem; if (!host.style.position) host.style.position = 'relative'; host.append(g);
     }
-    var count = [0, 3, 2, 1][n], gap = 15, lifts = [4, 0, 8];
     for (var i = 0; i < count; i++) {
       var b = document.createElement('div'); b.className = 'lv-b';
       b.style.left = (right - 13 - (count - 1 - i) * gap) + 'px';
@@ -95,18 +115,14 @@
       t.style.left = (clusterLeft + p[0]) + 'px'; t.style.top = p[1] + 'px'; t.style.animationDelay = (1 + k * 0.7) + 's';
       layer.append(t);
     });
-    if (n < 3 && !phone) {
-      var pill = document.createElement('a'); pill.className = 'lv-pill';
-      pill.href = url; pill.target = '_blank'; pill.rel = 'noopener';
-      pill.innerHTML = '<b></b> earned <span>Certificate →</span>';
-      pill.querySelector('b').textContent = 'Level ' + level;
-      if (!first) pill.style.animationDelay = '0s';
-      bar.append(pill);
+    if (pill) {
       var left = clusterLeft - 14 - pill.offsetWidth;
-      // never over the logo: if the bar is too narrow, drop the pill
+      // never over the logo: if the bar is too narrow, drop the pill and give the row its room back
       var logo = bar.querySelector('.lms-topbar-logo');
-      if (logo && left < logo.getBoundingClientRect().right - br.left + 12) pill.remove();
-      else pill.style.left = left + 'px';
+      if (logo && left < logo.getBoundingClientRect().right - br.left + 12) {
+        pill.remove(); bar.classList.remove('lv-pill-on');
+        var s2 = bar.querySelector('.lv-space'); if (s2) s2.style.width = cluster + 'px';
+      } else pill.style.left = left + 'px';
     }
   }
 
