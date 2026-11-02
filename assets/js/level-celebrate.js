@@ -16,7 +16,8 @@
     '.lv-in{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}',
     // 2 Nov 2026 (Victor: "fix this clutter"): the celebration takes real room in the row instead of floating over
     // the name, and while the earned pill shows, the duplicate "certificate is ready" pill and the name step aside
-    '.lv-space{flex:none;display:inline-block;height:1px;pointer-events:none}',
+    '.lv-slot{display:inline-flex;align-items:center;gap:4px;flex:none;position:relative;z-index:1}',
+    '.lv-bunch{position:relative;display:block;flex:none;overflow:hidden;pointer-events:none}',
     '.lms-topbar.lv-pill-on .lms-topbar-identity,.lms-topbar.lv-pill-on a.cert-pill{display:none!important}',
     '.lms-topbar.lv-on>*:not(.lv-in):not(.lv-pill){position:relative;z-index:1}',
     '.lv-rim{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden;opacity:0;animation:lvIn .6s .1s ease-out forwards}',
@@ -34,14 +35,17 @@
     '.lv-glint{position:absolute;inset:0;border-radius:999px;overflow:hidden;pointer-events:none}',
     '.lv-glint::after{content:"";position:absolute;top:-20%;bottom:-20%;width:40%;left:-60%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,250,230,.95),transparent);animation:lvGlint 1.1s .6s cubic-bezier(.4,0,.2,1) forwards}',
     '@keyframes lvGlint{to{left:130%}}',
-    '.lv-pill{position:absolute;top:50%;z-index:2;pointer-events:auto;display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px;border-radius:999px;',
+    '.lv-pill{position:relative;z-index:2;pointer-events:auto;display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px;border-radius:999px;',
     'background:rgba(169,118,31,.08);box-shadow:inset 0 0 0 1px rgba(169,118,31,.32);font:600 12px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;color:#000036;text-decoration:none;white-space:nowrap;',
-    'opacity:0;transform:translate(8px,-50%);animation:lvPill .45s .95s cubic-bezier(.2,1.2,.4,1) forwards;transition:background .18s}',
+    'opacity:0;transform:translateX(8px);animation:lvPill .45s .95s cubic-bezier(.2,1.2,.4,1) forwards;transition:background .18s,box-shadow .18s}',
     '.lv-pill:hover{background:rgba(169,118,31,.15)}',
-    '.lv-pill b{color:#a9761f;font-weight:700}.lv-pill span{color:rgba(60,60,67,.55);font-weight:500;transition:transform .18s}.lv-pill:hover span{transform:translateX(2px)}',
-    '@keyframes lvPill{to{opacity:1;transform:translate(0,-50%)}}',
-    '.lms-dark .lv-pill{background:rgba(227,200,120,.1);box-shadow:inset 0 0 0 1px rgba(227,200,120,.4);color:#fff}.lms-dark .lv-pill b{color:#E3C878}.lms-dark .lv-pill span{color:rgba(255,255,255,.55)}',
-    '@media (prefers-reduced-motion:reduce){.lv-rim,.lv-rim i,.lv-b,.lv-pill,.lv-t,.lv-glint::after{animation:none!important;opacity:1}.lv-pill{transform:translate(0,-50%)}.lv-t,.lv-glint{display:none}}'
+    '.lv-pill b{color:#a9761f;font-weight:700}.lv-pill em{font-style:normal}.lv-pill span{display:inline-flex;gap:4px;padding-left:8px;margin-left:2px;border-left:1px solid rgba(169,118,31,.3);color:rgba(60,60,67,.6);font-weight:500}',
+    '.lv-pill span i{font-style:normal;transition:transform .18s cubic-bezier(.2,1.4,.4,1)}.lv-pill:hover span i{transform:translateX(3px)}',
+    '@keyframes lvPill{to{opacity:1;transform:translateX(0)}}',
+    '.lms-dark .lv-pill{background:linear-gradient(180deg,rgba(227,200,120,.2),rgba(227,200,120,.06));box-shadow:inset 0 0 0 1px rgba(227,200,120,.45),inset 0 1px 0 rgba(255,246,220,.35),0 0 18px rgba(227,200,120,.18);color:#fff}',
+    '.lms-dark .lv-pill:hover{background:linear-gradient(180deg,rgba(227,200,120,.3),rgba(227,200,120,.1));box-shadow:inset 0 0 0 1px rgba(227,200,120,.7),inset 0 1px 0 rgba(255,246,220,.45),0 0 26px rgba(227,200,120,.3)}',
+    '.lms-dark .lv-pill b{color:#E3C878;text-shadow:0 0 14px rgba(227,200,120,.45)}.lms-dark .lv-pill span{color:rgba(255,255,255,.62);border-left-color:rgba(227,200,120,.3)}',
+    '@media (prefers-reduced-motion:reduce){.lv-rim,.lv-rim i,.lv-b,.lv-pill,.lv-t,.lv-glint::after{animation:none!important;opacity:1}.lv-pill{transform:none}.lv-t,.lv-glint{display:none}}'
   ].join('');
 
   function balloon(c, i) {
@@ -56,7 +60,25 @@
 
   function clear(bar) {
     bar.classList.remove('lv-on', 'lv-pill-on');
-    bar.querySelectorAll('.lv-in,.lv-pill,.lv-glint,.lv-space').forEach(function (el) { el.remove(); });
+    bar.querySelectorAll('.lv-in,.lv-slot,.lv-pill,.lv-glint').forEach(function (el) { el.remove(); });
+  }
+
+  function balloons(into, n, foil, first, x0) {
+    var count = [0, 3, 2, 1][n], gap = 15, lifts = [4, 0, 8];
+    for (var i = 0; i < count; i++) {
+      var b = document.createElement('div'); b.className = 'lv-b';
+      b.style.left = (x0 + i * gap) + 'px';
+      b.style.bottom = (2 - lifts[i % 3]) + 'px';
+      b.style.animationDelay = (first ? 0.15 + i * 0.12 : 0) + 's,' + (0.9 + i * 0.45) + 's';
+      if (!first) b.style.animationDuration = '.01s,4.6s';
+      b.innerHTML = balloon(foil[i % 3], i); into.append(b);
+    }
+    if (n === 1 && first) [[-8, 9], [count * gap + 4, 34], [Math.round(count * gap / 2), 14]].forEach(function (p, k) {
+      var t = document.createElement('i'); t.className = 'lv-t';
+      t.style.left = (x0 + p[0]) + 'px'; t.style.top = p[1] + 'px'; t.style.animationDelay = (1 + k * 0.7) + 's';
+      into.append(t);
+    });
+    return count ? 13 + (count - 1) * gap : 0;
   }
 
   // first: whether this is the first paint of this visit (glint, sparkles and entrance only then)
@@ -71,59 +93,44 @@
     layer.innerHTML = '<div class="lv-rim"><i></i></div>';
     bar.prepend(layer);
 
-    // anchor: the level gem; on phones the bar hides it, so the rightmost visible control
-    var gem = bar.querySelector('.fil-top-level');
-    var anchor = gem && gem.offsetWidth ? gem : null, phone = !anchor;
-    if (phone) bar.querySelectorAll('a,button').forEach(function (el) {
+    var gem = bar.querySelector('.fil-top-level:not([hidden])');
+    if (gem && gem.offsetWidth) {
+      // 2 Nov 2026: pill and balloons are real content in the row, just before the gem. The gem fills in its
+      // level and XP a moment after sign-in and grows; content in the flow moves with it, so nothing can overlap.
+      var slot = document.createElement('span'); slot.className = 'lv-slot';
+      if (n < 3) {
+        bar.classList.add('lv-pill-on');
+        var pill = document.createElement('a'); pill.className = 'lv-pill';
+        pill.href = url; pill.target = '_blank'; pill.rel = 'noopener';
+        pill.innerHTML = '<b></b><em>earned</em><span>Certificate <i>→</i></span>';
+        pill.querySelector('b').textContent = 'Level ' + level;
+        if (!first) pill.style.animationDelay = '0s';
+        slot.append(pill);
+      }
+      var bunch = document.createElement('span'); bunch.className = 'lv-bunch';
+      bunch.style.height = bar.clientHeight + 'px';
+      bunch.style.width = (balloons(bunch, n, foil, first, 8) + 16) + 'px';
+      slot.append(bunch);
+      gem.parentNode.insertBefore(slot, gem);
+      // too narrow for the pill (the row would run under the logo): keep the balloons, drop the pill
+      var logo = bar.querySelector('.lms-topbar-logo'), row = gem.parentNode;
+      if (pill && logo && row.getBoundingClientRect().left < logo.getBoundingClientRect().right + 12) {
+        pill.remove(); bar.classList.remove('lv-pill-on');
+      }
+      if (n === 1 && first) {
+        var g = document.createElement('i'); g.className = 'lv-glint';
+        var host = gem.firstElementChild || gem; if (!host.style.position) host.style.position = 'relative'; host.append(g);
+      }
+      return;
+    }
+    // phones hide the gem: a few balloons float just left of the rightmost control, no pill
+    var anchor = null;
+    bar.querySelectorAll('a,button').forEach(function (el) {
       var r = el.getBoundingClientRect(); if (r.width && (!anchor || r.right > anchor.getBoundingClientRect().right)) anchor = el; });
     if (!anchor) return;
-    var count = [0, 3, 2, 1][n], gap = 15, lifts = [4, 0, 8];
-    var cluster = count ? 13 + (count - 1) * gap + 14 : 0;   // balloons plus their margin to the gem
-    var pill = null;
-    if (n < 3 && !phone) {
-      bar.classList.add('lv-pill-on');
-      pill = document.createElement('a'); pill.className = 'lv-pill';
-      pill.href = url; pill.target = '_blank'; pill.rel = 'noopener';
-      pill.innerHTML = '<b></b> earned <span>Certificate →</span>';
-      pill.querySelector('b').textContent = 'Level ' + level;
-      if (!first) pill.style.animationDelay = '0s';
-      bar.append(pill);
-    }
-    if (!phone) {
-      var sp = document.createElement('span'); sp.className = 'lv-space'; sp.setAttribute('aria-hidden', 'true');
-      sp.style.width = (cluster + (pill ? 14 + pill.offsetWidth : 0)) + 'px';
-      gem.parentNode.insertBefore(sp, gem);
-    }
     var br = bar.getBoundingClientRect(), ar = anchor.getBoundingClientRect();
-    var right = ar.left - br.left - 14;
-
-    if (n === 1 && first && !phone) {
-      var g = document.createElement('i'); g.className = 'lv-glint';
-      var host = gem.firstElementChild || gem; if (!host.style.position) host.style.position = 'relative'; host.append(g);
-    }
-    for (var i = 0; i < count; i++) {
-      var b = document.createElement('div'); b.className = 'lv-b';
-      b.style.left = (right - 13 - (count - 1 - i) * gap) + 'px';
-      b.style.bottom = (2 - lifts[i % 3]) + 'px';
-      b.style.animationDelay = (first ? 0.15 + i * 0.12 : 0) + 's,' + (0.9 + i * 0.45) + 's';
-      if (!first) b.style.animationDuration = '.01s,4.6s';
-      b.innerHTML = balloon(foil[i % 3], i); layer.append(b);
-    }
-    var clusterLeft = right - 13 - (count - 1) * gap;
-    if (n === 1 && first) [[-8, 9], [count * gap + 4, 34], [Math.round(count * gap / 2), 14]].forEach(function (p, k) {
-      var t = document.createElement('i'); t.className = 'lv-t';
-      t.style.left = (clusterLeft + p[0]) + 'px'; t.style.top = p[1] + 'px'; t.style.animationDelay = (1 + k * 0.7) + 's';
-      layer.append(t);
-    });
-    if (pill) {
-      var left = clusterLeft - 14 - pill.offsetWidth;
-      // never over the logo: if the bar is too narrow, drop the pill and give the row its room back
-      var logo = bar.querySelector('.lms-topbar-logo');
-      if (logo && left < logo.getBoundingClientRect().right - br.left + 12) {
-        pill.remove(); bar.classList.remove('lv-pill-on');
-        var s2 = bar.querySelector('.lv-space'); if (s2) s2.style.width = cluster + 'px';
-      } else pill.style.left = left + 'px';
-    }
+    var count = [0, 3, 2, 1][n];
+    balloons(layer, n, foil, first, ar.left - br.left - 14 - (13 + (count - 1) * 15));
   }
 
   // Draw into whichever bar is on screen, and redraw when the view or the window size changes.
@@ -134,11 +141,14 @@
       for (var i = 0; i < bars.length; i++) if (bars[i].offsetParent !== null && bars[i].offsetWidth) return bars[i];
       return null;
     }
+    var hadGem = null;
     function tick() {
       var bar = visibleBar();
-      if (bar !== current) {
+      var g = bar && bar.querySelector('.fil-top-level:not([hidden])'), hasGem = !!(g && g.offsetWidth);
+      // redraw on a new bar, or when the gem appears or goes (it fills in late, and phones hide it)
+      if (bar !== current || hasGem !== hadGem) {
         if (current) clear(current);
-        current = bar;
+        current = bar; hadGem = hasGem;
         if (bar) { render(bar, n, level, url, first); first = false; }
       }
     }
