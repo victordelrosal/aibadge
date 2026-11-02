@@ -161,7 +161,9 @@ try {
 
     // 4. Name on the credential = the learner's own profile name.
     const user = await (await fetch(`${fs}/users/${uid}`, { headers: { Authorization: "Bearer " + token } })).json();
-    const name = String((user.fields && user.fields.displayName && user.fields.displayName.stringValue) || "").normalize("NFC").trim();
+    // displayName, else fullName (2 Nov 2026): the site writes both; older NCI records may hold only one.
+    const uf = user.fields || {};
+    const name = String((uf.displayName && uf.displayName.stringValue) || (uf.fullName && uf.fullName.stringValue) || "").normalize("NFC").trim();
     const nameOk = !(name.length < 2 || name.length > 80 || name.includes("@"));
     if (!nameOk) why.push("no usable profile name");
 
@@ -172,7 +174,7 @@ try {
       if (missing.length) notes.push("Mark these lessons complete: " + missing.map((t) => TITLES[t] || t).join(", ") + ".");
       if (!ex.some((e) => BUILDS.includes(e.exerciseId))) notes.push("Submit your live page for AI Interviews You or The Five Innovators. At least one build has to pass.");
       if (!emailOk) notes.push("Confirm your email: on your dashboard, type the 8-digit code we emailed you.");
-      if (!nameOk) notes.push("Add your full name to your profile. It is the name printed on your certificate.");
+      if (!nameOk) notes.push("Add your full name: type it in the box here, exactly as it should be printed on your certificate.");
       const toFix = items.filter((i) => i.verdict === "REPEAT").length + notes.length;
       if (toFix) {
         const fb = { uid, email, items, notes, at: new Date().toISOString() };

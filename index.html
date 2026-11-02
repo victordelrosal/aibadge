@@ -2765,6 +2765,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       .cpath .lms-subheading { color:var(--muted) !important; }
       .cpath [data-cert-code-step] a, .cpath > p[x-show] { color:var(--gold) !important; }
       .cpath [data-cert-code-step] input { background:rgba(255,255,255,.95); }
+      .cpath [data-cert-name-step] { border-top-color:rgba(227,200,120,.2) !important; }
+      .cpath [data-cert-name-step] > div:first-child { color:var(--ink) !important; }
+      .cpath [data-cert-name-step] a { color:var(--gold) !important; }
+      .cpath [data-cert-name-step] input { background:rgba(255,255,255,.95); }
+      .cpath [data-cert-name-step] > p[x-show] { color:#ffb4a6 !important; }
       .cpath > div[x-show="$store.review.needsAction"] { border-top-color:rgba(227,200,120,.2) !important; }
       .cpath > div[x-show="$store.review.needsAction"] > div { color:#ffb4a6 !important; }
       .cpath .cp-in { opacity:0; transform:translateY(12px); }
@@ -3158,6 +3163,18 @@ input[type="range"].explorer-slider::-moz-range-thumb{
               </button>
             </template>
             <span x-show="certState==='working'" class="cpath-wait">Starting&hellip;</span>
+          </div>
+          <!-- Name on the certificate (2 Nov 2026): asked before every request, prefilled when we have one -->
+          <div x-show="certState==='name'" x-cloak data-cert-name-step style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(184,134,11,0.22);">
+            <div style="font:700 15px/1.3 -apple-system,sans-serif;color:#000036;">The name on your certificate</div>
+            <p class="lms-subheading" style="font-size:0.9rem;margin:4px 0 12px;">Type it exactly as it should be printed: first name and surname. Your certificate is permanent and public, so check the spelling.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <input x-model="certName" @keydown.enter="confirmCertName()" data-cert-name-input autocomplete="name" maxlength="80" placeholder="First name and surname" aria-label="Your full name, as printed on your certificate"
+                     style="flex:1;min-width:220px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(0,0,54,0.18);font:600 17px/1.2 -apple-system,sans-serif;color:#000036;">
+              <button @click="confirmCertName()" :disabled="certNameBusy" class="lms-invite-btn" style="border-radius:12px;padding:12px 18px;height:auto;font-weight:700;" x-text="certNameBusy ? 'Saving...' : 'Request certificate'"></button>
+              <a href="#" @click.prevent="certState='idle'; certNameMsg=''" style="color:#1d4d8c;font-weight:600;font-size:0.9rem;text-decoration:none;">Cancel</a>
+            </div>
+            <p x-show="certNameMsg" x-text="certNameMsg" style="margin:10px 0 0;font:600 13px/1.45 -apple-system,sans-serif;color:#9a3412;"></p>
           </div>
           <!-- Email-ownership proof (3 Oct 2026): a typed code, because mail scanners pre-click links -->
           <div x-show="certState==='code'" x-cloak data-cert-code-step style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(184,134,11,0.22);">
@@ -4451,7 +4468,20 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <span>We cannot read Notion, Google Docs or Drive, anything that needs a sign-in, or a repo's front page (it shows only file names).</span>
     </div>
     <template x-for="n in $store.review.notes" :key="n">
-      <div class="review-item"><span class="review-tag todo">To do</span><p x-text="n"></p></div>
+      <div class="review-item"><span class="review-tag todo">To do</span><p x-show="!/full name/i.test(n)" x-text="n"></p>
+        <!-- The name note gets its own box (2 Nov 2026): before this there was nowhere to type it -->
+        <div x-show="/full name/i.test(n)" x-data="{ nm: $store.auth.certNameDraft, msg: '', busy: false, saved: '' }">
+          <p style="margin:0 0 10px;">Type your full name, exactly as it should be printed on your certificate: first name and surname.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <input x-model="nm" @keydown.enter="$refs.nameSave.click()" autocomplete="name" maxlength="80" placeholder="First name and surname" aria-label="Your full name, as printed on your certificate"
+                   style="flex:1;min-width:200px;padding:11px 13px;border-radius:12px;border:1.5px solid rgba(0,0,54,0.18);font:600 16px/1.2 -apple-system,sans-serif;color:#000036;">
+            <button x-ref="nameSave" :disabled="busy" class="lms-invite-btn" style="border-radius:12px;padding:11px 16px;height:auto;font-weight:700;" x-text="busy ? 'Saving...' : 'Save my name'"
+                    @click="if (busy) return; busy = true; msg = ''; $store.auth.saveCertName(nm).then(function(r){ if (r.error) { msg = r.error; } else { saved = r.name; nm = r.name; return $store.review.afterName(); } }).catch(function(){ msg = 'Network error. Try again.'; }).finally(function(){ busy = false; })"></button>
+          </div>
+          <p x-show="msg" x-text="msg" style="margin:8px 0 0;font:600 13px/1.45 -apple-system,sans-serif;color:#9a3412;"></p>
+          <p x-show="saved && !msg" style="margin:8px 0 0;font:600 13px/1.45 -apple-system,sans-serif;color:#1d6e36;">Saved. Your certificate will read: <span x-text="saved"></span></p>
+        </div>
+      </div>
     </template>
     <template x-for="e in $store.review.items" :key="e.exerciseId">
       <div class="review-item">
@@ -5435,6 +5465,32 @@ try{
         var p = this.profile || {};
         return p.fullName || p.displayName || (this.user ? this.user.email : '') || '';
       },
+      // Name printed on the certificate (2 Nov 2026). Only NCI sign-ups stored one, so Google, LinkedIn
+      // and email learners passed marking and then waited forever on "add your full name" with nowhere
+      // to type it. The grading loop reads users.displayName (or fullName); saveCertName writes both.
+      get certName() {
+        var p = this.profile || {}, n = String(p.displayName || p.fullName || '').trim();
+        return n.length >= 2 && n.length <= 80 && n.indexOf('@') < 0 ? n : '';
+      },
+      get certNameDraft() {
+        return this.certName || String((this.user && this.user.displayName) || '').trim();
+      },
+      checkCertName(s) {
+        var n = String(s || '').normalize('NFC').replace(/\s+/g, ' ').trim();
+        if (n.length < 3 || n.length > 80) return { error: 'Type your full name: first name and surname.' };
+        if (/[@0-9<>{}\[\]\\\/_=+*#$%^|~`"]/.test(n)) return { error: 'Use only the letters of your name, as you write it.' };
+        if (!/\s/.test(n)) return { error: 'Add your surname too: first name and surname.' };
+        return { name: n };
+      },
+      async saveCertName(s) {
+        var c = this.checkCertName(s);
+        if (c.error) return c;
+        if (!this.user) return { error: 'Sign in again, then save your name.' };
+        var r = await updateUserProfile(this.user.uid, { displayName: c.name, fullName: c.name });
+        if (!r.success) return { error: 'Could not save your name. Try again.' };
+        this.profile = Object.assign({}, this.profile || {}, { displayName: c.name, fullName: c.name });
+        return { name: c.name };
+      },
       get studentId() {
         var p = this.profile || {};
         if (p.studentId) return p.studentId;
@@ -5534,6 +5590,14 @@ try{
         if (!this.needsAction) return;
         await this.load();
         if (this.needsAction && this.toFix === 0) await this.rereview();
+      },
+      // After the learner saves their name: if the name was the last thing open, ask for the fresh
+      // review now (the note itself stays until the next marking run clears it).
+      async afterName() {
+        if (!this.needsAction) return;
+        var open = this.items.filter(function(e){ return !e.fixed; }).length
+          + this.notes.filter(function(n){ return !/full name/i.test(n); }).length;
+        if (open === 0) await this.rereview();
       }
     });
 
@@ -6624,8 +6688,9 @@ try{
     return {
       progress: {},
       subs: {},
-      certState: 'idle',   // idle | working | code | requested | paid
+      certState: 'idle',   // idle | name | working | code | requested | paid
       certMsg: '',
+      certName: '', certNameMsg: '', certNameBusy: false,
       certCode: '', certCodeMsg: '', certCodeTo: '', certCodeBusy: false,
 
       tutorials: window._lmsTutorials.map(function(t) { return Object.assign({}, t); }),
@@ -6837,7 +6902,22 @@ try{
       cpRequest(ev) {
         if (!this.allComplete || this.certState !== 'idle') return;
         window.__aibBurst && window.__aibBurst(ev.clientX, ev.clientY);
-        this.requestCertificate();
+        // Name first: the certificate is permanent and the grading loop cannot issue without one.
+        this.certName = Alpine.store('auth').certNameDraft; this.certNameMsg = '';
+        this.certState = 'name';
+        this.$nextTick(() => { var i = document.querySelector('[data-cert-name-input]'); i && i.focus(); });
+      },
+      async confirmCertName() {
+        if (this.certState !== 'name' || this.certNameBusy) return;
+        this.certNameBusy = true; this.certNameMsg = '';
+        try {
+          var r = await Alpine.store('auth').saveCertName(this.certName);
+          if (r.error) { this.certNameMsg = r.error; return; }
+          this.certName = r.name;
+          this.certState = 'idle';
+          await this.requestCertificate();
+        } catch (e) { this.certNameMsg = 'Network error. Try again.'; }
+        finally { this.certNameBusy = false; }
       },
       toggleComplete(tut) {
         if (tut.submit) { this.openSubmit(tut); return; }
