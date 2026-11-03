@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<script src="assets/js/nci-guard.js?v=1"></script>
+<script src="assets/js/nci-guard.js?v=2"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Badge: Get good at AI, then prove it</title>
 <meta property="og:type" content="website">
@@ -1735,7 +1735,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <li><a href="#" class="nav-signin" @click.prevent="$store.ui.showModal('signin')">Sign in</a></li>
     </ul>
     <div class="lx-nav-right">
-      <a href="#" class="lx-btn lx-btn-light lx-btn-sm" @click.prevent="$store.ui.showModal('signin')">Start free</a>
+      <a href="#" class="lx-btn lx-btn-light lx-btn-sm" @click.prevent="$store.ui.showModal('signin')"><span class="aib-price">Start free</span><span class="aib-nci-only">Start learning</span></a>
       <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
         <span></span><span></span><span></span>
       </button>
@@ -1753,12 +1753,12 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 
   <div class="lx-wrap lx-hero-inner">
     <div class="lx-hero-copy">
-      <a href="#pricing-v2" class="lx-pill fade-in"><span class="lx-dot"></span>The Level&nbsp;1 certificate is now free for everyone</a>
+      <a href="#pricing-v2" class="lx-pill fade-in aib-price"><span class="lx-dot"></span>The Level&nbsp;1 certificate is now free for everyone</a>
       <h1 class="lx-h1 fade-in">Get good at AI.<br><em>Then prove it.</em></h1>
       <p class="lx-lede fade-in">Short video tutorials for working professionals. Each one ends with something you build and submit. When your work meets the bar, you receive a signed credential, mapped to <strong>European and international AI competency frameworks</strong>, that anyone can verify.</p>
 
       <div class="lx-start fade-in">
-        <span class="lx-start-label">Start free with</span>
+        <span class="lx-start-label"><span class="aib-price">Start free with</span><span class="aib-nci-only">Start with</span></span>
         <div class="lx-start-pills">
           <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="navGoogleSignup()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Google</a>
           <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="signInWithLinkedIn()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>LinkedIn</a>
@@ -1870,7 +1870,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 ]</code></pre>
     </div>
 
-    <p class="lx-fw-disclaimer fade-in">Independent mapping by fiveinnolabs indicating the frameworks this credential relates to. It is not a graded assessment and does not certify a level within any framework. The AI Badge is not endorsed by, accredited by, or affiliated with these organisations. The bands shown are the ones used in the free self-assessment.</p>
+    <p class="lx-fw-disclaimer fade-in">Independent mapping by fiveinnolabs indicating the frameworks this credential relates to. It is not a graded assessment and does not certify a level within any framework. The AI Badge is not endorsed by, accredited by, or affiliated with these organisations. The bands shown are the ones used in the <span class="aib-price">free </span>self-assessment.</p>
   </div>
 </section>
 
@@ -1895,7 +1895,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <li>
         <span class="lx-step-n">03</span>
         <h3>Submit</h3>
-        <p>Paste the link to what you made. AI marks it against a published rubric. If it is not there yet, improve it and resubmit for free.</p>
+        <p>Paste the link to what you made. AI marks it against a published rubric. If it is not there yet, improve it and resubmit<span class="aib-price"> for free</span>.</p>
       </li>
       <li>
         <span class="lx-step-n">04</span>
@@ -1922,7 +1922,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
             <p class="lx-track-k">Level 1</p>
             <h3>Foundations</h3>
           </div>
-          <span class="lx-tag lx-tag-free">Free certificate</span>
+          <span class="lx-tag lx-tag-free aib-price">Free certificate</span>
         </header>
         <ol class="lx-syllabus" data-lx="track1">
           <li><span class="i">01</span><span class="t">Hello World <span class="o">Open</span></span><span class="d">7 min</span></li>
@@ -2117,7 +2117,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       <article class="lx-plan lx-plan-main">
         <p class="lx-plan-k">Level&nbsp;1 certificate</p>
         <p class="lx-price">&euro;0</p>
-        <p class="lx-price-note">Free for everyone</p>
+        <p class="lx-price-note aib-price">Free for everyone</p>
         <ul class="lx-checks">
           <li>First three tutorials open as soon as you sign in</li>
           <li>Full Level&nbsp;1 access on request</li>
@@ -2125,7 +2125,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <li>Resubmit as often as you need</li>
           <li>Signed, verifiable Level&nbsp;1 certificate</li>
         </ul>
-        <a href="#" class="lx-btn lx-btn-dark lx-btn-block" @click.prevent="$store.ui.showModal('signin')">Start free</a>
+        <a href="#" class="lx-btn lx-btn-dark lx-btn-block" @click.prevent="$store.ui.showModal('signin')"><span class="aib-price">Start free</span><span class="aib-nci-only">Start learning</span></a>
       </article>
 
       <article class="lx-plan">
@@ -2159,11 +2159,11 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <div class="faq-icon">+</div>
         </div>
         <div class="faq-answer">
-          <p>Sign in for free and the first three tutorials open straight away; <a href="mailto:victor@fiveinnolabs.com?subject=AI%20Badge%20full%20access">email Victor</a> for full access to the rest. Do each exercise as you go. You submit a link to what you made. If it meets the bar it is approved; if not, you get notes and resubmit at no cost. When every Level 1 tutorial is approved, you request your certificate.</p>
+          <p>Sign in<span class="aib-price"> for free</span> and the first three tutorials open straight away; <a href="mailto:victor@fiveinnolabs.com?subject=AI%20Badge%20full%20access">email Victor</a> for full access to the rest. Do each exercise as you go. You submit a link to what you made. If it meets the bar it is approved; if not, you get notes and resubmit<span class="aib-price"> at no cost</span>. When every Level 1 tutorial is approved, you request your certificate.</p>
         </div>
       </div>
 
-      <div class="faq-item">
+      <div class="faq-item aib-price">
         <div class="faq-question" role="button" tabindex="0">
           <h3>Is the certificate free?</h3>
           <div class="faq-icon">+</div>
@@ -2199,7 +2199,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
           <div class="faq-icon">+</div>
         </div>
         <div class="faq-answer">
-          <p>You get specific, kind notes on what to improve, and you resubmit whenever you are ready. Re-review is always free.</p>
+          <p>You get specific, kind notes on what to improve, and you resubmit whenever you are ready.<span class="aib-price"> Re-review is always free.</span></p>
         </div>
       </div>
 
@@ -2233,7 +2233,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <h2 class="lx-h2 lx-light">The first tutorial takes <em data-lx="firstmin">seven minutes</em>.</h2>
     <p class="lx-sub lx-light-sub">Sign in, press play, and build your first web page today.</p>
     <div class="lx-start lx-start-center">
-        <span class="lx-start-label">Start free with</span>
+        <span class="lx-start-label"><span class="aib-price">Start free with</span><span class="aib-nci-only">Start with</span></span>
         <div class="lx-start-pills">
           <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="navGoogleSignup()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 010-9.18l-7.98-6.19a24.003 24.003 0 000 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></span>Google</a>
           <a href="#" class="lx-btn lx-btn-glass lx-btn-lg" @click.prevent="signInWithLinkedIn()"><span class="lx-chip"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.4h-2.6V19h2.6V9.4zM5.8 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.4c0-2.6-.6-4.2-3.4-4.2-1.4 0-2.3.7-2.7 1.4V9.4h-2.5V19h2.6v-4.8c0-1.3.3-2.5 1.8-2.5s1.6 1.4 1.6 2.6V19h2.6v-5.6z"/></svg></span>LinkedIn</a>
@@ -3076,7 +3076,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
               <div class="lms-module-info">
                 <div class="lms-module-title">
                   <span x-text="tut.title"></span>
-                  <span x-show="tut.free && $store.auth.isFreeTier" class="lms-free-tag">Free</span>
+                  <span x-show="tut.free && $store.auth.isFreeTier" class="lms-free-tag aib-price">Free</span>
                   <span x-show="$store.news.isNew(tut.id)" class="lms-new-pill">New</span>
                 </div>
                 <div class="lms-module-meta">
@@ -3130,7 +3130,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                 <span x-show="cpPhase==='fix'">A few changes, then your <em>certificate</em></span>
                 <span x-show="cpPhase==='issued'">Level 1 is <em>yours</em></span>
               </h3>
-              <p class="cpath-sub cp-in" style="--d:180ms">Five lessons ask you to make something and submit a link to it. Each seal lights when your link is in. AI marks the work against a <a href="#" @click.prevent="$store.ui.showModal('cert')">published rubric</a>, free for everyone.</p>
+              <p class="cpath-sub cp-in" style="--d:180ms">Five lessons ask you to make something and submit a link to it. Each seal lights when your link is in. AI marks the work against a <a href="#" @click.prevent="$store.ui.showModal('cert')">published rubric</a><span class="aib-price">, free for everyone</span>.</p>
             </div>
             <div class="cpath-count cp-in" style="--d:240ms" :aria-label="l1Submitted + ' of ' + l1Need.length + ' pieces of work submitted'">
               <b x-ref="cpNum" x-text="l1Submitted"></b><span>/<span x-text="l1Need.length"></span></span>
@@ -3216,7 +3216,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
               <div class="lms-module-info">
                 <div class="lms-module-title">
                   <span x-text="tut.title"></span>
-                  <span x-show="tut.free && $store.auth.isFreeTier" class="lms-free-tag">Free</span>
+                  <span x-show="tut.free && $store.auth.isFreeTier" class="lms-free-tag aib-price">Free</span>
                   <span x-show="$store.news.isNew(tut.id)" class="lms-new-pill">New</span>
                 </div>
                 <div class="lms-module-meta">
@@ -4592,9 +4592,9 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <!-- Availability + price (2 Oct 2026, Victor: Level 1 certificate free for everyone; Level 2 certificate EUR 49) -->
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
       <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(52,199,89,0.14);color:#1d6e36;font:600 13px/1 -apple-system,sans-serif;">✅ Level 1 open now</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(52,199,89,0.14);color:#1d6e36;font:700 13px/1 -apple-system,sans-serif;">🎉 Free for everyone</span>
+      <span class="aib-price" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:rgba(52,199,89,0.14);color:#1d6e36;font:700 13px/1 -apple-system,sans-serif;">🎉 Free for everyone</span>
     </div>
-    <p style="font:600 13px/1.45 -apple-system,sans-serif;color:#1d6e36;margin:-8px 0 20px;">Your Level 1 certificate is completely free, for everyone. No payment, ever.</p>
+    <p class="aib-price" style="font:600 13px/1.45 -apple-system,sans-serif;color:#1d6e36;margin:-8px 0 20px;">Your Level 1 certificate is completely free, for everyone. No payment, ever.</p>
 
     <!-- How review and payment works -->
     <div style="background:#F2F2F7;border-radius:16px;padding:18px 18px 6px;">
@@ -4627,10 +4627,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;max-width:380px;width:calc(100% - 40px);padding:32px 28px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
     <div style="font-size:2.4rem;margin-bottom:10px;">&#128081;</div>
     <h2 style="font:700 22px/1.25 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;margin:0 0 8px;color:#000036;">Unlock the full path</h2>
-    <p style="font:400 15px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.7);margin:0 0 22px;">You&rsquo;ve got the first three tutorials free. Full access opens every tutorial plus the verifiable AI Badge.</p>
+    <p style="font:400 15px/1.5 -apple-system,sans-serif;color:rgba(60,60,67,0.7);margin:0 0 22px;"><span class="aib-price">You&rsquo;ve got the first three tutorials free. </span>Full access opens every tutorial plus the verifiable AI Badge.</p>
     <a href="mailto:victor@fiveinnolabs.com?subject=AI%20Badge%20full%20access&body=Hi%20Victor%2C%20I%27d%20like%20full%20access%20to%20AI%20Badge."
        style="display:block;width:100%;padding:14px;border-radius:12px;font:700 16px/1.3 -apple-system,sans-serif;text-decoration:none;background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#F5E7A0 100%);color:#0A0E27;box-shadow:0 4px 20px rgba(212,175,55,0.4);margin-bottom:10px;">Get full access</a>
-    <button @click="$store.ui.closeModal()" style="font:500 15px/1.4 -apple-system,sans-serif;color:#007AFF;background:none;border:none;cursor:pointer;padding:8px;min-height:44px;">Keep exploring the free lessons</button>
+    <button @click="$store.ui.closeModal()" style="font:500 15px/1.4 -apple-system,sans-serif;color:#007AFF;background:none;border:none;cursor:pointer;padding:8px;min-height:44px;">Keep exploring the lessons</button>
   </div>
 </div>
 
@@ -4648,8 +4648,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <div class="sx-head">
       <div class="sx-handle" aria-hidden="true"></div>
       <button type="button" class="sx-x" @click="$store.ui.closeModal()" aria-label="Close">&times;</button>
-      <p class="sx-kick" x-text="isNciEmailLive ? 'NCI free access' : 'AI Badge &middot; Level 1 is free'">AI Badge &middot; Level 1 is free</p>
-      <h2 class="sx-title" id="sx-title" x-html="isNciEmailLive ? (nciRequestMode ? 'Request <em>access</em>' : 'Welcome, <em>NCI</em>') : 'Start <em>free</em>, in seconds'">Start <em>free</em>, in seconds</h2>
+      <p class="sx-kick" x-text="isNciEmailLive ? 'NCI access' : (window.aibNciDevice && aibNciDevice() ? 'AI Badge' : 'AI Badge \u00b7 Level 1 is free')">AI Badge</p>
+      <h2 class="sx-title" id="sx-title" x-html="isNciEmailLive ? (nciRequestMode ? 'Request <em>access</em>' : 'Welcome, <em>NCI</em>') : (window.aibNciDevice && aibNciDevice() ? 'Start <em>learning</em>, in seconds' : 'Start <em>free</em>, in seconds')"><span class="aib-price">Start <em>free</em>, in seconds</span><span class="aib-nci-only">Start <em>learning</em>, in seconds</span></h2>
       <p class="sx-lede" x-text="isNciEmailLive ? (nciRequestMode ? 'Confirm your details and the class code to get in.' : 'Add the class code Victor shared in lecture.') : 'New here or coming back, pick any way in. Same account, same progress.'">New here or coming back, pick any way in. Same account, same progress.</p>
     </div>
 
@@ -4790,7 +4790,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       </div>
       </div>
 
-      <button type="button" class="sx-nci" x-show="!isNciEmailLive" @click="openEmail()">NCI student or staff? Use your <b>@ncirl.ie</b> email for free full access &rsaquo;</button>
+      <button type="button" class="sx-nci" x-show="!isNciEmailLive" @click="openEmail()">NCI student or staff? Use your <b>@ncirl.ie</b> email for full access &rsaquo;</button>
       <p class="sx-fine" x-show="!isNciEmailLive">By continuing you agree to the <a href="terms.html" target="_blank" rel="noopener">terms</a> and <a href="privacy.html" target="_blank" rel="noopener">privacy notice</a>.</p>
 
     </div>
@@ -6932,6 +6932,12 @@ try{
 
   // ---------- Certificate notice (navbar 🎓 modal: proof + policy) ----------
   window.certNotice = function() {
+    // NCI devices get the same steps with no money words (Victor, 3 Nov 2026).
+    if (window.aibNciDevice && window.aibNciDevice()) return { steps: [
+        'You submit all your <strong>Level 1</strong> tutorial work. AI marks it against a published rubric.',
+        'If it isn’t a pass yet, you get notes: revise and resubmit as often as you need.',
+        'When it passes, your verifiable Level 1 credential is issued.'
+      ] };
     return {
       steps: [
         'You submit all your <strong>Level 1</strong> tutorial work. AI marks it against a published rubric. It is <strong>free</strong>, for everyone.',

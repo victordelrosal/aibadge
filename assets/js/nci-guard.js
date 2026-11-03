@@ -1,6 +1,6 @@
 /* NCI price guard (2 Nov 2026, Victor: "hide all pricing to nci students").
    Loaded synchronously in <head> so the class lands before the first paint. Any element tagged
-   class="aib-price" is hidden on an NCI device. A device counts as NCI once any of these is true:
+   class="aib-price" is hidden on an NCI device; class="aib-nci-only" (a neutral stand-in) shows only there. A device counts as NCI once any of these is true:
    it arrived from a class hub (?code= / ?nci=), it holds the hub's class code this tab, an NCI address
    has ever signed in on it, or the signed-in profile carries an NCI roster marker. The mark is sticky
    (localStorage), so signing out does not bring prices back. */
@@ -29,7 +29,7 @@
   }
 
   var css = document.createElement('style');
-  css.textContent = 'html.aib-nci .aib-price{display:none!important}';
+  css.textContent = 'html.aib-nci .aib-price{display:none!important}html:not(.aib-nci) .aib-nci-only{display:none!important}';
   (document.head || root).appendChild(css);
   if (known()) mark();
 
