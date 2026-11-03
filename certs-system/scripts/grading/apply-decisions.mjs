@@ -40,7 +40,7 @@ const fs = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(d
 const autoKey = keychain("aibadge-certs-auto-issue-key");
 const resolveKey = keychain("aibadge-grading-resolve-key");
 const resolve = (uid, outcome, exercises, notes, note) => DRY ? { status: 0 } : post(WORKER + "/api/cert-resolve", { "X-Grading-Key": resolveKey },
-  { uid, outcome, exercises, notes, note, humanApproval: { by: dec.approvedBy, at: new Date().toISOString() } });
+  { uid, outcome, exercises, notes, note, email: dec.email, humanApproval: { by: dec.approvedBy, at: new Date().toISOString() } });
 
 const results = [];
 const needIssue = dec.learners.some((l) => l.decision === "approve");
