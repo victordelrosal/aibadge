@@ -79,7 +79,8 @@ try {
       r.ucid = iss.body.ucid; r.url = iss.body.url; r.emailed = iss.body.emailed;
       r.resolve = (await resolve(l.uid, "pass", exercises, notes, "issued " + iss.body.ucid)).status;
     } else if (l.decision === "resubmit" || l.decision === "hold") {
-      r.resolve = (await resolve(l.uid, "repeat", exercises, notes, l.decision === "hold" ? "held: admin step" : "feedback to learner")).status;
+      const rs = await resolve(l.uid, "repeat", exercises, notes, l.decision === "hold" ? "held: admin step" : "feedback to learner");
+      r.resolve = rs.status; r.emailed = rs.body?.emailed ?? null;
     } else r.error = "unknown decision";
     results.push(r);
   }
