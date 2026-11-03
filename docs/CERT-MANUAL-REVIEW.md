@@ -19,6 +19,8 @@ The guardrails are deliberately strict, and most holds are false alarms. These a
 - `ai-on-terminal` has no rubric, so it holds every time. Read the session report.
 - Runs that disagree on a multi-page site: freeze.mjs reads only the page at the link, so curl the sub-pages too.
 - A link that 404s (a Codespaces `app.github.dev` preview, for example) is missing evidence, not failed work.
+- A Google Doc frozen as "JavaScript isn't enabled" is a freezer gap: the graders then call it an error page. If the
+  frozen text shows the doc title with no sign-in wall, read it with `curl -sL .../document/d/<id>/export?format=txt`.
 
 Also look for what the graders tend to miss:
 - A Five Innovators page that is the tutorial's demo (the trade academy) labelled as the learner's own idea. The rubric allows it, but score it lower.
