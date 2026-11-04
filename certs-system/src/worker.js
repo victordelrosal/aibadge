@@ -299,7 +299,10 @@ function cors() {
 async function apiMy(request, env) {
   const principal = await requireUser(request, env);
   if (!principal) return json({ error: "unauthorised" }, 401, cors());
-  const rec = await findByEmail(env, principal.email);
+  // View as (Victor only, 4 Nov 2026): an issuer may read one named learner's credential, read-only.
+  const asEmail = new URL(request.url).searchParams.get("email");
+  if (asEmail && !(await requireIssuer(request, env))) return json({ error: "unauthorised" }, 403, cors());
+  const rec = await findByEmail(env, asEmail || principal.email);
   if (!rec || rec.legacy) return json({ found: false }, 200, cors());
   const host = new URL(request.url).host;
   return json(

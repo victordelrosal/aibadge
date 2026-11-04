@@ -5606,13 +5606,14 @@ try{
           var u = (window.firebase && firebase.auth().currentUser) || null;
           if (!u) { this.loading = false; return; }
           var token = await u.getIdToken();
-          var res = await fetch('https://certs.fiveinnolabs.com/api/my', { headers: { Authorization: 'Bearer ' + token } });
+          var va = Alpine.store('auth').viewingAs;
+          var res = await fetch('https://certs.fiveinnolabs.com/api/my' + (va ? '?email=' + encodeURIComponent(Alpine.store('auth').user.email || '-') : ''), { headers: { Authorization: 'Bearer ' + token } });
           if (res.ok) {
             var j = await res.json();
             this.found = !!j.found;
             this.data = j.found ? j : null;
             // Level-up celebration in the navbar for the next 3 visits (31 Oct 2026)
-            if (this.found && window.lvMaybeCelebrate) window.lvMaybeCelebrate(this.data);
+            if (this.found && window.lvMaybeCelebrate && !va) window.lvMaybeCelebrate(this.data);
           }
         } catch (e) { /* the dashboard works fine without it */ }
         this.loading = false;
@@ -5647,9 +5648,10 @@ try{
           var u = (window.firebase && firebase.auth().currentUser) || null;
           if (!u) return;
           var token = await u.getIdToken();
-          var res = await fetch('https://aibadge-report-mailer.victordelrosal.workers.dev/api/my-verdict', { headers: { Authorization: 'Bearer ' + token } });
+          var va = Alpine.store('auth').viewingAs;
+          var res = await fetch('https://aibadge-report-mailer.victordelrosal.workers.dev/api/my-verdict' + (va ? '?uid=' + encodeURIComponent(va.uid) : ''), { headers: { Authorization: 'Bearer ' + token } });
           if (res.ok) this.data = await res.json();
-          if (this.needsAction && typeof getSubmissions === 'function') this.subs = await getSubmissions(u.uid);
+          if (this.needsAction && typeof getSubmissions === 'function') this.subs = await getSubmissions(va ? va.uid : u.uid);
           // A lesson opened before this finished loading gets its note now.
           document.querySelectorAll('[data-exercise-submission]').forEach(function(b){ window.__renderReviewNote && window.__renderReviewNote(b.getAttribute('data-exercise-submission')); });
         } catch (e) { /* the dashboard works without it */ }
@@ -5798,8 +5800,8 @@ try{
   // The admin table's eye button stores a learner and reloads. On sign-in, if the real user is an admin,
   // the page loads that learner's profile and progress in place of his own. Firestore rules already let
   // admins read every learner; here every Firestore write and every non-GET request is refused, so the
-  // preview can never change the learner's record or post anything as them. Cert and review cards are
-  // fetched with Victor's own token, so they are not part of the preview.
+  // preview can never change the learner's record or post anything as them. Cert and review cards come
+  // from the two Workers, which let an admin token read one named learner (?email= / ?uid=).
   var AIB_ADMINS = ['victor@fiveinnolabs.com', 'victordelrosal@gmail.com'];
   window.AIB_VIEWAS = (function () { try { return JSON.parse(sessionStorage.getItem('aib-viewas') || 'null'); } catch (e) { return null; } })();
   window.aibViewAs = function (uid, name) {
@@ -5910,6 +5912,9 @@ try{
           auth.viewingAs = { uid: AIB_VIEWAS.uid, name: AIB_VIEWAS.name, realEmail: user.email };
           auth.setUser({ uid: AIB_VIEWAS.uid, email: vp.email || '' });
           auth.setProfile(vp);
+          Alpine.store('cert').init();
+          Alpine.store('cert').load();
+          Alpine.store('review').load();
           Alpine.store('ui').closeModal();
           auth.setLoading(false);
           route();
