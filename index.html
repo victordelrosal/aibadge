@@ -1714,12 +1714,52 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 }
 </style>
 <style>
-.amx-viewas-pick{border-color:rgba(212,175,55,.55)!important;max-width:220px}
 .amx-viewas{margin-left:6px;padding:2px 5px;border:0;border-radius:6px;background:transparent;color:inherit;opacity:.7;cursor:pointer;vertical-align:middle;line-height:0}
 .amx-row:hover .amx-viewas,.amx-viewas:focus-visible{opacity:.9}.amx-viewas:hover{background:rgba(212,175,55,.18);opacity:1}
-#aib-viewas-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 24px);padding:9px 10px 9px 16px;border-radius:999px;font:500 13px/1.3 system-ui,sans-serif;color:#1a1405;background:linear-gradient(180deg,#f0dc9c,#e3c878);box-shadow:0 10px 30px -8px rgba(0,0,0,.45)}
-#aib-viewas-bar button{border:0;border-radius:999px;padding:7px 12px;font:600 12px/1 system-ui,sans-serif;color:#fff;background:#0b1a3a;cursor:pointer}
-#aib-viewas-bar.nudge{animation:aibnudge .5s}@keyframes aibnudge{25%{transform:translateX(calc(-50% - 6px))}75%{transform:translateX(calc(-50% + 6px))}}
+#aib-viewas-bar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:14px;max-width:calc(100vw - 24px);padding:8px 8px 8px 10px;border-radius:999px;color:#eef2fb;background:linear-gradient(180deg,rgba(18,26,52,.92),rgba(8,12,28,.94));box-shadow:inset 0 0 0 1px rgba(227,200,120,.45),0 0 32px -6px rgba(227,200,120,.45),0 18px 40px -12px rgba(0,0,0,.6);animation:vbin .42s cubic-bezier(.2,.9,.25,1.15) both}
+#aib-viewas-bar .vb-eye{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#1a1405;background:radial-gradient(circle at 35% 30%,#f6e6b0,#E3C878 55%,#c9a64e);box-shadow:0 0 18px rgba(227,200,120,.55)}
+#aib-viewas-bar .vb-eye svg{width:17px;height:17px}
+#aib-viewas-bar .vb-t{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+#aib-viewas-bar .vb-t small{font:500 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:rgba(238,242,251,.6);margin-bottom:4px}
+#aib-viewas-bar .vb-t b{font:italic 700 18px/1.1 'Playfair Display',Georgia,serif;color:#E3C878;text-shadow:0 0 24px rgba(227,200,120,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
+#aib-viewas-bar button{border:0;border-radius:999px;padding:10px 16px;font:600 12.5px/1 Inter,system-ui,sans-serif;color:#1a1405;background:linear-gradient(180deg,#f0dc9c,#E3C878 55%,#cfae55);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);cursor:pointer;transition:transform .12s}
+#aib-viewas-bar button:hover{transform:translateY(-1px)}#aib-viewas-bar button:active{transform:scale(.97)}
+#aib-viewas-bar.nudge{animation:aibnudge .45s}
+@keyframes aibnudge{25%{transform:translateX(calc(-50% - 6px))}75%{transform:translateX(calc(-50% + 6px))}}
+@keyframes vbin{from{opacity:0;transform:translate(-50%,16px) scale(.96)}to{opacity:1;transform:translate(-50%,0)}}
+/* navbar View as */
+.va{position:relative;display:flex;align-items:center;height:38px;width:230px;padding:0 12px 0 36px;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(227,200,120,.38),0 0 22px -10px rgba(227,200,120,.6);transition:box-shadow .18s,background .18s}
+.va:hover{background:rgba(255,255,255,.09)}
+.va.va-open{background:rgba(10,16,36,.9);box-shadow:inset 0 0 0 1px rgba(227,200,120,.75),0 0 0 4px rgba(227,200,120,.12),0 0 30px -6px rgba(227,200,120,.55)}
+.va-eye{position:absolute;left:12px;width:17px;height:17px;color:#E3C878;filter:drop-shadow(0 0 6px rgba(227,200,120,.55))}
+.va-in{all:unset;width:100%;font:500 13.5px/1 Inter,system-ui,sans-serif;color:#eef2fb;cursor:text}
+.va-in::placeholder{color:rgba(238,242,251,.62)}
+.va-list{position:absolute;top:calc(100% + 10px);right:0;width:360px;max-width:calc(100vw - 24px);padding:8px;border-radius:18px;z-index:1000;background:linear-gradient(180deg,#141c38,#080c1c);box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),inset 0 1px 0 rgba(227,200,120,.5),0 24px 60px -18px rgba(0,0,0,.75),0 0 40px -20px rgba(227,200,120,.5);transform-origin:top right;animation:vaIn .16s cubic-bezier(.2,.9,.25,1.1)}
+@keyframes vaIn{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.va-kick{display:flex;justify-content:space-between;padding:6px 10px 8px;font:500 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:rgba(238,242,251,.5)}
+.va-kick span:first-child{color:#E3C878}
+.va-row{all:unset;box-sizing:border-box;position:relative;display:flex;align-items:center;gap:11px;width:100%;padding:8px 10px;border-radius:12px;cursor:pointer;overflow:hidden}
+.va-row.va-on{background:rgba(227,200,120,.1);box-shadow:inset 0 0 0 1px rgba(227,200,120,.32)}
+.va-av{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;font:600 11.5px/1 'IBM Plex Mono',monospace;letter-spacing:.04em;color:#eef2fb;background:linear-gradient(145deg,rgba(47,120,255,.45),rgba(20,30,70,.9));box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.va-row.va-on .va-av{color:#1a1405;background:radial-gradient(circle at 35% 30%,#f6e6b0,#E3C878 60%,#c9a64e);box-shadow:0 0 16px rgba(227,200,120,.5)}
+.va-nm{display:flex;flex-direction:column;min-width:0;flex:1}
+.va-nm b{font:600 14px/1.25 Inter,system-ui,sans-serif;color:#eef2fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.va-nm small{font:400 11.5px/1.35 Inter,system-ui,sans-serif;color:rgba(238,242,251,.52);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.va-nm mark{background:none;color:#E3C878;text-shadow:0 0 12px rgba(227,200,120,.5)}
+.va-go{flex:none;font:500 14px/1 'IBM Plex Mono',monospace;color:#E3C878;opacity:0;transform:translateX(-6px);transition:opacity .14s,transform .14s}
+.va-row.va-on .va-go{opacity:1;transform:none}
+.va-row.va-picked::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,240,200,.55) 50%,transparent 70%);transform:translateX(-100%);animation:vaGlint .5s ease-out forwards}
+@keyframes vaGlint{to{transform:translateX(100%)}}
+.va-empty{padding:14px 12px;font:400 13px/1.4 Inter,system-ui,sans-serif;color:rgba(238,242,251,.6)}.va-empty b{color:#eef2fb}
+.va-foot{display:flex;gap:14px;padding:8px 10px 4px;margin-top:4px;border-top:1px solid rgba(255,255,255,.07);font:400 11px/1 Inter,system-ui,sans-serif;color:rgba(238,242,251,.45)}
+.va-foot kbd{display:inline-block;min-width:16px;margin-right:3px;padding:2px 4px;border-radius:5px;font:500 10px/1.2 'IBM Plex Mono',monospace;text-align:center;color:rgba(238,242,251,.75);background:rgba(255,255,255,.07);box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
+.va:not(.lms-dark .va):not(.va-open){background:rgba(169,118,31,.07);box-shadow:inset 0 0 0 1px rgba(169,118,31,.45)}
+.va:not(.lms-dark .va):not(.va-open) .va-eye{color:#a9761f;filter:none}
+.va:not(.lms-dark .va):not(.va-open) .va-in{color:#0b1220}.va:not(.lms-dark .va):not(.va-open) .va-in::placeholder{color:#5a5040}
+@media (max-width:640px){.va{width:38px;padding:0;justify-content:center}.va-eye{position:static}.va-in{position:absolute;inset:0;opacity:0;cursor:pointer}
+.va.va-open{position:fixed;top:10px;left:12px;right:12px;width:auto;z-index:1001;background:#0a1024;padding:0 14px 0 40px;justify-content:flex-start}.va.va-open .va-eye{position:absolute;left:14px}.va.va-open .va-in{position:static;opacity:1}
+.va-list{position:fixed;top:58px;left:12px;right:12px;width:auto}.va-foot{display:none}}
+@media (prefers-reduced-motion:reduce){.va-list,#aib-viewas-bar,.va-row.va-picked::after{animation:none}}
 </style>
 </head>
 <body x-data>
@@ -2493,6 +2533,22 @@ input[type="range"].explorer-slider::-moz-range-thumb{
         <span style="font-size:17px;line-height:1;">🌳</span>
         <span class="lms-tree-badge" x-show="$store.ui.treeCount > 0" x-text="$store.ui.treeCount"></span>
       </button>
+      <div class="va" x-data="viewAsBox()" x-show="$store.auth.isAdmin && !$store.auth.viewingAs" :class="{ 'va-open': open, 'va-going': going }" @click.outside="close()" @keydown.escape.window="close()">
+        <svg class="va-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <input class="va-in" type="text" x-ref="in" x-model="q" @focus="openUp()" @input="hi = 0; open = true" @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.enter.prevent="pick(hits[hi])" placeholder="View as&hellip;" aria-label="View the site as a learner" role="combobox" aria-autocomplete="list" :aria-expanded="open" autocomplete="off" spellcheck="false">
+        <div class="va-list" x-show="open" x-cloak role="listbox">
+          <div class="va-kick"><span>View as</span><span x-text="loading ? 'loading learners' : (q ? hits.length + ' match' + (hits.length === 1 ? '' : 'es') : all.length + ' learners')"></span></div>
+          <template x-for="(u, i) in hits" :key="u.id">
+            <button type="button" class="va-row" role="option" :aria-selected="i === hi" :class="{ 'va-on': i === hi, 'va-picked': going === u.id }" @mousemove="hi = i" @click="pick(u)">
+              <span class="va-av" x-text="u.ini"></span>
+              <span class="va-nm"><b x-html="mark(u.name)"></b><small x-html="mark(u.name, true) === mark(u.name) ? mark(u.sub) : mark(u.sub, true)"></small></span>
+              <span class="va-go" aria-hidden="true">&rarr;</span>
+            </button>
+          </template>
+          <div class="va-empty" x-show="!loading && q && !hits.length">Nobody matches <b x-text="q"></b></div>
+          <div class="va-foot" x-show="hits.length"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd> move</span><span><kbd>&crarr;</kbd> open</span><span><kbd>esc</kbd> close</span></div>
+        </div>
+      </div>
       <span class="lms-topbar-identity" x-show="$store.auth.fullName">
         <span class="lms-topbar-name" x-text="$store.auth.fullName"></span>
         <span class="lms-topbar-sid" x-show="$store.auth.studentId" x-text="'NCI ' + $store.auth.studentId"></span>
@@ -3946,6 +4002,22 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       AI Badge
     </a>
     <div style="display:flex;align-items:center;gap:16px;">
+      <div class="va" x-data="viewAsBox()" x-show="$store.auth.isAdmin && !$store.auth.viewingAs" :class="{ 'va-open': open, 'va-going': going }" @click.outside="close()" @keydown.escape.window="close()">
+        <svg class="va-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <input class="va-in" type="text" x-ref="in" x-model="q" @focus="openUp()" @input="hi = 0; open = true" @keydown.arrow-down.prevent="move(1)" @keydown.arrow-up.prevent="move(-1)" @keydown.enter.prevent="pick(hits[hi])" placeholder="View as&hellip;" aria-label="View the site as a learner" role="combobox" aria-autocomplete="list" :aria-expanded="open" autocomplete="off" spellcheck="false">
+        <div class="va-list" x-show="open" x-cloak role="listbox">
+          <div class="va-kick"><span>View as</span><span x-text="loading ? 'loading learners' : (q ? hits.length + ' match' + (hits.length === 1 ? '' : 'es') : all.length + ' learners')"></span></div>
+          <template x-for="(u, i) in hits" :key="u.id">
+            <button type="button" class="va-row" role="option" :aria-selected="i === hi" :class="{ 'va-on': i === hi, 'va-picked': going === u.id }" @mousemove="hi = i" @click="pick(u)">
+              <span class="va-av" x-text="u.ini"></span>
+              <span class="va-nm"><b x-html="mark(u.name)"></b><small x-html="mark(u.name, true) === mark(u.name) ? mark(u.sub) : mark(u.sub, true)"></small></span>
+              <span class="va-go" aria-hidden="true">&rarr;</span>
+            </button>
+          </template>
+          <div class="va-empty" x-show="!loading && q && !hits.length">Nobody matches <b x-text="q"></b></div>
+          <div class="va-foot" x-show="hits.length"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd> move</span><span><kbd>&crarr;</kbd> open</span><span><kbd>esc</kbd> close</span></div>
+        </div>
+      </div>
       <a href="#/" class="lms-topbar-link">Dashboard</a>
       <button class="lms-theme-toggle" @click="darkMode = !darkMode; localStorage.setItem('dashboard-theme', darkMode ? 'dark' : 'light')" title="Toggle theme">
         <svg x-show="!darkMode" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -3985,10 +4057,6 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       </select>
       <span class="amx-count" x-text="processedUsers.length + ' shown'"></span>
       <span style="flex:1;"></span>
-      <select class="amx-select amx-viewas-pick" aria-label="View the site as a learner" @change="var v = $event.target.value; $event.target.value = ''; var u = users.find(function (x) { return x.id === v; }); if (u) aibViewAs(u.id, displayName(u));">
-        <option value="">&#128065; View as&hellip;</option>
-        <template x-for="u in users.slice().sort(function (a, b) { return displayName(a).localeCompare(displayName(b)); })" :key="'va-' + u.id"><option :value="u.id" x-text="displayName(u)"></option></template>
-      </select>
       <button class="amx-btn" @click="exportCsv()">⬇ Export CSV</button>
       <button class="amx-btn" @click="loadUsers()">↻ Refresh</button>
     </div>
@@ -5738,6 +5806,62 @@ try{
     try { sessionStorage.setItem('aib-viewas', JSON.stringify({ uid: uid, name: name || 'Learner' })); } catch (e) { return; }
     location.hash = '#/dashboard'; location.reload();
   };
+  // Navbar type-ahead (4 Nov 2026): loads the learner list once, on first focus, then filters locally on every key.
+  window.viewAsBox = function () {
+    var fold = function (s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
+    var esc = function (s) { return String(s || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    return {
+      q: '', open: false, loading: false, all: [], hi: 0, going: null,
+      async openUp() {
+        this.open = true;
+        if (this.all.length || this.loading) return;
+        this.loading = true;
+        var list = window._aibLearners;
+        if (!list) {
+          var raw = []; try { raw = await getAllUsers(); } catch (e) {}
+          list = window._aibLearners = raw.map(function (u) {
+            var name = String(u.fullName || u.displayName || u.firstName || u.email || 'Unnamed').trim();
+            var sub = [u.studentId ? 'NCI ' + u.studentId : '', u.email || ''].filter(Boolean).join(' \u00b7 ');
+            var ini = name.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join('').toUpperCase();
+            return { id: u.id, name: name, sub: sub, ini: ini || '?', key: fold(name + ' ' + sub) };
+          }).filter(function (u) { return !AIB_ADMINS.some(function (a) { return u.key.indexOf(a) >= 0; }); })
+            .sort(function (a, b) { return a.name.localeCompare(b.name); });
+        }
+        this.all = list; this.loading = false;
+      },
+      get hits() {
+        var q = fold(this.q).trim();
+        if (!q) return this.all.slice(0, 8);
+        var words = q.split(/\s+/), out = [];
+        this.all.forEach(function (u) {
+          if (!words.every(function (w) { return u.key.indexOf(w) >= 0; })) return;
+          var n = fold(u.name), score = n.indexOf(q) === 0 ? 0 : (' ' + n).indexOf(' ' + words[0]) >= 0 ? 1 : 2;
+          out.push([score, u]);
+        });
+        return out.sort(function (a, b) { return a[0] - b[0]; }).slice(0, 8).map(function (x) { return x[1]; });
+      },
+      mark(s, plain) {
+        var t = esc(s), words = fold(this.q).trim().split(/\s+/).filter(Boolean);
+        if (plain || !words.length) return t;
+        var f = fold(s), marks = new Array(f.length).fill(false);
+        words.forEach(function (w) { var i = f.indexOf(w); if (i >= 0) for (var k = i; k < i + w.length; k++) marks[k] = true; });
+        var src = String(s || ''), out = '', on = false;
+        for (var i = 0; i < src.length; i++) {
+          if (marks[i] !== on) { out += marks[i] ? '<mark>' : '</mark>'; on = marks[i]; }
+          out += esc(src[i]);
+        }
+        return out + (on ? '</mark>' : '');
+      },
+      move(d) { var n = this.hits.length; if (!n) return; this.open = true; this.hi = (this.hi + d + n) % n; },
+      close() { this.open = false; },
+      pick(u) {
+        if (!u || this.going) return;
+        this.going = u.id; this.q = u.name;
+        var self = this;
+        requestAnimationFrame(function () { setTimeout(function () { aibViewAs(u.id, u.name); }, 260); });
+      }
+    };
+  };
   window.aibExitViewAs = function () {
     try { sessionStorage.removeItem('aib-viewas'); } catch (e) {}
     location.hash = '#/admin'; location.reload();
@@ -5746,7 +5870,7 @@ try{
     var bar = document.createElement('div');
     bar.id = 'aib-viewas-bar';
     bar.setAttribute('role', 'status');
-    bar.innerHTML = '<span>Viewing as <b></b> &middot; read-only, nothing is saved</span><button type="button">Back to admin</button>';
+    bar.innerHTML = '<span class="vb-eye"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="vb-t"><small>Viewing as &middot; read-only</small><b></b></span><button type="button">Back to admin</button>';
     bar.querySelector('b').textContent = name;
     bar.querySelector('button').onclick = window.aibExitViewAs;
     document.body.appendChild(bar);
