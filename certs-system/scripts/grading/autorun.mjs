@@ -181,7 +181,7 @@ try {
         if (DRY) actions.push(`${email}: WOULD POST feedback (${toFix} to fix)`);
         else if (feedbackOn) {
           const r = await resolve(uid, "repeat", items, "feedback to learner", notes);
-          actions.push(`${email}: feedback posted to the learner, ${toFix} to fix [resolve ${r.status}]`);
+          actions.push(`${email}: ${r.status === 200 ? "feedback posted to the learner" : "feedback REFUSED by the server, nothing reached the learner"}, ${toFix} to fix [resolve ${r.status}${r.status === 200 ? "" : " " + JSON.stringify(r.body).slice(0, 120)}]`);
           if (r.status === 200) { delete state.reported[uid]; continue; }
         } else {
           writeFileSync(join(ensureDir(join(GRADING_HOME, "staged-feedback")), uid + ".json"), JSON.stringify(fb, null, 2), { mode: 0o600 });
@@ -203,7 +203,7 @@ try {
       continue;
     }
     const r = await resolve(uid, "pass", ex.map((e) => ({ exerciseId: e.exerciseId, verdict: "PASS", feedback: e.feedback || "", submissionSha256: e.submissionSha256 })), "issued " + iss.body.ucid);
-    actions.push(`${email}: ISSUED Level 1 to "${name}" ${iss.body.url} emailed=${iss.body.emailed} [resolve ${r.status}]`);
+    actions.push(`${email}: ISSUED Level 1 to "${name}" ${iss.body.url} emailed=${iss.body.emailed} [resolve ${r.status}${r.status === 200 ? "" : " REFUSED, request still open: " + JSON.stringify(r.body).slice(0, 120)}]`);
   }
 } catch (e) {
   if (!e.quiet) waiting.push("RUN FAILED: " + String(e.message).split("\n")[0].slice(0, 300));
