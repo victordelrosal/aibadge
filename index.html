@@ -1713,6 +1713,13 @@ input[type="range"].explorer-slider::-moz-range-thumb{
   #view-landing .lx-btn,#view-landing .lx-cred-art img,#view-landing .lx-radar img{transition:none}
 }
 </style>
+<style>
+.amx-viewas{margin-left:6px;padding:2px 5px;border:0;border-radius:6px;background:transparent;color:inherit;opacity:.35;cursor:pointer;vertical-align:middle;line-height:0}
+.amx-row:hover .amx-viewas,.amx-viewas:focus-visible{opacity:.9}.amx-viewas:hover{background:rgba(212,175,55,.18);opacity:1}
+#aib-viewas-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 24px);padding:9px 10px 9px 16px;border-radius:999px;font:500 13px/1.3 system-ui,sans-serif;color:#1a1405;background:linear-gradient(180deg,#f0dc9c,#e3c878);box-shadow:0 10px 30px -8px rgba(0,0,0,.45)}
+#aib-viewas-bar button{border:0;border-radius:999px;padding:7px 12px;font:600 12px/1 system-ui,sans-serif;color:#fff;background:#0b1a3a;cursor:pointer}
+#aib-viewas-bar.nudge{animation:aibnudge .5s}@keyframes aibnudge{25%{transform:translateX(calc(-50% - 6px))}75%{transform:translateX(calc(-50% + 6px))}}
+</style>
 </head>
 <body x-data>
 
@@ -4114,6 +4121,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
                 <td class="amx-sticky amx-td-name">
                   <span class="amx-dot" :style="'background:' + (u.enrolled ? '#34C759' : 'rgba(142,142,147,0.5)')"></span>
                   <span class="amx-name" x-text="displayName(u)"></span>
+                  <button type="button" class="amx-viewas" @click.stop="aibViewAs(u.id, displayName(u))" :title="'View the site as ' + displayName(u) + ' (read-only)'" aria-label="View as this learner"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
                 </td>
                 <td class="amx-td-id" x-text="u.studentId || '—'"></td>
                 <template x-for="t in l1Tuts" :key="t.id">
@@ -5437,6 +5445,7 @@ try{
       user: null,
       profile: null,
       loading: true,
+      viewingAs: null, // Victor-only 'View as' preview (4 Nov 2026): { uid, name, realEmail }
       fairMember: false, // set by assets/js/fair-membership.js (14 Oct 2026); never true for NCI accounts
       firstTime: false, // true only for a fresh first-time greeting this session
       get isLoggedIn() { return !!this.user; },
@@ -5712,6 +5721,48 @@ try{
     }
   };
 
+  // ---------- View as (Victor only, 4 Nov 2026) ----------
+  // The admin table's eye button stores a learner and reloads. On sign-in, if the real user is an admin,
+  // the page loads that learner's profile and progress in place of his own. Firestore rules already let
+  // admins read every learner; here every Firestore write and every non-GET request is refused, so the
+  // preview can never change the learner's record or post anything as them. Cert and review cards are
+  // fetched with Victor's own token, so they are not part of the preview.
+  var AIB_ADMINS = ['victor@fiveinnolabs.com', 'victordelrosal@gmail.com'];
+  window.AIB_VIEWAS = (function () { try { return JSON.parse(sessionStorage.getItem('aib-viewas') || 'null'); } catch (e) { return null; } })();
+  window.aibViewAs = function (uid, name) {
+    try { sessionStorage.setItem('aib-viewas', JSON.stringify({ uid: uid, name: name || 'Learner' })); } catch (e) { return; }
+    location.hash = '#/dashboard'; location.reload();
+  };
+  window.aibExitViewAs = function () {
+    try { sessionStorage.removeItem('aib-viewas'); } catch (e) {}
+    location.hash = '#/admin'; location.reload();
+  };
+  function aibReadOnly(name) {
+    var bar = document.createElement('div');
+    bar.id = 'aib-viewas-bar';
+    bar.setAttribute('role', 'status');
+    bar.innerHTML = '<span>Viewing as <b></b> &middot; read-only, nothing is saved</span><button type="button">Back to admin</button>';
+    bar.querySelector('b').textContent = name;
+    bar.querySelector('button').onclick = window.aibExitViewAs;
+    document.body.appendChild(bar);
+    var t = null;
+    function no() {
+      bar.classList.add('nudge'); clearTimeout(t); t = setTimeout(function () { bar.classList.remove('nudge'); }, 700);
+      return Promise.reject(new Error('Read-only preview: nothing was saved'));
+    }
+    var fs = firebase.firestore;
+    ['set', 'update', 'delete'].forEach(function (m) { fs.DocumentReference.prototype[m] = no; });
+    fs.CollectionReference.prototype.add = no;
+    fs.WriteBatch.prototype.commit = no;
+    fs.Firestore.prototype.runTransaction = no;
+    var f = window.fetch;
+    window.fetch = function (u, o) {
+      var m = (o && o.method) || (u && u.method) || 'GET';
+      return String(m).toUpperCase() === 'GET' ? f.apply(this, arguments) : no();
+    };
+    ['startEngagementHeartbeat', 'updateLastActive', 'logLogin', 'recordLoginMetrics'].forEach(function (n) { if (typeof window[n] === 'function') window[n] = function () {}; });
+  }
+
   // ---------- Init ----------
   document.addEventListener('alpine:init', () => {
     registerStores(Alpine);
@@ -5721,6 +5772,23 @@ try{
     try { if (typeof captureReferralParam === 'function') captureReferralParam(); } catch(e) {}
     onAuthChange(async (user) => {
       const auth = Alpine.store('auth');
+      if (user && window.AIB_VIEWAS && AIB_ADMINS.includes(user.email)) {
+        auth.setLoading(true);
+        var vp = null;
+        try { vp = await getUserProfile(AIB_VIEWAS.uid); } catch (e) {}
+        if (vp) {
+          aibReadOnly(AIB_VIEWAS.name);
+          auth.viewingAs = { uid: AIB_VIEWAS.uid, name: AIB_VIEWAS.name, realEmail: user.email };
+          auth.setUser({ uid: AIB_VIEWAS.uid, email: vp.email || '' });
+          auth.setProfile(vp);
+          Alpine.store('ui').closeModal();
+          auth.setLoading(false);
+          route();
+          return;
+        }
+        try { sessionStorage.removeItem('aib-viewas'); } catch (e) {}
+        window.AIB_VIEWAS = null;
+      }
       if (user) {
         auth.setLoading(true);
         auth.setUser({ uid: user.uid, email: user.email });
