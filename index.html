@@ -1714,7 +1714,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 }
 </style>
 <style>
-.amx-viewas{margin-left:6px;padding:2px 5px;border:0;border-radius:6px;background:transparent;color:inherit;opacity:.35;cursor:pointer;vertical-align:middle;line-height:0}
+.amx-viewas-pick{border-color:rgba(212,175,55,.55)!important;max-width:220px}
+.amx-viewas{margin-left:6px;padding:2px 5px;border:0;border-radius:6px;background:transparent;color:inherit;opacity:.7;cursor:pointer;vertical-align:middle;line-height:0}
 .amx-row:hover .amx-viewas,.amx-viewas:focus-visible{opacity:.9}.amx-viewas:hover{background:rgba(212,175,55,.18);opacity:1}
 #aib-viewas-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 24px);padding:9px 10px 9px 16px;border-radius:999px;font:500 13px/1.3 system-ui,sans-serif;color:#1a1405;background:linear-gradient(180deg,#f0dc9c,#e3c878);box-shadow:0 10px 30px -8px rgba(0,0,0,.45)}
 #aib-viewas-bar button{border:0;border-radius:999px;padding:7px 12px;font:600 12px/1 system-ui,sans-serif;color:#fff;background:#0b1a3a;cursor:pointer}
@@ -3984,6 +3985,10 @@ input[type="range"].explorer-slider::-moz-range-thumb{
       </select>
       <span class="amx-count" x-text="processedUsers.length + ' shown'"></span>
       <span style="flex:1;"></span>
+      <select class="amx-select amx-viewas-pick" aria-label="View the site as a learner" @change="var v = $event.target.value; $event.target.value = ''; var u = users.find(function (x) { return x.id === v; }); if (u) aibViewAs(u.id, displayName(u));">
+        <option value="">&#128065; View as&hellip;</option>
+        <template x-for="u in users.slice().sort(function (a, b) { return displayName(a).localeCompare(displayName(b)); })" :key="'va-' + u.id"><option :value="u.id" x-text="displayName(u)"></option></template>
+      </select>
       <button class="amx-btn" @click="exportCsv()">⬇ Export CSV</button>
       <button class="amx-btn" @click="loadUsers()">↻ Refresh</button>
     </div>
