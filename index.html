@@ -1718,6 +1718,7 @@ input[type="range"].explorer-slider::-moz-range-thumb{
 .amx-row:hover .amx-viewas,.amx-viewas:focus-visible{opacity:.9}.amx-viewas:hover{background:rgba(212,175,55,.18);opacity:1}
 #aib-viewas-bar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:14px;max-width:calc(100vw - 24px);padding:8px 8px 8px 10px;border-radius:999px;color:#eef2fb;background:linear-gradient(180deg,rgba(18,26,52,.92),rgba(8,12,28,.94));box-shadow:inset 0 0 0 1px rgba(227,200,120,.45),0 0 32px -6px rgba(227,200,120,.45),0 18px 40px -12px rgba(0,0,0,.6);animation:vbin .42s cubic-bezier(.2,.9,.25,1.15) both}
 #aib-viewas-bar .vb-eye{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#1a1405;background:radial-gradient(circle at 35% 30%,#f6e6b0,#E3C878 55%,#c9a64e);box-shadow:0 0 18px rgba(227,200,120,.55)}
+body.aib-va .fil-top-level,body.aib-va .fil-me,body.aib-va .fil-keep,body.aib-va .fil-card{display:none!important}
 #aib-viewas-bar .vb-eye svg{width:17px;height:17px}
 #aib-viewas-bar .vb-t{display:flex;flex-direction:column;line-height:1.15;min-width:0}
 #aib-viewas-bar .vb-t small{font:500 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:rgba(238,242,251,.6);margin-bottom:4px}
@@ -2565,7 +2566,8 @@ input[type="range"].explorer-slider::-moz-range-thumb{
     <!-- the learner's AI Badge level and XP beside the welcome (2 Oct 2026, Victor: "show XP and badge where appropriate") -->
     <div style="display:flex;align-items:baseline;flex-wrap:wrap;column-gap:14px;row-gap:6px;margin-bottom:8px;">
       <h1 class="lms-heading" style="margin-bottom:0" x-text="$store.auth.loading ? 'Your Learning' : ('Welcome' + ($store.auth.firstTime ? '' : ' back') + ($store.auth.firstName ? ', ' + $store.auth.firstName : ''))"></h1>
-      <fil-level mine x-show="$store.auth.user && !$store.auth.loading" style="zoom:1.18"></fil-level>
+      <fil-level mine x-show="$store.auth.user && !$store.auth.loading && !$store.auth.viewingAs" style="zoom:1.18"></fil-level>
+      <fil-level x-show="$store.auth.viewingAs" :level="$store.cert.found ? ($store.cert.data.level || 1) : 0" style="zoom:1.18"></fil-level>
     </div>
     <p class="lms-subheading" x-text="$store.auth.loading ? 'Loading...' : ($store.auth.isEnrolled ? 'Continue where you left off.' : '')"></p>
     <!-- fair membership card: filled only by assets/js/fair-membership.js, which never loads for NCI accounts -->
@@ -5870,6 +5872,7 @@ try{
   };
   function aibReadOnly(name) {
     var bar = document.createElement('div');
+    document.body.classList.add('aib-va');
     bar.id = 'aib-viewas-bar';
     bar.setAttribute('role', 'status');
     bar.innerHTML = '<span class="vb-eye"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="vb-t"><small>Viewing as &middot; read-only</small><b></b></span><button type="button">Back to admin</button>';
