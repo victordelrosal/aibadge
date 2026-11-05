@@ -67,19 +67,53 @@
     '.lms-dark .fil-keep .fil-pair i{box-shadow:0 0 0 1.5px #000036}',
     '.lms-dark .fil-note{background:rgba(10,132,255,.14);color:#fff}.lms-dark .fil-note.kept{background:rgba(48,209,88,.14)}.lms-dark .fil-note.kept svg{color:#30D158}',
     '.lms-dark .fil-later{color:rgba(235,235,245,.6)}.lms-dark .fil-later:hover{background:rgba(255,255,255,.08);color:#fff}',
-    '.fil-due{display:block;margin-top:6px;font-size:12.5px;font-weight:600;color:#C93400}.lms-dark .fil-due{color:#FFB340}',
-    /* the gate after 3 lessons */
+    '.fil-due{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;font-weight:600;color:#a9761f}.lms-dark .fil-due{color:#E3C878}',
+    '.fil-dots{display:inline-flex;gap:4px}.fil-dots i{width:8px;height:8px;border-radius:50%;background:rgba(169,118,31,.22)}.fil-dots i.on{background:#a9761f}',
+    '.lms-dark .fil-dots i{background:rgba(227,200,120,.25)}.lms-dark .fil-dots i.on{background:#E3C878;box-shadow:0 0 8px rgba(227,200,120,.6)}',
+    /* the gate after 3 lessons: navy glass, one gold seal as the focal point */
     'html.fil-gated,html.fil-gated body{overflow:hidden}',
-    '.fil-gate{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(0,0,40,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}.fil-gate[hidden]{display:none}',
-    '.fil-gate-card{width:100%;max-width:400px;padding:28px 24px 18px;border-radius:22px;background:#fff;color:#000036;text-align:center;box-shadow:0 30px 80px rgba(0,0,40,.35);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;animation:fil-in .2s ease-out}',
-    '.fil-gate-card h2{margin:0 0 10px;font:700 21px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif}',
-    '.fil-gate-card p{margin:0 0 12px;font-size:14.5px;line-height:1.5;color:rgba(0,0,54,.8)}.fil-gate-card .fil-gate-n{font-size:13px;color:rgba(60,60,67,.65);margin-bottom:18px}',
-    '.fil-gate-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:48px;margin-top:10px;border-radius:12px;font:600 15px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;cursor:pointer;transition:transform .12s cubic-bezier(.34,1.56,.64,1)}',
-    '.fil-gate-btn:active{transform:scale(.97)}.fil-gate-btn:focus-visible{outline:2px solid #007AFF;outline-offset:2px}.fil-gate-btn[aria-busy]{opacity:.7;cursor:progress}',
-    '.fil-gate-btn svg{width:18px;height:18px}.fil-gate-btn.li{border:0;background:#0A66C2;color:#fff}.fil-gate-btn.li:hover{background:#004182}',
-    '.fil-gate-btn.g{border:1px solid rgba(60,60,67,.2);background:#fff;color:#000036}.fil-gate-btn.g:hover{background:#F2F2F7}',
-    '.fil-gate-card .fil-gate-msg{min-height:1em;margin:12px 0 0;font-size:13px;color:#D70015}.fil-gate-card .fil-gate-msg:empty{margin:0;min-height:0}',
-    '.fil-gate-out{margin-top:12px;padding:8px 14px;min-height:36px;border:0;background:none;border-radius:999px;font:600 13px/1 -apple-system,sans-serif;color:rgba(60,60,67,.6);cursor:pointer}.fil-gate-out:hover{background:rgba(120,120,128,.1)}',
+    '.fil-gate{position:fixed;inset:0;z-index:10000;display:grid;grid-template-columns:minmax(0,420px);justify-content:center;align-content:center;padding:20px;background:rgba(0,0,30,.5);-webkit-backdrop-filter:blur(10px) saturate(.9);backdrop-filter:blur(10px) saturate(.9);animation:fil-fade .2s ease-out}',
+    '.fil-gate[hidden]{display:none}.fil-gate.leaving{opacity:0;transition:opacity .3s ease}',
+    '@keyframes fil-fade{from{opacity:0}to{opacity:1}}',
+    '@keyframes fil-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}',
+    '@keyframes fil-land{0%{opacity:0;transform:translateY(18px) scale(.97)}70%{transform:translateY(-2px) scale(1.005)}100%{opacity:1;transform:none}}',
+    '.fil-gate,.fil-gate *{box-sizing:border-box}',
+    '.fil-gate-card{position:relative;overflow:hidden;width:100%;max-width:420px;padding:30px 28px 18px;border-radius:24px;text-align:center;color:#fff;',
+    '  background:radial-gradient(120% 70% at 0% 0%,rgba(227,200,120,.16),transparent 60%),linear-gradient(165deg,#13187a 0%,#000036 72%);',
+    '  border:1px solid rgba(227,200,120,.24);box-shadow:0 40px 100px rgba(0,0,30,.55),inset 0 1px 0 rgba(255,255,255,.07);',
+    '  font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;animation:fil-land .42s cubic-bezier(.2,.8,.2,1) both}',
+    '.fil-gate-card:focus{outline:none}.fil-gate-card::before{content:"";position:absolute;left:12%;right:12%;top:0;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#E3C878,transparent);box-shadow:0 0 18px rgba(227,200,120,.7)}',
+    '.fil-gate-card>*{animation:fil-rise .36s cubic-bezier(.2,.8,.2,1) both}',
+    '.fil-gate-card>:nth-child(1){animation-delay:.08s}.fil-gate-card>:nth-child(2){animation-delay:.13s}.fil-gate-card>:nth-child(3){animation-delay:.16s}',
+    '.fil-gate-card>:nth-child(4){animation-delay:.2s}.fil-gate-card>:nth-child(5){animation-delay:.25s}.fil-gate-card>:nth-child(n+6){animation-delay:.3s}',
+    '.fil-gate-k{display:block;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(227,200,120,.9)}',
+    '.fil-seal{position:relative;display:grid;place-items:center;width:84px;height:84px;margin:18px auto 8px;border-radius:50%;',
+    '  background:radial-gradient(circle at 32% 28%,#FBEFC4 0%,#E3C878 42%,#B48B36 100%);box-shadow:0 0 0 6px rgba(227,200,120,.12),0 0 44px rgba(227,200,120,.45),inset 0 -4px 10px rgba(120,80,10,.35)}',
+    '.fil-seal-n{font:700 38px/1 "Playfair Display",Georgia,serif;color:#000036;transition:transform .2s ease,opacity .2s ease}',
+    '.fil-seal svg{position:absolute;width:40px;height:40px;color:#000036;opacity:0;transform:scale(.4) rotate(-20deg);transition:transform .32s cubic-bezier(.34,1.56,.64,1),opacity .2s}',
+    '.fil-seal-cap{display:block;font-size:12px;color:rgba(255,255,255,.55);margin-bottom:14px}',
+    '.fil-gate-card h2{margin:0 0 10px;font:700 29px/1.15 "Playfair Display",Georgia,serif;letter-spacing:-.01em;color:#fff}',
+    '.fil-gate-card h2 em{font-style:italic;color:#E3C878;text-shadow:0 0 24px rgba(227,200,120,.45)}',
+    '.fil-gate-p{margin:0 auto 20px;max-width:330px;font-size:14.5px;line-height:1.55;color:rgba(255,255,255,.78)}',
+    '.fil-gate-acts{display:grid;gap:10px}',
+    '.fil-gate-btn{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:50px;border-radius:14px;font:600 15px/1 Inter,-apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer;transition:transform .12s cubic-bezier(.34,1.56,.64,1),background-color .15s,box-shadow .15s}',
+    '.fil-gate-btn:active{transform:scale(.97)}.fil-gate-btn:focus-visible{outline:2px solid #E3C878;outline-offset:3px}.fil-gate-btn[aria-busy]{cursor:progress;filter:saturate(.8) brightness(.95)}',
+    '.fil-gate-btn i{display:grid;place-items:center;width:26px;height:26px;border-radius:7px;flex:none}.fil-gate-btn i svg{width:15px;height:15px;display:block}',
+    '.fil-gate-btn.li{border:0;background:#E3C878;color:#000036;box-shadow:0 8px 24px rgba(227,200,120,.28)}.fil-gate-btn.li:hover{background:#ECD590;box-shadow:0 10px 30px rgba(227,200,120,.4)}',
+    '.fil-chip-li{background:#0A66C2}.fil-chip-g{background:#fff}',
+    '.fil-gate-btn.g{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff}.fil-gate-btn.g:hover{background:rgba(255,255,255,.13)}',
+    '.fil-gate-card .fil-gate-msg{margin:12px 0 0;font-size:13px;line-height:1.45;color:#FF9C8F}.fil-gate-card .fil-gate-msg:empty{display:none}',
+    '.fil-gate-small{margin:14px 0 0;font-size:12.5px;color:rgba(255,255,255,.5)}',
+    '.fil-gate-out{margin-top:6px;padding:8px 14px;min-height:36px;border:0;background:none;border-radius:999px;font:500 13px/1 Inter,-apple-system,sans-serif;color:rgba(255,255,255,.45);cursor:pointer}',
+    '.fil-gate-out:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8)}.fil-gate-out:focus-visible{outline:2px solid #E3C878}',
+    /* joy: the seal becomes a tick, one glint crosses the card */
+    '.fil-gate.won .fil-seal-n{opacity:0;transform:scale(.5)}.fil-gate.won .fil-seal svg{opacity:1;transform:none}',
+    '.fil-gate.won .fil-seal{animation:fil-pop .45s cubic-bezier(.34,1.56,.64,1)}@keyframes fil-pop{50%{transform:scale(1.1)}}',
+    '.fil-gate-card::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,240,200,.22),transparent);transform:skewX(-18deg);opacity:0;pointer-events:none}',
+    '.fil-gate.won .fil-gate-card::after{animation:fil-glint .9s ease-out .1s}@keyframes fil-glint{0%{left:-60%;opacity:1}100%{left:130%;opacity:1}}',
+    '.fil-gate.won .fil-gate-acts,.fil-gate.won .fil-gate-small,.fil-gate.won .fil-gate-out,.fil-gate.won .fil-gate-msg{display:none}',
+    '@media (max-width:420px){.fil-gate{padding:12px}.fil-gate-card{padding:26px 20px 14px}.fil-gate-card h2{font-size:26px}}',
+    '@media (prefers-reduced-motion:reduce){.fil-gate,.fil-gate-card,.fil-gate-card>*,.fil-gate.won .fil-seal{animation:none}.fil-gate.won .fil-gate-card::after{animation:none}}',
     '.lms-dark .fil-me{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}',
     '.lms-dark .fil-tag{box-shadow:0 0 0 1.5px #000036}',
     '.lms-dark .fil-card{background:#0b0d3a;color:#fff;border-color:rgba(255,255,255,.12);box-shadow:0 22px 60px rgba(0,0,0,.55)}',
@@ -135,7 +169,8 @@
       ? TICK + '<span>LinkedIn linked. Your AI Badge, level and XP stay yours after you leave NCI, and LinkedIn opens the same account on aireckon.ing.</span>'
       : '<b>Link your LinkedIn</b>One tap. When your NCI email is gone, LinkedIn will still open this account, with your level and XP, here and on aireckon.ing.' +
         (student && keptAny === false && done !== null && done < NEED
-          ? '<span class="fil-due">Required after ' + NEED + ' lessons. You have completed ' + done + '.</span>' : '') +
+          ? '<span class="fil-due"><span class="fil-dots" aria-hidden="true">' + [0, 1, 2].map(function (i) { return '<i' + (i < done ? ' class="on"' : '') + '></i>'; }).join('') +
+            '</span>Needed after ' + NEED + ' lessons: ' + (NEED - done) + ' to go</span>' : '') +
         '<button type="button" class="fil-golink">' + TAG.linkedin + '<span>Link LinkedIn</span></button>';
     var go = note.querySelector('.fil-golink'); if (go) go.addEventListener('click', function (e) { e.stopPropagation(); linkNow(go); });
     later.textContent = kept ? 'Done' : 'Not now';
@@ -168,32 +203,55 @@
   /* the gate: a full-page sheet over every view, with no "Not now". Sign out is the only other way off it. */
   function paintGate() {
     var show = !!(user && student && keptAny === false && done !== null && done >= NEED);
+    if (gate && gate.classList.contains('won')) return;   // the success moment finishes by itself
     if (!show) { if (gate) { gate.hidden = true; document.documentElement.classList.remove('fil-gated'); } return; }
     if (!gate) {
       gate = document.createElement('div'); gate.className = 'fil-gate'; gate.hidden = true;
       gate.setAttribute('role', 'dialog'); gate.setAttribute('aria-modal', 'true'); gate.setAttribute('aria-labelledby', 'fil-gate-h');
-      gate.innerHTML = '<div class="fil-gate-card"><h2 id="fil-gate-h">Keep your AI Badge after NCI</h2>' +
-        '<p>Your NCI email closes when your course ends. Link LinkedIn or Google now and it will keep opening this account, with your lessons, level, XP and certificate.</p>' +
-        '<p class="fil-gate-n"></p>' +
-        '<button type="button" class="fil-gate-btn li">' + TAG.linkedin + '<span>Link LinkedIn</span></button>' +
-        '<button type="button" class="fil-gate-btn g">' + TAG.google + '<span>Link Google</span></button>' +
+      gate.innerHTML = '<div class="fil-gate-card" tabindex="-1">' +
+        '<span class="fil-gate-k">Before your NCI email closes</span>' +
+        '<span class="fil-seal" aria-hidden="true"><b class="fil-seal-n"></b>' + TICK + '</span>' +
+        '<span class="fil-seal-cap"></span>' +
+        '<h2 id="fil-gate-h">Keep your badge <em>for life</em></h2>' +
+        '<p class="fil-gate-p">Link LinkedIn or Google. When your NCI email is gone, either one opens this account, with your lessons, XP and certificate.</p>' +
+        '<div class="fil-gate-acts">' +
+          '<button type="button" class="fil-gate-btn li"><i class="fil-chip-li">' + TAG.linkedin + '</i><span>Link LinkedIn</span></button>' +
+          '<button type="button" class="fil-gate-btn g"><i class="fil-chip-g">' + TAG.google + '</i><span>Link Google</span></button>' +
+        '</div>' +
         '<p class="fil-gate-msg" aria-live="polite"></p>' +
+        '<p class="fil-gate-small">One tap. Nothing is ever posted to your LinkedIn.</p>' +
         '<button type="button" class="fil-gate-out">Sign out</button></div>';
-      gate.querySelector('.li').addEventListener('click', function (e) { linkNow(e.currentTarget); });
+      gate.querySelector('.li').addEventListener('click', function (e) { gate.querySelector('.fil-gate-msg').textContent = ''; linkNow(e.currentTarget); });
       gate.querySelector('.g').addEventListener('click', function (e) {
-        var b = e.currentTarget, msg = gate.querySelector('.fil-gate-msg');
-        b.setAttribute('aria-busy', 'true'); msg.textContent = '';
+        var b = e.currentTarget, msg = gate.querySelector('.fil-gate-msg'), lab = b.querySelector('span');
+        if (b.hasAttribute('aria-busy')) return;
+        b.setAttribute('aria-busy', 'true'); lab.textContent = 'Opening Google\u2026'; msg.textContent = '';
         user.linkWithPopup(new firebase.auth.GoogleAuthProvider()).then(function () {
-          keptAny = true; paintGate(); return user.reload();
-        }).then(function () { if (ways) ways.refresh(); }).catch(function (err) {
-          msg.textContent = (window.FIL_WAYS_ERR || {})[(err && err.code) || ''] || 'Google was not linked. Please try again, or link LinkedIn.';
-        }).then(function () { b.removeAttribute('aria-busy'); });
+          keptAny = true; celebrate();
+          return user.reload().then(function () { if (ways) ways.refresh(); });
+        }).catch(function (err) {
+          msg.textContent = (window.FIL_WAYS_ERR || {})[(err && err.code) || ''] || 'Google was not linked. Try again, or link LinkedIn.';
+        }).then(function () { b.removeAttribute('aria-busy'); lab.textContent = 'Link Google'; });
       });
       gate.querySelector('.fil-gate-out').addEventListener('click', function () { firebase.auth().signOut().then(function () { location.hash = ''; }); });
       document.body.appendChild(gate);
     }
-    gate.querySelector('.fil-gate-n').textContent = 'You have completed ' + done + ' lessons. Linking takes one tap and is needed to carry on.';
-    if (gate.hidden) { gate.hidden = false; document.documentElement.classList.add('fil-gated'); close(); }
+    gate.querySelector('.fil-seal-n').textContent = done;
+    gate.querySelector('.fil-seal-cap').textContent = done === 1 ? 'lesson in your account' : 'lessons in your account';
+    if (gate.hidden) {
+      gate.hidden = false; document.documentElement.classList.add('fil-gated'); close();
+      setTimeout(function () { var f = gate.querySelector('.fil-gate-card'); if (f) f.focus({ preventScroll: true }); }, 60);
+    }
+  }
+  /* the one moment of joy: the seal turns into a gold tick with a glint, then the gate settles away */
+  function celebrate() {
+    if (!gate || gate.hidden) return;
+    gate.classList.add('won');
+    gate.querySelector('#fil-gate-h').innerHTML = 'Yours <em>for life</em>';
+    gate.querySelector('.fil-seal-cap').textContent = 'Linked';
+    gate.querySelector('.fil-gate-p').textContent = 'Google now opens this account too, long after your NCI email is gone.';
+    setTimeout(function () { gate.classList.add('leaving'); }, 1500);
+    setTimeout(function () { gate.classList.remove('won', 'leaving'); paintGate(); }, 1800);
   }
   /* once a week at most, after sign-in, when the top bar is on screen and no sheet is open */
   function maybeAsk() {
