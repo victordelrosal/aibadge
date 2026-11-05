@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlantic Coast Tours</title>
+<meta name="description" content="Ask anything about our tours on the Wild Atlantic Way. Answers come live from our tour sheet.">
+<meta property="og:title" content="Atlantic Coast Tours: ask about our tours">
+<meta property="og:description" content="Prices, slots this week and special offers, answered live from our tour sheet.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1530'/%3E%3Cpath d='M10 42c8-8 14-8 22 0s14 8 22 0' stroke='%23d9b46a' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 30 30 14l14 16' stroke='%23f3ead8' stroke-width='4' fill='none' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0b1530;--navy2:#13224a;--ink:#f3ead8;--muted:#a9b3c9;--gold:#d9b46a;--line:rgba(255,255,255,.1);--glass:rgba(255,255,255,.06)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:radial-gradient(1200px 600px at 80% -10%,#24376b 0,transparent 60%),linear-gradient(180deg,var(--navy) 0,#070e22 100%);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;min-height:100%}
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px 24px;display:flex;flex-direction:column;min-height:100vh}
+.eyebrow{letter-spacing:.32em;font-size:12px;font-weight:600;color:var(--gold);text-transform:uppercase}
+h1{font-family:Fraunces,Georgia,serif;font-weight:500;font-size:clamp(32px,6vw,52px);line-height:1.05;margin:10px 0 8px}
+h1 em{color:var(--gold)}
+.sub{color:var(--muted);margin:0 0 18px}
+.live{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;color:var(--muted);margin-bottom:16px}
+.dot{width:8px;height:8px;border-radius:50%;background:#5fd38d;box-shadow:0 0 0 0 rgba(95,211,141,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(95,211,141,0)}100%{box-shadow:0 0 0 0 rgba(95,211,141,0)}}
+.live a{color:var(--gold)}
+.live button{background:none;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:3px 10px;font:inherit;cursor:pointer}
+.chat{flex:1;background:var(--glass);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;min-height:320px;max-height:62vh;backdrop-filter:blur(8px)}
+.msg{max-width:85%;padding:11px 15px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word}
+.msg.bot{background:var(--navy2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--gold);color:#1a1405;align-self:flex-end;border-bottom-right-radius:4px}
+.msg b{color:var(--gold)}
+.msg.me b{color:inherit}
+.typing span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:var(--muted);animation:b 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-4px);opacity:.4}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 10px}
+.chips button{background:var(--glass);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 13px;font:14px Inter,sans-serif;cursor:pointer}
+.chips button:hover{border-color:var(--gold)}
+form{display:flex;gap:8px}
+input{flex:1;min-width:0;background:#0f1a3a;border:1px solid var(--line);color:var(--ink);border-radius:14px;padding:14px 16px;font:16px Inter,sans-serif;outline:none}
+input:focus{border-color:var(--gold)}
+form button{background:var(--gold);color:#1a1405;border:0;border-radius:14px;padding:0 20px;font:600 15px Inter,sans-serif;cursor:pointer}
+form button:disabled{opacity:.5}
+footer{color:var(--muted);font-size:12px;margin-top:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Atlantic Coast Tours</div>
+  <h1><em>Ask</em> about our tours.</h1>
+  <p class="sub">Prices, slots this week, special offers and meeting points across Clare, Galway and Mayo.</p>
+  <div class="live"><span class="dot"></span><span id="liveText">Connecting to the live tour sheet...</span>
+    <button id="refresh" type="button">Refresh</button>
+    <a href="https://docs.google.com/spreadsheets/d/1balBGf8QhZ5dc-RCCAPt2kcrcf6m_YRh0HL_r8bBtJw/edit?gid=120683740" target="_blank" rel="noopener">Open sheet &#8599;</a></div>
+
+  <div class="chat" id="chat" aria-live="polite"></div>
+
+  <div class="chips" id="chips">
+    <button>What's cheapest this week?</button>
+    <button>Which tours have special offers?</button>
+    <button>Anything family friendly in Mayo?</button>
+    <button>Is the Kilkee sea cave tour available?</button>
+  </div>
+  <form id="form"><input id="q" placeholder="Ask about a tour, price or slot..." autocomplete="off" maxlength="500"><button id="send">Ask</button></form>
+  <footer>Answers are read live from our tour sheet on every question.</footer>
+</div>
+<script>
+const API = "https://atlantic-tours-bot.victordelrosal.workers.dev";
+const chat = document.getElementById("chat"), form = document.getElementById("form"), q = document.getElementById("q"), send = document.getElementById("send");
+const history = [];
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function fmt(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>")}
+function add(role, text){const d=document.createElement("div");d.className="msg "+(role==="user"?"me":"bot");d.innerHTML=fmt(text);chat.appendChild(d);chat.scrollTop=chat.scrollHeight;return d}
+
+add("assistant","Hello! I'm the Atlantic Coast Tours assistant. Ask me about any of our tours: prices, slots left this week, offers or where to meet.");
+
+async function loadLive(){
+  const t=document.getElementById("liveText");
+  try{const r=await fetch(API+"/tours");const d=await r.json();
+    const open=d.tours.filter(x=>+x.slots_this_week>0).length;
+    t.textContent=`Live: ${d.tours.length} tours, ${open} with slots this week · read ${new Date(d.fetchedAt).toLocaleTimeString()}`;
+  }catch(e){t.textContent="Live sheet unavailable right now"}
+}
+document.getElementById("refresh").onclick=loadLive;
+loadLive();
+
+async function ask(text){
+  text=text.trim(); if(!text) return;
+  add("user",text); history.push({role:"user",content:text});
+  q.value=""; send.disabled=true;
+  const typing=document.createElement("div");typing.className="msg bot typing";typing.innerHTML="<span></span><span></span><span></span>";chat.appendChild(typing);chat.scrollTop=chat.scrollHeight;
+  try{
+    const r=await fetch(API+"/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});
+    const d=await r.json(); typing.remove();
+    const reply=d.reply||("Sorry, something went wrong: "+(d.error||"no reply"));
+    add("assistant",reply); if(d.reply) history.push({role:"assistant",content:reply}); else history.pop();
+    loadLive();
+  }catch(e){typing.remove();add("assistant","Sorry, I couldn't reach the tour desk. Please try again.");history.pop()}
+  send.disabled=false; q.focus();
+}
+form.onsubmit=e=>{e.preventDefault();ask(q.value)};
+document.querySelectorAll("#chips button").forEach(b=>b.onclick=()=>ask(b.textContent));
+</script>
+</body>
+</html>
