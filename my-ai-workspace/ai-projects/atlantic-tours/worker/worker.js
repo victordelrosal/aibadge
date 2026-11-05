@@ -67,6 +67,14 @@ LIVE TOUR SHEET (CSV):
 ${csv}`;
 }
 
+// Soft abuse guard: per-isolate, per-IP limit of 20 questions a minute, and only our page's origins.
+const HITS = new Map();
+function limited(ip) {
+  const now = Date.now(), list = (HITS.get(ip) || []).filter(t => now - t < 60_000);
+  list.push(now); HITS.set(ip, list);
+  return list.length > 20;
+}
+
 function json(data, status, origin) {
   return new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...cors(origin) } });
 }
@@ -84,6 +92,8 @@ export default {
       }
 
       if (req.method === "POST" && path === "/chat") {
+        if (!origin || !(ALLOW.includes(origin) || LOCAL_ORIGIN.test(origin))) return json({ error: "Forbidden" }, 403, origin);
+        if (limited(req.headers.get("CF-Connecting-IP") || "?")) return json({ error: "Too many questions, please wait a minute." }, 429, origin);
         const body = await req.json().catch(() => ({}));
         const messages = (Array.isArray(body.messages) ? body.messages : [])
           .filter(m => (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim())
