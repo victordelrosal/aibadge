@@ -113,7 +113,7 @@ async function loadLive(){
   b.classList.remove("spin");void b.offsetWidth;b.classList.add("spin");
   try{const r=await fetch(API+"/tours");const d=await r.json();
     const open=d.tours.filter(x=>+x.slots_this_week>0).length;
-    t.textContent=`Live · ${d.tours.length} tours · ${open} with slots · ${new Date(d.fetchedAt).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
+    t.textContent=`Live · ${d.tours.length} tours · ${open} open · ${new Date(d.fetchedAt).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`;
   }catch(e){t.textContent="Live sheet unavailable right now"}
 }
 document.getElementById("refresh").onclick=loadLive;
