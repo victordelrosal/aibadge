@@ -67,6 +67,19 @@
     '.lms-dark .fil-keep .fil-pair i{box-shadow:0 0 0 1.5px #000036}',
     '.lms-dark .fil-note{background:rgba(10,132,255,.14);color:#fff}.lms-dark .fil-note.kept{background:rgba(48,209,88,.14)}.lms-dark .fil-note.kept svg{color:#30D158}',
     '.lms-dark .fil-later{color:rgba(235,235,245,.6)}.lms-dark .fil-later:hover{background:rgba(255,255,255,.08);color:#fff}',
+    '.fil-due{display:block;margin-top:6px;font-size:12.5px;font-weight:600;color:#C93400}.lms-dark .fil-due{color:#FFB340}',
+    /* the gate after 3 lessons */
+    'html.fil-gated,html.fil-gated body{overflow:hidden}',
+    '.fil-gate{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(0,0,40,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}.fil-gate[hidden]{display:none}',
+    '.fil-gate-card{width:100%;max-width:400px;padding:28px 24px 18px;border-radius:22px;background:#fff;color:#000036;text-align:center;box-shadow:0 30px 80px rgba(0,0,40,.35);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;animation:fil-in .2s ease-out}',
+    '.fil-gate-card h2{margin:0 0 10px;font:700 21px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif}',
+    '.fil-gate-card p{margin:0 0 12px;font-size:14.5px;line-height:1.5;color:rgba(0,0,54,.8)}.fil-gate-card .fil-gate-n{font-size:13px;color:rgba(60,60,67,.65);margin-bottom:18px}',
+    '.fil-gate-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:48px;margin-top:10px;border-radius:12px;font:600 15px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;cursor:pointer;transition:transform .12s cubic-bezier(.34,1.56,.64,1)}',
+    '.fil-gate-btn:active{transform:scale(.97)}.fil-gate-btn:focus-visible{outline:2px solid #007AFF;outline-offset:2px}.fil-gate-btn[aria-busy]{opacity:.7;cursor:progress}',
+    '.fil-gate-btn svg{width:18px;height:18px}.fil-gate-btn.li{border:0;background:#0A66C2;color:#fff}.fil-gate-btn.li:hover{background:#004182}',
+    '.fil-gate-btn.g{border:1px solid rgba(60,60,67,.2);background:#fff;color:#000036}.fil-gate-btn.g:hover{background:#F2F2F7}',
+    '.fil-gate-card .fil-gate-msg{min-height:1em;margin:12px 0 0;font-size:13px;color:#D70015}.fil-gate-card .fil-gate-msg:empty{margin:0;min-height:0}',
+    '.fil-gate-out{margin-top:12px;padding:8px 14px;min-height:36px;border:0;background:none;border-radius:999px;font:600 13px/1 -apple-system,sans-serif;color:rgba(60,60,67,.6);cursor:pointer}.fil-gate-out:hover{background:rgba(120,120,128,.1)}',
     '.lms-dark .fil-me{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}',
     '.lms-dark .fil-tag{box-shadow:0 0 0 1.5px #000036}',
     '.lms-dark .fil-card{background:#0b0d3a;color:#fff;border-color:rgba(255,255,255,.12);box-shadow:0 22px 60px rgba(0,0,0,.55)}',
@@ -76,7 +89,11 @@
 
   var me = null, card = null, ways = null, user = null, via = '', level = null;
   var keep = null, note = null, later = null, nci = false, kept = null, asking = false, topLevel = null;
-  var ASKED = 'fil-keep-asked', WEEK = 7 * 864e5;
+  /* required after 3 lessons (5 Nov 2026, Victor: "add nudges from the very start, and maybe require it after say 3 lessons
+     completed ... for all nci students"; 7 of 138 NCI accounts had linked anything). Students only; either Google or
+     LinkedIn lifts the gate, since either opens the account after the NCI email closes. Unknown link state never blocks. */
+  var student = false, keptAny = null, done = null, gate = null, NEED = 3;
+  var ASKED = 'fil-keep-asked', WEEK = 864e5;   // the card asks once a day now (was weekly)
   var TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>';
 
   function photo(u) {
@@ -117,6 +134,8 @@
     note.innerHTML = kept
       ? TICK + '<span>LinkedIn linked. Your AI Badge, level and XP stay yours after you leave NCI, and LinkedIn opens the same account on aireckon.ing.</span>'
       : '<b>Link your LinkedIn</b>One tap. When your NCI email is gone, LinkedIn will still open this account, with your level and XP, here and on aireckon.ing.' +
+        (student && keptAny === false && done !== null && done < NEED
+          ? '<span class="fil-due">Required after ' + NEED + ' lessons. You have completed ' + done + '.</span>' : '') +
         '<button type="button" class="fil-golink">' + TAG.linkedin + '<span>Link LinkedIn</span></button>';
     var go = note.querySelector('.fil-golink'); if (go) go.addEventListener('click', function (e) { e.stopPropagation(); linkNow(go); });
     later.textContent = kept ? 'Done' : 'Not now';
@@ -134,15 +153,57 @@
     var m = (d && d.methods) || {};
     return !!(m.linkedin || (d && d.current === 'linkedin'));
   }
+  function linkedAny(d) {
+    var m = (d && d.methods) || {};
+    return !!(m.google || linkedNow(d));
+  }
+  function countDone(uid) {
+    if (typeof getTutorialCompletions !== 'function') return;
+    getTutorialCompletions(uid).then(function (c) {
+      if (!user || user.uid !== uid) return;
+      done = Object.keys(c || {}).filter(function (k) { return c[k] && c[k].completed; }).length;
+      paintKeep(); paintGate();
+    });
+  }
+  /* the gate: a full-page sheet over every view, with no "Not now". Sign out is the only other way off it. */
+  function paintGate() {
+    var show = !!(user && student && keptAny === false && done !== null && done >= NEED);
+    if (!show) { if (gate) { gate.hidden = true; document.documentElement.classList.remove('fil-gated'); } return; }
+    if (!gate) {
+      gate = document.createElement('div'); gate.className = 'fil-gate'; gate.hidden = true;
+      gate.setAttribute('role', 'dialog'); gate.setAttribute('aria-modal', 'true'); gate.setAttribute('aria-labelledby', 'fil-gate-h');
+      gate.innerHTML = '<div class="fil-gate-card"><h2 id="fil-gate-h">Keep your AI Badge after NCI</h2>' +
+        '<p>Your NCI email closes when your course ends. Link LinkedIn or Google now and it will keep opening this account, with your lessons, level, XP and certificate.</p>' +
+        '<p class="fil-gate-n"></p>' +
+        '<button type="button" class="fil-gate-btn li">' + TAG.linkedin + '<span>Link LinkedIn</span></button>' +
+        '<button type="button" class="fil-gate-btn g">' + TAG.google + '<span>Link Google</span></button>' +
+        '<p class="fil-gate-msg" aria-live="polite"></p>' +
+        '<button type="button" class="fil-gate-out">Sign out</button></div>';
+      gate.querySelector('.li').addEventListener('click', function (e) { linkNow(e.currentTarget); });
+      gate.querySelector('.g').addEventListener('click', function (e) {
+        var b = e.currentTarget, msg = gate.querySelector('.fil-gate-msg');
+        b.setAttribute('aria-busy', 'true'); msg.textContent = '';
+        user.linkWithPopup(new firebase.auth.GoogleAuthProvider()).then(function () {
+          keptAny = true; paintGate(); return user.reload();
+        }).then(function () { if (ways) ways.refresh(); }).catch(function (err) {
+          msg.textContent = (window.FIL_WAYS_ERR || {})[(err && err.code) || ''] || 'Google was not linked. Please try again, or link LinkedIn.';
+        }).then(function () { b.removeAttribute('aria-busy'); });
+      });
+      gate.querySelector('.fil-gate-out').addEventListener('click', function () { firebase.auth().signOut().then(function () { location.hash = ''; }); });
+      document.body.appendChild(gate);
+    }
+    gate.querySelector('.fil-gate-n').textContent = 'You have completed ' + done + ' lessons. Linking takes one tap and is needed to carry on.';
+    if (gate.hidden) { gate.hidden = false; document.documentElement.classList.add('fil-gated'); close(); }
+  }
   /* once a week at most, after sign-in, when the top bar is on screen and no sheet is open */
   function maybeAsk() {
-    if (!nci || kept !== false || asking) return;
+    if (!nci || kept !== false || asking || (gate && !gate.hidden)) return;
     try { if (Date.now() - (+localStorage.getItem(ASKED) || 0) < WEEK) return; } catch (e) { return; }
     asking = true;
     var tries = 0, t = setInterval(function () {
       var ui = window.Alpine && Alpine.store && Alpine.store('ui');
       var free = (me.offsetParent !== null || keep.offsetParent !== null) && !(ui && ui.activeModal);
-      if (!user || kept !== false || ++tries > 60) { clearInterval(t); asking = false; return; }
+      if (!user || kept !== false || (gate && !gate.hidden) || ++tries > 60) { clearInterval(t); asking = false; return; }
       if (!free) return;
       clearInterval(t); asking = false;
       try { localStorage.setItem(ASKED, String(Date.now())); } catch (e) {}
@@ -201,7 +262,11 @@
     card.appendChild(later);
     /* the level comes with the ways-in list; it sits beside the name */
     ways.addEventListener('fil-ways', function (e) {
-      if (e.detail && nci) { var was = kept; kept = linkedNow(e.detail); if (was !== kept) { paintKeep(); maybeAsk(); } }
+      if (e.detail && nci) {
+        var was = kept; kept = linkedNow(e.detail); keptAny = linkedAny(e.detail);
+        if (was !== kept) { paintKeep(); maybeAsk(); }
+        paintGate();
+      }
       var l = e.detail && e.detail.level; if (l === level) return; level = l || null;
       var nm = card.querySelector('.fil-nm'); if (!nm) return;
       var lv = nm.querySelector('fil-level');
@@ -231,11 +296,30 @@
       };
       window.saveTutorialCompletion.xp = true;
     }
+    /* each finished lesson recounts: below the bar the card asks again at once (the countdown), at the bar the gate goes up */
+    if (typeof window.saveTutorialCompletion === 'function' && !saveTutorialCompletion.keep) {
+      var save2 = window.saveTutorialCompletion, keepFlag = !!save2.xp;
+      window.saveTutorialCompletion = function (uid, id, isDone) {
+        var r = save2.apply(this, arguments);
+        if (isDone && student && user && user.uid === uid) Promise.resolve(r).then(function () {
+          if (keptAny === false) { try { localStorage.removeItem(ASKED); } catch (e) {} }
+          countDone(uid); maybeAsk();
+        });
+        return r;
+      };
+      window.saveTutorialCompletion.xp = keepFlag; window.saveTutorialCompletion.keep = true;
+    }
     firebase.auth().onAuthStateChanged(function (u) {
       var same = user && u && user.uid === u.uid;
       user = u; via = '';
       if (window.filXp) { if (u) filXp.hello(u.uid); else filXp.reset(); }
-      if (!same) { kept = null; nci = !!(u && typeof isNciEmail === 'function' && isNciEmail(u.email)); }
+      if (!same) {
+        kept = null; keptAny = null; done = null;
+        nci = !!(u && typeof isNciEmail === 'function' && isNciEmail(u.email));
+        student = nci && /@student\.ncirl\.ie$/i.test(u.email || '');
+        paintGate();
+        if (student) countDone(u.uid);
+      }
       if (!u) return paint();
       /* NCI: learn now whether LinkedIn is linked (only the broker knows) */
       if (nci && !same) ways.refresh();
@@ -253,7 +337,10 @@
         if (!user) return;
         clearInterval(wait); open();
         if (r.success) { ways.say('good', 'LinkedIn connected. Either one now opens this account.'); ways.flash('linkedin'); }
-        else ways.say('bad', (window.FIL_WAYS_ERR || {})[r.code] || r.error);
+        else {
+          ways.say('bad', (window.FIL_WAYS_ERR || {})[r.code] || r.error);
+          var gm = gate && gate.querySelector('.fil-gate-msg'); if (gm) gm.textContent = (window.FIL_WAYS_ERR || {})[r.code] || r.error;
+        }
       }, 150);
       setTimeout(function () { clearInterval(wait); }, 8000);
     });
