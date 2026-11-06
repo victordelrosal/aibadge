@@ -48,9 +48,10 @@ function learnerItems(ex) {
     else if (/could not be frozen/.test(r)) { f = "We could not read any text at this link. It may need a sign-in, or JavaScript to load."; link = true; }
     else if (/role hijack phrase/.test(r)) f = "Your work is fine; one phrase held it back. Our safety check stops pages with role instructions such as \"act as\" or \"you are now\". THE FIX: reword those lines in your own words (\"I asked it to play a sceptical investor\"), keep everything else, resubmit. " + said;
     else if (/addresses the grader/.test(r)) f = "Your work is fine; one sentence held it back. Our safety check stops sentences that read like orders to an AI, such as \"ChatGPT should...\" or \"the model must...\". THE FIX: reword them as what happened (\"ChatGPT gave me...\", \"it got this wrong\"), resubmit. " + said;
-    else if (/invisible or bidi/.test(r)) f = "Your work is fine; hidden characters held it back. Our safety check stops pages that contain invisible characters (zero-width spaces and similar), which often come along when text is copied from an AI chat. THE FIX: retype the copied lines, or clean them (in VS Code, search for \\u200b with regex on and delete the matches), redeploy, resubmit. " + said;
+    else if (/invisible or bidi/.test(r)) f = "Your work is fine; hidden characters held it back. Our safety check stops pages that contain invisible characters (zero-width spaces and similar), which often come along when text is copied from an AI chat. THE FIX: retype the copied lines, or clean them (in VS Code, turn on regex search, search for [\\u200b-\\u200f\\u202a-\\u202e\\u2060-\\u2064\\ufeff] and delete every match), redeploy, resubmit. " + said;
     else if (/tripwire/.test(r)) f = "Your work was held by our safety check, which stops pages that look like instructions to the marker. THE FIX: remove any line written to an AI rather than about it, resubmit. " + said;
     else if (e.verdict === "REPEAT" && e.feedback) f = "THE FIX: " + e.feedback;
+    else if (e.verdict === "REPEAT") f = "THE FIX: reread the lesson brief, make every step it asks for visible on the page, and resubmit the link.";
     else f = "The two AI markers did not agree, so this is not a pass yet. THE FIX: make the work itself visible on the page in full (your prompts, the AI's actual replies, your own pushback), resubmit. " + said;
     if (/\bpaste\b/i.test(f)) f += " The lesson takes a link only, so share it as a link.";
     f = f.trim();
@@ -218,7 +219,7 @@ try {
           // learner is never left without an answer, and tell Victor the marker's words were dropped.
           if (r.status === 400 || r.status === 422) {
             const why = JSON.stringify(r.body).slice(0, 120);
-            const plain = items.map((i) => ({ ...i, feedback: i.verdict === "PASS" ? "" : "This one needs another go. THE FIX: reread the lesson brief, make every step it asks for visible on the page, and resubmit the link." }));
+            const plain = learnerItems(ex.map((e) => ({ ...e, feedback: "" })));   // cause-specific advice kept, marker words dropped
             r = await resolve(uid, "repeat", plain, "feedback to learner (fixed wording)", notes);
             how = r.status === 200 ? "feedback posted in fixed wording (marker text refused: " + why + ")" : how;
             if (r.status === 200) needs.push(`${email}: marker feedback was refused (${why}); the learner got fixed wording instead. Check the wording rule in autorun.mjs.`);
@@ -264,23 +265,31 @@ if (!DRY) {
     if (sync.written || sync.markedVerified) actions.push(`navbar levels: ${sync.written} written, ${sync.markedVerified} accounts marked verified`);
     okNote("sync-levels");
   } catch (e) { failNote("sync-levels", e); }
-  writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), { mode: 0o600 });
 }
 
 for (const a of actions) log("ACTION " + a);
 for (const w of waiting) log("WAITING " + w);
 for (const n of needs) log("NEEDS VICTOR " + n);
-if (!DRY && (actions.length || waiting.length || needs.length)) {
+// Hourly runs (6 Nov 2026) would repeat an unfixed problem 15 times a day. Each "needs you" item is mailed when it
+// is new, then at most once a day while it stays open; counts and timestamps are ignored when matching.
+const needKey = (n) => sha256(n.replace(/\d+/g, "#"));
+state.needsSent = Object.fromEntries(Object.entries(state.needsSent || {}).filter(([, t]) => Date.now() - t < 7 * 864e5));
+const freshNeeds = needs.filter((n) => !state.needsSent[needKey(n)] || Date.now() - state.needsSent[needKey(n)] > 864e5);
+const repeatNeeds = needs.length - freshNeeds.length;
+if (!DRY && (actions.length || waiting.length || freshNeeds.length)) {
   const body = ["AI Badge Level 1: autonomous run " + new Date().toISOString(), "",
-    "Needs you:", ...(needs.length ? needs.map((n) => "- " + n) : ["- nothing, the loop handled this run"]), "",
+    "Needs you:", ...(freshNeeds.length ? freshNeeds.map((n) => "- " + n) : ["- nothing new, the loop handled this run"]),
+    ...(repeatNeeds ? [`- (${repeatNeeds} already reported and still open; reminded once a day)`] : []), "",
     "Done:", ...(actions.length ? actions.map((a) => "- " + a) : ["- nothing"]), "",
     "With the learner (new or changed since last report, no action for you):", ...(waiting.length ? waiting.map((w) => "- " + w) : ["- nothing"]), "",
     "Revoke any credential at " + CERTS + "/issue. Switch the loop off: wrangler kv key put config:autoissue off --namespace-id " + CERTS_KV + " --remote",
   ].join("\n");
-  const subject = `AI Badge L1: ${needs.length ? needs.length + " need you" : "nothing needs you"}, ${actions.length} done`;
+  const subject = `AI Badge L1: ${freshNeeds.length ? freshNeeds.length + " need you" : "nothing needs you"}, ${actions.length} done`;
   try {
     const r = await post("https://team-inbox.victordelrosal.workers.dev/send", { Authorization: "Bearer " + keychain("aibadge-digest-send-key") },
       { from: "v@vdr.me", to: "victordelrosal@gmail.com", subject, body });
     log("digest " + r.status);
+    if (r.status === 200) for (const n of freshNeeds) state.needsSent[needKey(n)] = Date.now();
   } catch (e) { log("digest not sent: " + errCause(e)); }
 }
+if (!DRY) writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), { mode: 0o600 });
