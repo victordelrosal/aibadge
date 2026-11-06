@@ -28,9 +28,15 @@ const TITLES = { "what-is-html": "Hello World", "hello-world-2": "Hello World 2"
 // ChatGPT/Claude/Gemini share. Not readable: Notion, Google Docs/Drive, sign-in pages, a repo's
 // front page (README and file names only).
 const READABLE = "Submit a link we can read: your live github.io page, the GitHub link to the file itself (not the repo front page), or a public ChatGPT, Claude or Gemini share. Notion and Google Docs cannot be read.";
+// Same word list as NCI_PAY_RE in worker/index.js, which refuses (422) any feedback that matches. The marker
+// sometimes describes the learner's own page ("with specific pricing", 6 Nov 2026), so every run was refused and
+// nothing reached the learner. Drop the sentences that match; the worker check stays as the backstop.
+const PAY_RE = /€|\$\s?\d|\b(eur|euros?|free|fees?|pay|pays|paid|paying|payments?|prices?|priced|pricing|discount(s|ed)?|coupons?|promo|checkout|stripe|refunds?|purchase[sd]?|buy|buying|charges?|charged|costs?|costing|invoices?|billing|billed|subscriptions?|membership|upgrade|premium|complimentary|waived?|card needed|no card)\b/i;
+const scrubPay = (t) => String(t || "").split(/(?<=[.!?])\s+/).filter((s) => !PAY_RE.test(s)).join(" ").trim();
 function learnerItems(ex) {
   return ex.map((e) => {
     const base = { exerciseId: e.exerciseId, submissionSha256: e.submissionSha256 };
+    e = { ...e, feedback: scrubPay(e.feedback) };
     if (e.verdict === "PASS") return { ...base, verdict: "PASS", feedback: e.feedback || "" };
     // Extra explicit (Victor, 21 Oct 2026: "be extra explicit in the feedback"). A learner resubmitted a
     // praised Thinking Partner page four times because a tripwire held it and the note said only "not
@@ -42,6 +48,7 @@ function learnerItems(ex) {
     else if (/could not be frozen/.test(r)) { f = "We could not read any text at this link. It may need a sign-in, or JavaScript to load."; link = true; }
     else if (/role hijack phrase/.test(r)) f = "Your work is fine; one phrase held it back. Our safety check stops pages with role instructions such as \"act as\" or \"you are now\". THE FIX: reword those lines in your own words (\"I asked it to play a sceptical investor\"), keep everything else, resubmit. " + said;
     else if (/addresses the grader/.test(r)) f = "Your work is fine; one sentence held it back. Our safety check stops sentences that read like orders to an AI, such as \"ChatGPT should...\" or \"the model must...\". THE FIX: reword them as what happened (\"ChatGPT gave me...\", \"it got this wrong\"), resubmit. " + said;
+    else if (/invisible or bidi/.test(r)) f = "Your work is fine; hidden characters held it back. Our safety check stops pages that contain invisible characters (zero-width spaces and similar), which often come along when text is copied from an AI chat. THE FIX: retype the copied lines, or clean them (in VS Code, search for \\u200b with regex on and delete the matches), redeploy, resubmit. " + said;
     else if (/tripwire/.test(r)) f = "Your work was held by our safety check, which stops pages that look like instructions to the marker. THE FIX: remove any line written to an AI rather than about it, resubmit. " + said;
     else if (e.verdict === "REPEAT" && e.feedback) f = "THE FIX: " + e.feedback;
     else f = "The two AI markers did not agree, so this is not a pass yet. THE FIX: make the work itself visible on the page in full (your prompts, the AI's actual replies, your own pushback), resubmit. " + said;
@@ -101,7 +108,7 @@ try {
   const autoKey = keychain("aibadge-certs-auto-issue-key");
   const resolveKey = keychain("aibadge-grading-resolve-key");
   const resolve = (uid, outcome, exercises, note, notes) => DRY ? { status: 0 } : post(WORKER + "/api/cert-resolve", { "X-Grading-Key": resolveKey },
-    { uid, outcome, note, notes, humanApproval: { by: POLICY, at: new Date().toISOString() }, exercises });
+    { uid, outcome, note, notes, email: false, humanApproval: { by: POLICY, at: new Date().toISOString() }, exercises });
   // Off until Victor authorises learner-facing feedback; while off, feedback is staged for him to read.
   const feedbackOn = certsKvGet("config:autofeedback") === "on";
   const uids = () => readdirSync(batch).filter((u) => existsSync(join(batch, u, "meta.json")));
