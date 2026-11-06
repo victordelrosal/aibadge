@@ -82,7 +82,32 @@ const STATE_PATH = join(GRADING_HOME, "state.json");
 const state = existsSync(STATE_PATH) ? JSON.parse(readFileSync(STATE_PATH, "utf8")) : { reported: {} };
 const log = (m) => { const line = new Date().toISOString() + " " + m; console.log(line); appendFileSync(join(GRADING_HOME, "runs.log"), line + "\n"); };
 
-const step = (script, ...args) => execFileSync(process.execPath, [join(HERE, script), ...args], { encoding: "utf8", env: process.env, maxBuffer: 16 << 20 }).trim().split("\n").pop();
+// A failed step used to report only "Command failed: node .../pull-queue.mjs": 19 such digests in Oct 2026, almost
+// all Wi-Fi not back after wake (ENOTFOUND in launchd.err.log). Name the real cause, and tell network blips apart.
+const TRANSIENT = /ENOTFOUND|EAI_AGAIN|EHOSTUNREACH|ENETUNREACH|ECONNRESET|ECONNREFUSED|ETIMEDOUT|UND_ERR_SOCKET|other side closed|fetch failed|network/i;
+function errCause(e) {
+  const t = String((e && e.stderr) || (e && e.message) || e);
+  const m = t.match(/[^\n]*\b(ENOTFOUND|EAI_AGAIN|EHOSTUNREACH|ENETUNREACH|ECONNRESET|ECONNREFUSED|ETIMEDOUT|UND_ERR_SOCKET)\b[^\n]*/) // network first
+    || t.match(/token exchange failed[^\n]*|\w*Error: [^\n]*/);
+  return (m ? m[0] : t.split("\n").filter(Boolean).pop() || "unknown").trim().slice(0, 200);
+}
+const step = (script, ...args) => {
+  try { return execFileSync(process.execPath, [join(HERE, script), ...args], { encoding: "utf8", env: process.env, maxBuffer: 16 << 20, stdio: ["ignore", "pipe", "pipe"] }).trim().split("\n").pop(); }
+  catch (e) { throw new Error(script + ": " + errCause(e)); }
+};
+// Victor reads the digest as his to-do list (6 Nov 2026: "every single day I have to either ask you run ... or fix
+// something"). needs = only what he must act on; waiting = learners who have their feedback and owe the next move.
+const needs = [];
+const failNote = (what, e) => {
+  const cause = String(e.message || e).split("\n")[0].slice(0, 300);
+  state.fails = state.fails || {};
+  if (!TRANSIENT.test(cause)) { needs.push(what + " failed: " + cause); return; }
+  // Network blips heal on the next hourly run; say so only when three runs in a row hit one.
+  state.fails[what] = (state.fails[what] || 0) + 1;
+  log(`${what} transient failure ${state.fails[what]} in a row: ${cause}`);
+  if (state.fails[what] >= 3) needs.push(`${what} failed ${state.fails[what]} runs in a row (network): ${cause}`);
+};
+const okNote = (what) => { if (state.fails) delete state.fails[what]; };
 const wranglerEnv = Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== "CLOUDFLARE_API_TOKEN"));
 function certsKvGet(key) {
   try {
@@ -187,8 +212,19 @@ try {
         const fb = { uid, email, items, notes, at: new Date().toISOString() };
         if (DRY) actions.push(`${email}: WOULD POST feedback (${toFix} to fix)`);
         else if (feedbackOn) {
-          const r = await resolve(uid, "repeat", items, "feedback to learner", notes);
-          actions.push(`${email}: ${r.status === 200 ? "feedback posted to the learner" : "feedback REFUSED by the server, nothing reached the learner"}, ${toFix} to fix [resolve ${r.status}${r.status === 200 ? "" : " " + JSON.stringify(r.body).slice(0, 120)}]`);
+          let r = await resolve(uid, "repeat", items, "feedback to learner", notes);
+          let how = "feedback posted to the learner";
+          // Refused on content (400/422: a word the server guards, a length): post a fixed-wording version so the
+          // learner is never left without an answer, and tell Victor the marker's words were dropped.
+          if (r.status === 400 || r.status === 422) {
+            const why = JSON.stringify(r.body).slice(0, 120);
+            const plain = items.map((i) => ({ ...i, feedback: i.verdict === "PASS" ? "" : "This one needs another go. THE FIX: reread the lesson brief, make every step it asks for visible on the page, and resubmit the link." }));
+            r = await resolve(uid, "repeat", plain, "feedback to learner (fixed wording)", notes);
+            how = r.status === 200 ? "feedback posted in fixed wording (marker text refused: " + why + ")" : how;
+            if (r.status === 200) needs.push(`${email}: marker feedback was refused (${why}); the learner got fixed wording instead. Check the wording rule in autorun.mjs.`);
+          }
+          if (r.status !== 200) needs.push(`${email}: feedback REFUSED by the server, nothing reached the learner [resolve ${r.status} ${JSON.stringify(r.body).slice(0, 120)}]`);
+          else actions.push(`${email}: ${how}, ${toFix} to fix`);
           if (r.status === 200) { delete state.reported[uid]; continue; }
         } else {
           writeFileSync(join(ensureDir(join(GRADING_HOME, "staged-feedback")), uid + ".json"), JSON.stringify(fb, null, 2), { mode: 0o600 });
@@ -205,18 +241,18 @@ try {
     if (DRY) { actions.push(`${email}: WOULD ISSUE Level 1 to "${name}" (${ex.map((e) => e.exerciseId).join(", ")})`); continue; }
     const iss = await post(CERTS + "/api/auto-issue", { "X-Auto-Issue-Key": autoKey }, { name, email });
     if (iss.status !== 200 || !iss.body || !iss.body.ok) {
-      waiting.push(`${email}: issue refused (${iss.status} ${JSON.stringify(iss.body)})`);
+      needs.push(`${email}: passed everything but the credential was refused (${iss.status} ${JSON.stringify(iss.body).slice(0, 160)})`);
       if (iss.status === 403 || iss.status === 429) break;             // switch off or daily cap: stop for this run
       continue;
     }
     const r = await resolve(uid, "pass", ex.map((e) => ({ exerciseId: e.exerciseId, verdict: "PASS", feedback: e.feedback || "", submissionSha256: e.submissionSha256 })), "issued " + iss.body.ucid);
     actions.push(`${email}: ISSUED Level 1 to "${name}" ${iss.body.url} emailed=${iss.body.emailed} [resolve ${r.status}${r.status === 200 ? "" : " REFUSED, request still open: " + JSON.stringify(r.body).slice(0, 120)}]`);
   }
+  okNote("run");
 } catch (e) {
-  if (!e.quiet) waiting.push("RUN FAILED: " + String(e.message).split("\n")[0].slice(0, 300));
+  if (e.quiet) okNote("run"); else failNote("run", e);
 } finally {
   rmSync(LOCK, { force: true });
-  if (!DRY) writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), { mode: 0o600 });
 }
 
 // Every run, issued or not: navbar level gem + level XP for every bound credential holder, and the
@@ -226,18 +262,25 @@ if (!DRY) {
     const sync = JSON.parse(step("sync-levels.mjs"));
     log("sync-levels " + JSON.stringify(sync));
     if (sync.written || sync.markedVerified) actions.push(`navbar levels: ${sync.written} written, ${sync.markedVerified} accounts marked verified`);
-  } catch (e) { waiting.push("sync-levels failed: " + String(e.message).split("\n")[0].slice(0, 200)); }
+    okNote("sync-levels");
+  } catch (e) { failNote("sync-levels", e); }
+  writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), { mode: 0o600 });
 }
 
 for (const a of actions) log("ACTION " + a);
 for (const w of waiting) log("WAITING " + w);
-if (!DRY && (actions.length || waiting.length)) {
+for (const n of needs) log("NEEDS VICTOR " + n);
+if (!DRY && (actions.length || waiting.length || needs.length)) {
   const body = ["AI Badge Level 1: autonomous run " + new Date().toISOString(), "",
+    "Needs you:", ...(needs.length ? needs.map((n) => "- " + n) : ["- nothing, the loop handled this run"]), "",
     "Done:", ...(actions.length ? actions.map((a) => "- " + a) : ["- nothing"]), "",
-    "Not issued (new or changed since last report):", ...(waiting.length ? waiting.map((w) => "- " + w) : ["- nothing"]), "",
+    "With the learner (new or changed since last report, no action for you):", ...(waiting.length ? waiting.map((w) => "- " + w) : ["- nothing"]), "",
     "Revoke any credential at " + CERTS + "/issue. Switch the loop off: wrangler kv key put config:autoissue off --namespace-id " + CERTS_KV + " --remote",
   ].join("\n");
-  const r = await post("https://team-inbox.victordelrosal.workers.dev/send", { Authorization: "Bearer " + keychain("aibadge-digest-send-key") },
-    { from: "v@vdr.me", to: "victordelrosal@gmail.com", subject: `AI Badge L1: ${actions.length} done, ${waiting.length} waiting`, body });
-  log("digest " + r.status);
+  const subject = `AI Badge L1: ${needs.length ? needs.length + " need you" : "nothing needs you"}, ${actions.length} done`;
+  try {
+    const r = await post("https://team-inbox.victordelrosal.workers.dev/send", { Authorization: "Bearer " + keychain("aibadge-digest-send-key") },
+      { from: "v@vdr.me", to: "victordelrosal@gmail.com", subject, body });
+    log("digest " + r.status);
+  } catch (e) { log("digest not sent: " + errCause(e)); }
 }
