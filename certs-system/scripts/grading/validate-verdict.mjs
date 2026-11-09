@@ -12,7 +12,9 @@ import { VICTOR_EMAILS } from "./common.mjs";
 const batch = process.argv[2];
 if (!batch || !existsSync(batch)) { console.error("usage: node validate-verdict.mjs <batch>"); process.exit(2); }
 
-const norm = (s) => String(s || "").replace(/\s+/g, " ").trim();
+// Curly and straight quotes count as the same (9 Nov 2026): a marker quoted "simulator's" against "simulator’s"
+// and a real verbatim quote was held as not found.
+const norm = (s) => String(s || "").replace(/[‘’‚‛′]/g, "'").replace(/[“”„‟″]/g, '"').replace(/\s+/g, " ").trim();
 // Deterministic tripwires on the SUBMISSION (independent of the AI's judgement).
 const WIRES = [
   [/ignore (all |any )?(previous|prior|above|the) (instructions|rubric|rules)/i, "instruction override phrase"],
