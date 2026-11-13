@@ -4532,12 +4532,23 @@ body.aib-va .fil-top-level,body.aib-va .fil-me,body.aib-va .fil-keep,body.aib-va
 </div>
 
 <!-- ===================== CERTIFICATE FEEDBACK MODAL (5 Oct 2026) ===================== -->
+<!-- Feedback gate (Victor, 13 Nov 2026): a learner with open feedback sees this on every new sign-in,
+     background blurred, no close button, Escape or click-outside; it lets go only once they reach the
+     bottom and say they have read it, or open a lesson to fix. -->
 <div x-show="$store.ui.activeModal === 'review'" x-transition.opacity.duration.200ms
-     @keydown.escape.window="$store.ui.closeModal()"
+     @keydown.escape.window="if (!$store.review.gate) $store.ui.closeModal()"
+     :class="{ 'review-gated': $store.review.gate }"
      style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);"
-     @click.self="$store.ui.closeModal()">
-  <div class="modal-scroll review-modal" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;max-width:520px;width:calc(100% - 32px);max-height:88vh;overflow:hidden auto;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,0.32);">
-    <button @click="$store.ui.closeModal()" aria-label="Close" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;background:rgba(0,0,0,0.06);border-radius:50%;cursor:pointer;font-size:18px;line-height:1;color:#3a3f4a;">&times;</button>
+     @click.self="if (!$store.review.gate) $store.ui.closeModal()">
+  <div class="modal-scroll review-modal" x-ref="rvScroll" @scroll.passive="$store.review.checkRead($el)" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:20px;max-width:520px;width:calc(100% - 32px);max-height:88vh;overflow:hidden auto;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,0.32);">
+    <button x-show="!$store.review.gate" @click="$store.ui.closeModal()" aria-label="Close" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;background:rgba(0,0,0,0.06);border-radius:50%;cursor:pointer;font-size:18px;line-height:1;color:#3a3f4a;">&times;</button>
+    <div x-show="$store.review.gate" class="review-stop" role="alert">
+      <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><path d="M15.5 3h17L45 15.5v17L32.5 45h-17L3 32.5v-17z" fill="#b42318"/><path d="M15.5 3h17L45 15.5v17L32.5 45h-17L3 32.5v-17z" fill="none" stroke="#fff" stroke-width="2.5" transform="translate(24 24) scale(.86) translate(-24 -24)"/><text x="24" y="28.5" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" font-weight="800" font-size="11" fill="#fff" letter-spacing=".5">STOP</text></svg>
+      <div>
+        <strong>Stop and read this first</strong>
+        <span>Your certificate is on hold. Nothing moves until the items below are fixed. Read to the end to continue.</span>
+      </div>
+    </div>
     <div style="font:600 12px/1 -apple-system,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#9a3412;margin-bottom:8px;">Your certificate request</div>
     <h2 style="font:700 21px/1.25 -apple-system,sans-serif;color:#000036;margin:0 0 8px;padding-right:36px;">A few things to fix, then you are there</h2>
     <p class="lms-subheading" style="font-size:0.92rem;margin:0 0 14px;line-height:1.5;">AI marked your work against the published rubric. Fix the items below, resubmit in each lesson (your new link replaces the old one), and your request is marked again.</p>
@@ -4547,7 +4558,7 @@ body.aib-va .fil-top-level,body.aib-va .fil-me,body.aib-va .fil-keep,body.aib-va
       <ul>
         <li>A page you built: its live <code>github.io</code> link.</li>
         <li>Files you wrote (code, personas, a skill): the GitHub link to the file itself. Several files? Put them in one file, such as README.md, and link to that file.</li>
-        <li>An AI conversation: a public share link from ChatGPT, Claude or Gemini.</li>
+        <li>An AI conversation: a public share link from ChatGPT, Claude or Gemini. If it cannot be read, use a public GitHub file containing the complete conversation.</li>
       </ul>
       <span>We cannot read Notion, Google Docs or Drive, anything that needs a sign-in, or a repo's front page (it shows only file names).</span>
     </div>
@@ -4571,16 +4582,19 @@ body.aib-va .fil-top-level,body.aib-va .fil-me,body.aib-va .fil-keep,body.aib-va
       <div class="review-item">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
           <strong style="font:700 15px/1.3 -apple-system,sans-serif;color:#000036;" x-text="$store.review.title(e.exerciseId)"></strong>
-          <span class="review-tag" :class="e.fixed ? 'done' : 'todo'" x-text="e.fixed ? 'Resubmitted' : 'Resubmit'"></span>
+          <span class="review-tag" :class="e.fixed ? 'done' : 'todo'" x-text="e.verdict === 'REVIEW' ? 'Review pending' : (e.fixed ? 'Resubmitted' : 'Resubmit')"></span>
         </div>
         <p x-text="e.feedback"></p>
-        <a href="#" x-show="!e.fixed" @click.prevent="$store.review.go(e.exerciseId)" class="review-go">Open the lesson to resubmit &rarr;</a>
+        <a href="#" x-show="e.verdict === 'REPEAT' && !e.fixed" @click.prevent="$store.review.go(e.exerciseId)" class="review-go">Open the lesson to resubmit &rarr;</a>
       </div>
     </template>
     <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(0,0,54,0.1);">
       <p class="lms-subheading" style="font-size:0.88rem;margin:0 0 12px;line-height:1.5;">Once every resubmit item is done, your request goes back in the queue by itself. Fixed something else, like a lesson or your profile name? Ask for a fresh review here.</p>
       <button @click="$store.review.rereview()" :disabled="$store.review.busy" class="lms-invite-btn" style="border-radius:12px;padding:12px 18px;height:auto;font-weight:700;" x-text="$store.review.busy ? 'Sending...' : 'I have fixed it: review my work again'"></button>
       <p x-show="$store.review.msg" x-text="$store.review.msg" style="margin:10px 0 0;font:600 13px/1.45 -apple-system,sans-serif;color:#1d6e36;"></p>
+    </div>
+    <div x-show="$store.review.gate" class="review-ack">
+      <button @click="$store.review.ack()" :disabled="!$store.review.readToEnd" x-text="$store.review.readToEnd ? 'I have read my feedback' : 'Scroll to the end to continue'"></button>
     </div>
   </div>
 </div>
@@ -4603,7 +4617,7 @@ body.aib-va .fil-top-level,body.aib-va .fil-me,body.aib-va .fil-keep,body.aib-va
       <li><strong>Tidy the leftovers.</strong> Remove <code>[cite: 4]</code> markers, codes such as <code>&amp;ldquo;</code> and any placeholder text before you submit.</li>
       <li><strong>Resubmit in the lesson itself.</strong> Your new link replaces the old one. When every item has been resubmitted, your request goes back in the queue by itself and is marked again, usually within a day.</li>
     </ol>
-    <p class="lms-subheading" style="font-size:0.85rem;margin:14px 0 0;line-height:1.5;">Still stuck after two tries? <a href="mailto:victor@fiveinnolabs.com?subject=AI%20Badge%20resubmit%20help">Email Victor</a> with the lesson name and your link.</p>
+    <p class="lms-subheading" style="font-size:0.85rem;margin:14px 0 0;line-height:1.5;">Still stuck? Keep your corrections here in AI Badge. Replace the link in the relevant lesson, then open your certificate feedback and select &ldquo;I have fixed it: review my work again&rdquo;. Your feedback appears here in AI Badge.</p>
   </div>
 </div>
 <style>
@@ -4616,6 +4630,15 @@ body.aib-va .fil-top-level,body.aib-va .fil-me,body.aib-va .fil-keep,body.aib-va
   .tips-list li { margin:0 0 10px; font:400 14px/1.5 -apple-system,sans-serif; color:#3a3f4a; }
   .tips-list li strong { color:#000036; }
   .tips-list code { font-size:12.5px; background:rgba(0,0,54,0.06); padding:1px 5px; border-radius:5px; }
+  .review-gated { background:rgba(0,0,30,0.62) !important; backdrop-filter:blur(14px) saturate(.7) !important; -webkit-backdrop-filter:blur(14px) saturate(.7) !important; }
+  .review-gated .review-modal { border-top:6px solid #b42318; }
+  .review-stop { display:flex; gap:14px; align-items:center; margin:0 0 18px; padding:14px 16px; border-radius:14px; background:#FEECEB; border:1.5px solid rgba(180,35,24,0.28); }
+  .review-stop svg { flex:none; }
+  .review-stop strong { display:block; font:800 18px/1.25 -apple-system,sans-serif; color:#8f1d14; margin-bottom:3px; }
+  .review-stop span { display:block; font:500 14px/1.45 -apple-system,sans-serif; color:#5b1a14; }
+  .review-ack { position:sticky; bottom:-24px; margin:18px -24px -24px; padding:14px 24px 20px; background:linear-gradient(rgba(255,255,255,0),#fff 30%); }
+  .review-ack button { width:100%; border:none; border-radius:12px; padding:14px 18px; font:700 15px/1.2 -apple-system,sans-serif; background:#000036; color:#fff; cursor:pointer; }
+  .review-ack button:disabled { background:rgba(0,0,54,0.12); color:#5a5f6e; cursor:default; }
   .review-item { padding:14px 16px; border-radius:14px; background:rgba(0,0,54,0.035); margin-bottom:10px; }
   .review-item p { margin:0; font:400 14px/1.5 -apple-system,sans-serif; color:#3a3f4a; }
   .review-tag { display:inline-block; padding:3px 9px; border-radius:999px; font:700 11px/1.4 -apple-system,sans-serif; letter-spacing:0.02em; margin-bottom:6px; }
@@ -5626,7 +5649,24 @@ try{
     // here, fixes things, and asks for a fresh review. A resubmission counts as "fixed" when it was
     // saved after the verdict.
     Alpine.store('review', {
-      data: null, subs: {}, busy: false, msg: '',
+      data: null, subs: {}, busy: false, msg: '', gate: false, readToEnd: false,
+      _readKey() { var u = Alpine.store('auth').user; return 'aib-feedback-read-' + (u && u.uid || '') + '-' + ((this.data && this.data.resolvedAt) || ''); },
+      // Open the gate once per sign-in session while anything is left to fix.
+      maybeGate() {
+        if (!this.needsAction || this.toFix === 0) return;
+        try { if (sessionStorage.getItem(this._readKey()) === '1') return; } catch (e) {}
+        this.gate = true; this.readToEnd = false;
+        Alpine.store('ui').showModal('review');
+        var self = this;
+        setTimeout(function(){ var el = document.querySelector('.review-gated .review-modal'); if (el) { el.scrollTop = 0; self.checkRead(el); } }, 250);
+      },
+      checkRead(el) { if (this.gate && el.scrollTop + el.clientHeight >= el.scrollHeight - 40) this.readToEnd = true; },
+      ack() {
+        if (!this.readToEnd) return;
+        try { sessionStorage.setItem(this._readKey(), '1'); } catch (e) {}
+        this.gate = false;
+        Alpine.store('ui').closeModal();
+      },
       get status() { return this.data ? this.data.reviewStatus : 'none'; },
       get needsAction() { return this.status === 'repeat'; },
       get items() {
@@ -5637,11 +5677,13 @@ try{
         });
       },
       get notes() { return (this.data && this.data.notes) || []; },
-      get toFix() { return this.items.filter(function(e){ return !e.fixed; }).length + this.notes.length; },
+      get toFix() { return this.items.filter(function(e){ return e.verdict === 'REPEAT' && !e.fixed; }).length + this.notes.length; },
       item(id) { return this.items.filter(function(e){ return e.exerciseId === id; })[0] || null; },
       title(id) { var t = (window._lmsTutorials || []).filter(function(x){ return x.id === id; })[0]; return t ? t.title : id; },
       go(id) {
         var t = (window._lmsTutorials || []).filter(function(x){ return x.id === id; })[0];
+        // Opening a lesson to fix counts as reading the feedback.
+        if (this.gate) { try { sessionStorage.setItem(this._readKey(), '1'); } catch (e) {} this.gate = false; }
         Alpine.store('ui').closeModal();
         if (t) { window.location.hash = '#/lesson/' + t.moduleId + '/' + t.id; window.scrollTo(0, 0); }
       },
@@ -5656,6 +5698,7 @@ try{
           if (this.needsAction && typeof getSubmissions === 'function') this.subs = await getSubmissions(va ? va.uid : u.uid);
           // A lesson opened before this finished loading gets its note now.
           document.querySelectorAll('[data-exercise-submission]').forEach(function(b){ window.__renderReviewNote && window.__renderReviewNote(b.getAttribute('data-exercise-submission')); });
+          if (!this.gate) this.maybeGate();
         } catch (e) { /* the dashboard works without it */ }
       },
       async rereview() {
@@ -5682,7 +5725,7 @@ try{
       // review now (the note itself stays until the next marking run clears it).
       async afterName() {
         if (!this.needsAction) return;
-        var open = this.items.filter(function(e){ return !e.fixed; }).length
+        var open = this.items.filter(function(e){ return e.verdict === 'REPEAT' && !e.fixed; }).length
           + this.notes.filter(function(n){ return !/full name/i.test(n); }).length;
         if (open === 0) await this.rereview();
       }
@@ -5698,7 +5741,9 @@ try{
       /* the email form starts open only when a class hub handed over an NCI code */
       signinMore: !!(typeof HUB_CLASS_CODE === 'string' && HUB_CLASS_CODE),
       showModal(name) { this.activeModal = name; document.body.style.overflow = 'hidden'; },
-      closeModal() { this.activeModal = null; document.body.style.overflow = ''; }
+      // The feedback gate is released only by review.ack() or review.go(), never by a sign-in flow closing modals.
+      // (The tips window opened from inside the gate returns to it on close.)
+      closeModal() { if (Alpine.store('review').gate) { this.activeModal = 'review'; return; } this.activeModal = null; document.body.style.overflow = ''; }
     });
 
     // New lessons (bell). Add an item here to announce a lesson. Seen/opened are per-device
