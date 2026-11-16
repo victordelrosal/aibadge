@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In 2027, be the AI person · AI Badge</title>
+<meta name="description" content="Finish AI Badge Level 1, which is free, then apply for a seat in a small group Victor del Rosal guides personally for eight weeks from January 2027.">
+<!-- DRAFT 16 Nov 2026: noindex stays until Victor sets the date, seats and price. -->
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="In 2027, be the AI person">
+<meta property="og:description" content="Level 1 is free. Then eight weeks in a small group, guided personally by Victor del Rosal, from January 2027.">
+<meta property="og:url" content="https://aibadge.fiveinnolabs.com/be-the-AI-person/">
+<meta property="og:image" content="https://aibadge.fiveinnolabs.com/assets/img/og-aibadge.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aibadge.fiveinnolabs.com/assets/img/og-aibadge.jpg">
+<link rel="icon" href="../assets/img/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Jost:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#03041a;--bg2:#070a2c;--navy:#000036;
+  --ink:#f2efe8;--ink2:#bdb9b0;--ink3:#8a8a9c;
+  --gold:#e3c878;--b:47,120,255;--g:46,200,110;
+  --disp:"Jost",Futura,"Century Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --body:"IBM Plex Sans",-apple-system,system-ui,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --line:rgba(255,255,255,.09);--glass:rgba(255,255,255,.045);
+}
+*{box-sizing:border-box}
+html{overflow-x:clip;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid rgb(var(--b));outline-offset:3px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.kick{font:500 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:-.01em}
+h2{font-size:clamp(30px,4.4vw,46px);line-height:1.08;font-weight:600;margin:14px 0 18px}
+h2 em,h1 em{font-style:italic;color:var(--gold)}
+p.lead{color:var(--ink2);max-width:640px;margin:0}
+section{padding:104px 0;position:relative}
+section + section{border-top:1px solid var(--line)}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:40;transition:background .4s,box-shadow .4s}
+nav.solid{background:rgba(3,4,26,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 1px 0 rgba(255,255,255,.06)}
+.nav-in{display:flex;align-items:center;gap:20px;height:68px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:600 17px/1 var(--disp)}
+.logo img{width:30px;height:auto;filter:drop-shadow(0 0 10px rgba(var(--b),.5))}
+.nav-sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border-radius:999px;text-decoration:none;font:600 15px/1 var(--disp);letter-spacing:.01em;transition:transform .25s var(--ease),box-shadow .25s,background .25s;border:1px solid transparent;cursor:pointer}
+.btn-gold{background:var(--gold);color:#12102a;box-shadow:0 10px 34px -12px rgba(227,200,120,.7)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 40px -12px rgba(227,200,120,.85)}
+.btn-ghost{border-color:rgba(255,255,255,.2);color:var(--ink)}
+.btn-ghost:hover{background:rgba(255,255,255,.07)}
+.btn-sm{padding:10px 18px;font-size:14px}
+
+/* hero */
+.hero{min-height:100svh;display:flex;align-items:center;padding:132px 0 88px;overflow:hidden;border-top:0}
+.hero::before{content:"";position:absolute;inset:-20% -10% auto -10%;height:120%;pointer-events:none;
+  background:radial-gradient(60% 50% at 78% 30%,rgba(var(--b),.30),transparent 70%),radial-gradient(40% 40% at 12% 78%,rgba(227,200,120,.13),transparent 70%)}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.08fr .92fr;gap:64px;align-items:center}
+h1{font-size:clamp(46px,7.4vw,92px);line-height:.98;font-weight:700;margin:22px 0 26px}
+.hero p.lead{font-size:19px}
+.cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.facts{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:38px;font:500 12px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.facts b{color:var(--ink);font-weight:500}
+
+/* hero stage: visual prism + #team thread toggle */
+.hero-stage{background:radial-gradient(85% 75% at 52% 42%,rgba(var(--b),.22),transparent 70%),linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:26px;padding:20px 22px 22px;backdrop-filter:blur(12px);box-shadow:0 40px 90px -40px rgba(0,0,0,.85);position:relative;overflow:hidden}
+.stage-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.stage-k{display:flex;align-items:center;gap:9px;font:500 11px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--ink3)}
+.stage-k i{width:8px;height:8px;border-radius:50%;background:rgb(var(--g));box-shadow:0 0 10px rgb(var(--g))}
+.stage-tabs{display:inline-flex;background:rgba(3,4,26,.65);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.stage-tab{border:0;background:transparent;color:var(--ink3);font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:6px 11px;border-radius:999px;cursor:pointer;transition:background .25s,color .25s}
+.stage-tab[aria-selected="true"]{background:var(--gold);color:#12102a;font-weight:600}
+.prism-fig{margin:0;position:relative}
+.prism-svg{width:100%;height:auto;display:block;border-radius:18px;background:radial-gradient(65% 55% at 52% 48%,rgba(227,200,120,.14),rgba(3,4,26,.92) 72%);border:1px solid rgba(255,255,255,.07)}
+.prism-flow{stroke-dasharray:6 6;animation:prismDash 16s linear infinite}
+.prism-beam{stroke-dasharray:10 5;animation:prismDash 10s linear infinite}
+.prism-ring{transform-origin:260px 185px;animation:prismSpin 28s linear infinite}
+@keyframes prismDash{to{stroke-dashoffset:-120}}
+@keyframes prismSpin{to{transform:rotate(360deg)}}
+.prism-badge-wrap{position:absolute;left:50%;top:46.5%;transform:translate(-50%,-50%);width:86px;height:86px;pointer-events:none;display:grid;place-items:center}
+.prism-badge-wrap img{width:78px;height:auto;filter:drop-shadow(0 0 22px rgba(227,200,120,.55)) drop-shadow(0 0 36px rgba(47,120,255,.45))}
+.prism-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.prism-pill{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:12px;padding:9px 11px;text-align:left;cursor:pointer;transition:border-color .25s,background .25s,transform .25s}
+.prism-pill:hover,.prism-pill.active{border-color:rgba(227,200,120,.65);background:rgba(227,200,120,.09);transform:translateY(-1px)}
+.prism-pill b{display:block;font:500 10px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.prism-pill span{display:block;font:600 13px/1.25 var(--disp);color:var(--ink)}
+.prism-caption{margin-top:10px;padding:10px 13px;border-radius:12px;background:rgba(3,4,26,.6);border:1px solid rgba(255,255,255,.06);font:400 13px/1.45 var(--body);color:var(--ink2);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.prism-caption code{font:500 11px/1 var(--mono);color:var(--gold);white-space:nowrap}
+.thread-pane[hidden],.prism-pane[hidden]{display:none}
+.msg{display:flex;gap:12px;margin:0 0 16px;opacity:0;transform:translateY(12px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.msg.in{opacity:1;transform:none}
+.av{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font:600 14px/1 var(--disp);background:rgba(255,255,255,.1);color:var(--ink2)}
+.msg .who{font:600 14px/1.2 var(--disp);margin-bottom:3px}
+.msg .who span{font:400 11px/1 var(--mono);color:var(--ink3);margin-left:8px}
+.msg .txt{color:var(--ink2);font-size:15.5px;line-height:1.5}
+.tag{color:#12102a;background:var(--gold);border-radius:6px;padding:1px 7px;font-weight:600;white-space:nowrap}
+.msg.you .av{background:var(--gold);color:#12102a;box-shadow:0 0 0 4px rgba(227,200,120,.18)}
+.thread-note{font:400 11px/1.4 var(--mono);color:var(--ink3);margin-top:6px}
+
+/* the office (hero image): every chair turns to one desk */
+.office{margin:0;position:relative}
+.office svg{display:block;width:100%;height:auto;overflow:visible}
+.office .desk{fill:rgba(255,255,255,.035);stroke:rgba(255,255,255,.2);stroke-width:1}
+.office .screen{stroke:rgba(255,255,255,.3);stroke-width:2;stroke-linecap:round}
+.office .sh{fill:#1a2052;stroke:rgba(255,255,255,.42);stroke-width:1.1;transition:fill 1.2s .4s,stroke 1.2s .4s}
+.office .hd{fill:#cfd3ea;transition:fill 1.2s .4s}
+.office .back{fill:none;stroke:rgba(255,255,255,.22);stroke-width:2.5;stroke-linecap:round}
+.office .ch{transition:transform 1.5s var(--ease)}
+.office .ch.turned .sh{fill:#262b5e;stroke:rgba(227,200,120,.7)}
+.office .ch.turned .hd{fill:#f4e7bd}
+.office .me .desk{fill:rgba(227,200,120,.2);stroke:var(--gold);stroke-width:1.5}
+.office .me .screen{stroke:var(--gold)}
+.office .me .sh{fill:var(--gold);stroke:#fff3cf}
+.office .me .hd{fill:#fff8e3}
+.office .me .back{stroke:rgba(227,200,120,.6)}
+.office .pool{opacity:0;transition:opacity 2.2s ease}
+.office.lit .pool{opacity:1}
+.office .ring{fill:none;stroke:var(--gold);stroke-width:1;opacity:0}
+.office.lit .ring{animation:ring 3.6s ease-out 1.2s infinite}
+@keyframes ring{0%{opacity:.55;transform:scale(.4)}100%{opacity:0;transform:scale(1.9)}}
+.office .youtag rect{fill:var(--gold)}
+.office .youtag text{font:600 13px var(--disp);fill:#12102a}
+.office figcaption{font:400 11px/1.4 var(--mono);letter-spacing:.06em;color:var(--ink3);margin-top:10px;text-align:center}
+.thread-wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+
+/* benefits */
+.ben{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:44px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:20px;padding:24px 24px 22px;display:grid;grid-template-columns:auto 1fr;gap:4px 18px;transition:transform .35s var(--ease),border-color .35s,background .35s}
+.card:hover{transform:translateY(-3px);border-color:rgba(227,200,120,.42);background:rgba(255,255,255,.07)}
+.card.wide{grid-column:1/-1}
+.card .n{grid-row:span 2;font:600 34px/1 var(--disp);color:transparent;-webkit-text-stroke:1px rgba(227,200,120,.75);min-width:44px}
+.card h3{font-size:19px;font-weight:600;line-height:1.25}
+.card p{margin:0;color:var(--ink2);font-size:15.5px}
+.grp{font:500 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);grid-column:1/-1;margin:22px 0 2px}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+.step{background:var(--glass);border:1px solid var(--line);border-radius:20px;padding:26px}
+.step .k{font:500 11px/1 var(--mono);letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+.step h3{font-size:22px;margin:14px 0 8px}
+.step p{margin:0;color:var(--ink2);font-size:15.5px}
+
+/* weeks */
+.finish{margin-top:30px;padding:26px 28px;border-radius:20px;border:1px solid rgba(227,200,120,.4);background:linear-gradient(135deg,rgba(227,200,120,.12),rgba(227,200,120,.02));font:500 clamp(19px,2.3vw,25px)/1.35 var(--disp)}
+.weeks{list-style:none;margin:34px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.weeks li{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--glass)}
+.weeks b{display:block;font:500 11px/1 var(--mono);letter-spacing:.2em;color:var(--gold);margin-bottom:10px}
+.weeks span{color:var(--ink2);font-size:15px;line-height:1.45;display:block}
+
+/* scoreboard */
+.score{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
+.tile{border:1px solid var(--line);border-radius:20px;padding:26px 22px;background:var(--glass)}
+.tile .v{font:700 clamp(40px,5vw,60px)/1 var(--disp);letter-spacing:-.02em}
+.tile .v.gold{color:var(--gold)}
+.tile .l{font:500 11px/1.5 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-top:12px}
+.asof{font:400 12px/1.5 var(--mono);color:var(--ink3);margin-top:18px}
+
+/* victor */
+.me{display:grid;grid-template-columns:200px 1fr;gap:44px;align-items:center}
+.me img{width:200px;height:200px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.me p{color:var(--ink2);margin:0 0 14px;max-width:640px}
+
+/* faq */
+details{border-bottom:1px solid var(--line);padding:20px 0}
+summary{cursor:pointer;font:600 19px/1.3 var(--disp);list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--gold);font-weight:500;transition:transform .3s var(--ease)}
+details[open] summary::after{transform:rotate(45deg)}
+details p{color:var(--ink2);margin:12px 0 0;max-width:720px}
+
+.end{text-align:center}
+.end h2{font-size:clamp(38px,6vw,72px)}
+.end .cta{justify-content:center}
+footer{padding:36px 0 56px;color:var(--ink3);font:400 12px/1.6 var(--mono);border-top:1px solid var(--line)}
+footer a{color:var(--ink2)}
+
+.rv{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+@media (max-width:900px){
+  .hero-grid,.thread-wrap{grid-template-columns:1fr;gap:44px}
+  .office{max-width:440px;margin:0 auto;width:100%}
+  .ben,.steps{grid-template-columns:1fr}
+  .weeks,.score{grid-template-columns:repeat(2,1fr)}
+  .me{grid-template-columns:1fr;gap:24px}
+  section{padding:76px 0}
+}
+@media (max-width:480px){.nav-in .btn-ghost{display:none}.card{grid-template-columns:1fr}.card .n{grid-row:auto}}
+@media (prefers-reduced-motion:reduce){.office .ch,.office .pool{transition:none}.office.lit .ring{animation:none}.rv,.msg{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav id="nav"><div class="wrap nav-in">
+  <a class="logo" href="../"><img src="../assets/img/ai-badge.png" alt="">AI Badge</a>
+  <span class="nav-sp"></span>
+  <a class="btn btn-ghost btn-sm" href="#weeks">The eight weeks</a>
+  <a class="btn btn-gold btn-sm" href="../">Start Level 1, free</a>
+</div></nav>
+
+<main>
+<section class="hero"><div class="wrap hero-grid">
+  <div>
+    <div class="kick">AI Badge · <span data-kickoff-short>January 2027</span> group</div>
+    <h1>In 2027, be the <em>AI person</em>.</h1>
+    <p class="lead">The colleague people ask when they wonder what AI could do for their work. Finish AI Badge Level 1, which is free, then apply for a seat in a small group I guide personally for eight weeks.</p>
+    <div class="cta">
+      <a class="btn btn-gold" href="../">Start Level 1, free</a>
+      <a class="btn btn-ghost" href="#how">How to get a seat</a>
+    </div>
+    <div class="facts">
+      <span>Starts <b data-kickoff>January 2027</b></span>
+      <span><b>8</b> weeks</span>
+      <span><b data-seats>Small</b> group</span>
+      <span>Guided by <b>Victor del Rosal</b></span>
+    </div>
+  </div>
+
+  <figure class="office" id="office" aria-label="An office seen from above. Everyone has turned to face one desk, marked you.">
+    <svg viewBox="0 0 520 520" role="img" aria-hidden="true">
+      <defs>
+        <radialGradient id="pool" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e3c878" stop-opacity=".42"/><stop offset=".55" stop-color="#e3c878" stop-opacity=".08"/><stop offset="1" stop-color="#e3c878" stop-opacity="0"/></radialGradient>
+      </defs>
+      <g id="floor"></g>
+    </svg>
+    <figcaption>The office, March 2027. Everyone has turned to one desk.</figcaption>
+  </figure>
+</div></section>
+
+<section id="thread-sec"><div class="wrap thread-wrap">
+  <div>
+    <div class="kick rv">What it sounds like</div>
+    <h2 class="rv">The question comes <em>to you</em></h2>
+    <p class="lead rv">By March the conversation about AI in your team has a name in it, and the name is yours.</p>
+  </div>
+  <div class="hero-stage" id="heroStage" aria-label="How one person in the room turns AI questions into tested work">
+    <div class="stage-top">
+      <div class="stage-k"><i></i> <span id="stageTitle">Fig. 01 · Noise in, proof out</span></div>
+      <div class="stage-tabs" role="tablist" aria-label="Hero illustration view">
+        <button type="button" class="stage-tab" role="tab" aria-selected="true" data-stage-tab="prism">The room</button>
+        <button type="button" class="stage-tab" role="tab" aria-selected="false" data-stage-tab="thread">#team chat</button>
+      </div>
+    </div>
+
+    <div class="prism-pane" id="prismPane">
+      <figure class="prism-fig">
+        <svg class="prism-svg" viewBox="0 0 520 350" role="img" aria-label="Diagram: four colleagues with raw AI questions on the left converge through @you and the AI Badge prism in the centre, emerging on the right as a timed workflow, a written rule sheet, and a colleague-run handover.">
+          <defs>
+            <linearGradient id="pIn" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#8a8a9c" stop-opacity="0.28"/>
+              <stop offset="60%" stop-color="#2f78ff" stop-opacity="0.65"/>
+              <stop offset="100%" stop-color="#e3c878" stop-opacity="0.95"/>
+            </linearGradient>
+            <linearGradient id="pOut" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#e3c878" stop-opacity="0.98"/>
+              <stop offset="100%" stop-color="#2ec86e" stop-opacity="0.9"/>
+            </linearGradient>
+            <radialGradient id="pGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#e3c878" stop-opacity="0.38"/>
+              <stop offset="65%" stop-color="#2f78ff" stop-opacity="0.12"/>
+              <stop offset="100%" stop-color="#03041a" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- subtle grid -->
+          <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+            <line x1="0" y1="70" x2="520" y2="70"/>
+            <line x1="0" y1="175" x2="520" y2="175"/>
+            <line x1="0" y1="280" x2="520" y2="280"/>
+            <line x1="130" y1="0" x2="130" y2="350"/>
+            <line x1="260" y1="0" x2="260" y2="350"/>
+            <line x1="390" y1="0" x2="390" y2="350"/>
+          </g>
+
+          <!-- zone headers -->
+          <text x="18" y="24" fill="#8a8a9c" font-family="'IBM Plex Mono',monospace" font-size="9.5" letter-spacing="1.4">10 PEOPLE GUESSING</text>
+          <text x="260" y="24" text-anchor="middle" fill="#e3c878" font-family="'IBM Plex Mono',monospace" font-size="9.5" letter-spacing="1.4">@YOU · THE PRISM</text>
+          <text x="502" y="24" text-anchor="end" fill="#2ec86e" font-family="'IBM Plex Mono',monospace" font-size="9.5" letter-spacing="1.4">1 WORKFLOW THAT RUNS</text>
+
+          <!-- converging noisy questions from the room -->
+          <path class="prism-flow" d="M 148 68 C 194 68, 208 142, 224 162" fill="none" stroke="url(#pIn)" stroke-width="1.8"/>
+          <path class="prism-flow" d="M 154 138 C 192 138, 206 162, 222 170" fill="none" stroke="url(#pIn)" stroke-width="2"/>
+          <path class="prism-flow" d="M 154 212 C 192 212, 206 188, 222 180" fill="none" stroke="url(#pIn)" stroke-width="2"/>
+          <path class="prism-flow" d="M 148 282 C 194 282, 208 208, 224 188" fill="none" stroke="url(#pIn)" stroke-width="1.8"/>
+
+          <!-- outgoing coherent proof beams -->
+          <path class="prism-beam" d="M 296 162 C 326 148, 340 84, 368 76" fill="none" stroke="url(#pOut)" stroke-width="2.4"/>
+          <path class="prism-beam" d="M 298 175 L 368 175" fill="none" stroke="url(#pOut)" stroke-width="2.6"/>
+          <path class="prism-beam" d="M 296 188 C 326 202, 340 266, 368 274" fill="none" stroke="url(#pOut)" stroke-width="2.4"/>
+
+          <!-- left nodes: colleagues asking -->
+          <g transform="translate(14,46)">
+            <rect width="134" height="44" rx="11" fill="#0b1033" stroke="#ffffff" stroke-opacity="0.12"/>
+            <circle cx="20" cy="22" r="10" fill="#1b2554"/>
+            <text x="20" y="25.5" text-anchor="middle" fill="#bdb9b0" font-family="'Jost',sans-serif" font-size="9.5" font-weight="600">AO</text>
+            <text x="36" y="19" fill="#f2efe8" font-family="'IBM Plex Sans',sans-serif" font-size="10" font-weight="600">Operations</text>
+            <text x="36" y="33" fill="#8a8a9c" font-family="'IBM Plex Sans',sans-serif" font-size="9.2">“Sort supplier mail?”</text>
+          </g>
+          <g transform="translate(18,116)">
+            <rect width="136" height="44" rx="11" fill="#0b1033" stroke="#ffffff" stroke-opacity="0.12"/>
+            <circle cx="20" cy="22" r="10" fill="#1b2554"/>
+            <text x="20" y="25.5" text-anchor="middle" fill="#bdb9b0" font-family="'Jost',sans-serif" font-size="9.5" font-weight="600">DN</text>
+            <text x="36" y="19" fill="#f2efe8" font-family="'IBM Plex Sans',sans-serif" font-size="10" font-weight="600">Finance</text>
+            <text x="36" y="33" fill="#8a8a9c" font-family="'IBM Plex Sans',sans-serif" font-size="9.2">“Is that figure real?”</text>
+          </g>
+          <g transform="translate(18,190)">
+            <rect width="136" height="44" rx="11" fill="#0b1033" stroke="#e3c878" stroke-opacity="0.4"/>
+            <circle cx="20" cy="22" r="10" fill="#28356e"/>
+            <text x="20" y="25.5" text-anchor="middle" fill="#e3c878" font-family="'Jost',sans-serif" font-size="9.5" font-weight="600">MR</text>
+            <text x="36" y="19" fill="#f2efe8" font-family="'IBM Plex Sans',sans-serif" font-size="10" font-weight="600">Team Lead</text>
+            <text x="36" y="33" fill="#e3c878" font-family="'IBM Plex Mono',monospace" font-size="9">“Ask @you first”</text>
+          </g>
+          <g transform="translate(14,260)">
+            <rect width="134" height="44" rx="11" fill="#0b1033" stroke="#ffffff" stroke-opacity="0.12"/>
+            <circle cx="20" cy="22" r="10" fill="#1b2554"/>
+            <text x="20" y="25.5" text-anchor="middle" fill="#bdb9b0" font-family="'Jost',sans-serif" font-size="9.5" font-weight="600">LK</text>
+            <text x="36" y="19" fill="#f2efe8" font-family="'IBM Plex Sans',sans-serif" font-size="10" font-weight="600">Compliance</text>
+            <text x="36" y="33" fill="#8a8a9c" font-family="'IBM Plex Sans',sans-serif" font-size="9.2">“What stays off-limits?”</text>
+          </g>
+
+          <!-- centre prism halo & orbital ring -->
+          <circle cx="260" cy="175" r="76" fill="url(#pGlow)"/>
+          <circle class="prism-ring" cx="260" cy="175" r="56" fill="none" stroke="#e3c878" stroke-opacity="0.32" stroke-width="1.2" stroke-dasharray="4 7"/>
+          <polygon points="260,122 306,148 306,202 260,228 214,202 214,148" fill="#060b2e" fill-opacity="0.9" stroke="#e3c878" stroke-width="2"/>
+          <rect x="234" y="236" width="52" height="19" rx="9.5" fill="#e3c878"/>
+          <text x="260" y="249" text-anchor="middle" fill="#12102a" font-family="'IBM Plex Mono',monospace" font-size="10.5" font-weight="600">@you</text>
+
+          <!-- right nodes: the 3 outputs that make you the AI person -->
+          <g transform="translate(368,50)">
+            <rect width="138" height="52" rx="12" fill="#0b1338" stroke="#e3c878" stroke-opacity="0.65" stroke-width="1.4"/>
+            <text x="12" y="19" fill="#e3c878" font-family="'IBM Plex Mono',monospace" font-size="8.5" letter-spacing="1">01 · TIMED SAVING</text>
+            <text x="12" y="37" fill="#f2efe8" font-family="'IBM Plex Mono',monospace" font-size="11.5" font-weight="600">3h 40m → <tspan fill="#2ec86e">22m</tspan></text>
+          </g>
+          <g transform="translate(368,149)">
+            <rect width="138" height="52" rx="12" fill="#0b1338" stroke="#2f78ff" stroke-opacity="0.7" stroke-width="1.4"/>
+            <text x="12" y="19" fill="#7aa8ff" font-family="'IBM Plex Mono',monospace" font-size="8.5" letter-spacing="1">02 · RULE SHEET</text>
+            <text x="12" y="37" fill="#f2efe8" font-family="'IBM Plex Sans',sans-serif" font-size="11" font-weight="600">What AI never touches</text>
+          </g>
+          <g transform="translate(368,248)">
+            <rect width="138" height="52" rx="12" fill="#0b1338" stroke="#2ec86e" stroke-opacity="0.65" stroke-width="1.4"/>
+            <text x="12" y="19" fill="#2ec86e" font-family="'IBM Plex Mono',monospace" font-size="8.5" letter-spacing="1">03 · HANDOVER</text>
+            <text x="12" y="37" fill="#f2efe8" font-family="'IBM Plex Sans',sans-serif" font-size="11" font-weight="600">Colleague runs it solo</text>
+          </g>
+        </svg>
+        <div class="prism-badge-wrap" aria-hidden="true">
+          <img src="../assets/img/ai-badge.webp" alt="">
+        </div>
+      </figure>
+
+      <div class="prism-legend" role="group" aria-label="Inspect what changes by Week 8">
+        <button type="button" class="prism-pill active" data-proof="timed">
+          <b>Week 1 → 7</b>
+          <span>Timed before &amp; after</span>
+        </button>
+        <button type="button" class="prism-pill" data-proof="rules">
+          <b>Week 4</b>
+          <span>Written rule sheet</span>
+        </button>
+        <button type="button" class="prism-pill" data-proof="handover">
+          <b>Week 6 → 8</b>
+          <span>Run without you</span>
+        </button>
+      </div>
+      <div class="prism-caption" id="prismCaption">
+        <span>You time one real weekly task before and after, so the hours saved are measured, not guessed.</span>
+        <code>PROOF 01/03</code>
+      </div>
+    </div>
+
+    <div class="thread-pane" id="thread" hidden aria-label="Illustration of a team chat">
+      <div class="msg in"><div class="av">A</div><div><div class="who">Aoife <span>Operations</span></div><div class="txt">Could AI sort the supplier emails for us, or is that a bad idea?</div></div></div>
+      <div class="msg in"><div class="av">D</div><div><div class="who">Dan <span>Finance</span></div><div class="txt">Ask <span class="tag">@you</span>. Month-end runs on the one they built, and I ran it myself last week.</div></div></div>
+      <div class="msg in"><div class="av">M</div><div><div class="who">Maria <span>Team lead</span></div><div class="txt"><span class="tag">@you</span> can you show the team on Thursday?</div></div></div>
+      <div class="msg you in"><div class="av">You</div><div><div class="who">You</div><div class="txt">Yes. I'll bring the before and after, and the list of what it must not touch.</div></div></div>
+      <div class="thread-note">A Tuesday in March 2027. The names are invented; the deliverables are weeks 4, 6 and 7.</div>
+    </div>
+  </div>
+</div></section>
+
+<section id="benefits"><div class="wrap">
+  <div class="kick rv">What changes for you</div>
+  <h2 class="rv">10 benefits of being <em>the AI person</em></h2>
+  <p class="lead rv">Each one is something you can do or show by week eight. I promise the work and my attention. Pay rises and promotions are your employer's to give, so you will find none promised here.</p>
+  <div class="ben">
+    <div class="grp rv">At work</div>
+    <div class="card rv"><div class="n">01</div><h3>People bring you the question first</h3><p>When a colleague wonders whether AI could do something, you are the one they ask.</p></div>
+    <div class="card rv"><div class="n">02</div><h3>You know what you saved</h3><p>You time one weekly task before and after, so the number is yours and it is real.</p></div>
+    <div class="card rv"><div class="n">03</div><h3>You speak with evidence</h3><p>When your team decides what to do about AI, you bring a working example from your own job.</p></div>
+    <div class="card rv"><div class="n">04</div><h3>You know where AI must stay out</h3><p>You write the rule sheet: what it never touches, and what a person checks every time.</p></div>
+    <div class="card wide rv"><div class="n">05</div><h3>You can hand it over</h3><p>A colleague runs your workflow without you. That is the test of whether you understand it.</p></div>
+    <div class="grp rv">For you</div>
+    <div class="card rv"><div class="n">06</div><h3>Proof anyone can check</h3><p>A verifiable Level 1 certificate, plus a one-page before and after of your own work.</p></div>
+    <div class="card rv"><div class="n">07</div><h3>New tools stop being noise</h3><p>You know what to test, so you can judge a new AI tool in an afternoon.</p></div>
+    <div class="card rv"><div class="n">08</div><h3>A specific story to tell</h3><p>For a review or an interview: the task you changed, how you did it, and what you measured.</p></div>
+    <div class="card rv"><div class="n">09</div><h3>Peers doing the same</h3><p>A small group in other workplaces, working through the same eight weeks alongside you.</p></div>
+    <div class="card wide rv"><div class="n">10</div><h3>My eyes on your work</h3><p>I read what you make every week and tell you plainly what I would change.</p></div>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <div class="kick rv">How to get a seat</div>
+  <h2 class="rv">Three steps, and the first is <em>free</em></h2>
+  <div class="steps">
+    <div class="step rv"><div class="k">Step 1 · now</div><h3>Finish Level 1</h3><p>Self-paced and free. It ends in a certificate with an ID anyone can verify.</p></div>
+    <div class="step rv"><div class="k">Step 2 · <span data-apply-when>dates to follow</span></div><h3>Apply with your certificate</h3><p>Four short questions: your certificate, the weekly task you want to change, the colleague who will try it, and whether the weekly slot suits you.</p></div>
+    <div class="step rv"><div class="k">Step 3 · <span data-kickoff-short>January 2027</span></div><h3>Eight weeks with me</h3><p>One live session a week in a small group. I review your work between sessions.</p></div>
+  </div>
+</div></section>
+
+<section id="weeks"><div class="wrap">
+  <div class="kick rv">The eight weeks</div>
+  <h2 class="rv">One task from your job, <em>changed for good</em></h2>
+  <div class="finish rv">The finish line: one recurring task from your own job runs with AI, and a colleague has run it without you.</div>
+  <ol class="weeks">
+    <li class="rv"><b>WEEK 1</b><span>Pick one recurring task and time it the way you do it today.</span></li>
+    <li class="rv"><b>WEEK 2</b><span>Do it with AI by hand on this week's real work. Keep the prompt and the output.</span></li>
+    <li class="rv"><b>WEEK 3</b><span>Use your real files and deliver the result to whoever normally receives it.</span></li>
+    <li class="rv"><b>WEEK 4</b><span>Write your rule sheet: what AI must not touch and what you check.</span></li>
+    <li class="rv"><b>WEEK 5</b><span>Turn it into a saved workflow with instructions a stranger could follow.</span></li>
+    <li class="rv"><b>WEEK 6</b><span>A colleague runs it alone. You log what broke.</span></li>
+    <li class="rv"><b>WEEK 7</b><span>Fix it and write your one-page before and after.</span></li>
+    <li class="rv"><b>WEEK 8</b><span>Demo to the group, then show your team at work.</span></li>
+  </ol>
+</div></section>
+
+<section id="score"><div class="wrap">
+  <div class="kick rv">The campaign, in the open</div>
+  <h2 class="rv">Where it <em>stands</em></h2>
+  <p class="lead rv">Real counts only. A tile stays blank until there is a true number to put in it.</p>
+  <div class="score">
+    <div class="tile rv"><div class="v gold" data-m="days">–</div><div class="l">Days to kickoff</div></div>
+    <div class="tile rv"><div class="v" data-m="certs">–</div><div class="l">Level 1 certificates earned since 16 Nov</div></div>
+    <div class="tile rv"><div class="v" data-m="apps">–</div><div class="l">Applications received</div></div>
+    <div class="tile rv"><div class="v" data-m="seats">–</div><div class="l">Seats taken</div></div>
+  </div>
+  <div class="asof" data-asof>Counting starts when applications open.</div>
+</div></section>
+
+<section id="victor"><div class="wrap me">
+  <img class="rv" src="../assets/img/VictordelRosal.png" alt="Victor del Rosal">
+  <div class="rv">
+    <div class="kick">Who guides it</div>
+    <h2>Victor del Rosal</h2>
+    <p>I lecture at National College of Ireland and I built AI Badge. I keep this group small so that I can read every person's work each week.</p>
+    <p>You become the AI person through work your colleagues can see. I sit beside you for eight weeks while you do it.</p>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <div class="kick rv">Questions</div>
+  <h2 class="rv">Before you <em>start</em></h2>
+  <details class="rv"><summary>What does it cost?</summary><p>Level 1 is free. The price of the eight-week group will be on this page before applications open.</p></details>
+  <details class="rv"><summary>Do I need to code?</summary><p>No. This group stays out of the terminal and works on a task from your own job.</p></details>
+  <details class="rv"><summary>What if I miss a week?</summary><p>Every session is recorded. Watch it and post that week's piece of work within seven days.</p></details>
+  <details class="rv"><summary>Why must I finish Level 1 first?</summary><p>It gives the whole group the same starting point, and it shows me you finish what you start.</p></details>
+  <details class="rv"><summary>How are seats decided?</summary><p>You need a verified Level 1 certificate, a specific task, a named colleague and the weekly slot free. Applicants who meet all four are seated in the order they applied.</p></details>
+</div></section>
+
+<section class="end"><div class="wrap">
+  <h2 class="rv">In 2027, be the <em>AI person</em>.</h2>
+  <p class="lead rv" style="margin:0 auto">The first step is free and you can take it today.</p>
+  <div class="cta rv"><a class="btn btn-gold" href="../">Start Level 1, free</a></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">AI Badge by <a href="https://fiveinnolabs.com">fiveinnolabs</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></div></footer>
+
+<script>
+// One place to set the campaign facts. Leave a value null until it is decided or real.
+const CAMPAIGN = {
+  kickoff: null,     // e.g. '2027-01-12'
+  applyBy: null,     // e.g. '2027-01-05'
+  seats: null,       // e.g. 10
+  countsUrl: null    // public JSON: { certs, apps, seatsTaken, asOf }
+};
+
+(function () {
+  const fmt = (d, o) => new Date(d + 'T12:00:00').toLocaleDateString('en-IE', o);
+  const set = (sel, text) => document.querySelectorAll(sel).forEach(el => { el.textContent = text; });
+  if (CAMPAIGN.kickoff) {
+    set('[data-kickoff]', fmt(CAMPAIGN.kickoff, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+    set('[data-kickoff-short]', fmt(CAMPAIGN.kickoff, { day: 'numeric', month: 'long', year: 'numeric' }));
+    const days = Math.ceil((new Date(CAMPAIGN.kickoff + 'T00:00:00') - new Date()) / 864e5);
+    set('[data-m="days"]', days > 0 ? days : 0);
+  }
+  if (CAMPAIGN.applyBy) set('[data-apply-when]', 'by ' + fmt(CAMPAIGN.applyBy, { day: 'numeric', month: 'long' }));
+  if (CAMPAIGN.seats) set('[data-seats]', CAMPAIGN.seats + ' seats, one');
+  if (CAMPAIGN.countsUrl) {
+    fetch(CAMPAIGN.countsUrl, { cache: 'no-cache' }).then(r => r.json()).then(c => {
+      if (Number.isFinite(c.certs)) set('[data-m="certs"]', c.certs);
+      if (Number.isFinite(c.apps)) set('[data-m="apps"]', c.apps);
+      if (Number.isFinite(c.seatsTaken) && CAMPAIGN.seats) set('[data-m="seats"]', c.seatsTaken + ' / ' + CAMPAIGN.seats);
+      if (c.asOf) set('[data-asof]', 'As of ' + c.asOf + '.');
+    }).catch(() => {});
+  }
+
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('solid', scrollY > 24);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { threshold: .12 });
+  document.querySelectorAll('.rv').forEach((el, i) => { el.style.transitionDelay = (i % 4) * 70 + 'ms'; io.observe(el); });
+
+  // The office: a 5 x 5 floor of desks. After a beat everyone swivels to face the gold one,
+  // nearest first, so the turn spreads outward from "you".
+  (function () {
+    const NS = 'http://www.w3.org/2000/svg', floor = document.getElementById('floor'), fig = document.getElementById('office');
+    const el = (n, a, parent) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); (parent || floor).appendChild(e); return e; };
+    const COLS = 5, ROWS = 5, STEP = 100, X0 = 60, Y0 = 46, ME = { c: 3, r: 2 };
+    const pos = (c, r) => ({ x: X0 + c * STEP, y: Y0 + r * STEP });
+    const me = pos(ME.c, ME.r), meChair = { x: me.x, y: me.y + 34 };
+    el('circle', { class: 'pool', cx: me.x, cy: me.y + 16, r: 150, fill: 'url(#pool)' });
+    const ring = el('circle', { class: 'ring', cx: me.x, cy: me.y + 16, r: 44 });
+    ring.style.transformOrigin = me.x + 'px ' + (me.y + 16) + 'px';
+    const chairs = [];
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const p = pos(c, r), mine = c === ME.c && r === ME.r;
+      const g = el('g', mine ? { class: 'me' } : {});
+      el('rect', { class: 'desk', x: p.x - 30, y: p.y - 13, width: 60, height: 26, rx: 5 }, g);
+      el('line', { class: 'screen', x1: p.x - 11, y1: p.y - 5, x2: p.x + 11, y2: p.y - 5 }, g);
+      const at = el('g', { transform: 'translate(' + p.x + ' ' + (p.y + 34) + ')' }, g);
+      const ch = el('g', { class: 'ch' }, at);            // drawn facing its own desk (up)
+      el('path', { class: 'back', d: 'M-13 9 A16 16 0 0 0 13 9' }, ch);
+      el('ellipse', { class: 'sh', rx: 15, ry: 7.5, cy: 2 }, ch);   // shoulders, seen from above
+      el('circle', { class: 'hd', r: 6.2, cy: -1 }, ch);            // head, a little forward
+      if (!mine) {
+        const dx = meChair.x - p.x, dy = meChair.y - (p.y + 34);
+        let deg = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+        if (deg > 180) deg -= 360;                         // take the short way round
+        chairs.push({ ch, deg, d: Math.hypot(dx, dy) });
+      }
+    }
+    const tag = el('g', { class: 'youtag', transform: 'translate(' + (me.x + 22) + ' ' + (me.y + 46) + ')' });
+    el('rect', { width: 38, height: 19, rx: 5 }, tag);
+    el('text', { x: 19, y: 14, 'text-anchor': 'middle' }, tag).textContent = '@you';
+    const still = matchMedia('(prefers-reduced-motion:reduce)').matches;
+    const turn = () => { fig.classList.add('lit'); chairs.forEach(o => setTimeout(() => {
+      o.ch.style.transform = 'rotate(' + o.deg.toFixed(1) + 'deg)'; o.ch.classList.add('turned');
+    }, still ? 0 : o.d * 3.2)); };
+    setTimeout(turn, still ? 0 : 900);
+  })();
+
+  // Stage tabs ("The room" prism diagram + "#team chat") and Week 8 proof pills.
+  const prismPane = document.getElementById('prismPane');
+  const threadPane = document.getElementById('thread');
+  const stageTitle = document.getElementById('stageTitle');
+  document.querySelectorAll('[data-stage-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.getAttribute('data-stage-tab');
+      document.querySelectorAll('[data-stage-tab]').forEach(b => b.setAttribute('aria-selected', String(b === btn)));
+      if (mode === 'thread') {
+        prismPane.hidden = true;
+        threadPane.hidden = false;
+        stageTitle.textContent = '#team · a Tuesday in March 2027';
+      } else {
+        threadPane.hidden = true;
+        prismPane.hidden = false;
+        stageTitle.textContent = 'Fig. 01 · Noise in, proof out';
+      }
+    });
+  });
+
+  const PROOFS = {
+    timed: ['You time one real weekly task before and after, so the hours saved are measured, not guessed.', 'PROOF 01/03'],
+    rules: ['You write the rule sheet for your team: what AI never touches, and what a human checks every time.', 'PROOF 02/03'],
+    handover: ['In Week 6 a colleague runs your workflow without you in the room. What breaks gets fixed in Week 7.', 'PROOF 03/03']
+  };
+  const cap = document.getElementById('prismCaption');
+  document.querySelectorAll('[data-proof]').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const k = pill.getAttribute('data-proof');
+      document.querySelectorAll('[data-proof]').forEach(p => p.classList.toggle('active', p === pill));
+      if (PROOFS[k] && cap) {
+        cap.querySelector('span').textContent = PROOFS[k][0];
+        cap.querySelector('code').textContent = PROOFS[k][1];
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
