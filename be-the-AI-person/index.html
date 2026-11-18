@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>In 2027, be the AI person · AI Badge</title>
-<meta name="description" content="Finish AI Badge Level 1, which is free, then apply for a seat in a small group Victor del Rosal guides personally for eight weeks from January 2027.">
+<meta name="description" content="Finish AI Badge Level 1, which is free, then apply for a seat in a small group Victor del Rosal guides personally for eight weeks, starting with a kick-off in person in Dublin or London in 2027.">
 <!-- DRAFT 16 Nov 2026: noindex stays until Victor sets the date, seats and price. -->
 <meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="In 2027, be the AI person">
-<meta property="og:description" content="Level 1 is free. Then eight weeks in a small group, guided personally by Victor del Rosal, from January 2027.">
+<meta property="og:description" content="Level 1 is free. Then eight weeks in a small group, guided personally by Victor del Rosal, with an in-person kick-off in Dublin or London.">
 <meta property="og:url" content="https://aibadge.fiveinnolabs.com/be-the-AI-person/">
 <meta property="og:image" content="https://aibadge.fiveinnolabs.com/assets/img/og-aibadge.jpg">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
@@ -183,18 +183,92 @@ details p{color:var(--ink2);margin:12px 0 0;max-width:720px}
 footer{padding:36px 0 56px;color:var(--ink3);font:400 12px/1.6 var(--mono);border-top:1px solid var(--line)}
 footer a{color:var(--ink2)}
 
+.keeps{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:44px}
+.keep{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:22px 20px}
+.keep b{display:block;font:500 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.keep h3{font-size:19px;line-height:1.25;margin-bottom:8px}
+.keep p{margin:0;color:var(--ink2);font-size:15px;line-height:1.5}
+.keep small{display:block;margin-top:10px;font:400 11px/1.4 var(--mono);color:var(--ink3)}
+.weeks i{display:block;margin-top:10px;font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;font-style:normal;color:var(--ink3)}
+.weeks i em{font-style:normal;color:var(--gold)}
+
+/* ---- Where and when ---- */
+.route{margin-top:44px;border:1px solid var(--line);border-radius:26px;background:radial-gradient(70% 60% at 30% 35%,rgba(227,200,120,.10),transparent 70%),radial-gradient(60% 60% at 80% 75%,rgba(var(--b),.16),transparent 70%),linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.01));padding:18px 18px 8px;position:relative;overflow:hidden}
+.route svg{display:block;width:100%;height:auto}
+.route .grat{stroke:rgba(255,255,255,.06);stroke-width:1}
+.route .gl{font:500 10px var(--mono);fill:var(--ink3);letter-spacing:.1em}
+.route .sea{font:500 11px var(--mono);fill:rgba(140,170,255,.35);letter-spacing:.5em}
+.route .star{fill:#fff}
+.route .arc{fill:none;stroke:url(#arcG);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:900;stroke-dashoffset:900;filter:url(#glow)}
+.route .arc2{fill:none;stroke:rgba(227,200,120,.18);stroke-width:1;stroke-dasharray:3 7}
+.route.in .arc{animation:draw 2.6s var(--ease) .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadein{to{opacity:1}}
+.route .pulse{fill:none;stroke-width:1.2;opacity:0;transform-box:fill-box;transform-origin:center}
+.route.in .pulse{animation:pulse 3.2s var(--ease) infinite}
+.route.in .pulse.d2{animation-delay:1.6s}
+.route .lon .pulse{stroke:rgb(var(--b))}
+.route .dub .pulse{stroke:var(--gold)}
+.route.in .lon .pulse{animation-delay:1.2s}.route.in .lon .pulse.d2{animation-delay:2.8s}
+@keyframes pulse{0%{opacity:.9;transform:scale(.3)}100%{opacity:0;transform:scale(2.4)}}
+.route .city{font:600 22px var(--disp);fill:var(--ink)}
+.route .cmeta{font:500 10.5px var(--mono);letter-spacing:.14em;fill:var(--ink3)}
+.route .ctag{font:600 10.5px var(--mono);letter-spacing:.16em}
+.route .pill rect{fill:#12102a;stroke:rgba(227,200,120,.55)}
+.route .pill text{font:600 11px var(--mono);letter-spacing:.14em;fill:var(--gold)}
+.route .comet{opacity:0}.route.in .comet{animation:fadein .6s 2.8s forwards}
+.tracks{margin:6px 4px 14px;display:grid;grid-template-columns:92px repeat(10,1fr);gap:6px;align-items:center;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.tracks .h{text-align:center;padding-bottom:4px}
+.tracks .nm{color:var(--ink);font-weight:600}
+.tracks i{height:12px;border-radius:6px;background:rgba(255,255,255,.04);display:block;transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease)}
+.route.in .tracks i{transform:none}
+.tracks i.w{background:rgba(var(--b),.45)}
+.tracks i.k{background:var(--gold);box-shadow:0 0 16px rgba(227,200,120,.7)}
+.tracks .lg{grid-column:1/-1;display:flex;gap:18px;flex-wrap:wrap;margin-top:6px}
+.tracks .lg span::before{content:"";display:inline-block;width:18px;height:8px;border-radius:4px;margin-right:7px;vertical-align:0;background:rgba(var(--b),.45)}
+.tracks .lg span.k::before{background:var(--gold)}
+.cities{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.city-card{border:1px solid var(--line);border-radius:22px;padding:26px;background:var(--glass);position:relative;overflow:hidden}
+.city-card.first{border-color:rgba(227,200,120,.45);background:linear-gradient(150deg,rgba(227,200,120,.10),rgba(255,255,255,.02))}
+.city-card .st{font:500 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.city-card.second .st{color:rgb(140,175,255)}
+.city-card h3{font-size:32px;margin:12px 0 16px}
+.city-card dl{margin:0;display:grid;grid-template-columns:96px 1fr;gap:10px 14px;font-size:15.5px}
+.city-card dt{font:500 11px/1.9 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.city-card dd{margin:0;color:var(--ink2)}
+.city-card dd b{color:var(--ink);font-weight:600}
+.city-card .tbc{display:inline-block;margin-left:6px;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);border:1px solid var(--line);border-radius:999px;padding:4px 8px;vertical-align:2px}
+/* ---- The minds in the room ---- */
+.minds{margin-top:40px;display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px;align-items:stretch}
+.minds .intro p{color:var(--ink2);margin:10px 0 0;font-size:15.5px}
+.mind{position:relative;border-radius:22px;padding:24px 22px;background:rgba(3,4,26,.7);border:1px solid var(--line);overflow:hidden;isolation:isolate}
+.mind::before{content:"";position:absolute;inset:-60%;z-index:-2;background:conic-gradient(from 0deg,transparent 0 55%,var(--c1) 70%,var(--c2) 80%,transparent 90%);animation:spin 7s linear infinite;opacity:.55}
+.mind::after{content:"";position:absolute;inset:1px;border-radius:21px;background:linear-gradient(160deg,#0b0d2e,#04051c);z-index:-1}
+.mind.opus{--c1:rgba(227,200,120,.9);--c2:rgba(255,236,180,.9)}
+.mind.fable{--c1:rgba(47,120,255,.9);--c2:rgba(160,190,255,.9)}
+.mind.fable::before{animation-duration:9s;animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mind .orb{width:54px;height:54px;border-radius:50%;margin-bottom:16px;background:radial-gradient(circle at 35% 30%,#fff,var(--c2) 22%,var(--c1) 55%,transparent 72%);box-shadow:0 0 36px var(--c1);animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.08);box-shadow:0 0 54px var(--c1)}}
+.mind .by{font:500 10.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink3)}
+.mind h3{font-size:26px;margin:8px 0 8px}
+.mind p{margin:0;color:var(--ink2);font-size:15px}
 .rv{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
 .rv.in{opacity:1;transform:none}
 @media (max-width:900px){
   .hero-grid,.thread-wrap{grid-template-columns:1fr;gap:44px}
   .office{max-width:440px;margin:0 auto;width:100%}
   .ben,.steps{grid-template-columns:1fr}
+  .keeps{grid-template-columns:1fr}
+  .cities,.minds{grid-template-columns:1fr}
+  .tracks{grid-template-columns:64px repeat(10,1fr);gap:4px;font-size:9px}
+  .route .city{font-size:46px}.route .ctag{font-size:22px;transform:translateY(-24px)}.route .cmeta{font-size:14px}.route .sea{font-size:20px;letter-spacing:.3em}.route .gl,.route .pill{display:none}
   .weeks,.score{grid-template-columns:repeat(2,1fr)}
   .me{grid-template-columns:1fr;gap:24px}
   section{padding:76px 0}
 }
 @media (max-width:480px){.nav-in .btn-ghost{display:none}.card{grid-template-columns:1fr}.card .n{grid-row:auto}}
-@media (prefers-reduced-motion:reduce){.office .ch,.office .pool{transition:none}.office.lit .ring{animation:none}.rv,.msg{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+@media (prefers-reduced-motion:reduce){.office .ch,.office .pool{transition:none}.office.lit .ring{animation:none}.rv,.msg{opacity:1;transform:none;transition:none}.route .arc{stroke-dashoffset:0;animation:none}.route .pulse,.mind::before,.mind .orb{animation:none}.route .comet{display:none}.tracks i{transform:none;transition:none}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
@@ -202,6 +276,7 @@ footer a{color:var(--ink2)}
 <nav id="nav"><div class="wrap nav-in">
   <a class="logo" href="../"><img src="../assets/img/ai-badge.png" alt="">AI Badge</a>
   <span class="nav-sp"></span>
+  <a class="btn btn-ghost btn-sm" href="#where">Dublin · London</a>
   <a class="btn btn-ghost btn-sm" href="#weeks">The eight weeks</a>
   <a class="btn btn-gold btn-sm" href="../">Start Level 1, free</a>
 </div></nav>
@@ -209,15 +284,16 @@ footer a{color:var(--ink2)}
 <main>
 <section class="hero"><div class="wrap hero-grid">
   <div>
-    <div class="kick">AI Badge · <span data-kickoff-short>January 2027</span> group</div>
+    <div class="kick">AI Badge · In person in Dublin and London</div>
     <h1>In 2027, be the <em>AI person</em>.</h1>
-    <p class="lead">The colleague people ask when they wonder what AI could do for their work. Finish AI Badge Level 1, which is free, then apply for a seat in a small group I guide personally for eight weeks.</p>
+    <p class="lead">The colleague people ask when they wonder what AI could do for their work. Finish AI Badge Level 1, which is free, then apply for a seat in a small group I guide personally for eight weeks. It opens with a kick-off in person, in Dublin or London.</p>
     <div class="cta">
       <a class="btn btn-gold" href="../">Start Level 1, free</a>
       <a class="btn btn-ghost" href="#how">How to get a seat</a>
     </div>
     <div class="facts">
-      <span>Starts <b data-kickoff>January 2027</b></span>
+      <span>Dublin <b data-kickoff>late February 2027</b></span>
+      <span>London <b>two weeks later</b></span>
       <span><b>8</b> weeks</span>
       <span><b data-seats>Small</b> group</span>
       <span>Guided by <b>Victor del Rosal</b></span>
@@ -233,6 +309,25 @@ footer a{color:var(--ink2)}
     </svg>
     <figcaption>The office, March 2027. Everyone has turned to one desk.</figcaption>
   </figure>
+</div></section>
+
+<section id="partner"><div class="wrap">
+  <div class="kick rv">Why the AI person, and why now</div>
+  <h2 class="rv">You can't outcompete digital minds. <em>Partner</em> instead.</h2>
+  <p class="lead rv">On speed, recall and volume, a model already beats most of us, and each release widens the gap. A job holds more than that. Someone chooses the work, knows what was never written down, signs it off, and gets colleagues to trust the change. Hand the model the part it does best and keep the rest on purpose. For eight weeks you practise that on one task from your own job.</p>
+  <div class="keeps">
+    <div class="keep rv"><b>Keep 1</b><h3>The choice</h3><p>A model answers the question in front of it. You decide which task deserves the week.</p></div>
+    <div class="keep rv"><b>Keep 2</b><h3>The context</h3><p>Which supplier always ships late, and what "quick" means to your manager. The model knows only what you tell it.</p><small>"We can know more than we can tell." Michael Polanyi, 1966</small></div>
+    <div class="keep rv"><b>Keep 3</b><h3>The signature</h3><p>Someone decides what is good enough and answers for it when it goes wrong. That person is you.</p></div>
+    <div class="keep rv"><b>Keep 4</b><h3>The trust</h3><p>Colleagues take up a new way of working after someone they trust has shown it working nearby.</p><small>Opinion leaders, in Everett Rogers' Diffusion of Innovations</small></div>
+    <div class="keep rv"><b>Keep 5</b><h3>The trade</h3><p>The model drafts for almost nothing, so your hours go to the work only you can do. You measure the difference.</p></div>
+  </div>
+
+  <div class="minds">
+    <div class="intro rv"><div class="kick">The minds in the room</div><h3 style="font-size:26px;margin-top:12px">Partner with the best digital minds there are</h3><p>You work beside Anthropic's Claude models on a task from your own job. These are the models I build with every day. If a newer one ships before your group starts, you use that one.</p></div>
+    <div class="mind opus rv"><div class="orb"></div><div class="by">Anthropic · Claude</div><h3 data-mind="1">Opus 5.5</h3><p>For the long, careful work: reading your real files, drafting, checking against your rule sheet.</p></div>
+    <div class="mind fable rv"><div class="orb"></div><div class="by">Anthropic · Claude</div><h3 data-mind="2">Fable 5.1</h3><p>The second mind at the table: another model to compare against, so you learn to judge an answer and stop simply accepting it.</p></div>
+  </div>
 </div></section>
 
 <section id="thread-sec"><div class="wrap thread-wrap">
@@ -410,8 +505,52 @@ footer a{color:var(--ink2)}
   <h2 class="rv">Three steps, and the first is <em>free</em></h2>
   <div class="steps">
     <div class="step rv"><div class="k">Step 1 · now</div><h3>Finish Level 1</h3><p>Self-paced and free. It ends in a certificate with an ID anyone can verify.</p></div>
-    <div class="step rv"><div class="k">Step 2 · <span data-apply-when>dates to follow</span></div><h3>Apply with your certificate</h3><p>Four short questions: your certificate, the weekly task you want to change, the colleague who will try it, and whether the weekly slot suits you.</p></div>
-    <div class="step rv"><div class="k">Step 3 · <span data-kickoff-short>January 2027</span></div><h3>Eight weeks with me</h3><p>One live session a week in a small group. I review your work between sessions.</p></div>
+    <div class="step rv"><div class="k">Step 2 · <span data-apply-when>dates to follow</span></div><h3>Apply with your certificate</h3><p>Four short questions: your certificate, the weekly task you want to change, the colleague who will try it, whether the weekly slot suits you, and which city's kick-off you will attend: Dublin or London.</p></div>
+    <div class="step rv"><div class="k">Step 3 · <span data-kickoff-short>from late February 2027</span></div><h3>Eight weeks with me</h3><p>It opens with a kick-off in person in Dublin or London, then one live session a week online. I review your work between sessions. Entry is [price].</p></div>
+  </div>
+</div></section>
+
+<section id="where"><div class="wrap">
+  <div class="kick rv">Where and when</div>
+  <h2 class="rv">Two cities, one <em>kick-off</em> each</h2>
+  <p class="lead rv">Each group starts in a room with me. Dublin goes first in late February 2027, and London follows two weeks later. After the kick-off, both groups run the same eight weeks in parallel, with one live session a week online.</p>
+  <div class="route rv" role="img" aria-label="A route from Dublin to London. Dublin kicks off first, London two weeks later; both groups then run eight weeks in parallel.">
+    <svg viewBox="0 0 1000 536" aria-hidden="true">
+      <defs>
+        <linearGradient id="arcG" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#e3c878"/><stop offset="1" stop-color="#5b8cff"/></linearGradient>
+        <radialGradient id="dubG"><stop offset="0" stop-color="#e3c878" stop-opacity=".55"/><stop offset="1" stop-color="#e3c878" stop-opacity="0"/></radialGradient>
+        <radialGradient id="lonG"><stop offset="0" stop-color="#2f78ff" stop-opacity=".55"/><stop offset="1" stop-color="#2f78ff" stop-opacity="0"/></radialGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <line class="grat" x1="71.4" y1="0" x2="71.4" y2="536"/><text class="gl" x="75.4" y="528">10°W</text><line class="grat" x1="142.9" y1="0" x2="142.9" y2="536"/><line class="grat" x1="214.3" y1="0" x2="214.3" y2="536"/><text class="gl" x="218.3" y="528">8°W</text><line class="grat" x1="285.7" y1="0" x2="285.7" y2="536"/><line class="grat" x1="357.1" y1="0" x2="357.1" y2="536"/><text class="gl" x="361.1" y="528">6°W</text><line class="grat" x1="428.6" y1="0" x2="428.6" y2="536"/><line class="grat" x1="500.0" y1="0" x2="500.0" y2="536"/><text class="gl" x="504.0" y="528">4°W</text><line class="grat" x1="571.4" y1="0" x2="571.4" y2="536"/><line class="grat" x1="642.9" y1="0" x2="642.9" y2="536"/><text class="gl" x="646.9" y="528">2°W</text><line class="grat" x1="714.3" y1="0" x2="714.3" y2="536"/><line class="grat" x1="785.7" y1="0" x2="785.7" y2="536"/><text class="gl" x="789.7" y="528">0°</text><line class="grat" x1="857.1" y1="0" x2="857.1" y2="536"/><line class="grat" x1="928.6" y1="0" x2="928.6" y2="536"/><text class="gl" x="932.6" y="528">2°E</text><line class="grat" x1="0" y1="476.4" x2="1000" y2="476.4"/><text class="gl" x="6" y="471.4">51°N</text><line class="grat" x1="0" y1="357.3" x2="1000" y2="357.3"/><text class="gl" x="6" y="352.3">52°N</text><line class="grat" x1="0" y1="238.2" x2="1000" y2="238.2"/><text class="gl" x="6" y="233.2">53°N</text><line class="grat" x1="0" y1="119.1" x2="1000" y2="119.1"/><text class="gl" x="6" y="114.1">54°N</text><circle class="star" cx="324" cy="81" r="0.6" opacity="0.10"/><circle class="star" cx="536" cy="196" r="0.6" opacity="0.37"/><circle class="star" cx="215" cy="46" r="1.3" opacity="0.10"/><circle class="star" cx="91" cy="228" r="0.6" opacity="0.38"/><circle class="star" cx="631" cy="312" r="0.6" opacity="0.26"/><circle class="star" cx="397" cy="523" r="0.6" opacity="0.26"/><circle class="star" cx="133" cy="225" r="0.6" opacity="0.26"/><circle class="star" cx="560" cy="366" r="0.6" opacity="0.27"/><circle class="star" cx="639" cy="200" r="0.6" opacity="0.26"/><circle class="star" cx="619" cy="266" r="1.3" opacity="0.33"/><circle class="star" cx="466" cy="495" r="1" opacity="0.18"/><circle class="star" cx="794" cy="375" r="0.8" opacity="0.11"/><circle class="star" cx="300" cy="265" r="1" opacity="0.31"/><circle class="star" cx="288" cy="525" r="0.6" opacity="0.24"/><circle class="star" cx="165" cy="183" r="1.3" opacity="0.21"/><circle class="star" cx="962" cy="42" r="1" opacity="0.19"/><circle class="star" cx="350" cy="266" r="1.3" opacity="0.10"/><circle class="star" cx="94" cy="145" r="0.6" opacity="0.10"/><circle class="star" cx="701" cy="347" r="1.3" opacity="0.17"/><circle class="star" cx="386" cy="358" r="0.6" opacity="0.38"/><circle class="star" cx="355" cy="327" r="1.3" opacity="0.10"/><circle class="star" cx="768" cy="69" r="0.8" opacity="0.21"/><circle class="star" cx="917" cy="266" r="0.8" opacity="0.22"/><circle class="star" cx="549" cy="473" r="1.3" opacity="0.36"/><circle class="star" cx="278" cy="223" r="1" opacity="0.30"/><circle class="star" cx="380" cy="124" r="0.6" opacity="0.14"/><circle class="star" cx="232" cy="125" r="1.3" opacity="0.35"/><circle class="star" cx="182" cy="151" r="0.8" opacity="0.21"/><circle class="star" cx="369" cy="304" r="0.8" opacity="0.30"/><circle class="star" cx="515" cy="331" r="0.6" opacity="0.23"/><circle class="star" cx="871" cy="510" r="1.3" opacity="0.21"/><circle class="star" cx="394" cy="258" r="1.3" opacity="0.10"/><circle class="star" cx="67" cy="112" r="0.8" opacity="0.12"/><circle class="star" cx="601" cy="55" r="0.8" opacity="0.25"/><circle class="star" cx="949" cy="329" r="0.6" opacity="0.36"/><circle class="star" cx="614" cy="80" r="1" opacity="0.39"/><circle class="star" cx="602" cy="254" r="0.6" opacity="0.35"/><circle class="star" cx="993" cy="250" r="1.3" opacity="0.18"/><circle class="star" cx="144" cy="402" r="1" opacity="0.23"/><circle class="star" cx="692" cy="277" r="0.8" opacity="0.38"/><circle class="star" cx="528" cy="79" r="0.6" opacity="0.32"/><circle class="star" cx="298" cy="345" r="0.6" opacity="0.30"/><circle class="star" cx="261" cy="197" r="0.8" opacity="0.19"/><circle class="star" cx="223" cy="290" r="1" opacity="0.28"/><circle class="star" cx="613" cy="423" r="0.8" opacity="0.34"/><circle class="star" cx="818" cy="397" r="0.8" opacity="0.14"/><circle class="star" cx="493" cy="392" r="0.6" opacity="0.33"/><circle class="star" cx="472" cy="104" r="1" opacity="0.22"/><circle class="star" cx="937" cy="530" r="1" opacity="0.11"/><circle class="star" cx="102" cy="252" r="1" opacity="0.15"/><circle class="star" cx="624" cy="483" r="0.6" opacity="0.23"/><circle class="star" cx="653" cy="429" r="0.6" opacity="0.35"/><circle class="star" cx="120" cy="208" r="0.8" opacity="0.23"/><circle class="star" cx="179" cy="423" r="1" opacity="0.11"/><circle class="star" cx="946" cy="387" r="1.3" opacity="0.21"/><circle class="star" cx="947" cy="388" r="0.8" opacity="0.40"/><circle class="star" cx="28" cy="317" r="1.3" opacity="0.34"/><circle class="star" cx="146" cy="443" r="1.3" opacity="0.29"/><circle class="star" cx="350" cy="294" r="0.8" opacity="0.09"/><circle class="star" cx="799" cy="389" r="0.6" opacity="0.25"/><circle class="star" cx="934" cy="233" r="0.8" opacity="0.34"/><circle class="star" cx="211" cy="135" r="1" opacity="0.24"/><circle class="star" cx="764" cy="175" r="1.3" opacity="0.35"/><circle class="star" cx="61" cy="397" r="1.3" opacity="0.29"/><circle class="star" cx="815" cy="277" r="0.8" opacity="0.25"/><circle class="star" cx="524" cy="10" r="1.3" opacity="0.33"/><circle class="star" cx="609" cy="416" r="0.8" opacity="0.14"/><circle class="star" cx="473" cy="389" r="0.6" opacity="0.18"/><circle class="star" cx="518" cy="298" r="0.6" opacity="0.36"/><circle class="star" cx="57" cy="103" r="0.6" opacity="0.33"/><circle class="star" cx="508" cy="301" r="0.6" opacity="0.22"/><circle class="star" cx="613" cy="271" r="0.8" opacity="0.30"/><circle class="star" cx="452" cy="286" r="1.3" opacity="0.24"/><circle class="star" cx="248" cy="280" r="1" opacity="0.38"/><circle class="star" cx="893" cy="109" r="1.3" opacity="0.12"/><circle class="star" cx="122" cy="237" r="0.6" opacity="0.29"/><circle class="star" cx="428" cy="114" r="1" opacity="0.33"/><circle class="star" cx="897" cy="83" r="1" opacity="0.13"/><circle class="star" cx="883" cy="519" r="0.8" opacity="0.32"/><circle class="star" cx="94" cy="474" r="0.8" opacity="0.40"/><circle class="star" cx="832" cy="87" r="1.3" opacity="0.40"/><circle class="star" cx="404" cy="226" r="1" opacity="0.18"/><circle class="star" cx="722" cy="10" r="1.3" opacity="0.22"/><circle class="star" cx="18" cy="178" r="1" opacity="0.24"/><circle class="star" cx="64" cy="528" r="0.8" opacity="0.39"/><circle class="star" cx="105" cy="142" r="0.6" opacity="0.37"/><circle class="star" cx="182" cy="405" r="1.3" opacity="0.35"/><circle class="star" cx="676" cy="507" r="1.3" opacity="0.13"/><circle class="star" cx="919" cy="306" r="1" opacity="0.11"/><circle class="star" cx="58" cy="369" r="1.3" opacity="0.37"/>
+      <text class="sea" x="404" y="300">IRISH SEA</text>
+      <path class="arc2" d="M338.6,196.5 Q590,40 776.4,415.7"/>
+      <path class="arc" id="routeArc" d="M338.6,196.5 Q590,40 776.4,415.7"/>
+      <circle class="comet" r="4" fill="#fff" filter="url(#glow)"><animateMotion dur="3.6s" repeatCount="indefinite" path="M338.6,196.5 Q590,40 776.4,415.7"/></circle>
+      <g class="dub"><circle class="pulse" cx="338.6" cy="196.5" r="22"/><circle class="pulse d2" cx="338.6" cy="196.5" r="22"/><circle cx="338.6" cy="196.5" r="26" fill="url(#dubG)"/><circle cx="338.6" cy="196.5" r="5.5" fill="#e3c878"/><circle cx="338.6" cy="196.5" r="2.2" fill="#fff"/></g><g class="lon"><circle class="pulse" cx="776.4" cy="415.7" r="22"/><circle class="pulse d2" cx="776.4" cy="415.7" r="22"/><circle cx="776.4" cy="415.7" r="26" fill="url(#lonG)"/><circle cx="776.4" cy="415.7" r="5.5" fill="#5b8cff"/><circle cx="776.4" cy="415.7" r="2.2" fill="#fff"/></g>
+      <g class="pill"><rect x="560" y="92" width="118" height="28" rx="14"/><text x="619" y="110" text-anchor="middle">+2 WEEKS</text></g>
+      <text class="ctag" x="310.6" y="122.5" fill="#e3c878" text-anchor="middle">KICK-OFF 1</text>
+      <text class="city" x="310.6" y="148.5" text-anchor="middle">Dublin</text>
+      <text class="cmeta" x="310.6" y="248.5" text-anchor="middle">53.35°N · 6.26°W</text>
+      <text class="cmeta" x="310.6" y="266.5" text-anchor="middle">LATE FEB 2027</text>
+      <text class="ctag" x="812" y="404" fill="#8cafff">KICK-OFF 2</text>
+      <text class="city" x="812" y="430">London</text>
+      <text class="cmeta" x="776.4" y="467.7" text-anchor="middle">51.51°N · 0.13°W</text>
+      <text class="cmeta" x="776.4" y="485.7" text-anchor="middle">TWO WEEKS LATER</text>
+    </svg>
+    <div class="tracks"><span></span><span class="h">W1</span><span class="h">W2</span><span class="h">W3</span><span class="h">W4</span><span class="h">W5</span><span class="h">W6</span><span class="h">W7</span><span class="h">W8</span><span class="h">W9</span><span class="h">W10</span><span class="nm">Dublin</span><i class="k"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i></i><i></i><span class="nm">London</span><i></i><i></i><i class="k"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><div class="lg"><span class="k">Kick-off in person</span><span>Live session online</span></div></div>
+  </div>
+  <div class="cities">
+    <div class="city-card first rv"><div class="st">Opens first</div><h3>Dublin</h3><dl>
+      <dt>Kick-off</dt><dd><b>Late February 2027</b> · [Dublin date]</dd>
+      <dt>Venue</dt><dd><b>WeWork Dublin Landings</b>, near the Point<span class="tbc">To confirm</span></dd>
+      <dt>Seats</dt><dd>[Dublin seats], in a room for up to 12</dd>
+      <dt>Entry</dt><dd>[price], after the free Level 1</dd></dl></div>
+    <div class="city-card second rv"><div class="st">Two weeks later</div><h3>London</h3><dl>
+      <dt>Kick-off</dt><dd><b>Two weeks after Dublin</b> · [London date]</dd>
+      <dt>Venue</dt><dd>[London venue]<span class="tbc">To confirm</span></dd>
+      <dt>Seats</dt><dd>[London seats]</dd>
+      <dt>Entry</dt><dd>[price], after the free Level 1</dd></dl></div>
   </div>
 </div></section>
 
@@ -420,13 +559,13 @@ footer a{color:var(--ink2)}
   <h2 class="rv">One task from your job, <em>changed for good</em></h2>
   <div class="finish rv">The finish line: one recurring task from your own job runs with AI, and a colleague has run it without you.</div>
   <ol class="weeks">
-    <li class="rv"><b>WEEK 1</b><span>Pick one recurring task and time it the way you do it today.</span></li>
+    <li class="rv"><b>WEEK 1 · IN PERSON</b><span>Kick-off in Dublin or London. Pick one recurring task and time it the way you do it today.</span><i>You keep <em>the choice</em></i></li>
     <li class="rv"><b>WEEK 2</b><span>Do it with AI by hand on this week's real work. Keep the prompt and the output.</span></li>
-    <li class="rv"><b>WEEK 3</b><span>Use your real files and deliver the result to whoever normally receives it.</span></li>
-    <li class="rv"><b>WEEK 4</b><span>Write your rule sheet: what AI must not touch and what you check.</span></li>
+    <li class="rv"><b>WEEK 3</b><span>Use your real files and deliver the result to whoever normally receives it.</span><i>You keep <em>the context</em></i></li>
+    <li class="rv"><b>WEEK 4</b><span>Write your rule sheet: what AI must not touch and what you check.</span><i>You keep <em>the signature</em></i></li>
     <li class="rv"><b>WEEK 5</b><span>Turn it into a saved workflow with instructions a stranger could follow.</span></li>
-    <li class="rv"><b>WEEK 6</b><span>A colleague runs it alone. You log what broke.</span></li>
-    <li class="rv"><b>WEEK 7</b><span>Fix it and write your one-page before and after.</span></li>
+    <li class="rv"><b>WEEK 6</b><span>A colleague runs it alone. You log what broke.</span><i>You keep <em>the trust</em></i></li>
+    <li class="rv"><b>WEEK 7</b><span>Fix it and write your one-page before and after.</span><i>You keep <em>the trade</em></i></li>
     <li class="rv"><b>WEEK 8</b><span>Demo to the group, then show your team at work.</span></li>
   </ol>
 </div></section>
@@ -450,18 +589,19 @@ footer a{color:var(--ink2)}
     <div class="kick">Who guides it</div>
     <h2>Victor del Rosal</h2>
     <p>I lecture at National College of Ireland and I built AI Badge. I keep this group small so that I can read every person's work each week.</p>
-    <p>You become the AI person through work your colleagues can see. I sit beside you for eight weeks while you do it.</p>
+    <p>You become the AI person through work your colleagues can see. We start in the same room, and I stay beside you for the eight weeks while you do it.</p>
   </div>
 </div></section>
 
 <section id="faq"><div class="wrap">
   <div class="kick rv">Questions</div>
   <h2 class="rv">Before you <em>start</em></h2>
-  <details class="rv"><summary>What does it cost?</summary><p>Level 1 is free. The price of the eight-week group will be on this page before applications open.</p></details>
+  <details class="rv"><summary>What does it cost?</summary><p>Level 1 is free. The eight weeks, kick-off included, cost [price].</p></details>
   <details class="rv"><summary>Do I need to code?</summary><p>No. This group stays out of the terminal and works on a task from your own job.</p></details>
-  <details class="rv"><summary>What if I miss a week?</summary><p>Every session is recorded. Watch it and post that week's piece of work within seven days.</p></details>
+  <details class="rv"><summary>What if I miss a week?</summary><p>The weekly online sessions are recorded. Watch the one you missed and post that week's piece of work within seven days. The kick-off is the one session I ask everyone to attend in person.</p></details>
+  <details class="rv"><summary>Can I join the kick-off online?</summary><p>No. The kick-off happens in a room in Dublin or London, because that is where the group meets and you start your task with me beside you. Pick the city you can reach.</p></details>
   <details class="rv"><summary>Why must I finish Level 1 first?</summary><p>It gives the whole group the same starting point, and it shows me you finish what you start.</p></details>
-  <details class="rv"><summary>How are seats decided?</summary><p>You need a verified Level 1 certificate, a specific task, a named colleague and the weekly slot free. Applicants who meet all four are seated in the order they applied.</p></details>
+  <details class="rv"><summary>How are seats decided?</summary><p>You need a verified Level 1 certificate, a specific task, a named colleague, the weekly slot free and a city you can reach for the kick-off. Applicants who meet all five are seated in the order they applied.</p></details>
 </div></section>
 
 <section class="end"><div class="wrap">
