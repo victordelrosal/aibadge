@@ -288,12 +288,13 @@ footer a{color:var(--ink2)}
 .route .pill rect{fill:#12102a;stroke:rgba(227,200,120,.55)}
 .route .pill text{font:600 11px var(--mono);letter-spacing:.14em;fill:var(--gold)}
 .route .comet{opacity:0}.route.in .comet{animation:fadein .6s 2.8s forwards}
-.tracks{margin:6px 4px 14px;display:grid;grid-template-columns:92px repeat(10,1fr);gap:6px;align-items:center;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.tracks{margin:6px 4px 14px;display:grid;grid-template-columns:92px repeat(8,1fr);gap:6px;align-items:center;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
 .tracks .h{text-align:center;padding-bottom:4px}
 .tracks .nm{color:var(--ink);font-weight:600}
 .tracks i{height:12px;border-radius:6px;background:rgba(255,255,255,.04);display:block;transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease)}
 .route.in .tracks i{transform:none}
-.tracks i.w{background:rgba(var(--b),.45)}
+.tracks i.w{background:linear-gradient(90deg,rgba(var(--b),.55),rgba(227,200,120,.45));box-shadow:0 0 12px rgba(var(--b),.35)}
+.tracks i.j{height:2px;margin:5px 0;background:rgba(255,255,255,.07)}
 .tracks i.k{background:var(--gold);box-shadow:0 0 16px rgba(227,200,120,.7)}
 .tracks .lg{grid-column:1/-1;display:flex;gap:18px;flex-wrap:wrap;margin-top:6px}
 .tracks .lg span::before{content:"";display:inline-block;width:18px;height:8px;border-radius:4px;margin-right:7px;vertical-align:0;background:rgba(var(--b),.45)}
@@ -341,7 +342,7 @@ footer a{color:var(--ink2)}
   .ben,.steps{grid-template-columns:1fr}
   .keeps{grid-template-columns:1fr}
   .cities,.minds{grid-template-columns:1fr}
-  .tracks{grid-template-columns:64px repeat(10,1fr);gap:4px;font-size:9px}
+  .tracks{grid-template-columns:72px repeat(8,1fr);gap:4px;font-size:9px}
   .route .city{font-size:46px}.route .ctag{font-size:22px;transform:translateY(-24px)}.route .cmeta{font-size:14px}.route .sea{font-size:20px;letter-spacing:.3em}.route .gl,.route .pill{display:none}
   .score{grid-template-columns:repeat(2,1fr)}
   .me{grid-template-columns:1fr;gap:24px}
@@ -381,7 +382,7 @@ footer a{color:var(--ink2)}
   </div>
   <div class="facts ld" style="--d:1s">
       <span>Dublin <b data-kickoff>late February 2027</b></span>
-      <span>London <b>two weeks later</b></span>
+      <span>London <b>the same week</b></span>
       <span><b>8</b> weeks</span>
       <span><b data-seats>Small</b> group</span>
       <span>Guided by <b>Victor del Rosal</b></span>
@@ -605,15 +606,15 @@ footer a{color:var(--ink2)}
   <div class="steps">
     <div class="step rv"><div class="k">Step 1 · now</div><h3>Finish Level 1</h3><p>Self-paced and free. It ends in a certificate with an ID anyone can verify.</p></div>
     <div class="step rv"><div class="k">Step 2 · <span data-apply-when>dates to follow</span></div><h3>Apply with your certificate</h3><p>Four short questions: your certificate, the weekly task you want to change, the colleague who will try it, whether the weekly slot suits you, and which city's kick-off you will attend: Dublin or London.</p></div>
-    <div class="step rv"><div class="k">Step 3 · <span data-kickoff-short>from late February 2027</span></div><h3>Eight weeks with me</h3><p>It opens with a kick-off in person in Dublin or London, then one live session a week online. I review your work between sessions. Entry is [price].</p></div>
+    <div class="step rv"><div class="k">Step 3 · <span data-kickoff-short>from late February 2027</span></div><h3>Eight weeks with me</h3><p>It opens with a kick-off in person in Dublin or London, then one live session a week online with both cities together. I review your work between sessions. Entry is [price].</p></div>
   </div>
 </div></section>
 
 <section id="where"><div class="wrap">
   <div class="kick rv">Where and when</div>
-  <h2 class="rv">Two cities, one <em style="white-space:nowrap">kick-off</em> each</h2>
-  <p class="lead rv">Each group starts in a room with me. Dublin goes first in late February 2027, and London follows two weeks later. After the kick-off, both groups run the same eight weeks in parallel, with one live session a week online.</p>
-  <div class="route rv" role="img" aria-label="A route from Dublin to London. Dublin kicks off first, London two weeks later; both groups then run eight weeks in parallel.">
+  <h2 class="rv">Two kick-offs, <em>one</em> group</h2>
+  <p class="lead rv">You start in a room with me, in Dublin or London. Both kick-offs happen in the same week in late February 2027. From week 2, Dublin and London meet as one group online: seven live sessions, on the same dates for everyone.</p>
+  <div class="route rv" role="img" aria-label="A route joining Dublin and London. Both cities kick off in person in the same week, then meet as one online group for seven weekly sessions.">
     <svg viewBox="0 0 1000 536" aria-hidden="true">
       <defs>
         <linearGradient id="arcG" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#e3c878"/><stop offset="1" stop-color="#5b8cff"/></linearGradient>
@@ -627,28 +628,30 @@ footer a{color:var(--ink2)}
       <path class="arc" id="routeArc" d="M338.6,196.5 Q590,40 776.4,415.7"/>
       <circle class="comet" r="4" fill="#fff" filter="url(#glow)"><animateMotion dur="3.6s" repeatCount="indefinite" path="M338.6,196.5 Q590,40 776.4,415.7"/></circle>
       <g class="dub"><circle class="pulse" cx="338.6" cy="196.5" r="22"/><circle class="pulse d2" cx="338.6" cy="196.5" r="22"/><circle cx="338.6" cy="196.5" r="26" fill="url(#dubG)"/><circle cx="338.6" cy="196.5" r="5.5" fill="#e3c878"/><circle cx="338.6" cy="196.5" r="2.2" fill="#fff"/></g><g class="lon"><circle class="pulse" cx="776.4" cy="415.7" r="22"/><circle class="pulse d2" cx="776.4" cy="415.7" r="22"/><circle cx="776.4" cy="415.7" r="26" fill="url(#lonG)"/><circle cx="776.4" cy="415.7" r="5.5" fill="#5b8cff"/><circle cx="776.4" cy="415.7" r="2.2" fill="#fff"/></g>
-      <g class="pill"><rect x="560" y="92" width="118" height="28" rx="14"/><text x="619" y="110" text-anchor="middle">+2 WEEKS</text></g>
-      <text class="ctag" x="310.6" y="122.5" fill="#e3c878" text-anchor="middle">KICK-OFF 1</text>
+      <g class="pill"><rect x="512" y="92" width="216" height="28" rx="14"/><text x="620" y="110" text-anchor="middle">SAME WEEK · ONE GROUP</text></g>
+      <text class="ctag" x="310.6" y="122.5" fill="#e3c878" text-anchor="middle">KICK-OFF</text>
       <text class="city" x="310.6" y="148.5" text-anchor="middle">Dublin</text>
       <text class="cmeta" x="310.6" y="248.5" text-anchor="middle">53.35°N · 6.26°W</text>
       <text class="cmeta" x="310.6" y="266.5" text-anchor="middle">LATE FEB 2027</text>
-      <text class="ctag" x="812" y="404" fill="#8cafff">KICK-OFF 2</text>
+      <text class="ctag" x="812" y="404" fill="#8cafff">KICK-OFF</text>
       <text class="city" x="812" y="430">London</text>
       <text class="cmeta" x="776.4" y="467.7" text-anchor="middle">51.51°N · 0.13°W</text>
-      <text class="cmeta" x="776.4" y="485.7" text-anchor="middle">TWO WEEKS LATER</text>
+      <text class="cmeta" x="776.4" y="485.7" text-anchor="middle">LATE FEB 2027</text>
     </svg>
-    <div class="tracks"><span></span><span class="h">W1</span><span class="h">W2</span><span class="h">W3</span><span class="h">W4</span><span class="h">W5</span><span class="h">W6</span><span class="h">W7</span><span class="h">W8</span><span class="h">W9</span><span class="h">W10</span><span class="nm">Dublin</span><i class="k"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i></i><i></i><span class="nm">London</span><i></i><i></i><i class="k"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><div class="lg"><span class="k">Kick-off in person</span><span>Live session online</span></div></div>
+    <div class="tracks"><span></span><span class="h">W1</span><span class="h">W2</span><span class="h">W3</span><span class="h">W4</span><span class="h">W5</span><span class="h">W6</span><span class="h">W7</span><span class="h">W8</span><span class="nm">Dublin</span><i class="k"></i><i class="j"></i><i class="j"></i><i class="j"></i><i class="j"></i><i class="j"></i><i class="j"></i><i class="j"></i><span class="nm">London</span><i class="k"></i><i class="j"></i><i class="j"></i><i class="j"></i><i class="j"></i><i class="j"></i><i class="j"></i><i class="j"></i><span class="nm">Together</span><i></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><i class="w"></i><div class="lg"><span class="k">Kick-off in person</span><span>Live session online, everyone together</span></div></div>
   </div>
   <div class="cities">
-    <div class="city-card first rv"><div class="st">Opens first</div><h3>Dublin</h3><dl>
+    <div class="city-card first rv"><div class="st">Kick-off in person</div><h3>Dublin</h3><dl>
       <dt>Kick-off</dt><dd><b>Late February 2027</b> · [Dublin date]</dd>
       <dt>Venue</dt><dd><b>WeWork Dublin Landings</b>, near the Point<span class="tbc">To confirm</span></dd>
       <dt>Seats</dt><dd>[Dublin seats], in a room for up to 12</dd>
+      <dt>Then</dt><dd>Seven live sessions online, with the London group</dd>
       <dt>Entry</dt><dd>[price], after the free Level 1</dd></dl></div>
-    <div class="city-card second rv"><div class="st">Two weeks later</div><h3>London</h3><dl>
-      <dt>Kick-off</dt><dd><b>Two weeks after Dublin</b> · [London date]</dd>
+    <div class="city-card second rv"><div class="st">Kick-off in person</div><h3>London</h3><dl>
+      <dt>Kick-off</dt><dd><b>Same week as Dublin</b> · [London date]</dd>
       <dt>Venue</dt><dd>[London venue]<span class="tbc">To confirm</span></dd>
       <dt>Seats</dt><dd>[London seats]</dd>
+      <dt>Then</dt><dd>Seven live sessions online, with the Dublin group</dd>
       <dt>Entry</dt><dd>[price], after the free Level 1</dd></dl></div>
   </div>
 </div></section>
@@ -661,7 +664,7 @@ footer a{color:var(--ink2)}
   <div class="wk-num" id="wkNum" aria-hidden="true"><div><b id="wkN">1</b><small>Week, of eight</small></div></div>
   <ol class="weeks" id="wkList">
     <li class="rv"><b>WEEK 1 · IN PERSON</b><span>Kick-off in Dublin or London. Pick one recurring task and time it the way you do it today.</span><i>You keep <em>the choice</em></i></li>
-    <li class="rv"><b>WEEK 2</b><span>Do it with AI by hand on this week's real work. Keep the prompt and the output.</span></li>
+    <li class="rv"><b>WEEK 2 · ONLINE, TOGETHER</b><span>Dublin and London meet as one group. Do it with AI by hand on this week's real work. Keep the prompt and the output.</span></li>
     <li class="rv"><b>WEEK 3</b><span>Use your real files and deliver the result to whoever normally receives it.</span><i>You keep <em>the context</em></i></li>
     <li class="rv"><b>WEEK 4</b><span>Write your rule sheet: what AI must not touch and what you check.</span><i>You keep <em>the signature</em></i></li>
     <li class="rv"><b>WEEK 5</b><span>Turn it into a saved workflow with instructions a stranger could follow.</span></li>
